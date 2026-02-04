@@ -51,7 +51,7 @@ function HomeContent() {
           </p>
 
           {/* Download button */}
-          <Link href="/join" className="inline-block">
+          <a href="/join" className="inline-block">
             <Image
               src="/download.svg"
               alt={t("home.download_alt")}
@@ -59,7 +59,7 @@ function HomeContent() {
               height={55}
               className="hover:opacity-90 transition-opacity"
             />
-          </Link>
+          </a>
         </div>
       </div>
 
