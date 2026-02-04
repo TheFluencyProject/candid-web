@@ -29,13 +29,13 @@ export async function generateMetadata({
     openGraph: {
       type: "website",
       locale: locale === "ko" ? "ko_KR" : "en_US",
-      url: "https://englishmode.app",
+      url: "https://daylienglish.com",
       title: t.title,
       description: t.description,
       siteName: "Dayli",
       images: [
         {
-          url: "https://englishmode.app/ogimage.png",
+          url: "https://daylienglish.com/ogimage.png",
           alt: t.title,
         },
       ],
@@ -44,7 +44,7 @@ export async function generateMetadata({
       card: "summary_large_image",
       title: t.title,
       description: t.description,
-      images: ["https://englishmode.app/ogimage.png"],
+      images: ["https://daylienglish.com/ogimage.png"],
     },
   };
 }
@@ -68,7 +68,7 @@ export default async function LocaleLayout({ children, params }: Props) {
       <head>
         {/* Google tag (gtag.js) */}
         <Script
-          src="https://www.googletagmanager.com/gtag/js?id=G-7ZF3G2WP8Q"
+          src="https://www.googletagmanager.com/gtag/js?id=G-RRJ4Q1XFDF"
           strategy="afterInteractive"
         />
         <Script id="google-analytics" strategy="afterInteractive">
@@ -76,7 +76,7 @@ export default async function LocaleLayout({ children, params }: Props) {
             window.dataLayer = window.dataLayer || [];
             function gtag(){dataLayer.push(arguments);}
             gtag('js', new Date());
-            gtag('config', 'G-7ZF3G2WP8Q');
+            gtag('config', 'G-RRJ4Q1XFDF');
           `}
         </Script>
         <meta name="color-scheme" content="dark" />

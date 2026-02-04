@@ -40,7 +40,7 @@ function HomeContent() {
 
           {/* Tagline */}
           <p
-            className="text-3xl mb-12"
+            className="text-xl md:text-3xl mb-12"
             style={{
               fontWeight: 300,
               color: "#FFFFFF",
@@ -64,10 +64,10 @@ function HomeContent() {
       </div>
 
       {/* Footer links */}
-      <footer className="flex gap-8 items-center justify-center">
+      <footer className="flex gap-4 md:gap-8 items-center justify-center flex-wrap">
         <Link
           href="/privacy"
-          className="text-lg hover:opacity-70 transition-opacity"
+          className="text-sm md:text-lg hover:opacity-70 transition-opacity"
           style={{
             color: "#FFFFFF",
           }}
@@ -76,7 +76,7 @@ function HomeContent() {
         </Link>
         <Link
           href="/terms"
-          className="text-lg hover:opacity-70 transition-opacity"
+          className="text-sm md:text-lg hover:opacity-70 transition-opacity"
           style={{
             color: "#FFFFFF",
           }}
@@ -85,7 +85,7 @@ function HomeContent() {
         </Link>
         <Link
           href="/youtube-videos"
-          className="text-lg hover:opacity-70 transition-opacity"
+          className="text-sm md:text-lg hover:opacity-70 transition-opacity"
           style={{
             color: "#FFFFFF",
           }}
