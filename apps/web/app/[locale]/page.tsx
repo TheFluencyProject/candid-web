@@ -1,7 +1,22 @@
-import Link from "next/link";
 import Image from "next/image";
+import { useTranslations } from "next-intl";
+import { setRequestLocale } from "next-intl/server";
+import { Link } from "@/i18n/routing";
 
-export default function Home() {
+type Props = {
+  params: Promise<{ locale: string }>;
+};
+
+export default async function Home({ params }: Props) {
+  const { locale } = await params;
+  setRequestLocale(locale);
+
+  return <HomeContent />;
+}
+
+function HomeContent() {
+  const t = useTranslations();
+
   return (
     <main
       className="flex min-h-screen flex-col items-center justify-between px-8 py-7"
@@ -15,10 +30,10 @@ export default function Home() {
           {/* App Icon */}
           <div className="mb-8 flex justify-center">
             <Image
-              src="/englishmode.svg"
-              alt="English Mode Logo"
-              width={150}
-              height={260}
+              src="/dayli-wordmark.svg"
+              alt="Dayli Logo"
+              width={112}
+              height={195}
               priority
             />
           </div>
@@ -31,14 +46,15 @@ export default function Home() {
               color: "#FFFFFF",
             }}
           >
-            Replace scrolling with<br className="md:hidden" /> English immersion
+            {t("home.tagline")}
+            <br className="md:hidden" />
           </p>
 
           {/* Download button */}
           <Link href="/join" className="inline-block">
             <Image
               src="/download.svg"
-              alt="Download on the App Store"
+              alt={t("home.download_alt")}
               width={170}
               height={55}
               className="hover:opacity-90 transition-opacity"
@@ -56,7 +72,7 @@ export default function Home() {
             color: "#FFFFFF",
           }}
         >
-          Privacy Policy
+          {t("footer.privacy")}
         </Link>
         <Link
           href="/terms"
@@ -65,7 +81,7 @@ export default function Home() {
             color: "#FFFFFF",
           }}
         >
-          Terms of Use
+          {t("footer.terms")}
         </Link>
         <Link
           href="/youtube-videos"
@@ -74,7 +90,7 @@ export default function Home() {
             color: "#FFFFFF",
           }}
         >
-          YouTube Videos
+          {t("footer.youtube_videos")}
         </Link>
       </footer>
     </main>

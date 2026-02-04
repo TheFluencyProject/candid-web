@@ -1,0 +1,32 @@
+{
+  "metadata": {
+    "title": "Dayli: Replace scrolling with English immersion",
+    "description": "Learn to speak English while watching content you love.."
+  },
+  "home": {
+    "tagline": "Replace scrolling with English immersion",
+    "download_alt": "Download on the App Store"
+  },
+  "footer": {
+    "privacy": "Privacy Policy",
+    "terms": "Terms of Use",
+    "youtube_videos": "YouTube Videos"
+  },
+  "privacy": {
+    "title": "Privacy Policy",
+    "brand_name": "Dayli"
+  },
+  "terms": {
+    "title": "Terms and Conditions",
+    "brand_name": "Dayli"
+  },
+  "youtube_videos": {
+    "title": "Youtube Videos",
+    "brand_name": "Dayli",
+    "description_1": "Below is the list of YouTube videos we have compiled to help you learn English.",
+    "description_2": "In the app, we curate you videos from this list according to your English level. Beyond just watching them, you can see contextual translations into your native language, practice \"shadowing\" or repeating after the speakers, track your immersion progress, & more.",
+    "description_3": "We make sure to follow all of YouTube's Community Guidelines and Terms of Service.",
+    "loading": "Loading videos...",
+    "load_more": "Load More"
+  }
+}
