@@ -1,0 +1,51 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Ensure full viewport coverage and handle overscroll */
+html,
+body {
+  height: 100%;
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+  font-family: 'SF Pro Condensed', 'SF Pro', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  font-weight: 300;
+  font-stretch: condensed;
+}
+
+html {
+  background-color: #131212;
+}
+
+body {
+  background-color: #131212;
+}
+
+/* Hide scrollbar for horizontal language selector */
+.scrollbar-hide {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none; /* Chrome, Safari and Opera */
+}
+
+/* Override browser autofill background and text color for input/select fields */
+input:-webkit-autofill,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:hover,
+select:-webkit-autofill,
+select:-webkit-autofill:focus,
+select:-webkit-autofill:hover {
+  -webkit-box-shadow: 0 0 0 1000px #131212 inset !important;
+  -webkit-text-fill-color: #fff !important;
+  caret-color: #fff !important;
+  transition: background-color 5000s ease-in-out 0s;
+}
+
+input:-internal-autofill-selected {
+  background-color: #131212 !important;
+  color: #fff !important;
+}
