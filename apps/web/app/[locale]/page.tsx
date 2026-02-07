@@ -11,10 +11,10 @@ export default async function Home({ params }: Props) {
   const { locale } = await params;
   setRequestLocale(locale);
 
-  return <HomeContent />;
+  return <HomeContent locale={locale} />;
 }
 
-function HomeContent() {
+function HomeContent({ locale }: { locale: string }) {
   const t = useTranslations();
 
   return (
@@ -92,6 +92,17 @@ function HomeContent() {
         >
           {t("footer.youtube_videos")}
         </Link>
+        {locale === "ko" && (
+          <Link
+            href="/company-info"
+            className="text-sm md:text-lg hover:opacity-70 transition-opacity"
+            style={{
+              color: "#FFFFFF",
+            }}
+          >
+            {t("footer.company_info")}
+          </Link>
+        )}
       </footer>
     </main>
   );

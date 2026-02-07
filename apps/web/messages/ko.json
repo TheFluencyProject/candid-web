@@ -10,7 +10,8 @@
   "footer": {
     "privacy": "개인정보 처리방침",
     "terms": "이용약관",
-    "youtube_videos": "콘텐츠 사용 권한"
+    "youtube_videos": "콘텐츠 사용 권한",
+    "company_info": "사업자정보"
   },
   "privacy": {
     "title": "개인정보 처리방침",
@@ -19,6 +20,9 @@
   "terms": {
     "title": "이용약관",
     "brand_name": "Dayli"
+  },
+  "company_info": {
+    "title": "사업자정보"
   },
   "youtube_videos": {
     "title": "콘텐츠 사용 권한",

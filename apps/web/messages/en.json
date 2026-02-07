@@ -10,7 +10,8 @@
   "footer": {
     "privacy": "Privacy Policy",
     "terms": "Terms of Use",
-    "youtube_videos": "Content Rights"
+    "youtube_videos": "Content Rights",
+    "company_info": "Company Info"
   },
   "privacy": {
     "title": "Privacy Policy",
@@ -19,6 +20,9 @@
   "terms": {
     "title": "Terms and Conditions",
     "brand_name": "Dayli"
+  },
+  "company_info": {
+    "title": "Company Info"
   },
   "youtube_videos": {
     "title": "Content Rights",
