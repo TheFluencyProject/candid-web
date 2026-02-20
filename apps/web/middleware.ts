@@ -7,6 +7,7 @@ export const config = {
   // Match all pathnames except for:
   // - API routes
   // - _next (Next.js internals)
+  // - /videos (video share pages, no i18n needed)
   // - Static files (images, fonts, etc.)
-  matcher: ["/((?!api|_next|.*\\..*).*)"],
+  matcher: ["/((?!api|_next|videos|.*\\..*).*)"],
 };
