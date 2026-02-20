@@ -65,7 +65,6 @@ export default async function VideoPage({
 
   return (
     <>
-      <meta httpEquiv="refresh" content={`0;url=${APP_STORE_URL}`} />
       <main
         style={{
           backgroundColor: "#131212",
