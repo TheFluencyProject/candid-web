@@ -34,6 +34,7 @@ export async function generateMetadata({
     "Learn English with real YouTube videos on Dayli. Open in the app to start watching.";
 
   return {
+    metadataBase: new URL("https://daylienglish.com"),
     title,
     description,
     openGraph: {
