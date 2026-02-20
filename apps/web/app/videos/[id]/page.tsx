@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
-import { redirect } from "next/navigation";
 
-const API_BASE_URL = "https://api.trydayli.com";
+const API_BASE_URL = "https://dev.api.trydayli.com";
 const APP_STORE_URL = "https://apps.apple.com/app/id6754859158";
 
 interface VideoMeta {
@@ -57,11 +56,7 @@ export default async function VideoPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const video = await fetchVideoMeta(id);
-
-  if (!video) {
-    redirect(APP_STORE_URL);
-  }
+  await fetchVideoMeta(id);
 
   return (
     <>
