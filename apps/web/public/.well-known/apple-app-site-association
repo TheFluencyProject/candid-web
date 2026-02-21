@@ -18,9 +18,18 @@
           {
             "/": "/deeplink",
             "comment": "Just open the app"
+          },
+          {
+            "/": "/videos/*",
+            "comment": "Open video in app when installed"
           }
         ]
       }
+    ]
+  },
+  "appclips": {
+    "apps": [
+      "4N59B984G5.co.thefluencyproject.bloom-ios.Clip"
     ]
   }
 }

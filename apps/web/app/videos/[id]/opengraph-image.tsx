@@ -23,7 +23,9 @@ interface VideoMeta {
 
 async function fetchVideoMeta(id: string): Promise<VideoMeta | null> {
   try {
-    const res = await fetch(`${API_BASE_URL}/public/videos/${id}`);
+    const res = await fetch(`${API_BASE_URL}/public/videos/${id}`, {
+      next: { revalidate: 604800 },
+    });
     if (!res.ok) return null;
     return res.json();
   } catch {
@@ -39,7 +41,10 @@ async function resolveYoutubeThumbnail(
   if (orientation === "vertical") {
     const verticalUrl = `https://i.ytimg.com/vi/${youtube_video_id}/oar1.jpg`;
     try {
-      const res = await fetch(verticalUrl, { method: "HEAD" });
+      const res = await fetch(verticalUrl, {
+        method: "HEAD",
+        next: { revalidate: 604800 },
+      });
       if (res.ok) return verticalUrl;
     } catch {
       // fall through to hqdefault
@@ -64,30 +69,6 @@ export default async function Image({
 
   if (!video) {
     // Fallback image: dark background with logo only
-    return new ImageResponse(
-      (
-        <div
-          style={{
-            display: "flex",
-            width: "100%",
-            height: "100%",
-            backgroundColor: "#131212",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          <img src={logoSrc} width={120} height={68} />
-        </div>
-      ),
-      { ...size }
-    );
-  }
-
-  const thumbnailUrl = await resolveYoutubeThumbnail(
-    video.youtube_video_id,
-    video.orientation
-  );
-
   return new ImageResponse(
     (
       <div
@@ -95,48 +76,82 @@ export default async function Image({
           display: "flex",
           width: "100%",
           height: "100%",
-          position: "relative",
           backgroundColor: "#131212",
+          alignItems: "center",
+          justifyContent: "center",
         }}
       >
-        {/* YouTube thumbnail as background */}
-        <img
-          src={thumbnailUrl}
-          style={{
-            position: "absolute",
-            top: 0,
-            left: 0,
-            width: "100%",
-            height: "100%",
-            objectFit: "cover",
-          }}
-        />
-        {/* Dark gradient overlay so logo is readable */}
-        <div
-          style={{
-            position: "absolute",
-            top: 0,
-            left: 0,
-            width: "100%",
-            height: "100%",
-            background:
-              "linear-gradient(to bottom right, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.4) 100%)",
-            display: "flex",
-          }}
-        />
-        {/* Dayli logo — top right */}
-        <img
-          src={logoSrc}
-          width={96}
-          height={54}
-          style={{
-            position: "absolute",
-            top: 28,
-            right: 28,
-          }}
-        />
+        <img src={logoSrc} width={120} height={68} />
       </div>
     ),
-    { ...size }
+    {
+      ...size,
+      headers: {
+        "Cache-Control": "public, max-age=604800, immutable",
+      },
+    }
   );
+}
+
+const thumbnailUrl = await resolveYoutubeThumbnail(
+  video.youtube_video_id,
+  video.orientation
+);
+
+return new ImageResponse(
+  (
+    <div
+      style={{
+        display: "flex",
+        width: "100%",
+        height: "100%",
+        position: "relative",
+        backgroundColor: "#131212",
+      }}
+    >
+      {/* YouTube thumbnail as background */}
+      <img
+        src={thumbnailUrl}
+        style={{
+          position: "absolute",
+          top: 0,
+          left: 0,
+          width: "100%",
+          height: "100%",
+          objectFit: "cover",
+        }}
+      />
+      {/* Dark gradient overlay so logo is readable */}
+      <div
+        style={{
+          position: "absolute",
+          top: 0,
+          left: 0,
+          width: "100%",
+          height: "100%",
+          background:
+            "linear-gradient(to bottom right, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.4) 100%)",
+          display: "flex",
+        }}
+      />
+      {/* Dayli logo — top right */}
+      <img
+        src={logoSrc}
+        width={96}
+        height={54}
+        style={{
+          position: "absolute",
+          top: 28,
+          right: 28,
+        }}
+      />
+    </div>
+  ),
+  {
+    ...size,
+    headers: {
+      "Cache-Control": "public, max-age=604800, immutable",
+    },
+  }
+);
 }
