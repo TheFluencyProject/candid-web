@@ -13,7 +13,7 @@ export const size = {
 
 export const contentType = "image/png";
 
-const API_BASE_URL = "https://dev.api.trydayli.com";
+const API_BASE_URL = "https://api.trydayli.com";
 
 interface VideoMeta {
   source_id: string | null;
