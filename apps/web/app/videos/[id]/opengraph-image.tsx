@@ -16,8 +16,9 @@ export const contentType = "image/png";
 const API_BASE_URL = "https://dev.api.trydayli.com";
 
 interface VideoMeta {
-  youtube_video_id: string;
-  orientation: "vertical" | "horizontal";
+  source_id: string | null;
+  source_type: string;
+  orientation: "vertical" | "horizontal" | null;
   title: string;
 }
 
@@ -35,7 +36,7 @@ async function fetchVideoMeta(id: string): Promise<VideoMeta | null> {
 
 async function resolveYoutubeThumbnail(
   youtube_video_id: string,
-  orientation: "vertical" | "horizontal"
+  orientation: "vertical" | "horizontal" | null
 ): Promise<string> {
   // Vertical videos have portrait thumbnails via oar1.jpg; fall back to hqdefault if missing
   if (orientation === "vertical") {
@@ -67,36 +68,36 @@ export default async function Image({
 
   const logoSrc = `data:image/svg+xml;base64,${logoData.toString("base64")}`;
 
-  if (!video) {
+  if (!video || !video.source_id) {
     // Fallback image: dark background with logo only
-  return new ImageResponse(
-    (
-      <div
-        style={{
-          display: "flex",
-          width: "100%",
-          height: "100%",
-          backgroundColor: "#131212",
-          alignItems: "center",
-          justifyContent: "center",
-        }}
-      >
-        <img src={logoSrc} width={120} height={68} />
-      </div>
-    ),
-    {
-      ...size,
-      headers: {
-        "Cache-Control": "public, max-age=604800, immutable",
-      },
-    }
-  );
-}
+    return new ImageResponse(
+      (
+        <div
+          style={{
+            display: "flex",
+            width: "100%",
+            height: "100%",
+            backgroundColor: "#131212",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <img src={logoSrc} width={120} height={68} />
+        </div>
+      ),
+      {
+        ...size,
+        headers: {
+          "Cache-Control": "public, max-age=604800, immutable",
+        },
+      }
+    );
+  }
 
-const thumbnailUrl = await resolveYoutubeThumbnail(
-  video.youtube_video_id,
-  video.orientation
-);
+  const thumbnailUrl = await resolveYoutubeThumbnail(
+    video.source_id,
+    video.orientation
+  );
 
 return new ImageResponse(
   (

@@ -4,8 +4,9 @@ const API_BASE_URL = "https://dev.api.trydayli.com";
 const APP_STORE_URL = "https://apps.apple.com/app/id6754859158";
 
 interface VideoMeta {
-  youtube_video_id: string;
-  orientation: "vertical" | "horizontal";
+  source_id: string | null;
+  source_type: string;
+  orientation: "vertical" | "horizontal" | null;
   title: string;
 }
 
