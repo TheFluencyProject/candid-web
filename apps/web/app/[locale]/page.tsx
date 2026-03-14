@@ -63,8 +63,9 @@ function HomeContent({ locale }: { locale: string }) {
         </div>
       </div>
 
-      {/* Footer links */}
-      <footer className="flex gap-4 md:gap-8 items-center justify-center flex-wrap">
+      {/* Footer */}
+      <footer className="relative flex items-center justify-center w-full flex-wrap gap-4">
+        <div className="flex gap-4 md:gap-8 items-center flex-wrap">
         <Link
           href="/privacy"
           className="text-sm md:text-lg hover:opacity-70 transition-opacity"
@@ -103,6 +104,14 @@ function HomeContent({ locale }: { locale: string }) {
             {t("footer.company_info")}
           </Link>
         )}
+        </div>
+        <a href="https://elevenlabs.io/startup-grants" target="_blank" rel="noopener noreferrer" className="absolute right-0">
+          <img
+            src="https://eleven-public-cdn.elevenlabs.io/payloadcms/cy7rxce8uki-IIElevenLabsGrants%201.webp"
+            alt="ElevenLabs Startup Grants"
+            style={{ width: "150px" }}
+          />
+        </a>
       </footer>
     </main>
   );
