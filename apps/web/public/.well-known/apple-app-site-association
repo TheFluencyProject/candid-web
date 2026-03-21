@@ -20,6 +20,10 @@
             "comment": "Just open the app"
           },
           {
+            "/": "/videos",
+            "comment": "Open videos page in app"
+          },
+          {
             "/": "/videos/*",
             "comment": "Open video in app when installed"
           }
