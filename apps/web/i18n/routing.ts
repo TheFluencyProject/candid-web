@@ -2,8 +2,8 @@ import { defineRouting } from "next-intl/routing";
 import { createNavigation } from "next-intl/navigation";
 
 export const routing = defineRouting({
-  locales: ["ko", "en"],
-  defaultLocale: "ko",
+  locales: ["en", "ko"],
+  defaultLocale: "en",
   localePrefix: "as-needed", // Korean has no prefix, English uses /en
 });
 

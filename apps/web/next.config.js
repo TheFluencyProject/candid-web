@@ -66,6 +66,16 @@ const nextConfig = {
         destination: "https://apps.apple.com/app/id6754859158",
         permanent: true,
       },
+      {
+        source: "/adam",
+        destination: "/guide/english-adam",
+        permanent: true,
+      },
+      {
+        source: "/mia",
+        destination: "/guide/korean-mia",
+        permanent: true,
+      },
     ];
   },
 };
