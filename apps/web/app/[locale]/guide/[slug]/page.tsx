@@ -3,7 +3,7 @@ import Image from "next/image";
 import { notFound } from "next/navigation";
 import { setRequestLocale } from "next-intl/server";
 
-const API_BASE_URL = "https://api.trydayli.com";
+const API_BASE_URL = "https://dev.api.trydayli.com";
 const APP_STORE_URL = "https://apps.apple.com/app/id6754859158";
 
 interface TutorLanguageProficiency {
