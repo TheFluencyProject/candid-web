@@ -16,6 +16,9 @@ interface TutorMetadata {
   personality?: string;
   bio?: string;
   nowadays?: string;
+  content_style?: string;
+  designed_for?: string;
+  interests?: string;
   [key: string]: unknown;
 }
 
