@@ -69,18 +69,20 @@ async function fetchTutor(
   }
 }
 
-function formatHeroTitle(html: string): string {
-  // Mobile-only line break after "to "
-  let result = html.replace(
-    /(\bto\s)/i,
-    '$1<span class="hero-break-mobile"></span>'
-  );
-  // Line break before "&" on both mobile and desktop
-  result = result.replace(
-    /\s(&)/,
-    ' <span class="hero-break-all"></span>$1'
-  );
-  return result;
+function formatHeroTitle(text: string): string {
+  // Pattern: "Your guide to [TOPIC] & [REST]"
+  // Wrap everything after "to " in accent font, with line breaks
+  const toMatch = text.match(/^(.*?\bto\s)(.+?)(\s&\s)(.+)$/i);
+  if (toMatch) {
+    const [, prefix, topic, amp, rest] = toMatch;
+    return (
+      `${prefix}<span class="hero-break-mobile"></span>` +
+      `<em>${topic}</em>` +
+      `<span class="hero-break-all"></span>` +
+      `<em>${amp}${rest}</em>`
+    );
+  }
+  return text;
 }
 
 function capitalize(s: string): string {
