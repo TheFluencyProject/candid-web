@@ -24,6 +24,30 @@
   "company_info": {
     "title": "Company Info"
   },
+  "guide": {
+    "subtitle": "Get {name}'s weekly set of listening & speaking lessons for real-life, conversational {language}",
+    "tutor_label": "Tutor {firstName}",
+    "download_qr": "Download & Try for Free",
+    "get_started": "GET STARTED FOR FREE",
+    "no_credit_card": "No Credit Card Required",
+    "listen": "Learn {language} through {firstName}'s eyes",
+    "learn": "Learn how natives actually talk",
+    "shadow": "Practice speaking just like {firstName} does",
+    "intro": "Get tutored through it all",
+    "personality": "Personality",
+    "about": "About",
+    "these_days": "These Days",
+    "teaches": "Teaches",
+    "difficulty": "Difficulty",
+    "based_in": "Based in",
+    "speaks": "Speaks",
+    "all_levels": "All levels",
+    "follow": "Follow {name}",
+    "ready_to_learn": "Ready to learn with {name}?",
+    "free_to_try": "Free to try — no credit card required",
+    "privacy": "Privacy Policy",
+    "terms": "Terms of Use"
+  },
   "youtube_videos": {
     "title": "Content Rights",
     "brand_name": "Candid",

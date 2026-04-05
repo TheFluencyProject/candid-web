@@ -1,7 +1,12 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import { notFound } from "next/navigation";
-import { setRequestLocale } from "next-intl/server";
+import { getTranslations, setRequestLocale } from "next-intl/server";
+import MobileCTABar from "@/components/MobileCTABar";
+import GuideNavbar from "@/components/GuideNavbar";
+import QRCode from "@/components/QRCode";
+import { getTutorPageConfig } from "@/config/tutors";
+import StickyHeader from "@/components/StickyHeader";
 
 const API_BASE_URL = "https://dev.api.joincandid.co";
 const APP_STORE_URL = "https://apps.apple.com/app/id6754859158";
@@ -19,6 +24,14 @@ interface TutorMetadata {
   content_style?: string;
   designed_for?: string;
   interests?: string;
+  cool_title?: string;
+  cool_title_kr?: string;
+  web_bg_picture?: string;
+  screenshot_listen?: string;
+  screenshot_learn?: string;
+  screenshot_shadow?: string;
+  screenshot_intro?: string;
+  name_kr?: string;
   [key: string]: unknown;
 }
 
@@ -56,6 +69,20 @@ async function fetchTutor(
   }
 }
 
+function formatHeroTitle(html: string): string {
+  // Mobile-only line break after "to "
+  let result = html.replace(
+    /(\bto\s)/i,
+    '$1<span class="hero-break-mobile"></span>'
+  );
+  // Line break before "&" on both mobile and desktop
+  result = result.replace(
+    /\s(&)/,
+    ' <span class="hero-break-all"></span>$1'
+  );
+  return result;
+}
+
 function capitalize(s: string): string {
   return s.charAt(0).toUpperCase() + s.slice(1);
 }
@@ -82,8 +109,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     return { title: "Guide Not Found — Candid" };
   }
 
-  const title = `${tutor.name} — Candid`;
+  const langLabel = capitalize(tutor.teaching_language);
+  const title = `Candid | ${langLabel} with ${tutor.name}`;
   const description = tutor.short_description;
+  const ogImage = (tutor.metadata?.web_bg_picture as string) || tutor.large_profile_picture_url;
 
   return {
     metadataBase: new URL("https://joincandid.co"),
@@ -94,17 +123,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       title,
       description,
       siteName: "Candid",
-      images: tutor.large_profile_picture_url
-        ? [{ url: tutor.large_profile_picture_url, alt: tutor.name }]
-        : [],
+      images: ogImage ? [{ url: ogImage, alt: tutor.name }] : [],
     },
     twitter: {
       card: "summary_large_image",
       title,
       description,
-      images: tutor.large_profile_picture_url
-        ? [tutor.large_profile_picture_url]
-        : [],
+      images: ogImage ? [ogImage] : [],
     },
   };
 }
@@ -113,7 +138,10 @@ export default async function GuidePage({ params }: Props) {
   const { locale, slug } = await params;
   setRequestLocale(locale);
 
-  const tutor = await fetchTutor(slug, locale);
+  const [tutor, t] = await Promise.all([
+    fetchTutor(slug, locale),
+    getTranslations("guide"),
+  ]);
   if (!tutor) {
     notFound();
   }
@@ -122,88 +150,143 @@ export default async function GuidePage({ params }: Props) {
     tutor.instagram_handle || tutor.tiktok_handle || tutor.youtube_handle;
 
   const firstName = tutor.name.split(" ")[0];
+  const localizedFirstName =
+    locale === "ko" && tutor.metadata?.name_kr
+      ? (tutor.metadata.name_kr as string)
+      : firstName;
+  const langLabel = capitalize(tutor.teaching_language);
+  const config = getTutorPageConfig(slug);
+  const rawCoolTitle =
+    locale === "ko"
+      ? (tutor.metadata?.cool_title_kr ?? tutor.metadata?.cool_title ?? tutor.title)
+      : (tutor.metadata?.cool_title ?? tutor.title);
+  const coolTitle = formatHeroTitle(rawCoolTitle);
 
   return (
     <main
       className="min-h-screen"
       style={{ backgroundColor: "#131212", color: "#FFFFFF" }}
     >
-      {/* ─── Sticky Navbar ─── */}
-      <nav className="sticky top-0 z-50 w-full px-4 py-3 transition-colors duration-500 bg-[#131212]/60 backdrop-blur-lg border-b border-white/10">
-        <div className="container mx-auto flex justify-between items-center max-w-6xl">
-          <a href="/" className="flex items-center gap-2">
-            <Image
-              src="/candid-wordmark.svg"
-              alt="Candid"
-              width={60}
-              height={30}
-              className="hover:opacity-80 transition-opacity"
-            />
-          </a>
-          <div className="flex gap-2 items-center text-sm">
-            <div className="flex items-center gap-[2px]">
-              {[...Array(5)].map((_, i) => (
-                <svg key={i} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-[14px] h-[14px] text-yellow-400">
-                  <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                </svg>
-              ))}
-            </div>
-            <span className="opacity-60 text-xs">4.9</span>
-          </div>
-        </div>
-      </nav>
+      {/* ─── Fixed Navbar ─── */}
+      <GuideNavbar sentinelId="hero-sentinel" downloadUrl={`/download/${slug}`} />
 
       {/* ─── Full-Viewport Hero ─── */}
-      <section className="relative min-h-[85vh] lg:min-h-screen flex items-end overflow-hidden">
-        {tutor.large_profile_picture_url ? (
+      <section className="relative min-h-screen overflow-hidden">
+        {/* Photo background */}
+        {(tutor.metadata?.web_bg_picture || tutor.large_profile_picture_url) ? (
           <img
-            src={tutor.large_profile_picture_url}
+            src={(tutor.metadata?.web_bg_picture as string) || tutor.large_profile_picture_url!}
             alt={tutor.name}
-            className="absolute inset-0 w-full h-full object-cover object-top"
+            className="absolute inset-0 w-full h-full object-cover"
+            style={{ objectPosition: config.photoPosition ?? "center top" }}
           />
         ) : (
           <div
             className="absolute inset-0"
             style={{
-              background: "linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%)",
+              background:
+                "linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%)",
             }}
           />
         )}
-        {/* Gradient overlays */}
-        <div
-          className="absolute inset-0 pointer-events-none"
-          style={{
-            background: "linear-gradient(to top, #131212 0%, rgba(19,18,18,0.8) 35%, rgba(19,18,18,0.2) 70%, rgba(19,18,18,0.3) 100%)",
-          }}
-        />
+
+        {/* Bottom fade into background color — desktop */}
         <div
           className="absolute inset-0 pointer-events-none hidden lg:block"
           style={{
-            background: "linear-gradient(75deg, rgba(0,0,0,0.7) 0%, rgba(255,255,255,0) 60%)",
+            background:
+              "linear-gradient(to bottom, transparent 70%, #131212 100%)",
+          }}
+        />
+        {/* Bottom fade into background color — mobile */}
+        <div
+          className="absolute inset-0 pointer-events-none lg:hidden"
+          style={{
+            background:
+              "linear-gradient(to bottom, transparent 35%, rgba(19,18,18,0.4) 50%, rgba(19,18,18,0.7) 65%, rgba(19,18,18,0.85) 80%, #131212 95%)",
           }}
         />
 
-        {/* Hero text content */}
-        <div className="relative z-10 w-full px-6 pb-12 md:px-12 md:pb-16 lg:pb-20 max-w-6xl mx-auto">
-          <h1 className="text-5xl md:text-7xl lg:text-8xl font-black uppercase tracking-tight mb-4 animate-fade-in-up">
-            {tutor.name}
-          </h1>
-          <p className="text-xl md:text-2xl font-light opacity-90 max-w-xl mb-8 animate-fade-in-up-delay-1">
-            {tutor.title}
+        {/* Desktop text content — left side */}
+        <div className="relative z-10 hidden lg:flex flex-col justify-center min-h-screen px-12 pt-16 pb-24">
+          <h1
+            className="hero-heading text-5xl xl:text-6xl font-light leading-[1.15] mb-6 animate-fade-in-up"
+            style={{ color: "#131212" }}
+            dangerouslySetInnerHTML={{ __html: coolTitle }}
+          />
+          <p
+            className="text-base xl:text-lg font-light leading-relaxed mb-10 max-w-md animate-fade-in-up-delay-1"
+            style={{ color: "#131212", opacity: 0.7 }}
+          >
+            {t("subtitle", { name: localizedFirstName, language: langLabel })}
           </p>
           <div className="animate-fade-in-up-delay-2">
-            <a
-              href={APP_STORE_URL}
-              className="inline-flex items-center justify-center gap-3 px-8 py-4 rounded-full text-lg font-bold transition-opacity hover:opacity-90"
-              style={{ backgroundColor: "#FFFFFF", color: "#131212" }}
-            >
-              START FREE TRIAL
-            </a>
-            <p className="mt-3 text-sm opacity-50">
-              No credit card required
-            </p>
+            <QRCode slug={slug} label={t("download_qr")} />
           </div>
         </div>
+
+        {/* Mobile text content — bottom, centered */}
+        <div className="relative z-10 lg:hidden flex flex-col items-center justify-end min-h-screen px-6 pb-36 text-center">
+          <h1
+            className="hero-heading text-3xl sm:text-4xl font-light leading-tight mb-4 animate-fade-in-up"
+            style={{ color: "#FFFFFF" }}
+            dangerouslySetInnerHTML={{ __html: coolTitle }}
+          />
+          <p className="text-sm font-light leading-relaxed opacity-70 max-w-sm animate-fade-in-up-delay-1">
+            {t("subtitle", { name: localizedFirstName, language: langLabel })}
+          </p>
+        </div>
+
+        {/* "Tutor [Name]" label + arrow — desktop */}
+        <div
+          className="absolute z-10 hidden lg:flex items-center gap-1 animate-fade-in-up-delay-3"
+          style={{
+            top: config.arrow.desktop.top,
+            left: config.arrow.desktop.left,
+            transform: config.arrow.desktop.rotation
+              ? `rotate(${config.arrow.desktop.rotation})`
+              : undefined,
+          }}
+        >
+          <img
+            src="/curved-arrow.svg"
+            alt=""
+            className="w-8 h-8"
+          />
+          <span
+            className="text-2xl text-white"
+            style={{ fontFamily: "'Sriracha', cursive" }}
+          >
+            {t("tutor_label", { firstName: localizedFirstName })}
+          </span>
+        </div>
+
+        {/* "Tutor [Name]" label + arrow — mobile */}
+        <div
+          className="absolute z-10 lg:hidden flex items-center gap-1 animate-fade-in-up-delay-3"
+          style={{
+            top: config.arrow.mobile.top,
+            right: config.arrow.mobile.right,
+            transform: config.arrow.mobile.rotation
+              ? `rotate(${config.arrow.mobile.rotation})`
+              : undefined,
+          }}
+        >
+          <img
+            src="/curved-arrow.svg"
+            alt=""
+            className="w-6 h-6"
+          />
+          <span
+            className="text-lg text-white"
+            style={{ fontFamily: "'Sriracha', cursive" }}
+          >
+            {t("tutor_label", { firstName: localizedFirstName })}
+          </span>
+        </div>
+
+        {/* Sentinel for navbar wordmark swap — at ~80% height */}
+        <div id="hero-sentinel" className="absolute w-full h-1" style={{ top: "60%" }} />
       </section>
 
       {/* ─── Guide Profile Card ─── */}
@@ -234,7 +317,7 @@ export default async function GuidePage({ params }: Props) {
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-5 h-5 opacity-70">
                     <path d="M10 8a3 3 0 100-6 3 3 0 000 6zM3.465 14.493a1.23 1.23 0 00.41 1.412A9.957 9.957 0 0010 18c2.31 0 4.438-.784 6.131-2.1.43-.333.604-.903.408-1.41a7.002 7.002 0 00-13.074.003z" />
                   </svg>
-                  <h3 className="font-bold text-sm">Personality</h3>
+                  <h3 className="font-bold text-sm">{t("personality")}</h3>
                 </div>
                 <p className="opacity-70 text-sm">{tutor.metadata.personality}</p>
               </div>
@@ -248,7 +331,7 @@ export default async function GuidePage({ params }: Props) {
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-5 h-5 opacity-70">
                       <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a.75.75 0 000 1.5h.253a.25.25 0 01.244.304l-.459 2.066A1.75 1.75 0 0010.747 15H11a.75.75 0 000-1.5h-.253a.25.25 0 01-.244-.304l.459-2.066A1.75 1.75 0 009.253 9H9z" clipRule="evenodd" />
                     </svg>
-                    <h3 className="font-bold text-sm">About</h3>
+                    <h3 className="font-bold text-sm">{t("about")}</h3>
                   </div>
                   <p className="opacity-70 text-sm">{tutor.metadata.bio}</p>
                 </div>
@@ -263,7 +346,7 @@ export default async function GuidePage({ params }: Props) {
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-5 h-5 opacity-70">
                       <path fillRule="evenodd" d="M5.75 2a.75.75 0 01.75.75V4h7V2.75a.75.75 0 011.5 0V4h.25A2.75 2.75 0 0118 6.75v8.5A2.75 2.75 0 0115.25 18H4.75A2.75 2.75 0 012 15.25v-8.5A2.75 2.75 0 014.75 4H5V2.75A.75.75 0 015.75 2zm-1 5.5c-.69 0-1.25.56-1.25 1.25v6.5c0 .69.56 1.25 1.25 1.25h10.5c.69 0 1.25-.56 1.25-1.25v-6.5c0-.69-.56-1.25-1.25-1.25H4.75z" clipRule="evenodd" />
                     </svg>
-                    <h3 className="font-bold text-sm">These Days</h3>
+                    <h3 className="font-bold text-sm">{t("these_days")}</h3>
                   </div>
                   <p className="opacity-70 text-sm">{tutor.metadata.nowadays}</p>
                 </div>
@@ -279,25 +362,25 @@ export default async function GuidePage({ params }: Props) {
           <div className="grid grid-cols-2 md:grid-cols-4 rounded-2xl border border-white/10 overflow-hidden" style={{ backgroundColor: "rgba(255,255,255,0.04)" }}>
             {/* Teaches */}
             <div className="p-5 border-b md:border-b-0 md:border-r border-white/10">
-              <p className="text-[10px] uppercase tracking-widest font-medium opacity-40 mb-2">Teaches</p>
+              <p className="text-[10px] uppercase tracking-widest font-medium opacity-40 mb-2">{t("teaches")}</p>
               <p className="text-base font-bold">{capitalize(tutor.teaching_language)}</p>
             </div>
 
             {/* Difficulty */}
             <div className="p-5 border-b md:border-b-0 md:border-r border-white/10">
-              <p className="text-[10px] uppercase tracking-widest font-medium opacity-40 mb-2">Difficulty</p>
-              <p className="text-base font-bold">{tutor.metadata?.difficulty ?? "All levels"}</p>
+              <p className="text-[10px] uppercase tracking-widest font-medium opacity-40 mb-2">{t("difficulty")}</p>
+              <p className="text-base font-bold">{tutor.metadata?.difficulty ?? t("all_levels")}</p>
             </div>
 
             {/* Based In */}
             <div className="p-5 md:border-r border-white/10">
-              <p className="text-[10px] uppercase tracking-widest font-medium opacity-40 mb-2">Based in</p>
+              <p className="text-[10px] uppercase tracking-widest font-medium opacity-40 mb-2">{t("based_in")}</p>
               <p className="text-base font-bold">{tutor.city ?? "—"}</p>
             </div>
 
             {/* Speaks */}
             <div className="p-5">
-              <p className="text-[10px] uppercase tracking-widest font-medium opacity-40 mb-2">Speaks</p>
+              <p className="text-[10px] uppercase tracking-widest font-medium opacity-40 mb-2">{t("speaks")}</p>
               <p className="text-base font-bold">
                 {tutor.languages.length > 0 ? formatLanguages(tutor.languages) : "—"}
               </p>
@@ -306,38 +389,45 @@ export default async function GuidePage({ params }: Props) {
         </div>
       </section>
 
-      {/* ─── How Candid Works — Placeholder Screenshots ─── */}
-      <section className="py-16 md:py-20">
-        <h2 className="text-center text-2xl md:text-3xl lg:text-4xl font-black uppercase tracking-tight mb-10 px-6">
-          How Candid Works
-        </h2>
-        <div className="flex gap-4 px-6 overflow-x-auto scrollbar-hide pb-4">
-          {[
-            { label: "Daily Lessons", gradient: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)" },
-            { label: "AI Conversations", gradient: "linear-gradient(135deg, #f093fb 0%, #f5576c 100%)" },
-            { label: "Progress Tracking", gradient: "linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)" },
-            { label: "Live Feedback", gradient: "linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)" },
-          ].map((item) => (
-            <div
-              key={item.label}
-              className="flex-shrink-0 w-[260px] md:w-[280px] rounded-3xl flex items-end p-6"
-              style={{
-                background: item.gradient,
-                aspectRatio: "9 / 16",
-              }}
-            >
-              <p className="text-lg font-bold text-white drop-shadow-lg">{item.label}</p>
+      {/* ─── App Screenshots with Sticky Headers ─── */}
+      {(() => {
+        const tVars = { firstName: localizedFirstName, language: langLabel };
+        const screenshots = [
+          { key: "screenshot_listen", title: t("listen", tVars) },
+          { key: "screenshot_learn", title: t("learn", tVars) },
+          { key: "screenshot_shadow", title: t("shadow", tVars) },
+          { key: "screenshot_intro", title: t("intro", tVars) },
+        ].filter((s) => tutor.metadata?.[s.key]);
+
+        if (screenshots.length === 0) return null;
+
+        return screenshots.map((s) => (
+          <section key={s.key} className="relative">
+            <StickyHeader>
+              <h2 className="text-center text-2xl md:text-3xl lg:text-4xl font-black uppercase tracking-tight">
+                {s.title}
+              </h2>
+            </StickyHeader>
+            {/* Screenshot */}
+            <div className="flex justify-center px-6 pb-16 md:pb-24">
+              <div className="w-full max-w-[320px] md:max-w-[500px] lg:max-w-[420px]">
+                <img
+                  src={tutor.metadata![s.key] as string}
+                  alt={s.title}
+                  className="w-full rounded-[2.5rem] shadow-2xl"
+                />
+              </div>
             </div>
-          ))}
-        </div>
-      </section>
+          </section>
+        ));
+      })()}
 
       {/* ─── Social Links ─── */}
       {has_social && (
         <section className="px-6 py-12 md:px-12 md:py-16">
           <div className="max-w-2xl mx-auto text-center">
             <h3 className="text-xs uppercase tracking-widest font-medium opacity-40 mb-6">
-              Follow {firstName}
+              {t("follow", { name: localizedFirstName })}
             </h3>
             <div className="flex flex-wrap justify-center gap-4">
               {tutor.instagram_handle && (
@@ -390,14 +480,12 @@ export default async function GuidePage({ params }: Props) {
       {/* ─── Bottom CTA ─── */}
       <section className="px-6 py-20 md:px-12 md:py-28 text-center">
         <h2 className="text-3xl md:text-5xl font-black uppercase tracking-tight mb-4">
-          Ready to learn{" "}
-          <br className="md:hidden" />
-          with {firstName}?
+          {t("ready_to_learn", { name: localizedFirstName })}
         </h2>
         <p className="text-lg font-light opacity-60 mb-10 max-w-lg mx-auto">
           {tutor.short_description}
         </p>
-        <a href={APP_STORE_URL} className="inline-block">
+        <a href={`/download/${slug}`} className="inline-block">
           <Image
             src="/download.svg"
             alt="Download on the App Store"
@@ -407,24 +495,25 @@ export default async function GuidePage({ params }: Props) {
           />
         </a>
         <p className="mt-4 text-sm opacity-40">
-          Free to try — no credit card required
+          {t("free_to_try")}
         </p>
       </section>
 
       {/* ─── Footer ─── */}
-      <footer className="px-6 py-8 md:px-12 flex items-center justify-between flex-wrap gap-4 border-t border-white/10">
+      <footer className="px-6 py-8 pb-32 md:pb-8 md:px-12 flex items-center justify-between flex-wrap gap-4 border-t border-white/10">
         <div className="flex gap-6 items-center">
           <a href="/privacy" className="text-sm opacity-50 hover:opacity-70 transition-opacity">
-            Privacy Policy
+            {t("privacy")}
           </a>
           <a href="/terms" className="text-sm opacity-50 hover:opacity-70 transition-opacity">
-            Terms of Use
+            {t("terms")}
           </a>
         </div>
         <p className="text-sm opacity-30">
           &copy; {new Date().getFullYear()} Candid
         </p>
       </footer>
+      <MobileCTABar downloadUrl={`/download/${slug}`} ctaLabel={t("get_started")} ctaSubtext={t("no_credit_card")} />
     </main>
   );
 }

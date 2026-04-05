@@ -79,6 +79,10 @@ export default async function LocaleLayout({ children, params }: Props) {
             gtag('config', 'G-RRJ4Q1XFDF');
           `}
         </Script>
+        <link
+          href="https://fonts.googleapis.com/css2?family=Sriracha&display=swap"
+          rel="stylesheet"
+        />
         <meta name="apple-itunes-app" content="app-id=6754859158" />
         <meta name="color-scheme" content="dark" />
       </head>

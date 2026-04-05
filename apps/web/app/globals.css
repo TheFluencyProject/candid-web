@@ -9,12 +9,12 @@ body {
   min-height: 100vh;
   margin: 0;
   padding: 0;
-  font-family: 'SF Pro Condensed', 'SF Pro', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  font-family: 'SF Pro Display', 'SF Pro', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
   font-weight: 300;
-  font-stretch: condensed;
 }
 
 html {
+  --navbar-height: 64px;
   background-color: #131212;
 }
 
@@ -53,6 +53,27 @@ input:-internal-autofill-selected {
 /* Smooth scrolling */
 html {
   scroll-behavior: smooth;
+}
+
+/* Hero heading — italic emphasis uses Caveat handwritten font */
+.hero-heading em,
+.hero-heading i {
+  font-family: 'Sriracha', cursive;
+  font-style: italic;
+  font-weight: 700;
+}
+
+/* Hero heading line break controls */
+.hero-break-mobile {
+  display: none;
+}
+.hero-break-all {
+  display: block;
+}
+@media (max-width: 1023px) {
+  .hero-break-mobile {
+    display: block;
+  }
 }
 
 /* Fade-in-up animation for hero text */

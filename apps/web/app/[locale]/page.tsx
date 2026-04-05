@@ -2,6 +2,7 @@ import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { setRequestLocale } from "next-intl/server";
 import { Link } from "@/i18n/routing";
+import MobileCTABar from "@/components/MobileCTABar";
 
 type Props = {
   params: Promise<{ locale: string }>;
@@ -19,7 +20,7 @@ function HomeContent({ locale }: { locale: string }) {
 
   return (
     <main
-      className="flex min-h-screen flex-col items-center justify-between px-8 py-7"
+      className="flex min-h-screen flex-col items-center justify-between px-8 py-7 pb-32 md:pb-7"
       style={{
         backgroundColor: "#131212",
       }}
@@ -113,6 +114,7 @@ function HomeContent({ locale }: { locale: string }) {
           />
         </a>
       </footer>
+      <MobileCTABar />
     </main>
   );
 }

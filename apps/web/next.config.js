@@ -22,6 +22,11 @@ const nextConfig = {
         permanent: true,
       },
       {
+        source: "/download/:slug",
+        destination: "https://apps.apple.com/app/id6754859158",
+        permanent: false,
+      },
+      {
         source: "/download",
         destination: "https://apps.apple.com/app/id6754859158",
         permanent: true,
