@@ -13,8 +13,7 @@ export default function QRCode({ slug, label }: { slug: string; label?: string }
         <QRCodeSVG value={url} size={140} level="M" />
       </div>
       <p
-        className="mt-3 text-sm font-bold"
-        style={{ color: "#131212" }}
+        className="mt-3 text-sm font-bold text-current"
       >
         {label ?? "Download & Try for Free"}
       </p>

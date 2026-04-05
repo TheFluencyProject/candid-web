@@ -8,6 +8,7 @@ import QRCode from "@/components/QRCode";
 import { getTutorPageConfig } from "@/config/tutors";
 import StickyHeader from "@/components/StickyHeader";
 import ScrollFadeIn from "@/components/ScrollFadeIn";
+import SiteFooter from "@/components/SiteFooter";
 
 const API_BASE_URL = "https://dev.api.joincandid.co";
 const APP_STORE_URL = "https://apps.apple.com/app/id6754859158";
@@ -461,19 +462,7 @@ export default async function GuidePage({ params }: Props) {
 
 
       {/* ─── Footer ─── */}
-      <footer className="px-6 py-8 pb-32 md:pb-8 md:px-12 flex items-center justify-between flex-wrap gap-4 border-t border-white/10">
-        <div className="flex gap-6 items-center">
-          <a href="/privacy" className="text-sm opacity-50 hover:opacity-70 transition-opacity">
-            {t("privacy")}
-          </a>
-          <a href="/terms" className="text-sm opacity-50 hover:opacity-70 transition-opacity">
-            {t("terms")}
-          </a>
-        </div>
-        <p className="text-sm opacity-30">
-          &copy; {new Date().getFullYear()} The Fluency Project
-        </p>
-      </footer>
+      <SiteFooter privacyLabel={t("privacy")} termsLabel={t("terms")} />
       <MobileCTABar downloadUrl={`/download/${slug}`} ctaLabel={t("get_started")} ctaSubtext={t("no_credit_card")} />
     </main>
   );
