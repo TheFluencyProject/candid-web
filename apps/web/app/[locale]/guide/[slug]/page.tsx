@@ -174,7 +174,7 @@ export default async function GuidePage({ params }: Props) {
       <GuideNavbar sentinelId="hero-sentinel" downloadUrl={`/download/${slug}`} />
 
       {/* ─── Full-Viewport Hero ─── */}
-      <section className="relative min-h-[85vh] lg:min-h-screen overflow-hidden">
+      <section className="relative min-h-[80vh] lg:min-h-screen overflow-hidden">
         {/* Photo background */}
         {(tutor.metadata?.web_bg_picture || tutor.large_profile_picture_url) ? (
           <>
@@ -189,7 +189,7 @@ export default async function GuidePage({ params }: Props) {
             <img
               src={(tutor.metadata?.web_bg_picture as string) || tutor.large_profile_picture_url!}
               alt={tutor.name}
-              className="absolute inset-0 w-full h-full object-cover lg:hidden"
+              className="absolute inset-0 w-full h-full object-cover lg:hidden scale-[1.15] origin-bottom"
               style={{ objectPosition: config.photo.mobile }}
             />
           </>
@@ -238,7 +238,7 @@ export default async function GuidePage({ params }: Props) {
         </div>
 
         {/* Mobile text content — bottom, centered */}
-        <div className="relative z-10 lg:hidden flex flex-col items-center justify-end min-h-[85vh] px-6 pb-6 text-center">
+        <div className="relative z-10 lg:hidden flex flex-col items-center justify-end min-h-[80vh] px-6 pb-10 text-center">
           <h1
             className="hero-heading text-3xl sm:text-4xl font-light leading-tight mb-4 animate-fade-in-up"
             style={{ color: "#FFFFFF" }}
@@ -304,7 +304,7 @@ export default async function GuidePage({ params }: Props) {
       </section>
 
       {/* ─── Guide Profile Card ─── */}
-      <section className="px-6 py-12 md:px-12 md:py-16">
+      <section className="px-6 pt-20 pb-12 md:px-12 md:pt-24 md:pb-16">
         <div className="max-w-2xl mx-auto">
           <div className="flex flex-col items-center text-center mb-6">
             {tutor.profile_picture_url && (
@@ -366,39 +366,59 @@ export default async function GuidePage({ params }: Props) {
                 </div>
               </>
             )}
-          </div>
-        </div>
-      </section>
 
-      {/* ─── Structured Details Grid ─── */}
-      <section className="px-6 py-8 md:px-12 md:py-12">
-        <div className="max-w-2xl mx-auto">
-          <div className="grid grid-cols-2 md:grid-cols-4 rounded-2xl border border-white/10 overflow-hidden" style={{ backgroundColor: "rgba(255,255,255,0.04)" }}>
-            {/* Teaches */}
-            <div className="p-5 border-b md:border-b-0 md:border-r border-white/10">
-              <p className="text-[10px] uppercase tracking-widest font-medium opacity-40 mb-2">{t("teaches")}</p>
-              <p className="text-base font-bold">{capitalize(tutor.teaching_language)}</p>
+            <hr className="border-white/10 my-2" />
+            <div className="py-3">
+              <div className="flex gap-2 items-center mb-1">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-5 h-5 opacity-70">
+                  <path d="M10.75 10.818v2.614A3.13 3.13 0 0011.888 13c.482-.315.612-.648.612-.875 0-.227-.13-.56-.612-.875a3.13 3.13 0 00-1.138-.432zM8.33 8.62c.053.055.115.11.184.164.208.16.46.284.736.363V6.603a2.45 2.45 0 00-.35.13c-.318.178-.529.372-.529.56 0 .194.21.39.529.564.1.058.205.108.316.153z" />
+                  <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-6a.75.75 0 01.75.75v.316a3.78 3.78 0 011.653.713c.426.33.744.74.925 1.2a.75.75 0 01-1.395.55 1.35 1.35 0 00-.447-.563 2.187 2.187 0 00-.736-.363V9.3c.514.107.983.276 1.387.517.669.399 1.113.965 1.113 1.683 0 .718-.444 1.284-1.113 1.683-.404.241-.873.41-1.387.517v.332a.75.75 0 01-1.5 0v-.332a3.78 3.78 0 01-1.653-.717A2.6 2.6 0 015.8 12.1a.75.75 0 011.4-.55c.079.2.207.364.411.527.268.214.618.38 1.039.474v-2.8a5.038 5.038 0 01-1.388-.515C6.596 8.838 6.15 8.272 6.15 7.553c0-.718.444-1.284 1.113-1.683A5.022 5.022 0 018.75 5.066V4.75A.75.75 0 019.5 4h.5z" clipRule="evenodd" />
+                </svg>
+                <h3 className="font-bold text-sm">{t("teaches")}</h3>
+              </div>
+              <p className="opacity-70 text-sm">{capitalize(tutor.teaching_language)}</p>
             </div>
 
-            {/* Difficulty */}
-            <div className="p-5 border-b md:border-b-0 md:border-r border-white/10">
-              <p className="text-[10px] uppercase tracking-widest font-medium opacity-40 mb-2">{t("difficulty")}</p>
-              <p className="text-base font-bold">{tutor.metadata?.difficulty ?? t("all_levels")}</p>
+            <hr className="border-white/10 my-2" />
+            <div className="py-3">
+              <div className="flex gap-2 items-center mb-1">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-5 h-5 opacity-70">
+                  <path fillRule="evenodd" d="M2.5 4A1.5 1.5 0 001 5.5V6h18v-.5A1.5 1.5 0 0017.5 4h-15zM19 8.5H1v6A1.5 1.5 0 002.5 16h15a1.5 1.5 0 001.5-1.5v-6zM3 13.25a.75.75 0 01.75-.75h1.5a.75.75 0 010 1.5h-1.5a.75.75 0 01-.75-.75zm4.75-.75a.75.75 0 000 1.5h3.5a.75.75 0 000-1.5h-3.5z" clipRule="evenodd" />
+                </svg>
+                <h3 className="font-bold text-sm">{t("difficulty")}</h3>
+              </div>
+              <p className="opacity-70 text-sm">{tutor.metadata?.difficulty ?? t("all_levels")}</p>
             </div>
 
-            {/* Based In */}
-            <div className="p-5 md:border-r border-white/10">
-              <p className="text-[10px] uppercase tracking-widest font-medium opacity-40 mb-2">{t("based_in")}</p>
-              <p className="text-base font-bold">{tutor.city ?? "—"}</p>
-            </div>
+            {tutor.city && (
+              <>
+                <hr className="border-white/10 my-2" />
+                <div className="py-3">
+                  <div className="flex gap-2 items-center mb-1">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-5 h-5 opacity-70">
+                      <path fillRule="evenodd" d="M9.69 18.933l.003.001C9.89 19.02 10 19 10 19s.11.02.308-.066l.002-.001.006-.003.018-.008a5.741 5.741 0 00.281-.14c.186-.096.446-.24.757-.433.62-.384 1.445-.966 2.274-1.765C15.302 14.988 17 12.493 17 9A7 7 0 103 9c0 3.492 1.698 5.988 3.355 7.584a13.731 13.731 0 002.273 1.765 11.842 11.842 0 00.976.544l.062.029.018.008.006.003zM10 11.25a2.25 2.25 0 100-4.5 2.25 2.25 0 000 4.5z" clipRule="evenodd" />
+                    </svg>
+                    <h3 className="font-bold text-sm">{t("based_in")}</h3>
+                  </div>
+                  <p className="opacity-70 text-sm">{tutor.city}</p>
+                </div>
+              </>
+            )}
 
-            {/* Speaks */}
-            <div className="p-5">
-              <p className="text-[10px] uppercase tracking-widest font-medium opacity-40 mb-2">{t("speaks")}</p>
-              <p className="text-base font-bold">
-                {tutor.languages.length > 0 ? formatLanguages(tutor.languages) : "—"}
-              </p>
-            </div>
+            {tutor.languages.length > 0 && (
+              <>
+                <hr className="border-white/10 my-2" />
+                <div className="py-3">
+                  <div className="flex gap-2 items-center mb-1">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-5 h-5 opacity-70">
+                      <path d="M7.75 2.75a.75.75 0 00-1.5 0v1.258a32.987 32.987 0 00-3.599.278.75.75 0 10.198 1.487A31.545 31.545 0 018.7 5.545 19.381 19.381 0 017 9.56a19.418 19.418 0 01-1.002-2.05.75.75 0 00-1.384.577 20.935 20.935 0 001.492 2.91 19.613 19.613 0 01-3.828 4.154.75.75 0 10.945 1.164A21.116 21.116 0 007 12.331c.095.132.192.262.29.391a.75.75 0 001.194-.91c-.094-.122-.19-.248-.287-.375A21.087 21.087 0 009.87 7.21a.75.75 0 00-1.146-.967A19.841 19.841 0 018.7 7.007a17.953 17.953 0 01.847-1.994 31.065 31.065 0 016.925.168.75.75 0 10.198-1.487 32.887 32.887 0 00-3.62-.282V2.75a.75.75 0 00-1.5 0v1.141a32.92 32.92 0 00-3.8 0V2.75zM14 11.25a.75.75 0 01.69.46l2.25 5.5a.75.75 0 01-1.38.58l-.49-1.19h-3.14l-.49 1.19a.75.75 0 01-1.38-.58l2.25-5.5a.75.75 0 01.69-.46zm-.97 3.85h1.94L14 12.85l-.97 2.25z" />
+                    </svg>
+                    <h3 className="font-bold text-sm">{t("speaks")}</h3>
+                  </div>
+                  <p className="opacity-70 text-sm">{formatLanguages(tutor.languages)}</p>
+                </div>
+              </>
+            )}
           </div>
         </div>
       </section>
@@ -425,7 +445,7 @@ export default async function GuidePage({ params }: Props) {
             </StickyHeader>
             {/* Screenshot */}
             <div className="flex justify-center px-6 pb-16 md:pb-24">
-              <div className="w-full max-w-[320px] md:max-w-[500px] lg:max-w-[420px]">
+              <div className="w-full max-w-sm md:max-w-[500px] lg:max-w-[420px]">
                 <img
                   src={tutor.metadata![s.key] as string}
                   alt={s.title}

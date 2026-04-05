@@ -4,7 +4,7 @@ import { createNavigation } from "next-intl/navigation";
 export const routing = defineRouting({
   locales: ["en", "ko"],
   defaultLocale: "en",
-  localePrefix: "as-needed", // Korean has no prefix, English uses /en
+  localePrefix: "as-needed",
 });
 
 export const { Link, redirect, usePathname, useRouter } =
