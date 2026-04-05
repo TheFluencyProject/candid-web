@@ -2,7 +2,7 @@ import { ImageResponse } from "next/og";
 
 export const revalidate = 604800; // 1 week
 
-export const alt = "Dayli Immersion";
+export const alt = "Candid Immersion";
 
 export const size = {
   width: 1200,
@@ -66,7 +66,7 @@ export default async function Image({
             letterSpacing: "-0.5px",
           }}
         >
-          Dayli Immersion
+          Candid Immersion
         </span>
         <span
           style={{

@@ -3,7 +3,7 @@ import Image from "next/image";
 import { notFound } from "next/navigation";
 import { setRequestLocale } from "next-intl/server";
 
-const API_BASE_URL = "https://dev.api.trydayli.com";
+const API_BASE_URL = "https://dev.api.joincandid.co";
 const APP_STORE_URL = "https://apps.apple.com/app/id6754859158";
 
 interface TutorLanguageProficiency {
@@ -79,21 +79,21 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const tutor = await fetchTutor(slug, locale);
 
   if (!tutor) {
-    return { title: "Guide Not Found — Dayli" };
+    return { title: "Guide Not Found — Candid" };
   }
 
-  const title = `${tutor.name} — Dayli`;
+  const title = `${tutor.name} — Candid`;
   const description = tutor.short_description;
 
   return {
-    metadataBase: new URL("https://daylienglish.com"),
+    metadataBase: new URL("https://joincandid.co"),
     title,
     description,
     openGraph: {
       type: "website",
       title,
       description,
-      siteName: "Dayli",
+      siteName: "Candid",
       images: tutor.large_profile_picture_url
         ? [{ url: tutor.large_profile_picture_url, alt: tutor.name }]
         : [],
@@ -133,8 +133,8 @@ export default async function GuidePage({ params }: Props) {
         <div className="container mx-auto flex justify-between items-center max-w-6xl">
           <a href="/" className="flex items-center gap-2">
             <Image
-              src="/dayli-wordmark.svg"
-              alt="Dayli"
+              src="/candid-wordmark.svg"
+              alt="Candid"
               width={60}
               height={30}
               className="hover:opacity-80 transition-opacity"
@@ -306,10 +306,10 @@ export default async function GuidePage({ params }: Props) {
         </div>
       </section>
 
-      {/* ─── How Dayli Works — Placeholder Screenshots ─── */}
+      {/* ─── How Candid Works — Placeholder Screenshots ─── */}
       <section className="py-16 md:py-20">
         <h2 className="text-center text-2xl md:text-3xl lg:text-4xl font-black uppercase tracking-tight mb-10 px-6">
-          How Dayli Works
+          How Candid Works
         </h2>
         <div className="flex gap-4 px-6 overflow-x-auto scrollbar-hide pb-4">
           {[
@@ -422,7 +422,7 @@ export default async function GuidePage({ params }: Props) {
           </a>
         </div>
         <p className="text-sm opacity-30">
-          &copy; {new Date().getFullYear()} Dayli
+          &copy; {new Date().getFullYear()} Candid
         </p>
       </footer>
     </main>

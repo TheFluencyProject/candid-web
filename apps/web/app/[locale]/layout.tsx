@@ -29,13 +29,13 @@ export async function generateMetadata({
     openGraph: {
       type: "website",
       locale: locale === "ko" ? "ko_KR" : "en_US",
-      url: "https://daylienglish.com",
+      url: "https://joincandid.co",
       title: t.title,
       description: t.description,
-      siteName: "Dayli",
+      siteName: "Candid",
       images: [
         {
-          url: "https://daylienglish.com/ogimage.png",
+          url: "https://joincandid.co/ogimage.png",
           alt: t.title,
         },
       ],
@@ -44,7 +44,7 @@ export async function generateMetadata({
       card: "summary_large_image",
       title: t.title,
       description: t.description,
-      images: ["https://daylienglish.com/ogimage.png"],
+      images: ["https://joincandid.co/ogimage.png"],
     },
   };
 }

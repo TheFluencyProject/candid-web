@@ -30,8 +30,8 @@ function HomeContent({ locale }: { locale: string }) {
           {/* App Icon */}
           <div className="mb-8 flex justify-center">
             <Image
-              src="/dayli-wordmark.svg"
-              alt="Dayli Logo"
+              src="/candid-wordmark.svg"
+              alt="Candid Logo"
               width={112}
               height={195}
               priority

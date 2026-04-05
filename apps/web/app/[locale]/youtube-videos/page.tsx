@@ -15,7 +15,7 @@ interface PaginatedResponse {
   has_more: boolean;
 }
 
-const API_BASE_URL = "https://api.trydayli.com";
+const API_BASE_URL = "https://api.joincandid.co";
 const PAGE_SIZE = 50;
 
 export default function YoutubeVideosPage() {
@@ -97,8 +97,8 @@ export default function YoutubeVideosPage() {
       <header className="mb-10">
         <Link href="/" className="inline-block mb-8">
           <Image
-            src="/dayli-wordmark.svg"
-            alt="Dayli"
+            src="/candid-wordmark.svg"
+            alt="Candid"
             width={60}
             height={30}
             className="hover:opacity-80 transition-opacity"

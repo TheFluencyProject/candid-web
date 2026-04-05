@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-const API_BASE_URL = "https://api.trydayli.com";
+const API_BASE_URL = "https://api.joincandid.co";
 const APP_STORE_URL = "https://apps.apple.com/app/id6754859158";
 
 interface VideoMeta {
@@ -30,19 +30,19 @@ export async function generateMetadata({
   const { id } = await params;
   const video = await fetchVideoMeta(id);
 
-  const title = video ? `${video.title} — Dayli` : "Dayli";
+  const title = video ? `${video.title} — Candid` : "Candid";
   const description =
-    "Learn English with real YouTube videos on Dayli. Open in the app to start watching.";
+    "Learn English with real YouTube videos on Candid. Open in the app to start watching.";
 
   return {
-    metadataBase: new URL("https://daylienglish.com"),
+    metadataBase: new URL("https://joincandid.co"),
     title,
     description,
     openGraph: {
       type: "website",
       title,
       description,
-      siteName: "Dayli",
+      siteName: "Candid",
     },
     twitter: {
       card: "summary_large_image",

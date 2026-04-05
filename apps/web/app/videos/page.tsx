@@ -3,23 +3,23 @@ import type { Metadata } from "next";
 const APP_STORE_URL = "https://apps.apple.com/app/id6754859158";
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://daylienglish.com"),
-  title: "Dayli",
+  metadataBase: new URL("https://joincandid.co"),
+  title: "Candid",
   description:
-    "Learn English with real YouTube videos on Dayli. Download the app to start watching.",
+    "Learn English with real YouTube videos on Candid. Download the app to start watching.",
   openGraph: {
     type: "website",
-    title: "Dayli",
+    title: "Candid",
     description:
-      "Learn English with real YouTube videos on Dayli. Download the app to start watching.",
-    siteName: "Dayli",
-    images: [{ url: "/ogimage.png", width: 1200, height: 630, alt: "Dayli" }],
+      "Learn English with real YouTube videos on Candid. Download the app to start watching.",
+    siteName: "Candid",
+    images: [{ url: "/ogimage.png", width: 1200, height: 630, alt: "Candid" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Dayli",
+    title: "Candid",
     description:
-      "Learn English with real YouTube videos on Dayli. Download the app to start watching.",
+      "Learn English with real YouTube videos on Candid. Download the app to start watching.",
   },
 };
 

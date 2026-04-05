@@ -4,7 +4,7 @@ import { join } from "node:path";
 
 export const revalidate = 604800; // 1 week
 
-export const alt = "Watch on Dayli";
+export const alt = "Watch on Candid";
 
 export const size = {
   width: 1200,
@@ -13,7 +13,7 @@ export const size = {
 
 export const contentType = "image/png";
 
-const API_BASE_URL = "https://api.trydayli.com";
+const API_BASE_URL = "https://api.joincandid.co";
 
 interface VideoMeta {
   source_id: string | null;
@@ -63,7 +63,7 @@ export default async function Image({
 
   const [video, logoData] = await Promise.all([
     fetchVideoMeta(id),
-    readFile(join(process.cwd(), "public", "dayli-wordmark.svg")),
+    readFile(join(process.cwd(), "public", "candid-wordmark.svg")),
   ]);
 
   const logoSrc = `data:image/svg+xml;base64,${logoData.toString("base64")}`;
@@ -135,7 +135,7 @@ return new ImageResponse(
           display: "flex",
         }}
       />
-      {/* Dayli logo — top right */}
+      {/* Candid logo — top right */}
       <img
         src={logoSrc}
         width={96}

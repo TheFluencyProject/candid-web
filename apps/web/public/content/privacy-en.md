@@ -1,4 +1,4 @@
-The Fluency Project, Inc. (“**Dayli**,” “**we**,” “**our**,” and/or “**us**”) values the privacy of individuals who use our application, website (including [https://daylienglish.com](https://daylienglish.com/)), and related services (collectively, our “**Services**”). This privacy policy (the “**Privacy Policy**”) explains how we collect, use, and disclose personal information from users of our Services (“**you**” or “**your**”). As used in this Privacy Policy, “**personal information**” means any information relating to an identified or identifiable individual.
+The Fluency Project, Inc. (“**Candid**,” “**we**,” “**our**,” and/or “**us**”) values the privacy of individuals who use our application, website (including [https://joincandid.co](https://joincandid.co/)), and related services (collectively, our “**Services**”). This privacy policy (the “**Privacy Policy**”) explains how we collect, use, and disclose personal information from users of our Services (“**you**” or “**your**”). As used in this Privacy Policy, “**personal information**” means any information relating to an identified or identifiable individual.
 
 By using our Services, you agree to the collection, use, disclosure, and procedures described in this Privacy Policy. Beyond this Privacy Policy, your use of our Services is also subject to our Terms of Service.
 
@@ -210,7 +210,7 @@ We will post any adjustments to the Privacy Policy on this page, and the revised
 
 ## Contact Information
 
-**Dayli** is responsible for and the data controller for processing your personal information.
+**Candid** is responsible for and the data controller for processing your personal information.
 
 If you have any questions, comments, or concerns about our processing activities, please email us at **support@thefluencyproject.co** or write to us at:
 

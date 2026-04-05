@@ -3,20 +3,20 @@ import type { Metadata } from "next";
 const APP_STORE_URL = "https://apps.apple.com/app/id6754859158";
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://daylienglish.com"),
-  title: "Dayli Immersion",
+  metadataBase: new URL("https://joincandid.co"),
+  title: "Candid Immersion",
   description:
-    "Join your group's daily English immersion session on Dayli.",
+    "Join your group's daily English immersion session on Candid.",
   openGraph: {
     type: "website",
-    title: "Dayli Immersion",
-    description: "Join your group's daily English immersion session on Dayli.",
-    siteName: "Dayli",
+    title: "Candid Immersion",
+    description: "Join your group's daily English immersion session on Candid.",
+    siteName: "Candid",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Dayli Immersion",
-    description: "Join your group's daily English immersion session on Dayli.",
+    title: "Candid Immersion",
+    description: "Join your group's daily English immersion session on Candid.",
   },
 };
 

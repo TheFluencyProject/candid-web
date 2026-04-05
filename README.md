@@ -85,4 +85,4 @@ Learn more about the power of Turborepo:
 # amiko-monorepo
 # bloom-web
 # englishmode-web
-# dayli-web
+# candid-web

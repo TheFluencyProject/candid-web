@@ -42,8 +42,8 @@ function CompanyInfoContent({ content }: { content: string }) {
       <header className="mb-10">
         <Link href="/" className="inline-block mb-8">
           <Image
-            src="/dayli-wordmark.svg"
-            alt="Dayli"
+            src="/candid-wordmark.svg"
+            alt="Candid"
             width={60}
             height={30}
             className="hover:opacity-80 transition-opacity"
