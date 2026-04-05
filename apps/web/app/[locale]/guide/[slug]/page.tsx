@@ -220,18 +220,18 @@ export default async function GuidePage({ params }: Props) {
         />
 
         {/* Desktop text content — left side */}
-        <div className="relative z-10 hidden lg:flex flex-col justify-center min-h-screen px-12 pt-16 pb-24">
+        <div className="relative z-10 hidden lg:flex flex-col justify-start min-h-screen px-12 pt-[120px] pb-24">
           <h1
             className="hero-heading text-5xl xl:text-6xl font-light leading-[1.15] mb-6 animate-fade-in-up"
             style={{ color: "#131212" }}
             dangerouslySetInnerHTML={{ __html: coolTitle }}
           />
           <p
-            className="text-base xl:text-lg font-light leading-relaxed mb-10 max-w-md animate-fade-in-up-delay-1"
+            className="text-base xl:text-lg font-light leading-relaxed mb-6 max-w-md animate-fade-in-up-delay-1"
             style={{ color: "#131212", opacity: 0.7 }}
             dangerouslySetInnerHTML={{ __html: t("subtitle", { name: localizedFirstName, language: langLabel }) }}
           />
-          <div className="animate-fade-in-up-delay-2">
+          <div className="animate-fade-in-up-delay-2 self-start">
             <QRCode slug={slug} label={t("download_qr")} />
           </div>
         </div>
@@ -254,6 +254,7 @@ export default async function GuidePage({ params }: Props) {
         <div
           className="absolute z-10 hidden lg:flex flex-col items-center animate-fade-in-up-delay-3"
           style={{
+            visibility: "hidden",
             top: config.arrow.desktop.top,
             left: config.arrow.desktop.left,
             transform: config.arrow.desktop.rotation
@@ -262,7 +263,7 @@ export default async function GuidePage({ params }: Props) {
           }}
         >
           <img
-            src="/curved-arrow.svg"
+            src="/curved-arrow.png"
             alt=""
             className="w-12 h-12 -mb-2"
           />
@@ -278,6 +279,7 @@ export default async function GuidePage({ params }: Props) {
         <div
           className="absolute z-10 lg:hidden flex flex-col items-center animate-fade-in-up-delay-3"
           style={{
+            visibility: "hidden",
             top: config.arrow.mobile.top,
             right: config.arrow.mobile.right,
             transform: config.arrow.mobile.rotation
@@ -286,7 +288,7 @@ export default async function GuidePage({ params }: Props) {
           }}
         >
           <img
-            src="/curved-arrow.svg"
+            src="/curved-arrow.png"
             alt=""
             className="w-9 h-9 -mb-1"
           />

@@ -16,7 +16,7 @@ const tutorPageConfig: Record<string, TutorPageConfig> = {
       mobile: "95% 12%",
     },
     arrow: {
-      desktop: { top: "60%", left: "72%" },
+      desktop: { top: "65%", left: "85%" },
       mobile: { top: "38%", right: "4%" },
     },
   },
@@ -26,7 +26,7 @@ const tutorPageConfig: Record<string, TutorPageConfig> = {
       mobile: "90% 20%",
     },
     arrow: {
-      desktop: { top: "52%", left: "62%" },
+      desktop: { top: "73%", left: "76%" },
       mobile: { top: "50%", right: "8%" },
     },
   },

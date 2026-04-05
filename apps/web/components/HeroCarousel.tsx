@@ -111,14 +111,14 @@ export default function HeroCarousel({ tutors }: { tutors: CarouselTutor[] }) {
             <img
               src={t.bgImage}
               alt={t.firstName}
-              className="carousel-desktop-only absolute inset-0 w-full h-full object-cover"
+              className="hidden lg:block absolute inset-0 w-full h-full object-cover"
               style={{ objectPosition: t.photoPosition.desktop }}
             />
-            {/* Mobile */}
+            {/* Mobile — scale-[1.15] matches tutor guide pages */}
             <img
               src={t.bgImage}
               alt={t.firstName}
-              className="carousel-mobile-only absolute inset-0 w-full h-full object-cover"
+              className="block lg:hidden absolute inset-0 w-full h-full object-cover scale-[1.15] origin-bottom"
               style={{ objectPosition: t.photoPosition.mobile }}
             />
           </div>
@@ -127,17 +127,17 @@ export default function HeroCarousel({ tutors }: { tutors: CarouselTutor[] }) {
         {/* Gradient overlays — same as tutor pages */}
         {/* Desktop: bottom fade */}
         <div
-          className="carousel-desktop-only absolute inset-0 pointer-events-none"
+          className="hidden lg:block absolute inset-0 pointer-events-none"
           style={{
             background: "linear-gradient(to bottom, transparent 70%, rgba(19,18,18,0.6) 100%)",
           }}
         />
         {/* Mobile: stronger bottom fade */}
         <div
-          className="carousel-mobile-only absolute inset-0 pointer-events-none"
+          className="block lg:hidden absolute inset-0 pointer-events-none"
           style={{
             background:
-              "linear-gradient(to bottom, transparent 35%, rgba(19,18,18,0.4) 50%, rgba(19,18,18,0.7) 65%, rgba(19,18,18,0.85) 80%, #131212 95%)",
+              "linear-gradient(to bottom, transparent 30%, rgba(19,18,18,0.3) 45%, rgba(19,18,18,0.5) 55%, rgba(19,18,18,0.65) 70%, rgba(19,18,18,0.75) 85%)",
           }}
         />
 
@@ -147,7 +147,7 @@ export default function HeroCarousel({ tutors }: { tutors: CarouselTutor[] }) {
           className="absolute inset-0 z-10 animate-carouselFadeIn"
         >
           {/* Desktop text — left side, no card bg, same as tutor pages */}
-          <div className="carousel-desktop-flex flex-col justify-start absolute inset-y-0 left-0 px-12 pt-12 pb-24">
+          <div className="hidden lg:flex flex-col justify-start absolute inset-y-0 left-0 px-12 pt-12 pb-24">
             <h1
               className="hero-heading text-5xl xl:text-6xl font-light leading-[1.15] mb-6"
               style={{ color: "#131212" }}
@@ -161,7 +161,7 @@ export default function HeroCarousel({ tutors }: { tutors: CarouselTutor[] }) {
           </div>
 
           {/* Mobile text — bottom, centered, same as tutor pages */}
-          <div className="carousel-mobile-only absolute inset-x-0 bottom-0 z-10 flex flex-col items-center justify-end px-6 pb-16 text-center">
+          <div className="flex lg:hidden absolute inset-x-0 bottom-0 z-10 flex-col items-center justify-end px-6 pb-16 text-center">
             <h1
               className="hero-heading text-3xl sm:text-4xl font-light leading-tight mb-4"
               style={{ color: "#FFFFFF" }}
@@ -176,8 +176,9 @@ export default function HeroCarousel({ tutors }: { tutors: CarouselTutor[] }) {
 
           {/* "Tutor [Name]" label + arrow — Desktop (same layout as tutor pages: flex-col) */}
           <div
-            className="carousel-desktop-flex absolute flex-col items-center"
+            className="hidden lg:flex absolute flex-col items-center"
             style={{
+              opacity: 0,
               top: tutor.arrowPosition.desktop.top,
               left: tutor.arrowPosition.desktop.left,
               transform: tutor.arrowPosition.desktop.rotation
@@ -186,7 +187,7 @@ export default function HeroCarousel({ tutors }: { tutors: CarouselTutor[] }) {
             }}
           >
             <img
-              src="/curved-arrow.svg"
+              src="/curved-arrow.png"
               alt=""
               className="w-12 h-12 -mb-2"
             />
@@ -200,8 +201,9 @@ export default function HeroCarousel({ tutors }: { tutors: CarouselTutor[] }) {
 
           {/* "Tutor [Name]" label + arrow — Mobile (same layout as tutor pages: flex-col) */}
           <div
-            className="carousel-mobile-flex absolute flex-col items-center"
+            className="flex lg:hidden absolute flex-col items-center"
             style={{
+              opacity: 0,
               top: tutor.arrowPosition.mobile.top,
               right: tutor.arrowPosition.mobile.right,
               transform: tutor.arrowPosition.mobile.rotation
@@ -210,7 +212,7 @@ export default function HeroCarousel({ tutors }: { tutors: CarouselTutor[] }) {
             }}
           >
             <img
-              src="/curved-arrow.svg"
+              src="/curved-arrow.png"
               alt=""
               className="w-9 h-9 -mb-1"
             />
@@ -225,7 +227,7 @@ export default function HeroCarousel({ tutors }: { tutors: CarouselTutor[] }) {
           {/* Desktop: App Store badge bottom-left */}
           <a
             href="/download"
-            className="carousel-desktop-only absolute bottom-8 left-8 hover:opacity-90 transition-opacity"
+            className="hidden lg:block absolute bottom-8 left-8 hover:opacity-90 transition-opacity"
             onClick={(e) => e.stopPropagation()}
           >
             <Image
@@ -312,30 +314,6 @@ export default function HeroCarousel({ tutors }: { tutors: CarouselTutor[] }) {
         <div id="hero-sentinel" className="absolute bottom-0 h-0 w-full" />
       </div>
 
-      {/* Inline styles for responsive show/hide */}
-      <style
-        dangerouslySetInnerHTML={{
-          __html: `
-            @keyframes carouselFadeIn {
-              from { opacity: 0; }
-              to { opacity: 1; }
-            }
-            .animate-carouselFadeIn {
-              animation: carouselFadeIn 400ms ease-in-out;
-            }
-            .carousel-desktop-only { display: none !important; }
-            .carousel-mobile-only { display: block !important; }
-            .carousel-mobile-flex { display: flex !important; }
-            .carousel-desktop-flex { display: none !important; }
-            @media (min-width: 1024px) {
-              .carousel-desktop-only { display: block !important; }
-              .carousel-mobile-only { display: none !important; }
-              .carousel-desktop-flex { display: flex !important; }
-              .carousel-mobile-flex { display: none !important; }
-            }
-          `,
-        }}
-      />
     </div>
   );
 }

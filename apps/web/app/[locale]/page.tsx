@@ -187,7 +187,7 @@ export default async function Home({ params }: Props) {
             </ScrollFadeIn>
           </StickyHeader>
           <ScrollFadeIn>
-            <div className="flex justify-center px-6 pb-16 md:pb-24">
+            <div className="flex justify-center px-6 pb-24 md:pb-32">
               <div className="w-full max-w-sm md:max-w-[500px] lg:max-w-[420px]">
                 <img
                   src={s.screenshotUrl}
@@ -202,7 +202,7 @@ export default async function Home({ params }: Props) {
 
       {/* ─── Footer ─── */}
       <SiteFooter privacyLabel={t("footer.privacy")} termsLabel={t("footer.terms")} />
-      <MobileCTABar />
+      <MobileCTABar hideUntilScroll />
     </main>
   );
 }
