@@ -7,6 +7,7 @@ import GuideNavbar from "@/components/GuideNavbar";
 import QRCode from "@/components/QRCode";
 import { getTutorPageConfig } from "@/config/tutors";
 import StickyHeader from "@/components/StickyHeader";
+import ScrollFadeIn from "@/components/ScrollFadeIn";
 
 const API_BASE_URL = "https://dev.api.joincandid.co";
 const APP_STORE_URL = "https://apps.apple.com/app/id6754859158";
@@ -148,9 +149,6 @@ export default async function GuidePage({ params }: Props) {
   if (!tutor) {
     notFound();
   }
-
-  const has_social =
-    tutor.instagram_handle || tutor.tiktok_handle || tutor.youtube_handle;
 
   const firstName = tutor.name.split(" ")[0];
   const localizedFirstName =
@@ -305,7 +303,7 @@ export default async function GuidePage({ params }: Props) {
 
       {/* ─── Guide Profile Card ─── */}
       <section className="px-6 pt-20 pb-12 md:px-12 md:pt-24 md:pb-16">
-        <div className="max-w-2xl mx-auto">
+        <div className="max-w-sm md:max-w-[500px] lg:max-w-[420px] mx-auto">
           <div className="flex flex-col items-center text-center mb-6">
             {tutor.profile_picture_url && (
               <img
@@ -439,100 +437,28 @@ export default async function GuidePage({ params }: Props) {
         return screenshots.map((s) => (
           <section key={s.key} className="relative">
             <StickyHeader>
-              <h2 className="text-center text-2xl md:text-3xl lg:text-4xl font-black uppercase tracking-tight">
-                {s.title}
-              </h2>
+              <ScrollFadeIn>
+                <h2 className="text-center text-2xl md:text-3xl lg:text-4xl font-black uppercase tracking-tight">
+                  {s.title}
+                </h2>
+              </ScrollFadeIn>
             </StickyHeader>
             {/* Screenshot */}
-            <div className="flex justify-center px-6 pb-16 md:pb-24">
-              <div className="w-full max-w-sm md:max-w-[500px] lg:max-w-[420px]">
-                <img
-                  src={tutor.metadata![s.key] as string}
-                  alt={s.title}
-                  className="w-full rounded-[2.5rem] shadow-2xl"
-                />
+            <ScrollFadeIn>
+              <div className="flex justify-center px-6 pb-16 md:pb-24">
+                <div className="w-full max-w-sm md:max-w-[500px] lg:max-w-[420px]">
+                  <img
+                    src={tutor.metadata![s.key] as string}
+                    alt={s.title}
+                    className="w-full rounded-[2.5rem] shadow-2xl"
+                  />
+                </div>
               </div>
-            </div>
+            </ScrollFadeIn>
           </section>
         ));
       })()}
 
-      {/* ─── Social Links ─── */}
-      {has_social && (
-        <section className="px-6 py-12 md:px-12 md:py-16">
-          <div className="max-w-2xl mx-auto text-center">
-            <h3 className="text-xs uppercase tracking-widest font-medium opacity-40 mb-6">
-              {t("follow", { name: localizedFirstName })}
-            </h3>
-            <div className="flex flex-wrap justify-center gap-4">
-              {tutor.instagram_handle && (
-                <a
-                  href={`https://instagram.com/${tutor.instagram_handle}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-2 px-6 py-3 rounded-full transition-colors hover:bg-white/10"
-                  style={{ backgroundColor: "rgba(255,255,255,0.06)" }}
-                >
-                  <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z" />
-                  </svg>
-                  <span className="text-sm font-medium">@{tutor.instagram_handle}</span>
-                </a>
-              )}
-              {tutor.tiktok_handle && (
-                <a
-                  href={`https://tiktok.com/@${tutor.tiktok_handle}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-2 px-6 py-3 rounded-full transition-colors hover:bg-white/10"
-                  style={{ backgroundColor: "rgba(255,255,255,0.06)" }}
-                >
-                  <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1v-3.5a6.37 6.37 0 00-.79-.05A6.34 6.34 0 003.15 15.2a6.34 6.34 0 0010.86 4.46V13a8.2 8.2 0 005.58 2.17V11.7a4.85 4.85 0 01-3.77-1.24V6.69h3.77z" />
-                  </svg>
-                  <span className="text-sm font-medium">@{tutor.tiktok_handle}</span>
-                </a>
-              )}
-              {tutor.youtube_handle && (
-                <a
-                  href={`https://youtube.com/@${tutor.youtube_handle}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-2 px-6 py-3 rounded-full transition-colors hover:bg-white/10"
-                  style={{ backgroundColor: "rgba(255,255,255,0.06)" }}
-                >
-                  <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M23.498 6.186a3.016 3.016 0 00-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 00.502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 002.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 002.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
-                  </svg>
-                  <span className="text-sm font-medium">@{tutor.youtube_handle}</span>
-                </a>
-              )}
-            </div>
-          </div>
-        </section>
-      )}
-
-      {/* ─── Bottom CTA ─── */}
-      <section className="px-6 py-20 md:px-12 md:py-28 text-center">
-        <h2 className="text-3xl md:text-5xl font-black uppercase tracking-tight mb-4">
-          {t("ready_to_learn", { name: localizedFirstName })}
-        </h2>
-        <p className="text-lg font-light opacity-60 mb-10 max-w-lg mx-auto">
-          {tutor.short_description}
-        </p>
-        <a href={`/download/${slug}`} className="inline-block">
-          <Image
-            src="/download.svg"
-            alt="Download on the App Store"
-            width={170}
-            height={55}
-            className="hover:opacity-90 transition-opacity"
-          />
-        </a>
-        <p className="mt-4 text-sm opacity-40">
-          {t("free_to_try")}
-        </p>
-      </section>
 
       {/* ─── Footer ─── */}
       <footer className="px-6 py-8 pb-32 md:pb-8 md:px-12 flex items-center justify-between flex-wrap gap-4 border-t border-white/10">
@@ -545,7 +471,7 @@ export default async function GuidePage({ params }: Props) {
           </a>
         </div>
         <p className="text-sm opacity-30">
-          &copy; {new Date().getFullYear()} Candid
+          &copy; {new Date().getFullYear()} The Fluency Project
         </p>
       </footer>
       <MobileCTABar downloadUrl={`/download/${slug}`} ctaLabel={t("get_started")} ctaSubtext={t("no_credit_card")} />

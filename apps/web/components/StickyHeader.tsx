@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 
 export default function StickyHeader({
   children,
@@ -8,42 +8,37 @@ export default function StickyHeader({
   children: React.ReactNode;
 }) {
   const [isStuck, setIsStuck] = useState(false);
-  const sentinelRef = useRef<HTMLDivElement>(null);
+  const stickyRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    const sentinel = sentinelRef.current;
-    if (!sentinel) return;
+  const checkStuck = useCallback(() => {
+    const el = stickyRef.current;
+    if (!el) return;
 
-    const navHeight = parseInt(
-      getComputedStyle(document.documentElement).getPropertyValue("--navbar-height") || "64"
-    );
+    const rect = el.getBoundingClientRect();
+    const stickyTop = parseFloat(getComputedStyle(el).top) || 0;
 
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        setIsStuck(!entry.isIntersecting);
-      },
-      { threshold: 0, rootMargin: `-${navHeight}px 0px 0px 0px` }
-    );
-
-    observer.observe(sentinel);
-    return () => observer.disconnect();
+    // Element is stuck when its top equals its CSS `top` value (within 1px tolerance)
+    setIsStuck(Math.abs(rect.top - stickyTop) < 1);
   }, []);
 
+  useEffect(() => {
+    window.addEventListener("scroll", checkStuck, { passive: true });
+    checkStuck();
+    return () => window.removeEventListener("scroll", checkStuck);
+  }, [checkStuck]);
+
   return (
-    <>
-      {/* Sentinel — when this scrolls out, the header is stuck */}
-      <div ref={sentinelRef} className="h-0 w-full" />
-      <div
-        className="sticky z-20 py-4 md:py-5 px-6 md:px-12 transition-all duration-300"
-        style={{
-          top: "var(--navbar-height, 64px)",
-          backgroundColor: isStuck ? "rgba(255,255,255,0.05)" : "transparent",
-          backdropFilter: isStuck ? "blur(24px)" : "none",
-          WebkitBackdropFilter: isStuck ? "blur(24px)" : "none",
-        }}
-      >
-        {children}
-      </div>
-    </>
+    <div
+      ref={stickyRef}
+      className="sticky z-20 py-4 md:py-5 px-6 md:px-12"
+      style={{
+        top: "var(--navbar-height, 64px)",
+        backgroundColor: isStuck ? "rgba(255,255,255,0.05)" : "transparent",
+        backdropFilter: isStuck ? "blur(24px)" : "none",
+        WebkitBackdropFilter: isStuck ? "blur(24px)" : "none",
+      }}
+    >
+      {children}
+    </div>
   );
 }

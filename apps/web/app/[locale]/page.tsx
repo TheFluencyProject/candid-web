@@ -85,15 +85,6 @@ function HomeContent({ locale }: { locale: string }) {
         >
           {t("footer.terms")}
         </Link>
-        <Link
-          href="/youtube-videos"
-          className="text-sm md:text-lg hover:opacity-70 transition-opacity"
-          style={{
-            color: "#FFFFFF",
-          }}
-        >
-          {t("footer.youtube_videos")}
-        </Link>
         {locale === "ko" && (
           <Link
             href="/company-info"
