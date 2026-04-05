@@ -7,9 +7,10 @@ export default function MobileCTABar({ downloadUrl, ctaLabel, ctaSubtext }: { do
   return (
     <div className="fixed bottom-0 left-0 right-0 z-50 md:hidden pointer-events-none">
       <div
-        className="pt-12 pb-6 px-6 flex flex-col items-center pointer-events-auto"
+        className="pt-12 px-6 flex flex-col items-center pointer-events-auto"
         style={{
           background: "linear-gradient(to top, #131212 60%, transparent 100%)",
+          paddingBottom: "max(0.5rem, env(safe-area-inset-bottom))",
         }}
       >
         <a
@@ -20,7 +21,7 @@ export default function MobileCTABar({ downloadUrl, ctaLabel, ctaSubtext }: { do
           {ctaLabel ?? "GET STARTED FOR FREE"}
         </a>
         <p
-          className="mt-2 text-xs font-medium"
+          className="mt-2 text-sm font-medium"
           style={{ color: "#89FFB4" }}
         >
           {ctaSubtext ?? "No Credit Card Required"}

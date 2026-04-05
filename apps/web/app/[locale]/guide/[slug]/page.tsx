@@ -28,6 +28,7 @@ interface TutorMetadata {
   cool_title_kr?: string;
   web_bg_picture?: string;
   screenshot_listen?: string;
+  screenshot_week?: string;
   screenshot_learn?: string;
   screenshot_shadow?: string;
   screenshot_intro?: string;
@@ -79,7 +80,7 @@ function formatHeroTitle(text: string): string {
       `${prefix}<span class="hero-break-mobile"></span>` +
       `<em>${topic}</em>` +
       `<span class="hero-break-all"></span>` +
-      `<em>${amp}${rest}</em>`
+      `${amp}<em>${rest}</em>`
     );
   }
   return text;
@@ -173,15 +174,25 @@ export default async function GuidePage({ params }: Props) {
       <GuideNavbar sentinelId="hero-sentinel" downloadUrl={`/download/${slug}`} />
 
       {/* ─── Full-Viewport Hero ─── */}
-      <section className="relative min-h-screen overflow-hidden">
+      <section className="relative min-h-[85vh] lg:min-h-screen overflow-hidden">
         {/* Photo background */}
         {(tutor.metadata?.web_bg_picture || tutor.large_profile_picture_url) ? (
-          <img
-            src={(tutor.metadata?.web_bg_picture as string) || tutor.large_profile_picture_url!}
-            alt={tutor.name}
-            className="absolute inset-0 w-full h-full object-cover"
-            style={{ objectPosition: config.photoPosition ?? "center top" }}
-          />
+          <>
+            {/* Desktop photo */}
+            <img
+              src={(tutor.metadata?.web_bg_picture as string) || tutor.large_profile_picture_url!}
+              alt={tutor.name}
+              className="absolute inset-0 w-full h-full object-cover hidden lg:block"
+              style={{ objectPosition: config.photo.desktop }}
+            />
+            {/* Mobile photo */}
+            <img
+              src={(tutor.metadata?.web_bg_picture as string) || tutor.large_profile_picture_url!}
+              alt={tutor.name}
+              className="absolute inset-0 w-full h-full object-cover lg:hidden"
+              style={{ objectPosition: config.photo.mobile }}
+            />
+          </>
         ) : (
           <div
             className="absolute inset-0"
@@ -219,29 +230,30 @@ export default async function GuidePage({ params }: Props) {
           <p
             className="text-base xl:text-lg font-light leading-relaxed mb-10 max-w-md animate-fade-in-up-delay-1"
             style={{ color: "#131212", opacity: 0.7 }}
-          >
-            {t("subtitle", { name: localizedFirstName, language: langLabel })}
-          </p>
+            dangerouslySetInnerHTML={{ __html: t("subtitle", { name: localizedFirstName, language: langLabel }) }}
+          />
           <div className="animate-fade-in-up-delay-2">
             <QRCode slug={slug} label={t("download_qr")} />
           </div>
         </div>
 
         {/* Mobile text content — bottom, centered */}
-        <div className="relative z-10 lg:hidden flex flex-col items-center justify-end min-h-screen px-6 pb-36 text-center">
+        <div className="relative z-10 lg:hidden flex flex-col items-center justify-end min-h-[85vh] px-6 pb-6 text-center">
           <h1
             className="hero-heading text-3xl sm:text-4xl font-light leading-tight mb-4 animate-fade-in-up"
             style={{ color: "#FFFFFF" }}
             dangerouslySetInnerHTML={{ __html: coolTitle }}
           />
-          <p className="text-sm font-light leading-relaxed opacity-70 max-w-sm animate-fade-in-up-delay-1">
-            {t("subtitle", { name: localizedFirstName, language: langLabel })}
-          </p>
+          <p
+            className="text-base font-normal leading-relaxed max-w-sm animate-fade-in-up-delay-1 [&_br]:hidden"
+            style={{ color: "rgba(255,255,255,0.7)" }}
+            dangerouslySetInnerHTML={{ __html: t("subtitle", { name: localizedFirstName, language: langLabel }) }}
+          />
         </div>
 
         {/* "Tutor [Name]" label + arrow — desktop */}
         <div
-          className="absolute z-10 hidden lg:flex items-center gap-1 animate-fade-in-up-delay-3"
+          className="absolute z-10 hidden lg:flex flex-col items-center animate-fade-in-up-delay-3"
           style={{
             top: config.arrow.desktop.top,
             left: config.arrow.desktop.left,
@@ -253,7 +265,7 @@ export default async function GuidePage({ params }: Props) {
           <img
             src="/curved-arrow.svg"
             alt=""
-            className="w-8 h-8"
+            className="w-12 h-12 -mb-2"
           />
           <span
             className="text-2xl text-white"
@@ -265,7 +277,7 @@ export default async function GuidePage({ params }: Props) {
 
         {/* "Tutor [Name]" label + arrow — mobile */}
         <div
-          className="absolute z-10 lg:hidden flex items-center gap-1 animate-fade-in-up-delay-3"
+          className="absolute z-10 lg:hidden flex flex-col items-center animate-fade-in-up-delay-3"
           style={{
             top: config.arrow.mobile.top,
             right: config.arrow.mobile.right,
@@ -277,7 +289,7 @@ export default async function GuidePage({ params }: Props) {
           <img
             src="/curved-arrow.svg"
             alt=""
-            className="w-6 h-6"
+            className="w-9 h-9 -mb-1"
           />
           <span
             className="text-lg text-white"
@@ -396,6 +408,7 @@ export default async function GuidePage({ params }: Props) {
         const tVars = { firstName: localizedFirstName, language: langLabel };
         const screenshots = [
           { key: "screenshot_listen", title: t("listen", tVars) },
+          { key: "screenshot_week", title: t("week", tVars) },
           { key: "screenshot_learn", title: t("learn", tVars) },
           { key: "screenshot_shadow", title: t("shadow", tVars) },
           { key: "screenshot_intro", title: t("intro", tVars) },

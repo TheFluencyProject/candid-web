@@ -28,7 +28,7 @@ export default function GuideNavbar({
   }, [sentinelId]);
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 px-6 md:px-10 py-3 bg-white/5 backdrop-blur-xl" style={{ height: "var(--navbar-height, 64px)" }}>
+    <nav className="fixed top-0 left-0 right-0 z-50 px-4 md:px-8 py-3 bg-white/5 backdrop-blur-xl" style={{ height: "var(--navbar-height, 64px)" }}>
       <div className="flex justify-between items-center">
         <a href="/" className="relative flex items-center" style={{ width: 80, height: 21 }}>
           <Image

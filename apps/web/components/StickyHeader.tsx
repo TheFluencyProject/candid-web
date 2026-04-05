@@ -34,7 +34,7 @@ export default function StickyHeader({
       {/* Sentinel — when this scrolls out, the header is stuck */}
       <div ref={sentinelRef} className="h-0 w-full" />
       <div
-        className="sticky z-20 py-4 md:py-5 transition-all duration-300"
+        className="sticky z-20 py-4 md:py-5 px-6 md:px-12 transition-all duration-300"
         style={{
           top: "var(--navbar-height, 64px)",
           backgroundColor: isStuck ? "rgba(255,255,255,0.05)" : "transparent",
