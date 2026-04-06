@@ -253,7 +253,6 @@ export default async function GuidePage({ params }: Props) {
           <p
             className="font-normal leading-relaxed max-w-sm animate-fade-in-up-delay-1 [&_br]:hidden"
             style={{ color: "rgba(255,255,255,0.7)", fontSize: "clamp(0.55rem, 2.5vw, 1rem)" }}
-            style={{ color: "rgba(255,255,255,0.7)" }}
             dangerouslySetInnerHTML={{ __html: t("subtitle", { name: localizedFirstName, language: langLabel }) }}
           />
         </div>
