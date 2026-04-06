@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/routing";
 import Image from "next/image";
+import SiteFooter from "@/components/SiteFooter";
 
 interface YoutubeVideo {
   youtube_video_id: string;
@@ -20,6 +21,7 @@ const PAGE_SIZE = 50;
 
 export default function YoutubeVideosPage() {
   const t = useTranslations("youtube_videos");
+  const footerT = useTranslations("footer");
   const [videos, setVideos] = useState<YoutubeVideo[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
@@ -210,6 +212,7 @@ export default function YoutubeVideosPage() {
           )}
         </>
       )}
+      <SiteFooter privacyLabel={footerT("privacy")} termsLabel={footerT("terms")} />
     </main>
   );
 }

@@ -7,6 +7,7 @@ export interface CarouselTutor {
   slug: string;
   firstName: string;
   city: string | null;
+  language: string;
   bgImage: string;
   coolTitle: string;
   subtitle: string;
@@ -289,7 +290,7 @@ export default function HeroCarousel({ tutors }: { tutors: CarouselTutor[] }) {
                 transition: "color 200ms ease",
               }}
             >
-              {(tutor.city?.split(",")[0]?.trim()) || tutor.firstName}
+              {tutor.language}
             </span>
           </div>
 

@@ -105,6 +105,7 @@ export default async function Home({ params }: Props) {
         slug: tutor.slug,
         firstName,
         city: tutor.city,
+        language: langLabel,
         bgImage,
         coolTitle,
         subtitle,

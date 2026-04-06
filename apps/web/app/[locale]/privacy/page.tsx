@@ -5,6 +5,7 @@ import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { setRequestLocale } from "next-intl/server";
 import { Link } from "@/i18n/routing";
+import SiteFooter from "@/components/SiteFooter";
 
 type Props = {
   params: Promise<{ locale: string }>;
@@ -28,6 +29,7 @@ export default async function PrivacyPage({ params }: Props) {
 
 function PrivacyContent({ content }: { content: string }) {
   const t = useTranslations("privacy");
+  const footerT = useTranslations("footer");
 
   return (
     <main
@@ -97,6 +99,7 @@ function PrivacyContent({ content }: { content: string }) {
           {content}
         </ReactMarkdown>
       </article>
+      <SiteFooter privacyLabel={footerT("privacy")} termsLabel={footerT("terms")} />
     </main>
   );
 }
