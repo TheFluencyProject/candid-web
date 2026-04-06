@@ -37,7 +37,7 @@ function PrivacyContent({ content }: { content: string }) {
       <header className="mb-10">
         <Link href="/" className="inline-block mb-8">
           <Image
-            src="/candid-wordmark.svg"
+            src="/wordmark-white.svg"
             alt="Candid"
             width={60}
             height={30}

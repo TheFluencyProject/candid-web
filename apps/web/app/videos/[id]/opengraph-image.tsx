@@ -63,7 +63,7 @@ export default async function Image({
 
   const [video, logoData] = await Promise.all([
     fetchVideoMeta(id),
-    readFile(join(process.cwd(), "public", "candid-wordmark.svg")),
+    readFile(join(process.cwd(), "public", "wordmark-white.svg")),
   ]);
 
   const logoSrc = `data:image/svg+xml;base64,${logoData.toString("base64")}`;

@@ -114,8 +114,15 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     return { title: "Guide Not Found — Candid" };
   }
 
-  const langLabel = capitalize(tutor.teaching_language);
-  const title = `Candid | ${langLabel} with ${tutor.name}`;
+  const koreanLangNames: Record<string, string> = { english: "영어", korean: "한국어" };
+  let title: string;
+  if (locale === "ko") {
+    const koreanLang = koreanLangNames[tutor.teaching_language] ?? capitalize(tutor.teaching_language);
+    const koreanName = (tutor.metadata?.name_kr as string) ?? tutor.name;
+    title = `Candid | ${koreanLang}, ${koreanName}과 함께`;
+  } else {
+    title = `Candid | ${capitalize(tutor.teaching_language)} with ${tutor.name}`;
+  }
   const description = tutor.short_description;
   const ogImage = (tutor.metadata?.web_bg_picture as string) || tutor.large_profile_picture_url;
 

@@ -49,34 +49,11 @@ Subscriptions renew automatically unless canceled in advance. Refunds are issued
 
 ---
 
-### 5.1 YouTube Content and What You’re Paying For
-
-Candid uses publicly available YouTube videos as part of the learning experience. To avoid confusion:
-
-- Any interaction with YouTube content through Candid is subject to YouTube’s Terms of Service
-- All videos are owned by their original creators and hosted entirely by YouTube
-- Candid does not upload, store, license, or sell YouTube videos
-- The same YouTube videos can be viewed for free at [**https://joincandid.co/en/youtube-videos**](https://joincandid.co/en/youtube-videos)
-- Videos are displayed only through YouTube’s official embedded player, with required branding and controls intact
-
-Candid does **not** charge for access to YouTube content. Subscription fees apply solely to Candid’s educational features that work *around* the videos, which may include:
-
-- Instant translations and vocabulary explanations
-- Guided learning flows and exercises
-- Video-based flashcards
-- Learning analytics and progress insights
-- Personal vocabulary tracking
-- Study time and usage summaries
-
-The underlying video content remains freely accessible at all times.
-
----
-
 ## 6. Ownership and Rights
 
 All original software, interfaces, designs, features, branding, and learning tools created by Candid are owned by Candid or its licensors and protected by intellectual property laws.
 
-Third-party content, including YouTube videos, is owned by the respective rights holders and is not part of Candid’s proprietary materials.
+Third-party content is owned by the respective rights holders and is not part of Candid’s proprietary materials.
 
 ---
 
