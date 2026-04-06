@@ -89,7 +89,7 @@ export default function HeroCarousel({ tutors }: { tutors: CarouselTutor[] }) {
 
   return (
     <div
-      className="mx-3 md:mx-6 mb-3 md:mb-6"
+      className="mx-3 md:mx-6 mb-12 md:mb-16"
       style={{
         marginTop: "var(--navbar-height, 52px)",
       }}
@@ -165,12 +165,12 @@ export default function HeroCarousel({ tutors }: { tutors: CarouselTutor[] }) {
           <div className="flex lg:hidden absolute inset-x-0 bottom-0 z-10 flex-col items-center justify-end px-6 pb-16 text-center">
             <h1
               className="hero-heading font-light leading-tight mb-4"
-              style={{ color: "#FFFFFF", fontSize: "clamp(1.25rem, 5.5vw, 1.875rem)" }}
+              style={{ color: "#FFFFFF", fontSize: "clamp(1.5rem, 7vw, 2.25rem)" }}
               dangerouslySetInnerHTML={{ __html: tutor.coolTitle }}
             />
             <p
-              className="font-normal leading-relaxed [&_br]:hidden"
-              style={{ color: "rgba(255,255,255,0.7)", fontSize: "clamp(0.55rem, 2.5vw, 1rem)" }}
+              className="text-sm font-normal leading-relaxed [&_br]:hidden"
+              style={{ color: "rgba(255,255,255,0.7)" }}
               dangerouslySetInnerHTML={{ __html: tutor.subtitle }}
             />
           </div>
