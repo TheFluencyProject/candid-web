@@ -171,7 +171,6 @@ export default function HeroCarousel({ tutors }: { tutors: CarouselTutor[] }) {
             <p
               className="font-normal leading-relaxed [&_br]:hidden"
               style={{ color: "rgba(255,255,255,0.7)", fontSize: "clamp(0.55rem, 2.5vw, 1rem)" }}
-              style={{ color: "rgba(255,255,255,0.7)" }}
               dangerouslySetInnerHTML={{ __html: tutor.subtitle }}
             />
           </div>
