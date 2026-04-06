@@ -97,7 +97,7 @@ export default function HeroCarousel({ tutors }: { tutors: CarouselTutor[] }) {
       <div
         className="relative rounded-3xl md:rounded-[2.5rem] overflow-hidden cursor-pointer select-none"
         style={{
-          height: "calc(100svh - var(--navbar-height, 60px) - 36px)",
+          height: "calc(100svh - var(--navbar-height, 52px) - 24px)",
         }}
         onClick={advance}
       >
@@ -164,12 +164,13 @@ export default function HeroCarousel({ tutors }: { tutors: CarouselTutor[] }) {
           {/* Mobile text — bottom, centered, same as tutor pages */}
           <div className="flex lg:hidden absolute inset-x-0 bottom-0 z-10 flex-col items-center justify-end px-6 pb-16 text-center">
             <h1
-              className="hero-heading text-3xl sm:text-4xl font-light leading-tight mb-4"
-              style={{ color: "#FFFFFF" }}
+              className="hero-heading font-light leading-tight mb-4"
+              style={{ color: "#FFFFFF", fontSize: "clamp(1.25rem, 5.5vw, 1.875rem)" }}
               dangerouslySetInnerHTML={{ __html: tutor.coolTitle }}
             />
             <p
-              className="text-base font-normal leading-relaxed [&_br]:hidden"
+              className="font-normal leading-relaxed [&_br]:hidden"
+              style={{ color: "rgba(255,255,255,0.7)", fontSize: "clamp(0.55rem, 2.5vw, 1rem)" }}
               style={{ color: "rgba(255,255,255,0.7)" }}
               dangerouslySetInnerHTML={{ __html: tutor.subtitle }}
             />
@@ -225,10 +226,9 @@ export default function HeroCarousel({ tutors }: { tutors: CarouselTutor[] }) {
             </span>
           </div>
 
-          {/* Desktop: App Store badge bottom-left */}
-          <a
-            href="/download"
-            className="hidden lg:block absolute bottom-8 left-8 hover:opacity-90 transition-opacity"
+          {/* Desktop: App Store badge bottom-left — disabled */}
+          <span
+            className="hidden lg:block absolute bottom-8 left-8"
             onClick={(e) => e.stopPropagation()}
           >
             <Image
@@ -237,7 +237,7 @@ export default function HeroCarousel({ tutors }: { tutors: CarouselTutor[] }) {
               width={140}
               height={46}
             />
-          </a>
+          </span>
         </div>
 
         {/* Pagination: left dot, center pill with progress, right dot */}

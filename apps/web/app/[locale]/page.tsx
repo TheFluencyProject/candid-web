@@ -153,15 +153,14 @@ export default async function Home({ params }: Props) {
         rightElement={
           <>
             {/* Desktop: Find your tutor pill */}
-            <a
-              href="/download"
-              className="hidden lg:block px-5 py-2 rounded-full text-sm font-semibold transition-opacity hover:opacity-90"
+            <span
+              className="hidden lg:block px-5 py-2 rounded-full text-sm font-semibold cursor-default"
               style={{ backgroundColor: "#FFFFFF", color: "#131212" }}
             >
               Get the app
-            </a>
-            {/* Mobile: App Store badge */}
-            <a href="/download" className="lg:hidden hover:opacity-90 transition-opacity">
+            </span>
+            {/* Mobile: App Store badge — disabled */}
+            <span className="lg:hidden cursor-default">
               <Image
                 src="/download.svg"
                 alt="Download on the App Store"
@@ -169,7 +168,7 @@ export default async function Home({ params }: Props) {
                 height={40}
                 priority
               />
-            </a>
+            </span>
           </>
         }
       />

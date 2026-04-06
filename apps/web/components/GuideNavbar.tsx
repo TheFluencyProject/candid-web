@@ -74,10 +74,7 @@ export default function GuideNavbar({
           />
         </a>
         {rightElement ?? (
-          <a
-            href={downloadUrl}
-            className="hover:opacity-90 transition-opacity"
-          >
+          <span className="cursor-default">
             <Image
               src="/download.svg"
               alt="Download on the App Store"
@@ -85,7 +82,7 @@ export default function GuideNavbar({
               height={40}
               priority
             />
-          </a>
+          </span>
         )}
       </div>
     </nav>
