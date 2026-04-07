@@ -32,10 +32,8 @@ function TermsContent({ content }: { content: string }) {
   const footerT = useTranslations("footer");
 
   return (
-    <main
-      className="min-h-screen px-8 py-10 md:px-12 lg:px-16"
-      style={{ backgroundColor: "#131212" }}
-    >
+    <div className="min-h-screen" style={{ backgroundColor: "#131212" }}>
+    <main className="px-8 py-10 md:px-12 lg:px-16">
       <header className="mb-10">
         <Link href="/" className="inline-block mb-8">
           <Image
@@ -99,7 +97,8 @@ function TermsContent({ content }: { content: string }) {
           {content}
         </ReactMarkdown>
       </article>
-      <SiteFooter privacyLabel={footerT("privacy")} termsLabel={footerT("terms")} />
     </main>
+      <SiteFooter privacyLabel={footerT("privacy")} termsLabel={footerT("terms")} />
+    </div>
   );
 }
