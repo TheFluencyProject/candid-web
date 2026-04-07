@@ -15,12 +15,6 @@ const TUTOR_SLUGS = ["english-adam", "korean-mia"];
 interface TutorMetadata {
   cool_title?: string;
   cool_title_kr?: string;
-  web_bg_picture?: string;
-  screenshot_listen?: string;
-  screenshot_week?: string;
-  screenshot_learn?: string;
-  screenshot_shadow?: string;
-  screenshot_intro?: string;
   [key: string]: unknown;
 }
 
@@ -32,6 +26,12 @@ interface Tutor {
   city: string | null;
   large_profile_picture_url: string | null;
   teaching_language: string;
+  screenshot_intro_url: string | null;
+  screenshot_learn_url: string | null;
+  screenshot_listen_url: string | null;
+  screenshot_shadow_url: string | null;
+  screenshot_week_url: string | null;
+  web_bg_picture_url: string | null;
   metadata: TutorMetadata | null;
 }
 
@@ -87,7 +87,7 @@ export default async function Home({ params }: Props) {
   const carouselTutors: CarouselTutor[] = tutors
     .map((tutor) => {
       const bgImage =
-        (tutor.metadata?.web_bg_picture as string) ||
+        tutor.web_bg_picture_url ||
         tutor.large_profile_picture_url;
       if (!bgImage) return null;
 
@@ -117,20 +117,22 @@ export default async function Home({ params }: Props) {
 
   // Build screenshot sections by alternating tutors
   const screenshotSections = [
-    { key: "screenshot_listen", title: "Learn the language through their eyes" },
-    { key: "screenshot_week", title: "New lessons every week" },
-    { key: "screenshot_learn", title: "Learn how natives actually talk" },
-    { key: "screenshot_shadow", title: "Practice speaking just like they do" },
-    { key: "screenshot_intro", title: "Get tutored through it all" },
-  ];
+    { key: "screenshot_listen_url", title: "Learn the language through their eyes" },
+    { key: "screenshot_week_url", title: "New lessons every week" },
+    { key: "screenshot_learn_url", title: "Learn how natives actually talk" },
+    { key: "screenshot_shadow_url", title: "Practice speaking just like they do" },
+    { key: "screenshot_intro_url", title: "Get tutored through it all" },
+  ] as const;
 
   const sectionsWithTutors = screenshotSections
     .map((section, i) => {
       const tutor = tutors[i % tutors.length];
-      if (!tutor?.metadata?.[section.key]) return null;
+      const url = tutor?.[section.key];
+      if (!url) return null;
       return {
-        ...section,
-        screenshotUrl: tutor.metadata[section.key] as string,
+        key: section.key,
+        title: section.title,
+        screenshotUrl: url,
         tutorName: tutor.name.split(" ")[0],
       };
     })

@@ -28,12 +28,6 @@ interface TutorMetadata {
   interests?: string;
   cool_title?: string;
   cool_title_kr?: string;
-  web_bg_picture?: string;
-  screenshot_listen?: string;
-  screenshot_week?: string;
-  screenshot_learn?: string;
-  screenshot_shadow?: string;
-  screenshot_intro?: string;
   name_kr?: string;
   [key: string]: unknown;
 }
@@ -51,6 +45,12 @@ interface Tutor {
   profile_picture_url: string | null;
   large_profile_picture_url: string | null;
   intro_video_url: string | null;
+  screenshot_intro_url: string | null;
+  screenshot_learn_url: string | null;
+  screenshot_listen_url: string | null;
+  screenshot_shadow_url: string | null;
+  screenshot_week_url: string | null;
+  web_bg_picture_url: string | null;
   languages: TutorLanguageProficiency[];
   teaching_language: string;
   metadata: TutorMetadata | null;
@@ -124,7 +124,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     title = `Candid | ${capitalize(tutor.teaching_language)} with ${tutor.name}`;
   }
   const description = tutor.short_description;
-  const ogImage = (tutor.metadata?.web_bg_picture as string) || tutor.large_profile_picture_url;
+  const ogImage = tutor.web_bg_picture_url || tutor.large_profile_picture_url;
 
   return {
     metadataBase: new URL("https://joincandid.co"),
@@ -182,18 +182,18 @@ export default async function GuidePage({ params }: Props) {
       {/* ─── Full-Viewport Hero ─── */}
       <section className="relative min-h-[80vh] lg:min-h-screen overflow-hidden">
         {/* Photo background */}
-        {(tutor.metadata?.web_bg_picture || tutor.large_profile_picture_url) ? (
+        {(tutor.web_bg_picture_url || tutor.large_profile_picture_url) ? (
           <>
             {/* Desktop photo */}
             <img
-              src={(tutor.metadata?.web_bg_picture as string) || tutor.large_profile_picture_url!}
+              src={tutor.web_bg_picture_url || tutor.large_profile_picture_url!}
               alt={tutor.name}
               className="absolute inset-0 w-full h-full object-cover hidden lg:block"
               style={{ objectPosition: config.photo.desktop }}
             />
             {/* Mobile photo */}
             <img
-              src={(tutor.metadata?.web_bg_picture as string) || tutor.large_profile_picture_url!}
+              src={tutor.web_bg_picture_url || tutor.large_profile_picture_url!}
               alt={tutor.name}
               className="absolute inset-0 w-full h-full object-cover lg:hidden scale-[1.15] origin-bottom"
               style={{ objectPosition: config.photo.mobile }}
@@ -435,17 +435,17 @@ export default async function GuidePage({ params }: Props) {
       {(() => {
         const tVars = { firstName: localizedFirstName, language: langLabel };
         const screenshots = [
-          { key: "screenshot_listen", title: t("listen", tVars) },
-          { key: "screenshot_week", title: t("week", tVars) },
-          { key: "screenshot_learn", title: t("learn", tVars) },
-          { key: "screenshot_shadow", title: t("shadow", tVars) },
-          { key: "screenshot_intro", title: t("intro", tVars) },
-        ].filter((s) => tutor.metadata?.[s.key]);
+          { url: tutor.screenshot_listen_url, title: t("listen", tVars) },
+          { url: tutor.screenshot_week_url, title: t("week", tVars) },
+          { url: tutor.screenshot_learn_url, title: t("learn", tVars) },
+          { url: tutor.screenshot_shadow_url, title: t("shadow", tVars) },
+          { url: tutor.screenshot_intro_url, title: t("intro", tVars) },
+        ].filter((s) => s.url);
 
         if (screenshots.length === 0) return null;
 
         return screenshots.map((s) => (
-          <section key={s.key} className="relative">
+          <section key={s.url} className="relative">
             <StickyHeader>
               <ScrollFadeIn>
                 <h2 className="text-center text-2xl md:text-3xl lg:text-4xl font-black uppercase tracking-tight">
@@ -458,7 +458,7 @@ export default async function GuidePage({ params }: Props) {
               <div className="flex justify-center px-6 pb-16 md:pb-24">
                 <div className="w-full max-w-sm md:max-w-[500px] lg:max-w-[420px]">
                   <img
-                    src={tutor.metadata![s.key] as string}
+                    src={s.url!}
                     alt={s.title}
                     className="w-full rounded-[2.5rem] shadow-2xl"
                   />
