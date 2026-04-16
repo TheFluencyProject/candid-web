@@ -28,7 +28,7 @@
     "tutor_label": "{firstName} 쌤",
     "download_qr": "무료로 다운로드 & 체험",
     "get_started": "무료로 시작하기",
-    "no_credit_card": "신용카드 필요 없음",
+    "no_credit_card": "카드 정보 입력 없이",
     "listen": "{firstName}의 눈으로 {language} 배우기",
     "learn": "원어민이 실제로 말하는 방식 배우기",
     "shadow": "{firstName}처럼 말하기 연습",
@@ -43,7 +43,7 @@
     "all_levels": "모든 레벨",
     "follow": "{name} 팔로우",
     "ready_to_learn": "{name}과 함께 배울 준비 되셨나요?",
-    "free_to_try": "무료 체험 — 신용카드 불필요",
+    "free_to_try": "무료 체험 — 카드 정보 입력 없이",
     "privacy": "개인정보 처리방침",
     "terms": "이용약관"
   },

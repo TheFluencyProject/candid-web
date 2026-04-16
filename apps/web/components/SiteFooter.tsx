@@ -50,14 +50,24 @@ export default function SiteFooter({
         <div>
           <h4 className="text-sm font-bold uppercase tracking-wider mb-4 opacity-70">Connect</h4>
           <ul className="space-y-2">
-            {/* Instagram — temporarily hidden */}
             <li>
               <a
-                href="mailto:support@thefluencyproject.co"
+                href="https://instagram.com/join.candid"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-sm opacity-50 hover:opacity-70 transition-opacity flex items-center gap-2"
+              >
+                <svg className="w-4 h-4 shrink-0" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+                @join.candid
+              </a>
+            </li>
+            <li>
+              <a
+                href="mailto:adam@thefluencyproject.co"
                 className="text-sm opacity-50 hover:opacity-70 transition-opacity flex items-center gap-2"
               >
                 <svg className="w-4 h-4 shrink-0" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
-                support@thefluencyproject.co
+                adam@thefluencyproject.co
               </a>
             </li>
           </ul>
