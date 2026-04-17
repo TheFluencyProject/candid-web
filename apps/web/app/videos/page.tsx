@@ -28,7 +28,7 @@ export default function VideosPage() {
     <>
       <main
         style={{
-          backgroundColor: "#18181E",
+          backgroundColor: "#1A1A1D",
           minHeight: "100vh",
           display: "flex",
           flexDirection: "column",

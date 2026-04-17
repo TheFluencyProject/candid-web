@@ -72,7 +72,7 @@ export default async function Image({
             display: "flex",
             width: "100%",
             height: "100%",
-            backgroundColor: "#18181E",
+            backgroundColor: "#1A1A1D",
           }}
         />
       ),
@@ -106,7 +106,7 @@ export default async function Image({
           width: "100%",
           height: "100%",
           position: "relative",
-          backgroundColor: "#18181E",
+          backgroundColor: "#1A1A1D",
         }}
       >
         {/* Thumbnail as background */}

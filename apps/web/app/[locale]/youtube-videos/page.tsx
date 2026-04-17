@@ -90,7 +90,7 @@ export default function YoutubeVideosPage() {
   };
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: "#18181E" }}>
+    <div className="min-h-screen" style={{ backgroundColor: "#1A1A1D" }}>
     <main className="px-8 py-10 md:px-12 lg:px-16">
       {/* Header */}
       <header className="mb-10">

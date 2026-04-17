@@ -160,7 +160,7 @@ export default async function Home({ params }: Props) {
   return (
     <main
       className="min-h-screen text-white"
-      style={{ backgroundColor: "#18181E" }}
+      style={{ backgroundColor: "#1A1A1D" }}
     >
       <GuideNavbar
         sentinelId="hero-sentinel"
@@ -172,7 +172,7 @@ export default async function Home({ params }: Props) {
             <a
               href="/download"
               className="hidden lg:block px-5 py-2 rounded-full text-sm font-semibold"
-              style={{ backgroundColor: "#FFFFFF", color: "#18181E" }}
+              style={{ backgroundColor: "#FFFFFF", color: "#1A1A1D" }}
             >
               Get the app
             </a>
