@@ -98,8 +98,12 @@ export default async function Home({ params }: Props) {
           : (tutor.metadata?.cool_title ?? tutor.title);
       const coolTitle = formatHeroTitle(rawCoolTitle);
       const firstName = tutor.name.split(" ")[0];
+      const localizedFirstName =
+        locale === "ko" && tutor.metadata?.name_kr
+          ? (tutor.metadata.name_kr as string)
+          : firstName;
       const langLabel = tutor.teaching_language.charAt(0).toUpperCase() + tutor.teaching_language.slice(1);
-      const subtitle = guideT("subtitle", { name: firstName, language: langLabel });
+      const subtitle = guideT("subtitle", { name: localizedFirstName, language: langLabel });
 
       return {
         slug: tutor.slug,
@@ -117,11 +121,11 @@ export default async function Home({ params }: Props) {
 
   // Build screenshot sections by alternating tutors
   const screenshotSections = [
-    { key: "screenshot_listen_url", title: "Learn the language through their eyes" },
-    { key: "screenshot_week_url", title: "New lessons every week" },
-    { key: "screenshot_learn_url", title: "Learn how natives actually talk" },
-    { key: "screenshot_shadow_url", title: "Practice speaking just like they do" },
-    { key: "screenshot_intro_url", title: "Get tutored through it all" },
+    { key: "screenshot_listen_url", title: guideT("home_listen") },
+    { key: "screenshot_week_url", title: guideT("week") },
+    { key: "screenshot_learn_url", title: guideT("home_learn") },
+    { key: "screenshot_shadow_url", title: guideT("home_shadow") },
+    { key: "screenshot_intro_url", title: guideT("intro") },
   ] as const;
 
   const sectionsWithTutors = screenshotSections
