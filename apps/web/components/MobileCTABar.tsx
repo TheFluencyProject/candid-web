@@ -24,7 +24,7 @@ export default function MobileCTABar({ downloadUrl, ctaLabel, ctaSubtext, hideUn
       <div
         className="pt-12 px-6 flex flex-col items-center pointer-events-auto"
         style={{
-          background: "linear-gradient(to top, #131212 60%, transparent 100%)",
+          background: "linear-gradient(to top, #1F1F27 60%, transparent 100%)",
           paddingBottom: "max(0.5rem, env(safe-area-inset-bottom))",
         }}
       >

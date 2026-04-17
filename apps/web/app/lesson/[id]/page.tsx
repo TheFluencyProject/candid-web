@@ -91,7 +91,7 @@ export default async function LessonPage({
     <>
       <main
         style={{
-          backgroundColor: "#131212",
+          backgroundColor: "#1F1F27",
           minHeight: "100vh",
           display: "flex",
           flexDirection: "column",

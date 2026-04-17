@@ -130,7 +130,7 @@ export default function HeroCarousel({ tutors }: { tutors: CarouselTutor[] }) {
         <div
           className="hidden lg:block absolute inset-0 pointer-events-none"
           style={{
-            background: "linear-gradient(to bottom, transparent 70%, rgba(19,18,18,0.6) 100%)",
+            background: "linear-gradient(to bottom, transparent 70%, rgba(31,31,39,0.6) 100%)",
           }}
         />
         {/* Mobile: stronger bottom fade */}
@@ -138,7 +138,7 @@ export default function HeroCarousel({ tutors }: { tutors: CarouselTutor[] }) {
           className="block lg:hidden absolute inset-0 pointer-events-none"
           style={{
             background:
-              "linear-gradient(to bottom, transparent 30%, rgba(19,18,18,0.3) 45%, rgba(19,18,18,0.5) 55%, rgba(19,18,18,0.65) 70%, rgba(19,18,18,0.75) 85%)",
+              "linear-gradient(to bottom, transparent 30%, rgba(31,31,39,0.3) 45%, rgba(31,31,39,0.5) 55%, rgba(31,31,39,0.65) 70%, rgba(31,31,39,0.75) 85%)",
           }}
         />
 
@@ -151,12 +151,12 @@ export default function HeroCarousel({ tutors }: { tutors: CarouselTutor[] }) {
           <div className="hidden lg:flex flex-col justify-start absolute inset-y-0 left-0 px-12 pt-12 pb-24">
             <h1
               className="hero-heading text-5xl xl:text-6xl font-light leading-[1.15] mb-6"
-              style={{ color: "#131212" }}
+              style={{ color: "#1F1F27" }}
               dangerouslySetInnerHTML={{ __html: tutor.coolTitle }}
             />
             <p
               className="text-base xl:text-lg font-light leading-relaxed"
-              style={{ color: "#131212", opacity: 0.7 }}
+              style={{ color: "#1F1F27", opacity: 0.7 }}
               dangerouslySetInnerHTML={{ __html: tutor.subtitle }}
             />
           </div>
@@ -286,7 +286,7 @@ export default function HeroCarousel({ tutors }: { tutors: CarouselTutor[] }) {
             <span
               className="relative text-xs font-semibold whitespace-nowrap uppercase tracking-wide"
               style={{
-                color: progress > 0.5 ? "#131212" : "rgba(255,255,255,0.9)",
+                color: progress > 0.5 ? "#1F1F27" : "rgba(255,255,255,0.9)",
                 transition: "color 200ms ease",
               }}
             >
