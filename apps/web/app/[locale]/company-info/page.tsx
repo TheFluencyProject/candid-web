@@ -29,10 +29,10 @@ export default async function CompanyInfoPage({ params }: Props) {
   );
   const content = await readFile(file_path, "utf-8");
 
-  return <CompanyInfoContent content={content} />;
+  return <CompanyInfoContent content={content} locale={locale} />;
 }
 
-function CompanyInfoContent({ content }: { content: string }) {
+function CompanyInfoContent({ content, locale }: { content: string; locale: string }) {
   const t = useTranslations("company_info");
   const footerT = useTranslations("footer");
 
