@@ -140,7 +140,7 @@ export default async function Home({ params }: Props) {
         screenshot_listen_url: guideT("home_listen", { language: tutorLang }),
         screenshot_week_url: guideT("week"),
         screenshot_learn_url: guideT("learn"),
-        screenshot_shadow_url: guideT("home_shadow"),
+        screenshot_shadow_url: guideT("home_shadow", { language: tutorLang }),
         screenshot_intro_url: guideT("intro"),
       };
       return {
