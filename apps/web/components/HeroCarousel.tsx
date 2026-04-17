@@ -225,8 +225,9 @@ export default function HeroCarousel({ tutors }: { tutors: CarouselTutor[] }) {
             </span>
           </div>
 
-          {/* Desktop: App Store badge bottom-left — disabled */}
-          <span
+          {/* Desktop: App Store badge bottom-left */}
+          <a
+            href="/download"
             className="hidden lg:block absolute bottom-8 left-8"
             onClick={(e) => e.stopPropagation()}
           >
@@ -236,7 +237,7 @@ export default function HeroCarousel({ tutors }: { tutors: CarouselTutor[] }) {
               width={140}
               height={46}
             />
-          </span>
+          </a>
         </div>
 
         {/* Pagination: left dot, center pill with progress, right dot */}

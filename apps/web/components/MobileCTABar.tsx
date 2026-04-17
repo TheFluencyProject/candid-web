@@ -28,12 +28,13 @@ export default function MobileCTABar({ downloadUrl, ctaLabel, ctaSubtext, hideUn
           paddingBottom: "max(0.5rem, env(safe-area-inset-bottom))",
         }}
       >
-        <span
-          className="w-full max-w-sm py-4 rounded-full text-center text-lg font-bold tracking-wide cursor-default block"
+        <a
+          href={href}
+          className="w-full max-w-sm py-4 rounded-full text-center text-lg font-bold tracking-wide block"
           style={{ backgroundColor: "#89FFB4", color: "#000000" }}
         >
           {ctaLabel ?? "GET STARTED FOR FREE"}
-        </span>
+        </a>
         <p
           className="mt-2 text-sm font-medium"
           style={{ color: "#89FFB4" }}

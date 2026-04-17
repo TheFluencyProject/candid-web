@@ -154,15 +154,16 @@ export default async function Home({ params }: Props) {
         alwaysWhite
         rightElement={
           <>
-            {/* Desktop: Find your tutor pill */}
-            <span
-              className="hidden lg:block px-5 py-2 rounded-full text-sm font-semibold cursor-default"
+            {/* Desktop: Get the app pill */}
+            <a
+              href="/download"
+              className="hidden lg:block px-5 py-2 rounded-full text-sm font-semibold"
               style={{ backgroundColor: "#FFFFFF", color: "#131212" }}
             >
               Get the app
-            </span>
-            {/* Mobile: App Store badge — disabled */}
-            <span className="lg:hidden cursor-default">
+            </a>
+            {/* Mobile: App Store badge */}
+            <a href="/download" className="lg:hidden">
               <Image
                 src="/download.svg"
                 alt="Download on the App Store"
@@ -170,7 +171,7 @@ export default async function Home({ params }: Props) {
                 height={40}
                 priority
               />
-            </span>
+            </a>
           </>
         }
       />

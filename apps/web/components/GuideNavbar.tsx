@@ -74,7 +74,7 @@ export default function GuideNavbar({
           />
         </a>
         {rightElement ?? (
-          <span className="cursor-default">
+          <a href={downloadUrl}>
             <Image
               src="/download.svg"
               alt="Download on the App Store"
@@ -82,7 +82,7 @@ export default function GuideNavbar({
               height={40}
               priority
             />
-          </span>
+          </a>
         )}
       </div>
     </nav>
