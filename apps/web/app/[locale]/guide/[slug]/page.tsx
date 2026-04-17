@@ -308,7 +308,7 @@ export default async function GuidePage({ params }: Props) {
       </section>
 
       {/* ─── Guide Profile Card ─── */}
-      <section className="px-6 pt-20 pb-12 md:px-12 md:pt-24 md:pb-16">
+      <section className="hidden px-6 pt-20 pb-12 md:px-12 md:pt-24 md:pb-16">
         <div className="max-w-sm md:max-w-[500px] lg:max-w-[420px] mx-auto">
           <div className="flex flex-col items-center text-center mb-6">
             {tutor.profile_picture_url && (
