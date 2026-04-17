@@ -126,7 +126,6 @@ export default async function Home({ params }: Props) {
     "screenshot_listen_url",
     "screenshot_week_url",
     "screenshot_shadow_url",
-    "screenshot_learn_url",
     "screenshot_intro_url",
   ] as const;
 

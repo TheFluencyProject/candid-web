@@ -433,7 +433,6 @@ export default async function GuidePage({ params }: Props) {
         const screenshots = [
           { url: tutor.screenshot_listen_url, title: t("listen", tVars) },
           { url: tutor.screenshot_week_url, title: t("week", tVars) },
-          { url: tutor.screenshot_learn_url, title: t("learn", tVars) },
           { url: tutor.screenshot_shadow_url, title: t("shadow", tVars) },
           { url: tutor.screenshot_intro_url, title: t("intro", tVars) },
         ].filter((s) => s.url);
