@@ -32,7 +32,7 @@ function PrivacyContent({ content }: { content: string }) {
   const footerT = useTranslations("footer");
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: "#1F1F27" }}>
+    <div className="min-h-screen" style={{ backgroundColor: "#18181E" }}>
     <main className="px-8 py-10 md:px-12 lg:px-16">
       <header className="mb-10">
         <Link href="/" className="inline-block mb-8">

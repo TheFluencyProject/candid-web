@@ -15,11 +15,11 @@ body {
 
 html {
   --navbar-height: 60px;
-  background-color: #1F1F27;
+  background-color: #18181E;
 }
 
 body {
-  background-color: #1F1F27;
+  background-color: #18181E;
 }
 
 /* Hide scrollbar for horizontal language selector */
@@ -39,14 +39,14 @@ input:-webkit-autofill:hover,
 select:-webkit-autofill,
 select:-webkit-autofill:focus,
 select:-webkit-autofill:hover {
-  -webkit-box-shadow: 0 0 0 1000px #1F1F27 inset !important;
+  -webkit-box-shadow: 0 0 0 1000px #18181E inset !important;
   -webkit-text-fill-color: #fff !important;
   caret-color: #fff !important;
   transition: background-color 5000s ease-in-out 0s;
 }
 
 input:-internal-autofill-selected {
-  background-color: #1F1F27 !important;
+  background-color: #18181E !important;
   color: #fff !important;
 }
 

@@ -170,7 +170,7 @@ export default async function GuidePage({ params }: Props) {
   return (
     <main
       className="min-h-screen"
-      style={{ backgroundColor: "#1F1F27", color: "#FFFFFF" }}
+      style={{ backgroundColor: "#18181E", color: "#FFFFFF" }}
     >
       {/* ─── Fixed Navbar ─── */}
       <GuideNavbar sentinelId="hero-sentinel" downloadUrl={`/download/${slug}`} />
@@ -210,7 +210,7 @@ export default async function GuidePage({ params }: Props) {
           className="absolute inset-0 pointer-events-none hidden lg:block"
           style={{
             background:
-              "linear-gradient(to bottom, transparent 70%, #1F1F27 100%)",
+              "linear-gradient(to bottom, transparent 70%, #18181E 100%)",
           }}
         />
         {/* Bottom fade into background color — mobile */}
@@ -218,7 +218,7 @@ export default async function GuidePage({ params }: Props) {
           className="absolute inset-0 pointer-events-none lg:hidden"
           style={{
             background:
-              "linear-gradient(to bottom, transparent 35%, rgba(31,31,39,0.4) 50%, rgba(31,31,39,0.7) 65%, rgba(31,31,39,0.85) 80%, #1F1F27 95%)",
+              "linear-gradient(to bottom, transparent 35%, rgba(24,24,30,0.4) 50%, rgba(24,24,30,0.7) 65%, rgba(24,24,30,0.85) 80%, #18181E 95%)",
           }}
         />
 
@@ -226,12 +226,12 @@ export default async function GuidePage({ params }: Props) {
         <div className="relative z-10 hidden lg:flex flex-col justify-start min-h-screen px-12 pt-[120px] pb-24">
           <h1
             className="hero-heading text-5xl xl:text-6xl font-light leading-[1.15] mb-6 animate-fade-in-up"
-            style={{ color: "#1F1F27" }}
+            style={{ color: "#18181E" }}
             dangerouslySetInnerHTML={{ __html: coolTitle }}
           />
           <p
             className="text-base xl:text-lg font-light leading-relaxed mb-6 max-w-md animate-fade-in-up-delay-1"
-            style={{ color: "#1F1F27", opacity: 0.7 }}
+            style={{ color: "#18181E", opacity: 0.7 }}
             dangerouslySetInnerHTML={{ __html: t("subtitle", { name: locale === "ko" ? withKoreanParticle(localizedFirstName) : localizedFirstName, language: langLabel }) }}
           />
           <div className="animate-fade-in-up-delay-2 self-start">
