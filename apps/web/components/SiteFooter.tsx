@@ -13,14 +13,14 @@ export default function SiteFooter({
       <div className="grid grid-cols-2 gap-8 px-6 py-10 lg:grid-cols-4 lg:px-12 lg:py-12">
         {/* App Store — desktop only */}
         <div className="hidden lg:flex flex-col items-start">
-          <span className="cursor-default">
+          <a href="/download">
             <Image
               src="/download.svg"
               alt="Download on the App Store"
               width={140}
               height={46}
             />
-          </span>
+          </a>
         </div>
 
         {/* Pages */}
