@@ -95,7 +95,7 @@ export default function HeroCarousel({ tutors }: { tutors: CarouselTutor[] }) {
       }}
     >
       <div
-        className="relative rounded-3xl md:rounded-[2.5rem] overflow-hidden cursor-pointer select-none"
+        className="relative rounded-3xl md:rounded-[2.5rem] overflow-hidden cursor-default select-none"
         style={{
           height: "calc(100svh - var(--navbar-height, 52px) - 24px)",
         }}
