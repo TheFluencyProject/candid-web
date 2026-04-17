@@ -103,7 +103,7 @@ function CompanyInfoContent({ content }: { content: string }) {
         </ReactMarkdown>
       </article>
     </main>
-      <SiteFooter privacyLabel={footerT("privacy")} termsLabel={footerT("terms")} />
+      <SiteFooter locale={locale} />
     </div>
   );
 }

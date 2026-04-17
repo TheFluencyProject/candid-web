@@ -1,54 +1,56 @@
 import Image from "next/image";
+import { getTranslations } from "next-intl/server";
+import { Link } from "@/i18n/routing";
 
-export default function SiteFooter({
-  privacyLabel,
-  termsLabel,
+export default async function SiteFooter({
+  locale,
 }: {
-  privacyLabel: string;
-  termsLabel: string;
+  locale: string;
 }) {
+  const t = await getTranslations({ locale, namespace: "footer" });
+
   return (
     <footer className="border-t border-white/10">
       {/* Main footer grid */}
       <div className="grid grid-cols-2 gap-8 px-6 py-10 lg:grid-cols-4 lg:px-12 lg:py-12">
         {/* App Store — desktop only */}
         <div className="hidden lg:flex flex-col items-start">
-          <a href="/download">
+          <Link href="/download">
             <Image
               src="/download.svg"
               alt="Download on the App Store"
               width={140}
               height={46}
             />
-          </a>
+          </Link>
         </div>
 
         {/* Pages */}
         <div>
-          <h4 className="text-sm font-bold uppercase tracking-wider mb-4 opacity-70">Pages</h4>
+          <h4 className="text-sm font-bold uppercase tracking-wider mb-4 opacity-70">{t("pages_heading")}</h4>
           <ul className="space-y-2">
             <li>
-              <a href="/" className="text-sm opacity-50 hover:opacity-70 transition-opacity">Home</a>
+              <Link href="/" className="text-sm opacity-50 hover:opacity-70 transition-opacity">{t("home")}</Link>
             </li>
           </ul>
         </div>
 
-        {/* Guides */}
+        {/* Programs */}
         <div>
-          <h4 className="text-sm font-bold uppercase tracking-wider mb-4 opacity-70">Programs</h4>
+          <h4 className="text-sm font-bold uppercase tracking-wider mb-4 opacity-70">{t("programs_heading")}</h4>
           <ul className="space-y-2">
             <li>
-              <a href="/guide/english-adam" className="text-sm opacity-50 hover:opacity-70 transition-opacity">English with Adam</a>
+              <Link href="/guide/english-adam" className="text-sm opacity-50 hover:opacity-70 transition-opacity">{t("english_with_adam")}</Link>
             </li>
             <li>
-              <a href="/guide/korean-mia" className="text-sm opacity-50 hover:opacity-70 transition-opacity">Korean with Mia</a>
+              <Link href="/guide/korean-mia" className="text-sm opacity-50 hover:opacity-70 transition-opacity">{t("korean_with_mia")}</Link>
             </li>
           </ul>
         </div>
 
         {/* Socials */}
         <div>
-          <h4 className="text-sm font-bold uppercase tracking-wider mb-4 opacity-70">Connect</h4>
+          <h4 className="text-sm font-bold uppercase tracking-wider mb-4 opacity-70">{t("connect_heading")}</h4>
           <ul className="space-y-2">
             <li>
               <a
@@ -77,14 +79,14 @@ export default function SiteFooter({
       {/* Bottom bar — always visible */}
       <div className="px-6 py-6 pb-32 md:pb-6 md:px-12 flex items-center justify-between flex-wrap gap-4 border-t border-white/5">
         <div className="flex gap-6 items-center">
-          <a href="/privacy" className="text-sm opacity-50 hover:opacity-70 transition-opacity">
-            {privacyLabel}
-          </a>
-          <a href="/terms" className="text-sm opacity-50 hover:opacity-70 transition-opacity">
-            {termsLabel}
-          </a>
+          <Link href="/privacy" className="text-sm opacity-50 hover:opacity-70 transition-opacity">
+            {t("privacy")}
+          </Link>
+          <Link href="/terms" className="text-sm opacity-50 hover:opacity-70 transition-opacity">
+            {t("terms")}
+          </Link>
           <span className="text-sm opacity-50">
-            ElevenLabs Partner
+            {t("elevenlabs_partner")}
           </span>
         </div>
         <p className="text-sm opacity-30">

@@ -7,6 +7,7 @@ import ScrollFadeIn from "@/components/ScrollFadeIn";
 import HeroCarousel, { type CarouselTutor } from "@/components/HeroCarousel";
 import SiteFooter from "@/components/SiteFooter";
 import { getTutorPageConfig } from "@/config/tutors";
+import { localizeLanguageName, withKoreanParticle } from "@/lib/i18n-helpers";
 
 const API_BASE_URL = "https://dev.api.joincandid.co";
 // english-adam first so carousel starts with Adam
@@ -102,8 +103,9 @@ export default async function Home({ params }: Props) {
         locale === "ko" && tutor.metadata?.name_kr
           ? (tutor.metadata.name_kr as string)
           : firstName;
-      const langLabel = tutor.teaching_language.charAt(0).toUpperCase() + tutor.teaching_language.slice(1);
-      const subtitle = guideT("subtitle", { name: localizedFirstName, language: langLabel });
+      const langLabel = localizeLanguageName(tutor.teaching_language, locale);
+      const nameForSubtitle = locale === "ko" ? withKoreanParticle(localizedFirstName) : localizedFirstName;
+      const subtitle = guideT("subtitle", { name: nameForSubtitle, language: langLabel });
 
       return {
         slug: tutor.slug,
@@ -120,22 +122,30 @@ export default async function Home({ params }: Props) {
     .filter((t): t is CarouselTutor => t !== null);
 
   // Build screenshot sections by alternating tutors
-  const screenshotSections = [
-    { key: "screenshot_listen_url", title: guideT("home_listen") },
-    { key: "screenshot_week_url", title: guideT("week") },
-    { key: "screenshot_learn_url", title: guideT("learn") },
-    { key: "screenshot_shadow_url", title: guideT("home_shadow") },
-    { key: "screenshot_intro_url", title: guideT("intro") },
+  const screenshotSectionKeys = [
+    "screenshot_listen_url",
+    "screenshot_week_url",
+    "screenshot_learn_url",
+    "screenshot_shadow_url",
+    "screenshot_intro_url",
   ] as const;
 
-  const sectionsWithTutors = screenshotSections
-    .map((section, i) => {
+  const sectionsWithTutors = screenshotSectionKeys
+    .map((key, i) => {
       const tutor = tutors[i % tutors.length];
-      const url = tutor?.[section.key];
+      const url = tutor?.[key];
       if (!url) return null;
+      const tutorLang = localizeLanguageName(tutor.teaching_language, locale);
+      const titleMap = {
+        screenshot_listen_url: guideT("home_listen", { language: tutorLang }),
+        screenshot_week_url: guideT("week"),
+        screenshot_learn_url: guideT("learn"),
+        screenshot_shadow_url: guideT("home_shadow"),
+        screenshot_intro_url: guideT("intro"),
+      };
       return {
-        key: section.key,
-        title: section.title,
+        key,
+        title: titleMap[key],
         screenshotUrl: url,
         tutorName: tutor.name.split(" ")[0],
       };
@@ -208,7 +218,7 @@ export default async function Home({ params }: Props) {
       ))}
 
       {/* ─── Footer ─── */}
-      <SiteFooter privacyLabel={t("footer.privacy")} termsLabel={t("footer.terms")} />
+      <SiteFooter locale={locale} />
       <MobileCTABar hideUntilScroll />
     </main>
   );

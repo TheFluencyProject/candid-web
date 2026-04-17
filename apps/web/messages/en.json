@@ -10,7 +10,14 @@
     "privacy": "Privacy Policy",
     "terms": "Terms of Use",
     "youtube_videos": "Content Rights",
-    "company_info": "Company Info"
+    "company_info": "Company Info",
+    "pages_heading": "Pages",
+    "home": "Home",
+    "programs_heading": "Programs",
+    "english_with_adam": "English with Adam",
+    "korean_with_mia": "Korean with Mia",
+    "connect_heading": "Connect",
+    "elevenlabs_partner": "ElevenLabs Partner"
   },
   "privacy": {
     "title": "Privacy Policy",
@@ -33,7 +40,7 @@
     "week": "Daily video lessons, new every week",
     "learn": "Explanations from a native, not AI",
     "shadow": "Speak {language} just like {firstName} does",
-    "home_listen": "Learn the language through your tutor's eyes",
+    "home_listen": "Learn {language} through your tutor's eyes",
     "home_shadow": "Speak the language just like they do",
     "intro": "Get tutored through it all",
     "personality": "Personality",

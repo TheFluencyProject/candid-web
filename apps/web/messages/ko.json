@@ -10,7 +10,14 @@
     "privacy": "개인정보 처리방침",
     "terms": "이용약관",
     "youtube_videos": "콘텐츠 사용 권한",
-    "company_info": "사업자정보"
+    "company_info": "사업자정보",
+    "pages_heading": "페이지",
+    "home": "홈",
+    "programs_heading": "프로그램",
+    "english_with_adam": "영어, 아담과 함께",
+    "korean_with_mia": "한국어, 미아와 함께",
+    "connect_heading": "소셜",
+    "elevenlabs_partner": "ElevenLabs 파트너"
   },
   "privacy": {
     "title": "개인정보 처리방침",
@@ -24,18 +31,18 @@
     "title": "사업자정보"
   },
   "guide": {
-    "subtitle": "{name}과 함께 실생활 {language} 말하기 듣기 프로그램을 시작해보세요",
+    "subtitle": "{name} 함께 실생활 {language} 말하기 듣기 프로그램을 시작해보세요",
     "tutor_label": "{firstName} 쌤",
     "download_qr": "무료로 다운로드 & 체험",
     "get_started": "무료로 시작하기",
     "no_credit_card": "카드 정보 입력 없이",
-    "listen": "{firstName}의 눈으로 {language} 배우기",
+    "listen": "리얼 라이프가 담긴 리얼 {language}",
     "week": "매일 새로운 레슨, 매주 새로운 주제",
     "learn": "사람 냄새 나는 표현과 설명",
     "shadow": "{firstName}의 억양과 발음, 그대로",
-    "home_listen": "현지 일상을, 직접 튜터의 눈으로",
+    "home_listen": "리얼 라이프가 담긴 리얼 {language}",
     "home_shadow": "네이티브의 억양과 발음, 그대로",
-    "intro": "처음부터 끝까지 튜터링 받기",
+    "intro": "내 곁에서 내내 튜터와 함께",
     "personality": "성격",
     "about": "자기소개",
     "these_days": "현황",
@@ -45,7 +52,7 @@
     "speaks": "구사 언어",
     "all_levels": "모든 레벨",
     "follow": "{name} 팔로우",
-    "ready_to_learn": "{name}과 함께 배울 준비 되셨나요?",
+    "ready_to_learn": "{name} 배울 준비 되셨나요?",
     "free_to_try": "무료 체험 — 카드 정보 입력 없이",
     "privacy": "개인정보 처리방침",
     "terms": "이용약관"

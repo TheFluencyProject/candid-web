@@ -211,7 +211,7 @@ export default function YoutubeVideosPage() {
         </>
       )}
     </main>
-      <SiteFooter privacyLabel={footerT("privacy")} termsLabel={footerT("terms")} />
+      <SiteFooter locale={locale} />
     </div>
   );
 }

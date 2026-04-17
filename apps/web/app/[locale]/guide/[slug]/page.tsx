@@ -9,6 +9,7 @@ import { getTutorPageConfig } from "@/config/tutors";
 import StickyHeader from "@/components/StickyHeader";
 import ScrollFadeIn from "@/components/ScrollFadeIn";
 import SiteFooter from "@/components/SiteFooter";
+import { localizeLanguageName, capitalize, withKoreanParticle } from "@/lib/i18n-helpers";
 
 const API_BASE_URL = "https://dev.api.joincandid.co";
 const APP_STORE_URL = "https://apps.apple.com/app/id6754859158";
@@ -88,10 +89,6 @@ function formatHeroTitle(text: string): string {
   return text;
 }
 
-function capitalize(s: string): string {
-  return s.charAt(0).toUpperCase() + s.slice(1);
-}
-
 function formatLanguages(languages: TutorLanguageProficiency[]): string {
   return languages
     .map((l) => {
@@ -114,10 +111,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     return { title: "Guide Not Found — Candid" };
   }
 
-  const koreanLangNames: Record<string, string> = { english: "영어", korean: "한국어" };
   let title: string;
   if (locale === "ko") {
-    const koreanLang = koreanLangNames[tutor.teaching_language] ?? capitalize(tutor.teaching_language);
+    const koreanLang = localizeLanguageName(tutor.teaching_language, "ko");
     const koreanName = (tutor.metadata?.name_kr as string) ?? tutor.name;
     title = `Candid | ${koreanLang}, ${koreanName}과 함께`;
   } else {
@@ -163,7 +159,7 @@ export default async function GuidePage({ params }: Props) {
     locale === "ko" && tutor.metadata?.name_kr
       ? (tutor.metadata.name_kr as string)
       : firstName;
-  const langLabel = capitalize(tutor.teaching_language);
+  const langLabel = localizeLanguageName(tutor.teaching_language, locale);
   const config = getTutorPageConfig(slug);
   const rawCoolTitle =
     locale === "ko"
@@ -236,7 +232,7 @@ export default async function GuidePage({ params }: Props) {
           <p
             className="text-base xl:text-lg font-light leading-relaxed mb-6 max-w-md animate-fade-in-up-delay-1"
             style={{ color: "#131212", opacity: 0.7 }}
-            dangerouslySetInnerHTML={{ __html: t("subtitle", { name: localizedFirstName, language: langLabel }) }}
+            dangerouslySetInnerHTML={{ __html: t("subtitle", { name: locale === "ko" ? withKoreanParticle(localizedFirstName) : localizedFirstName, language: langLabel }) }}
           />
           <div className="animate-fade-in-up-delay-2 self-start">
             <QRCode slug={slug} label={t("download_qr")} />
@@ -253,7 +249,7 @@ export default async function GuidePage({ params }: Props) {
           <p
             className="text-sm font-normal leading-relaxed max-w-sm animate-fade-in-up-delay-1 [&_br]:hidden"
             style={{ color: "rgba(255,255,255,0.7)" }}
-            dangerouslySetInnerHTML={{ __html: t("subtitle", { name: localizedFirstName, language: langLabel }) }}
+            dangerouslySetInnerHTML={{ __html: t("subtitle", { name: locale === "ko" ? withKoreanParticle(localizedFirstName) : localizedFirstName, language: langLabel }) }}
           />
         </div>
 
@@ -471,7 +467,7 @@ export default async function GuidePage({ params }: Props) {
 
 
       {/* ─── Footer ─── */}
-      <SiteFooter privacyLabel={t("privacy")} termsLabel={t("terms")} />
+      <SiteFooter locale={locale} />
       <MobileCTABar downloadUrl={`/download/${slug}`} ctaLabel={t("get_started")} ctaSubtext={t("no_credit_card")} />
     </main>
   );
