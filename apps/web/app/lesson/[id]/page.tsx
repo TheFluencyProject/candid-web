@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { headers } from "next/headers";
 
 const API_BASE_URL = "https://api.joincandid.co";
 const APP_STORE_URL = "https://apps.apple.com/app/id6754859158";
@@ -10,11 +11,14 @@ interface LessonMeta {
   orientation: "vertical" | "horizontal" | null;
   title: string;
   thumbnail_url: string;
+  localized_title: string;
+  tutor_name: string;
+  teaching_language: string;
 }
 
-async function fetchLessonMeta(id: string): Promise<LessonMeta | null> {
+async function fetchLessonMeta(id: string, locale: string): Promise<LessonMeta | null> {
   try {
-    const res = await fetch(`${API_BASE_URL}/public/lessons/${id}`, {
+    const res = await fetch(`${API_BASE_URL}/public/lessons/${id}?locale=${locale}`, {
       next: { revalidate: 604800 },
     });
     if (!res.ok) return null;
@@ -24,17 +28,36 @@ async function fetchLessonMeta(id: string): Promise<LessonMeta | null> {
   }
 }
 
+function parseLocale(acceptLanguage: string | null): "en" | "ko" {
+  if (!acceptLanguage) return "en";
+  const primary = acceptLanguage.split(",")[0]?.split(";")[0]?.trim().toLowerCase() ?? "";
+  if (primary.startsWith("ko")) return "ko";
+  return "en";
+}
+
+function buildTitle(lesson: LessonMeta | null): string {
+  if (!lesson) return "Candid";
+  const { localized_title, tutor_name, teaching_language } = lesson;
+  if (teaching_language && tutor_name && localized_title) {
+    const lang = teaching_language.charAt(0).toUpperCase() + teaching_language.slice(1);
+    return `${lang} with ${tutor_name}: ${localized_title}`;
+  }
+  return localized_title || "Candid";
+}
+
 export async function generateMetadata({
   params,
 }: {
   params: Promise<{ id: string }>;
 }): Promise<Metadata> {
   const { id } = await params;
-  const lesson = await fetchLessonMeta(id);
+  const headersList = await headers();
+  const locale = parseLocale(headersList.get("accept-language"));
+  const lesson = await fetchLessonMeta(id, locale);
 
-  const title = lesson ? `${lesson.title} — Candid` : "Candid";
+  const title = buildTitle(lesson);
   const description =
-    "Learn English with real YouTube videos on Candid. Open in the app to start watching.";
+    "Learn with real YouTube videos on Candid. Open in the app to start watching.";
 
   return {
     metadataBase: new URL("https://joincandid.co"),
@@ -60,7 +83,9 @@ export default async function LessonPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  await fetchLessonMeta(id);
+  const headersList = await headers();
+  const locale = parseLocale(headersList.get("accept-language"));
+  await fetchLessonMeta(id, locale);
 
   return (
     <>

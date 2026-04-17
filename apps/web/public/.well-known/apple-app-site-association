@@ -26,6 +26,10 @@
           {
             "/": "/videos/*",
             "comment": "Open video in app when installed"
+          },
+          {
+            "/": "/lesson/*",
+            "comment": "Open shared lesson link in app when installed"
           }
         ]
       }

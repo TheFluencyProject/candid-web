@@ -1,14 +1,12 @@
 import { ImageResponse } from "next/og";
-import { readFile } from "node:fs/promises";
-import { join } from "node:path";
 
 export const revalidate = 604800; // 1 week
 
 export const alt = "Watch on Candid";
 
 export const size = {
-  width: 1200,
-  height: 630,
+  width: 1080,
+  height: 1920,
 };
 
 export const contentType = "image/png";
@@ -63,15 +61,10 @@ export default async function Image({
 }) {
   const { id } = await params;
 
-  const [lesson, logoData] = await Promise.all([
-    fetchLessonMeta(id),
-    readFile(join(process.cwd(), "public", "wordmark-white.svg")),
-  ]);
-
-  const logoSrc = `data:image/svg+xml;base64,${logoData.toString("base64")}`;
+  const lesson = await fetchLessonMeta(id);
 
   if (!lesson || (!lesson.thumbnail_url && !lesson.source_id)) {
-    // Fallback image: dark background with logo only
+    // Fallback: solid dark background
     return new ImageResponse(
       (
         <div
@@ -80,12 +73,8 @@ export default async function Image({
             width: "100%",
             height: "100%",
             backgroundColor: "#131212",
-            alignItems: "center",
-            justifyContent: "center",
           }}
-        >
-          <img src={logoSrc} width={120} height={68} />
-        </div>
+        />
       ),
       {
         ...size,
@@ -132,7 +121,7 @@ export default async function Image({
             objectFit: "cover",
           }}
         />
-        {/* Dark gradient overlay so logo is readable */}
+        {/* Dark gradient overlay */}
         <div
           style={{
             position: "absolute",
@@ -143,17 +132,6 @@ export default async function Image({
             background:
               "linear-gradient(to bottom right, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.4) 100%)",
             display: "flex",
-          }}
-        />
-        {/* Candid logo — top right */}
-        <img
-          src={logoSrc}
-          width={96}
-          height={54}
-          style={{
-            position: "absolute",
-            top: 28,
-            right: 28,
           }}
         />
       </div>
