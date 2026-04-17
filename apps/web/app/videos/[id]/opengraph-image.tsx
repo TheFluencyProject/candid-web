@@ -77,7 +77,7 @@ export default async function Image({
             display: "flex",
             width: "100%",
             height: "100%",
-            backgroundColor: "#1A1A1D",
+            backgroundColor: "#18181C",
             alignItems: "center",
             justifyContent: "center",
           }}
@@ -107,7 +107,7 @@ return new ImageResponse(
         width: "100%",
         height: "100%",
         position: "relative",
-        backgroundColor: "#1A1A1D",
+        backgroundColor: "#18181C",
       }}
     >
       {/* YouTube thumbnail as background */}

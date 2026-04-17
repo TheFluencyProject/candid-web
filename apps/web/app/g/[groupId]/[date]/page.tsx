@@ -25,7 +25,7 @@ export default function GroupDatePage() {
     <>
       <main
         style={{
-          backgroundColor: "#1A1A1D",
+          backgroundColor: "#18181C",
           minHeight: "100vh",
           display: "flex",
           flexDirection: "column",

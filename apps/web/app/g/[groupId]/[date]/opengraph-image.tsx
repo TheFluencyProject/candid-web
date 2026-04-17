@@ -53,7 +53,7 @@ export default async function Image({
           justifyContent: "center",
           width: "100%",
           height: "100%",
-          backgroundColor: "#1A1A1D",
+          backgroundColor: "#18181C",
           gap: 20,
         }}
       >
