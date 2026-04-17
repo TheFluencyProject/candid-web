@@ -29,10 +29,10 @@ export default async function CompanyInfoPage({ params }: Props) {
   );
   const content = await readFile(file_path, "utf-8");
 
-  return <CompanyInfoContent content={content} locale={locale} />;
+  return <CompanyInfoContent content={content} />;
 }
 
-function CompanyInfoContent({ content, locale }: { content: string; locale: string }) {
+function CompanyInfoContent({ content }: { content: string }) {
   const t = useTranslations("company_info");
   const footerT = useTranslations("footer");
 
@@ -103,7 +103,7 @@ function CompanyInfoContent({ content, locale }: { content: string; locale: stri
         </ReactMarkdown>
       </article>
     </main>
-      <SiteFooter locale={locale} />
+      <SiteFooter />
     </div>
   );
 }

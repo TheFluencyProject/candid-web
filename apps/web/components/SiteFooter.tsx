@@ -1,13 +1,11 @@
+"use client";
+
 import Image from "next/image";
-import { getTranslations } from "next-intl/server";
+import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/routing";
 
-export default async function SiteFooter({
-  locale,
-}: {
-  locale: string;
-}) {
-  const t = await getTranslations({ locale, namespace: "footer" });
+export default function SiteFooter() {
+  const t = useTranslations("footer");
 
   return (
     <footer className="border-t border-white/10">

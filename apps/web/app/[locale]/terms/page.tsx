@@ -98,7 +98,7 @@ function TermsContent({ content }: { content: string }) {
         </ReactMarkdown>
       </article>
     </main>
-      <SiteFooter locale={locale} />
+      <SiteFooter />
     </div>
   );
 }

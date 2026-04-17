@@ -467,7 +467,7 @@ export default async function GuidePage({ params }: Props) {
 
 
       {/* ─── Footer ─── */}
-      <SiteFooter locale={locale} />
+      <SiteFooter />
       <MobileCTABar downloadUrl={`/download/${slug}`} ctaLabel={t("get_started")} ctaSubtext={t("no_credit_card")} />
     </main>
   );

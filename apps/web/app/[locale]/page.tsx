@@ -218,7 +218,7 @@ export default async function Home({ params }: Props) {
       ))}
 
       {/* ─── Footer ─── */}
-      <SiteFooter locale={locale} />
+      <SiteFooter />
       <MobileCTABar hideUntilScroll />
     </main>
   );

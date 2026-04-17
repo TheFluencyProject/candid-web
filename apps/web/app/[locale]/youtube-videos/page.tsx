@@ -21,7 +21,6 @@ const PAGE_SIZE = 50;
 
 export default function YoutubeVideosPage() {
   const t = useTranslations("youtube_videos");
-  const footerT = useTranslations("footer");
   const [videos, setVideos] = useState<YoutubeVideo[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
@@ -211,7 +210,7 @@ export default function YoutubeVideosPage() {
         </>
       )}
     </main>
-      <SiteFooter locale={locale} />
+      <SiteFooter />
     </div>
   );
 }
