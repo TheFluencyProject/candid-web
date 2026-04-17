@@ -123,7 +123,7 @@ export default async function Home({ params }: Props) {
   const screenshotSections = [
     { key: "screenshot_listen_url", title: guideT("home_listen") },
     { key: "screenshot_week_url", title: guideT("week") },
-    { key: "screenshot_learn_url", title: guideT("home_learn") },
+    { key: "screenshot_learn_url", title: guideT("learn") },
     { key: "screenshot_shadow_url", title: guideT("home_shadow") },
     { key: "screenshot_intro_url", title: guideT("intro") },
   ] as const;
