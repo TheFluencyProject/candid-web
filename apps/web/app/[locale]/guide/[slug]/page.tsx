@@ -439,7 +439,9 @@ export default async function GuidePage({ params }: Props) {
 
         if (screenshots.length === 0) return null;
 
-        return screenshots.map((s) => (
+        return (
+          <div className="pt-20 md:pt-28 lg:pt-32">
+          {screenshots.map((s) => (
           <section key={s.url} className="relative">
             <StickyHeader>
               <ScrollFadeIn>
@@ -461,7 +463,9 @@ export default async function GuidePage({ params }: Props) {
               </div>
             </ScrollFadeIn>
           </section>
-        ));
+        ))}
+          </div>
+        );
       })()}
 
 
