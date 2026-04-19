@@ -25,5 +25,5 @@ export function formatHeroTitle(text: string | null | undefined): string {
   if (idx === -1) return text;
   const line1 = text.slice(0, idx);
   const line2 = text.slice(idx + 1);
-  return `${line1}<span class="hero-break-all"></span><em>${line2}</em>`;
+  return `<span class="hero-line1">${line1}</span><span class="hero-break-all"></span><em>${line2}</em>`;
 }

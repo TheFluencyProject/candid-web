@@ -11,7 +11,7 @@ import ScrollFadeIn from "@/components/ScrollFadeIn";
 import SiteFooter from "@/components/SiteFooter";
 import { localizeLanguageName, capitalize, withKoreanParticle, formatHeroTitle } from "@/lib/i18n-helpers";
 
-const API_BASE_URL = "https://dev.api.joincandid.co";
+const API_BASE_URL = "https://api.joincandid.co";
 const APP_STORE_URL = "https://apps.apple.com/app/id6754859158";
 
 interface TutorLanguageProficiency {
@@ -217,7 +217,7 @@ export default async function GuidePage({ params }: Props) {
         <div className="relative z-10 lg:hidden flex flex-col items-center justify-end min-h-[80vh] px-6 pb-10 text-center">
           <h1
             className="hero-heading font-light leading-tight mb-4 animate-fade-in-up"
-            style={{ color: "#FFFFFF", fontSize: "clamp(1.5rem, 7vw, 2.25rem)" }}
+            style={{ color: "#FFFFFF", fontSize: "clamp(1.125rem, 5.5vw, 1.875rem)" }}
             dangerouslySetInnerHTML={{ __html: coolTitle }}
           />
           <p

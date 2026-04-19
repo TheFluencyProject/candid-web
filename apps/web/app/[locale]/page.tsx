@@ -9,7 +9,7 @@ import SiteFooter from "@/components/SiteFooter";
 import { getTutorPageConfig } from "@/config/tutors";
 import { localizeLanguageName, withKoreanParticle, formatHeroTitle } from "@/lib/i18n-helpers";
 
-const API_BASE_URL = "https://dev.api.joincandid.co";
+const API_BASE_URL = "https://api.joincandid.co";
 // english-adam first so carousel starts with Adam
 const TUTOR_SLUGS = ["english-adam", "korean-mia"];
 

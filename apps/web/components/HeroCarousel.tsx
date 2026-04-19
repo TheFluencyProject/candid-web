@@ -165,7 +165,7 @@ export default function HeroCarousel({ tutors }: { tutors: CarouselTutor[] }) {
           <div className="flex lg:hidden absolute inset-x-0 bottom-0 z-10 flex-col items-center justify-end px-6 pb-16 text-center">
             <h1
               className="hero-heading font-light leading-tight mb-4"
-              style={{ color: "#FFFFFF", fontSize: "clamp(1.5rem, 7vw, 2.25rem)" }}
+              style={{ color: "#FFFFFF", fontSize: "clamp(1.125rem, 5.5vw, 1.875rem)" }}
               dangerouslySetInnerHTML={{ __html: tutor.coolTitle }}
             />
             <p
