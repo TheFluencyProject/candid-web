@@ -31,7 +31,7 @@
     "title": "사업자정보"
   },
   "guide": {
-    "subtitle": "{name} 함께 실생활 {language} 말하기 듣기 프로그램을 시작해보세요",
+    "subtitle": "{name} 함께 실생활 {language} 말하기 듣기<br/>프로그램을 시작해보세요",
     "tutor_label": "{firstName} 쌤",
     "download_qr": "무료로 다운로드 & 체험",
     "get_started": "무료로 시작하기",

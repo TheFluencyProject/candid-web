@@ -217,11 +217,11 @@ export default async function GuidePage({ params }: Props) {
         <div className="relative z-10 lg:hidden flex flex-col items-center justify-end min-h-[80vh] px-6 pb-10 text-center">
           <h1
             className="hero-heading font-light leading-tight mb-4 animate-fade-in-up"
-            style={{ color: "#FFFFFF", fontSize: "clamp(1.125rem, 5.5vw, 1.875rem)" }}
+            style={{ color: "#FFFFFF", fontSize: "clamp(1.375rem, 6.25vw, 2.125rem)" }}
             dangerouslySetInnerHTML={{ __html: coolTitle }}
           />
           <p
-            className="text-sm font-normal leading-relaxed max-w-sm animate-fade-in-up-delay-1 [&_br]:hidden"
+            className="text-sm font-normal leading-relaxed max-w-sm animate-fade-in-up-delay-1"
             style={{ color: "rgba(255,255,255,0.7)" }}
             dangerouslySetInnerHTML={{ __html: t("subtitle", { name: locale === "ko" ? withKoreanParticle(localizedFirstName) : localizedFirstName, language: langLabel }) }}
           />
