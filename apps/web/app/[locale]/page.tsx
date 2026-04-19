@@ -7,15 +7,14 @@ import ScrollFadeIn from "@/components/ScrollFadeIn";
 import HeroCarousel, { type CarouselTutor } from "@/components/HeroCarousel";
 import SiteFooter from "@/components/SiteFooter";
 import { getTutorPageConfig } from "@/config/tutors";
-import { localizeLanguageName, withKoreanParticle } from "@/lib/i18n-helpers";
+import { localizeLanguageName, withKoreanParticle, formatHeroTitle } from "@/lib/i18n-helpers";
 
 const API_BASE_URL = "https://dev.api.joincandid.co";
 // english-adam first so carousel starts with Adam
 const TUTOR_SLUGS = ["english-adam", "korean-mia"];
 
 interface TutorMetadata {
-  cool_title?: string;
-  cool_title_kr?: string;
+  name_kr?: string;
   [key: string]: unknown;
 }
 
@@ -23,7 +22,9 @@ interface Tutor {
   slug: string;
   name: string;
   title: string;
-  short_description: string;
+  // Backend field during iOS transition: dev-deployed API may still return only short_description.
+  cool_title?: string;
+  short_description?: string;
   city: string | null;
   large_profile_picture_url: string | null;
   teaching_language: string;
@@ -34,20 +35,6 @@ interface Tutor {
   screenshot_week_url: string | null;
   web_bg_picture_url: string | null;
   metadata: TutorMetadata | null;
-}
-
-function formatHeroTitle(text: string): string {
-  const toMatch = text.match(/^(.*?\bto\s)(.+?)(\s&\s)(.+)$/i);
-  if (toMatch) {
-    const [, prefix, topic, amp, rest] = toMatch;
-    return (
-      `${prefix}<span class="hero-break-mobile"></span>` +
-      `<em>${topic}</em>` +
-      `<span class="hero-break-all"></span>` +
-      `${amp}<em>${rest}</em>`
-    );
-  }
-  return text;
 }
 
 async function fetchTutor(
@@ -93,11 +80,7 @@ export default async function Home({ params }: Props) {
       if (!bgImage) return null;
 
       const config = getTutorPageConfig(tutor.slug);
-      const rawCoolTitle =
-        locale === "ko"
-          ? (tutor.metadata?.cool_title_kr ?? tutor.metadata?.cool_title ?? tutor.title)
-          : (tutor.metadata?.cool_title ?? tutor.title);
-      const coolTitle = formatHeroTitle(rawCoolTitle);
+      const coolTitle = formatHeroTitle(tutor.cool_title ?? tutor.short_description);
       const firstName = tutor.name.split(" ")[0];
       const localizedFirstName =
         locale === "ko" && tutor.metadata?.name_kr
