@@ -22,6 +22,26 @@ const nextConfig = {
         permanent: true,
       },
       {
+        source: "/studywithus",
+        destination: "https://apps.apple.com/app/id6754859158",
+        permanent: true,
+      },
+      {
+        source: "/learnwithus",
+        destination: "https://apps.apple.com/app/id6754859158",
+        permanent: true,
+      },
+      {
+        source: "/redirects/adam",
+        destination: "https://apps.apple.com/app/id6754859158?ppid=a5bb8fc4-a398-442f-b401-92c2cc1e050a",
+        permanent: false,
+      },
+      {
+        source: "/redirects/mia",
+        destination: "https://apps.apple.com/app/id6754859158?ppid=86959fbf-bcba-4bea-829f-5b7d73270854",
+        permanent: false,
+      },
+      {
         source: "/download/english-adam",
         destination: "https://apps.apple.com/app/id6754859158?ppid=a5bb8fc4-a398-442f-b401-92c2cc1e050a",
         permanent: false,
