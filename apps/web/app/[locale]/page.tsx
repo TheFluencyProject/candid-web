@@ -7,7 +7,7 @@ import ScrollFadeIn from "@/components/ScrollFadeIn";
 import HeroCarousel, { type CarouselTutor } from "@/components/HeroCarousel";
 import SiteFooter from "@/components/SiteFooter";
 import { getTutorPageConfig } from "@/config/tutors";
-import { localizeLanguageName, withKoreanParticle, formatHeroTitle } from "@/lib/i18n-helpers";
+import { localizeLanguageName, withKoreanParticle, formatHeroTitle, stripEmojis } from "@/lib/i18n-helpers";
 
 const API_BASE_URL = "https://api.joincandid.co";
 // english-adam first so carousel starts with Adam
@@ -88,7 +88,7 @@ export default async function Home({ params }: Props) {
           : firstName;
       const langLabel = localizeLanguageName(tutor.teaching_language, locale);
       const nameForSubtitle = locale === "ko" ? withKoreanParticle(localizedFirstName) : localizedFirstName;
-      const subtitle = guideT("subtitle", { name: nameForSubtitle, language: langLabel });
+      const subtitle = stripEmojis(guideT("subtitle", { name: nameForSubtitle, language: langLabel }));
 
       return {
         slug: tutor.slug,
@@ -188,10 +188,13 @@ export default async function Home({ params }: Props) {
           <ScrollFadeIn>
             <div className="flex justify-center px-6 pb-24 md:pb-32">
               <div className="w-full max-w-sm md:max-w-[500px] lg:max-w-[420px]">
-                <img
+                <Image
                   src={s.screenshotUrl}
                   alt={s.title}
-                  className="w-full rounded-[2.5rem] shadow-2xl"
+                  width={840}
+                  height={1820}
+                  sizes="(min-width: 1024px) 420px, (min-width: 768px) 500px, 384px"
+                  className="w-full h-auto rounded-[2.5rem] shadow-2xl"
                 />
               </div>
             </div>

@@ -13,6 +13,17 @@ export function withKoreanParticle(name: string): string {
   return name === "미아" ? `${name}와` : `${name}과`;
 }
 
+export function stripEmojis(text: string): string {
+  return text
+    .replace(/\p{Extended_Pictographic}/gu, "")
+    .replace(/[\u{1F1E6}-\u{1F1FF}]/gu, "")
+    .replace(/[\u{FE00}-\u{FE0F}]/gu, "")
+    .replace(/\u200D/g, "")
+    .replace(/[ \t]+(?=[\n\r])/g, "")
+    .replace(/[ \t]{2,}/g, " ")
+    .trim();
+}
+
 /**
  * Renders a tutor's cool_title with the second line emphasized.
  * The DB value comes with a literal `\n` separating the two lines; we wrap the
@@ -21,9 +32,10 @@ export function withKoreanParticle(name: string): string {
  */
 export function formatHeroTitle(text: string | null | undefined): string {
   if (!text) return "";
-  const idx = text.indexOf("\n");
-  if (idx === -1) return text;
-  const line1 = text.slice(0, idx);
-  const line2 = text.slice(idx + 1);
+  const cleaned = stripEmojis(text);
+  const idx = cleaned.indexOf("\n");
+  if (idx === -1) return cleaned;
+  const line1 = cleaned.slice(0, idx);
+  const line2 = cleaned.slice(idx + 1);
   return `<span class="hero-line1">${line1}</span><span class="hero-break-all"></span><em>${line2}</em>`;
 }

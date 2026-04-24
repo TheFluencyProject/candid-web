@@ -9,7 +9,7 @@ import { getTutorPageConfig } from "@/config/tutors";
 import StickyHeader from "@/components/StickyHeader";
 import ScrollFadeIn from "@/components/ScrollFadeIn";
 import SiteFooter from "@/components/SiteFooter";
-import { localizeLanguageName, capitalize, withKoreanParticle, formatHeroTitle } from "@/lib/i18n-helpers";
+import { localizeLanguageName, capitalize, withKoreanParticle, formatHeroTitle, stripEmojis } from "@/lib/i18n-helpers";
 
 const API_BASE_URL = "https://api.joincandid.co";
 const APP_STORE_URL = "https://apps.apple.com/app/id6754859158";
@@ -155,17 +155,23 @@ export default async function GuidePage({ params }: Props) {
         {(tutor.web_bg_picture_url || tutor.large_profile_picture_url) ? (
           <>
             {/* Desktop photo */}
-            <img
+            <Image
               src={tutor.web_bg_picture_url || tutor.large_profile_picture_url!}
               alt={tutor.name}
-              className="absolute inset-0 w-full h-full object-cover hidden lg:block"
+              fill
+              sizes="(min-width: 1024px) 100vw, 0px"
+              priority
+              className="object-cover hidden lg:block"
               style={{ objectPosition: config.photo.desktop }}
             />
             {/* Mobile photo */}
-            <img
+            <Image
               src={tutor.web_bg_picture_url || tutor.large_profile_picture_url!}
               alt={tutor.name}
-              className="absolute inset-0 w-full h-full object-cover lg:hidden scale-[1.15] origin-bottom"
+              fill
+              sizes="(max-width: 1023px) 100vw, 0px"
+              priority
+              className="object-cover lg:hidden scale-[1.15] origin-bottom"
               style={{ objectPosition: config.photo.mobile }}
             />
           </>
@@ -206,7 +212,7 @@ export default async function GuidePage({ params }: Props) {
           <p
             className="text-base xl:text-lg font-light leading-relaxed mb-6 max-w-md animate-fade-in-up-delay-1"
             style={{ color: "#18181C", opacity: 0.7 }}
-            dangerouslySetInnerHTML={{ __html: t("subtitle", { name: locale === "ko" ? withKoreanParticle(localizedFirstName) : localizedFirstName, language: langLabel }) }}
+            dangerouslySetInnerHTML={{ __html: stripEmojis(t("subtitle", { name: locale === "ko" ? withKoreanParticle(localizedFirstName) : localizedFirstName, language: langLabel })) }}
           />
           <div className="animate-fade-in-up-delay-2 self-start">
             <QRCode slug={slug} label={t("download_qr")} />
@@ -223,7 +229,7 @@ export default async function GuidePage({ params }: Props) {
           <p
             className="text-sm font-normal leading-relaxed max-w-sm animate-fade-in-up-delay-1"
             style={{ color: "rgba(255,255,255,0.7)" }}
-            dangerouslySetInnerHTML={{ __html: t("subtitle", { name: locale === "ko" ? withKoreanParticle(localizedFirstName) : localizedFirstName, language: langLabel }) }}
+            dangerouslySetInnerHTML={{ __html: stripEmojis(t("subtitle", { name: locale === "ko" ? withKoreanParticle(localizedFirstName) : localizedFirstName, language: langLabel })) }}
           />
         </div>
 
@@ -239,9 +245,11 @@ export default async function GuidePage({ params }: Props) {
               : undefined,
           }}
         >
-          <img
+          <Image
             src="/curved-arrow.png"
             alt=""
+            width={48}
+            height={48}
             className="w-12 h-12 -mb-2"
           />
           <span
@@ -264,9 +272,11 @@ export default async function GuidePage({ params }: Props) {
               : undefined,
           }}
         >
-          <img
+          <Image
             src="/curved-arrow.png"
             alt=""
+            width={36}
+            height={36}
             className="w-9 h-9 -mb-1"
           />
           <span
@@ -309,10 +319,13 @@ export default async function GuidePage({ params }: Props) {
             <ScrollFadeIn>
               <div className="flex justify-center px-6 pb-16 md:pb-24">
                 <div className="w-full max-w-sm md:max-w-[500px] lg:max-w-[420px]">
-                  <img
+                  <Image
                     src={s.url!}
                     alt={s.title}
-                    className="w-full rounded-[2.5rem] shadow-2xl"
+                    width={840}
+                    height={1820}
+                    sizes="(min-width: 1024px) 420px, (min-width: 768px) 500px, 384px"
+                    className="w-full h-auto rounded-[2.5rem] shadow-2xl"
                   />
                 </div>
               </div>

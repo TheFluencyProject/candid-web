@@ -109,17 +109,23 @@ export default function HeroCarousel({ tutors }: { tutors: CarouselTutor[] }) {
             style={{ opacity: i === currentIndex ? 1 : 0 }}
           >
             {/* Desktop */}
-            <img
+            <Image
               src={t.bgImage}
               alt={t.firstName}
-              className="hidden lg:block absolute inset-0 w-full h-full object-cover"
+              fill
+              sizes="(min-width: 1024px) 100vw, 0px"
+              priority
+              className="hidden lg:block object-cover"
               style={{ objectPosition: t.photoPosition.desktop }}
             />
             {/* Mobile — scale-[1.15] matches tutor guide pages */}
-            <img
+            <Image
               src={t.bgImage}
               alt={t.firstName}
-              className="block lg:hidden absolute inset-0 w-full h-full object-cover scale-[1.15] origin-bottom"
+              fill
+              sizes="(max-width: 1023px) 100vw, 0px"
+              priority
+              className="block lg:hidden object-cover scale-[1.15] origin-bottom"
               style={{ objectPosition: t.photoPosition.mobile }}
             />
           </div>
@@ -187,9 +193,11 @@ export default function HeroCarousel({ tutors }: { tutors: CarouselTutor[] }) {
                 : undefined,
             }}
           >
-            <img
+            <Image
               src="/curved-arrow.png"
               alt=""
+              width={48}
+              height={48}
               className="w-12 h-12 -mb-2"
             />
             <span
@@ -212,9 +220,11 @@ export default function HeroCarousel({ tutors }: { tutors: CarouselTutor[] }) {
                 : undefined,
             }}
           >
-            <img
+            <Image
               src="/curved-arrow.png"
               alt=""
+              width={36}
+              height={36}
               className="w-9 h-9 -mb-1"
             />
             <span
