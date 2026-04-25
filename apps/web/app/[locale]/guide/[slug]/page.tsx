@@ -9,7 +9,7 @@ import { getTutorPageConfig } from "@/config/tutors";
 import StickyHeader from "@/components/StickyHeader";
 import ScrollFadeIn from "@/components/ScrollFadeIn";
 import SiteFooter from "@/components/SiteFooter";
-import { localizeLanguageName, capitalize, withKoreanParticle, formatHeroTitle, stripEmojis } from "@/lib/i18n-helpers";
+import { localizeLanguageName, localizeMapCountry, capitalize, withKoreanParticle, formatHeroTitle, stripEmojis } from "@/lib/i18n-helpers";
 
 const API_BASE_URL = "https://api.joincandid.co";
 const APP_STORE_URL = "https://apps.apple.com/app/id6754859158";
@@ -39,9 +39,11 @@ interface Tutor {
   profile_picture_url: string | null;
   large_profile_picture_url: string | null;
   intro_video_url: string | null;
+  screenshot_community_url: string | null;
   screenshot_intro_url: string | null;
   screenshot_learn_url: string | null;
   screenshot_listen_url: string | null;
+  screenshot_map_url: string | null;
   screenshot_shadow_url: string | null;
   screenshot_week_url: string | null;
   web_bg_picture_url: string | null;
@@ -295,11 +297,14 @@ export default async function GuidePage({ params }: Props) {
       {/* ─── App Screenshots with Sticky Headers ─── */}
       {(() => {
         const tVars = { firstName: localizedFirstName, language: langLabel };
+        const country = localizeMapCountry(tutor.teaching_language, locale);
         const screenshots = [
           { url: tutor.screenshot_listen_url, title: t("listen", tVars) },
           { url: tutor.screenshot_week_url, title: t("week", tVars) },
           { url: tutor.screenshot_shadow_url, title: t("shadow", tVars) },
+          { url: tutor.screenshot_map_url, title: t("map", { firstName: localizedFirstName, country }) },
           { url: tutor.screenshot_intro_url, title: t("intro", tVars) },
+          { url: tutor.screenshot_community_url, title: t("community") },
         ].filter((s) => s.url);
 
         if (screenshots.length === 0) return null;

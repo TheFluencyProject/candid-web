@@ -30,6 +30,10 @@
           {
             "/": "/lesson/*",
             "comment": "Open shared lesson link in app when installed"
+          },
+          {
+            "/": "/redirects/*",
+            "comment": "Custom product page deep link (iOS 18+)"
           }
         ]
       }

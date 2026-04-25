@@ -28,9 +28,11 @@ interface Tutor {
   city: string | null;
   large_profile_picture_url: string | null;
   teaching_language: string;
+  screenshot_community_url: string | null;
   screenshot_intro_url: string | null;
   screenshot_learn_url: string | null;
   screenshot_listen_url: string | null;
+  screenshot_map_url: string | null;
   screenshot_shadow_url: string | null;
   screenshot_week_url: string | null;
   web_bg_picture_url: string | null;
@@ -104,12 +106,14 @@ export default async function Home({ params }: Props) {
     })
     .filter((t): t is CarouselTutor => t !== null);
 
-  // Build screenshot sections by alternating tutors
+  // Build screenshot sections by alternating tutors. Sections without a screenshot are dropped.
   const screenshotSectionKeys = [
     "screenshot_listen_url",
     "screenshot_week_url",
     "screenshot_shadow_url",
+    "screenshot_map_url",
     "screenshot_intro_url",
+    "screenshot_community_url",
   ] as const;
 
   const sectionsWithTutors = screenshotSectionKeys
@@ -117,13 +121,13 @@ export default async function Home({ params }: Props) {
       const tutor = tutors[i % tutors.length];
       const url = tutor?.[key];
       if (!url) return null;
-      const tutorLang = localizeLanguageName(tutor.teaching_language, locale);
       const titleMap = {
-        screenshot_listen_url: guideT("home_listen", { language: tutorLang }),
+        screenshot_listen_url: guideT("home_listen"),
         screenshot_week_url: guideT("week"),
-        screenshot_learn_url: guideT("learn"),
-        screenshot_shadow_url: guideT("home_shadow", { language: tutorLang }),
+        screenshot_shadow_url: guideT("home_shadow"),
+        screenshot_map_url: guideT("home_map"),
         screenshot_intro_url: guideT("intro"),
+        screenshot_community_url: guideT("community"),
       };
       return {
         key,
