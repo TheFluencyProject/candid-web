@@ -110,7 +110,6 @@ export default async function Home({ params }: Props) {
   const screenshotSectionKeys = [
     "screenshot_listen_url",
     "screenshot_week_url",
-    "screenshot_shadow_url",
     "screenshot_map_url",
     "screenshot_community_url",
     "screenshot_intro_url",
@@ -126,7 +125,6 @@ export default async function Home({ params }: Props) {
       const titleMap = {
         screenshot_listen_url: guideT("home_listen"),
         screenshot_week_url: guideT("week"),
-        screenshot_shadow_url: guideT("home_shadow"),
         screenshot_map_url: guideT("home_map"),
         screenshot_intro_url: guideT("intro"),
         screenshot_community_url: guideT("community"),
