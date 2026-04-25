@@ -112,8 +112,8 @@ export default async function Home({ params }: Props) {
     "screenshot_week_url",
     "screenshot_shadow_url",
     "screenshot_map_url",
-    "screenshot_intro_url",
     "screenshot_community_url",
+    "screenshot_intro_url",
   ] as const;
 
   const sectionsWithTutors = screenshotSectionKeys
