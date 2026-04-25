@@ -118,9 +118,11 @@ export default async function Home({ params }: Props) {
 
   const sectionsWithTutors = screenshotSectionKeys
     .map((key, i) => {
-      const tutor = tutors[i % tutors.length];
+      // Prefer the alternation pick; if that tutor doesn't have this screenshot, use any tutor that does.
+      const preferred = tutors[i % tutors.length];
+      const tutor = preferred?.[key] ? preferred : tutors.find((t) => t?.[key]);
       const url = tutor?.[key];
-      if (!url) return null;
+      if (!tutor || !url) return null;
       const titleMap = {
         screenshot_listen_url: guideT("home_listen"),
         screenshot_week_url: guideT("week"),
