@@ -94,7 +94,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (locale === "ko") {
     const koreanLang = localizeLanguageName(tutor.teaching_language, "ko");
     const koreanName = (tutor.metadata?.name_kr as string) ?? tutor.name;
-    title = `Candid | ${koreanLang}, ${koreanName}과 함께`;
+    title = `Candid | ${koreanLang}, ${withKoreanParticle(koreanName)} 함께`;
   } else {
     title = `Candid | ${capitalize(tutor.teaching_language)} with ${tutor.name}`;
   }
