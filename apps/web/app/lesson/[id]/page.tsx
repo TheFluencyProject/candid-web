@@ -77,16 +77,7 @@ export async function generateMetadata({
   };
 }
 
-export default async function LessonPage({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}) {
-  const { id } = await params;
-  const headersList = await headers();
-  const locale = parseLocale(headersList.get("accept-language"));
-  await fetchLessonMeta(id, locale);
-
+export default async function LessonPage() {
   return (
     <>
       <main
