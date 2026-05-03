@@ -30,6 +30,8 @@ interface Tutor {
   title: string;
   // Backend field during iOS transition: dev-deployed API may still return only short_description.
   cool_title?: string;
+  // Optional web-only override; falls back to cool_title when null.
+  web_title_override?: string | null;
   short_description?: string;
   city: string | null;
   birthday: string | null;
@@ -141,7 +143,8 @@ export default async function GuidePage({ params }: Props) {
       : firstName;
   const langLabel = localizeLanguageName(tutor.teaching_language, locale);
   const config = getTutorPageConfig(slug);
-  const coolTitle = formatHeroTitle(tutor.cool_title ?? tutor.short_description);
+  // Web-only override; falls back to cool_title (and short_description for legacy API responses) when null.
+  const coolTitle = formatHeroTitle(tutor.web_title_override ?? tutor.cool_title ?? tutor.short_description);
 
   return (
     <main
