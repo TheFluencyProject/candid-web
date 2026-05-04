@@ -76,11 +76,13 @@ html {
   }
 }
 
-/* Keep each cool_title line on its own line even if it would otherwise wrap.
-   Page-level font-size clamps shrink the heading so the longest line fits. */
-.hero-heading .hero-line1,
-.hero-heading em {
-  white-space: nowrap;
+/* Desktop only: keep each cool_title line intact so the headline reads as authored.
+   Mobile lets it wrap naturally because the viewport is too narrow for the long line. */
+@media (min-width: 1024px) {
+  .hero-heading .hero-line1,
+  .hero-heading em {
+    white-space: nowrap;
+  }
 }
 
 /* Carousel fade-in animation */
