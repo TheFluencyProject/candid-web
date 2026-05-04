@@ -4,6 +4,11 @@ import { headers } from "next/headers";
 const API_BASE_URL = "https://api.joincandid.co";
 const APP_STORE_URL = "https://apps.apple.com/app/id6754859158";
 
+const SHARE_DESCRIPTIONS: Record<"en" | "ko", string> = {
+  en: "Candid is your guide to real, spoken language through a tutor's real life in the country.",
+  ko: "Candid는 나만의 튜터가 보여주는 실생활 영어 프로그램입니다.",
+};
+
 interface LessonMeta {
   lesson_id: string;
   source_id: string | null;
@@ -56,8 +61,7 @@ export async function generateMetadata({
   const lesson = await fetchLessonMeta(id, locale);
 
   const title = buildTitle(lesson);
-  const description =
-    "Learn with real YouTube videos on Candid. Open in the app to start watching.";
+  const description = SHARE_DESCRIPTIONS[locale];
 
   return {
     metadataBase: new URL("https://joincandid.co"),
