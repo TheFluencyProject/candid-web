@@ -63,6 +63,15 @@ html {
   font-weight: 700;
 }
 
+/* Never break Korean (or any CJK) words mid-character. Default `word-break:
+   normal` allows browsers to break Korean between any two characters, which
+   produces things like "한국 / 어" stranding a single character on its own
+   line. `keep-all` only allows breaks at spaces — for English this is a
+   no-op, for Korean it keeps "한국어" intact. */
+.hero-heading {
+  word-break: keep-all;
+}
+
 /* The cursive em renders shadow much heavier than the sans-serif line1
    (thicker strokes catch the blur). On white-hero tutors, halve the
    inherited shadow alpha so the cursive doesn't feel oppressive. The
