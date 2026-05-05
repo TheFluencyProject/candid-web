@@ -50,8 +50,8 @@ const tutorPageConfig: Record<string, TutorPageConfig> = {
   },
   "english-adam": {
     photo: {
-      desktop: "70% 25%",
-      mobile: "90% 20%",
+      desktop: "62% 25%",
+      mobile: "90% 13%",
     },
     arrow: {
       desktop: { top: "73%", left: "76%" },
