@@ -32,8 +32,8 @@ export interface TutorPageConfig {
 const tutorPageConfig: Record<string, TutorPageConfig> = {
   "korean-mia": {
     photo: {
-      desktop: "center 3%",
-      mobile: "88% 20%",
+      desktop: "center 15%",
+      mobile: "92% 22%",
     },
     arrow: {
       desktop: { top: "65%", left: "85%" },
@@ -50,8 +50,8 @@ const tutorPageConfig: Record<string, TutorPageConfig> = {
   },
   "english-adam": {
     photo: {
-      desktop: "62% 25%",
-      mobile: "90% 13%",
+      desktop: "72% 30%",
+      mobile: "90% 25%",
     },
     arrow: {
       desktop: { top: "73%", left: "76%" },

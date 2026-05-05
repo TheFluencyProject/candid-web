@@ -40,7 +40,7 @@ export default function SiteFooter() {
           <h4 className="text-xl font-bold uppercase tracking-wider mb-3 text-white">{t("programs_heading")}</h4>
           <div className="space-y-5">
             <div>
-              <p className="text-sm font-bold uppercase tracking-widest text-white/35 mb-2">{localizeLanguageName("english", locale)}</p>
+              <p className="text-sm font-bold uppercase tracking-widest text-white/70 mb-2">{localizeLanguageName("english", locale)}</p>
               <ul className="space-y-2">
                 <li>
                   <Link href="/guide/english-adam" className="text-sm font-normal text-white hover:opacity-70 transition-opacity">American Dream</Link>
@@ -48,7 +48,7 @@ export default function SiteFooter() {
               </ul>
             </div>
             <div>
-              <p className="text-sm font-bold uppercase tracking-widest text-white/35 mb-2">{localizeLanguageName("korean", locale)}</p>
+              <p className="text-sm font-bold uppercase tracking-widest text-white/70 mb-2">{localizeLanguageName("korean", locale)}</p>
               {/* Footer lists active tutors only. Chan (CHINGU) is is_enabled=false
                   for now — add her back here when she's flipped live. */}
               <ul className="space-y-2">
