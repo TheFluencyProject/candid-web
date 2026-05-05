@@ -1,6 +1,12 @@
 export interface TutorPageConfig {
   photo: {
-    desktop: string; // CSS object-position, e.g. "70% 20%"
+    // CSS object-position, e.g. "70% 20%". Counterintuitive but important:
+    // X/Y here is the SOURCE-IMAGE coordinate that aligns with the same
+    // coordinate of the container. Higher X% means the crop window moves
+    // RIGHT into the source — which makes the subject appear further LEFT
+    // in the visible frame (and vice versa). Same for Y. So if the subject
+    // looks "too far right on mobile", INCREASE X%, don't decrease it.
+    desktop: string;
     mobile: string;
     // Optional CSS transform-scale on mobile only. Defaults to 1.15 (matches the
     // baseline zoom-in applied via Tailwind). Set <1.15 to zoom out for tutors
@@ -32,8 +38,8 @@ export interface TutorPageConfig {
 const tutorPageConfig: Record<string, TutorPageConfig> = {
   "korean-mia": {
     photo: {
-      desktop: "center 15%",
-      mobile: "92% 22%",
+      desktop: "center 35%",
+      mobile: "98% 35%",
     },
     arrow: {
       desktop: { top: "65%", left: "85%" },
@@ -50,8 +56,8 @@ const tutorPageConfig: Record<string, TutorPageConfig> = {
   },
   "english-adam": {
     photo: {
-      desktop: "72% 30%",
-      mobile: "90% 25%",
+      desktop: "82% 45%",
+      mobile: "100% 38%",
     },
     arrow: {
       desktop: { top: "73%", left: "76%" },
