@@ -34,6 +34,11 @@ const tutorPageConfig: Record<string, TutorPageConfig> = {
       desktop: { top: "65%", left: "85%" },
       mobile: { top: "38%", right: "4%" },
     },
+    hero: {
+      textColor: "#FFFFFF",
+      textShadow: "0 0 14px rgba(0,0,0,0.35), 0 1px 2px rgba(0,0,0,0.4)",
+      overlay: "radial-gradient(ellipse 95% 65% at 0% 0%, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0) 100%)",
+    },
   },
   "english-adam": {
     photo: {
