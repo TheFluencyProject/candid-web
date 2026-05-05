@@ -120,6 +120,11 @@ const nextConfig = {
         destination: "/guide/korean-mia",
         permanent: true,
       },
+      {
+        source: "/misshoney",
+        destination: "/guide/misshoney",
+        permanent: true,
+      },
     ];
   },
 };
