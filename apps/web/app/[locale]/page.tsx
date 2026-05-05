@@ -4,6 +4,7 @@ import GuideNavbar from "@/components/GuideNavbar";
 import MobileCTABar from "@/components/MobileCTABar";
 import StickyHeader from "@/components/StickyHeader";
 import ScrollFadeIn from "@/components/ScrollFadeIn";
+import BlurImage from "@/components/BlurImage";
 import HeroCarousel, { type CarouselTutor } from "@/components/HeroCarousel";
 import SiteFooter from "@/components/SiteFooter";
 import { getTutorPageConfig } from "@/config/tutors";
@@ -196,14 +197,12 @@ export default async function Home({ params }: Props) {
               </h2>
             </ScrollFadeIn>
           </StickyHeader>
-          {/* No ScrollFadeIn around the image: the 700ms opacity fade was racing
-              the ~5MB PNG download and producing a "pop-in" mid-fade. Just let
-              the image render whenever its bytes arrive. */}
           <div className="flex justify-center px-6 pb-24 md:pb-32">
             <div className="w-full max-w-sm md:max-w-[500px] lg:max-w-[420px]">
-              {/* Plain <img> direct from S3 — bypasses /_next/image transcode hop. */}
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
+              {/* BlurImage = own intersection observer + opacity/blur transition,
+                  decoupled from any sibling fade so the image's animation always
+                  anchors to its own viewport rect. */}
+              <BlurImage
                 src={s.screenshotUrl}
                 alt={s.title}
                 className="w-full rounded-[2.5rem] shadow-2xl"

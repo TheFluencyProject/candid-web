@@ -8,6 +8,7 @@ import QRCode from "@/components/QRCode";
 import { getTutorPageConfig } from "@/config/tutors";
 import StickyHeader from "@/components/StickyHeader";
 import ScrollFadeIn from "@/components/ScrollFadeIn";
+import BlurImage from "@/components/BlurImage";
 import SiteFooter from "@/components/SiteFooter";
 import { localizeLanguageName, localizeMapCountry, capitalize, withKoreanParticle, formatHeroTitle, stripEmojis } from "@/lib/i18n-helpers";
 
@@ -343,14 +344,12 @@ export default async function GuidePage({ params }: Props) {
                 </h2>
               </ScrollFadeIn>
             </StickyHeader>
-            {/* Screenshot — no ScrollFadeIn: 700ms opacity fade raced the
-                ~5MB PNG download and caused a "pop-in" mid-fade. Just let
-                the image render whenever its bytes arrive. */}
+            {/* Screenshot — BlurImage anchors its fade/unblur to its own
+                viewport rect so the animation feels right regardless of where
+                the sibling sticky header is. */}
             <div className="flex justify-center px-6 pb-16 md:pb-24">
               <div className="w-full max-w-sm md:max-w-[500px] lg:max-w-[420px]">
-                {/* Plain <img> direct from S3 — bypasses /_next/image transcode hop. */}
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
+                <BlurImage
                   src={s.url!}
                   alt={s.title}
                   className="w-full rounded-[2.5rem] shadow-2xl"
