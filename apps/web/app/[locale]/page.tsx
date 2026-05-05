@@ -183,7 +183,7 @@ export default async function Home({ params }: Props) {
       <HeroCarousel tutors={carouselTutors} />
 
       {/* ─── Screenshot Sections ─── */}
-      {sectionsWithTutors.map((s, idx) => (
+      {sectionsWithTutors.map((s) => (
         <section key={s.key} className="relative">
           <StickyHeader>
             <ScrollFadeIn>
@@ -201,8 +201,8 @@ export default async function Home({ params }: Props) {
                   width={840}
                   height={1820}
                   sizes="(min-width: 1024px) 420px, (min-width: 768px) 500px, 384px"
-                  // eager-load first 2 so they're ready before the user scrolls down; rest stay lazy.
-                  loading={idx < 2 ? "eager" : "lazy"}
+                  // eager-load all screenshots so they're ready before the user scrolls; ~50KB each post-AVIF, page-defining content.
+                  loading="eager"
                   className="w-full h-auto rounded-[2.5rem] shadow-2xl"
                 />
               </div>

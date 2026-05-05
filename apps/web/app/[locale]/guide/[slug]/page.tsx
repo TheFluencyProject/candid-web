@@ -150,6 +150,10 @@ export default async function GuidePage({ params }: Props) {
   const config = getTutorPageConfig(slug);
   // Web-only override; falls back to cool_title (and short_description for legacy API responses) when null.
   const coolTitle = formatHeroTitle(tutor.web_title_override ?? tutor.cool_title ?? tutor.short_description);
+  // Per-tutor English subtitle override (HTML allowed). Korean keeps the i18n default.
+  const subtitleHtml = locale === "en" && config.subtitle?.en
+    ? config.subtitle.en
+    : stripEmojis(t("subtitle", { name: locale === "ko" ? withKoreanParticle(localizedFirstName) : localizedFirstName, language: langLabel }));
 
   return (
     <main
@@ -234,9 +238,9 @@ export default async function GuidePage({ params }: Props) {
             dangerouslySetInnerHTML={{ __html: coolTitle }}
           />
           <p
-            className={`text-base xl:text-lg font-light ${config.hero?.textColor ? "lg:font-medium" : ""} leading-relaxed mb-6 max-w-md animate-fade-in-up-delay-1`}
+            className={`text-[1.5rem] xl:text-[1.6875rem] font-light ${config.hero?.textColor ? "lg:font-medium" : ""} leading-snug mb-6 max-w-xl animate-fade-in-up-delay-1`}
             style={{ color: config.hero?.textColor ?? "#18181C", opacity: 0.7, textShadow: config.hero?.textShadow }}
-            dangerouslySetInnerHTML={{ __html: stripEmojis(t("subtitle", { name: locale === "ko" ? withKoreanParticle(localizedFirstName) : localizedFirstName, language: langLabel })) }}
+            dangerouslySetInnerHTML={{ __html: subtitleHtml }}
           />
           <div className="animate-fade-in-up-delay-2 self-start">
             <QRCode slug={slug} label={t("download_qr")} />
@@ -254,7 +258,7 @@ export default async function GuidePage({ params }: Props) {
           <p
             className="text-[1.05rem] font-normal leading-relaxed max-w-sm animate-fade-in-up-delay-1"
             style={{ color: "rgba(255,255,255,0.7)", textShadow: config.hero?.textShadow }}
-            dangerouslySetInnerHTML={{ __html: stripEmojis(t("subtitle", { name: locale === "ko" ? withKoreanParticle(localizedFirstName) : localizedFirstName, language: langLabel })) }}
+            dangerouslySetInnerHTML={{ __html: subtitleHtml }}
           />
         </div>
 
@@ -334,7 +338,7 @@ export default async function GuidePage({ params }: Props) {
 
         return (
           <div className="pt-20 md:pt-28 lg:pt-32">
-          {screenshots.map((s, idx) => (
+          {screenshots.map((s) => (
           <section key={s.url} className="relative">
             <StickyHeader>
               <ScrollFadeIn>
@@ -353,8 +357,8 @@ export default async function GuidePage({ params }: Props) {
                     width={840}
                     height={1820}
                     sizes="(min-width: 1024px) 420px, (min-width: 768px) 500px, 384px"
-                    // eager-load first 2 so they're ready before the user scrolls down; rest stay lazy.
-                    loading={idx < 2 ? "eager" : "lazy"}
+                    // eager-load all screenshots so they're ready before the user scrolls; ~50KB each post-AVIF, page-defining content.
+                    loading="eager"
                     className="w-full h-auto rounded-[2.5rem] shadow-2xl"
                   />
                 </div>
