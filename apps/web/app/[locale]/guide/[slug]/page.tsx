@@ -162,7 +162,33 @@ export default async function GuidePage({ params }: Props) {
       style={{ backgroundColor: "#18181C", color: "#FFFFFF" }}
     >
       {/* ─── Fixed Navbar ─── */}
-      <GuideNavbar sentinelId="hero-sentinel" downloadUrl={`/download/${slug}`} alwaysWhite={Boolean(config.hero?.textColor)} />
+      <GuideNavbar
+        sentinelId="hero-sentinel"
+        downloadUrl={`/download/${slug}`}
+        alwaysWhite={Boolean(config.hero?.textColor)}
+        rightElement={
+          <>
+            {/* Desktop: Get the app pill (App Store badge moves inline under hero) */}
+            <a
+              href={`/download/${slug}`}
+              className="hidden lg:block px-5 py-2 rounded-full text-sm font-semibold"
+              style={{ backgroundColor: "#FFFFFF", color: "#18181C" }}
+            >
+              Get the app
+            </a>
+            {/* Mobile: App Store badge */}
+            <a href={`/download/${slug}`} className="lg:hidden">
+              <Image
+                src="/download.svg"
+                alt="Download on the App Store"
+                width={120}
+                height={40}
+                priority
+              />
+            </a>
+          </>
+        }
+      />
 
       {/* ─── Full-Viewport Hero ─── */}
       <section className="relative min-h-[80vh] lg:min-h-screen overflow-hidden">
@@ -235,11 +261,24 @@ export default async function GuidePage({ params }: Props) {
             dangerouslySetInnerHTML={{ __html: coolTitle }}
           />
           <p
-            className={`text-[1.25rem] xl:text-[1.40625rem] font-light leading-snug mb-3 animate-fade-in-up-delay-1`}
+            className={`text-[1.25rem] xl:text-[1.40625rem] font-light leading-snug mb-6 animate-fade-in-up-delay-1`}
             style={{ color: config.hero?.textColor ?? "#18181C", textShadow: config.hero?.textShadow }}
             dangerouslySetInnerHTML={{ __html: subtitleHtml }}
           />
-          <div className="animate-fade-in-up-delay-2 self-start">
+          <a
+            href={`/download/${slug}`}
+            className="animate-fade-in-up-delay-2 self-start"
+          >
+            <Image
+              src="/download.svg"
+              alt="Download on the App Store"
+              width={140}
+              height={46}
+              priority
+            />
+          </a>
+          {/* Hidden until further notice; superseded by inline App Store badge above. */}
+          <div className="hidden">
             <QRCode slug={slug} label={t("download_qr")} />
           </div>
         </div>

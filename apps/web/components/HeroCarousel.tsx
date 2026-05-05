@@ -172,10 +172,24 @@ export default function HeroCarousel({ tutors }: { tutors: CarouselTutor[] }) {
               style={{ color: tutor.hero?.textColor ?? "#18181C", textShadow: tutor.hero?.textShadow }}
               dangerouslySetInnerHTML={{ __html: tutor.subtitle }}
             />
+            <a
+              href="/download"
+              onClick={(e) => e.stopPropagation()}
+              className="self-start"
+            >
+              <Image
+                src="/download.svg"
+                alt="Download on the App Store"
+                width={140}
+                height={46}
+              />
+            </a>
           </div>
 
-          {/* Mobile text — bottom, centered, same as tutor pages */}
-          <div className="flex lg:hidden absolute inset-x-0 bottom-0 z-10 flex-col items-center justify-end px-6 pb-[calc(4rem+5svh)] text-center">
+          {/* Mobile text — bottom, centered, same as tutor pages. Tighter pb
+              than per-tutor (which has no pagination pill); just enough to
+              clear the language pill cleanly. */}
+          <div className="flex lg:hidden absolute inset-x-0 bottom-0 z-10 flex-col items-center justify-end px-6 pb-16 text-center">
             <h1
               className={`hero-heading ${tutor.hero?.textShadow ? "hero-heading--shadowed" : ""} font-light leading-tight mb-4`}
               style={{ color: "#FFFFFF", fontSize: "clamp(1.65rem, 7.7vw, 2.75rem)", textShadow: tutor.hero?.textShadow }}
@@ -242,19 +256,6 @@ export default function HeroCarousel({ tutors }: { tutors: CarouselTutor[] }) {
             </span>
           </div>
 
-          {/* Desktop: App Store badge bottom-left */}
-          <a
-            href="/download"
-            className="hidden lg:block absolute bottom-8 left-8"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <Image
-              src="/download.svg"
-              alt="Download on the App Store"
-              width={140}
-              height={46}
-            />
-          </a>
         </div>
 
         {/* Pagination: left dot, center pill with progress, right dot */}
