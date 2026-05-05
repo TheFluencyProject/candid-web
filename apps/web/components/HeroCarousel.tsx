@@ -149,15 +149,16 @@ export default function HeroCarousel({ tutors }: { tutors: CarouselTutor[] }) {
         <div
           className="hidden lg:block absolute inset-0 pointer-events-none"
           style={{
-            background: "linear-gradient(to bottom, transparent 70%, rgba(24,24,28,0.6) 100%)",
+            background: "linear-gradient(to bottom, transparent 70%, #18181C 100%)",
           }}
         />
-        {/* Mobile: stronger bottom fade */}
+        {/* Mobile: stronger bottom fade — fades fully to bg color so the
+            subtitle reads as cleanly white as it does on the guide page. */}
         <div
           className="block lg:hidden absolute inset-0 pointer-events-none"
           style={{
             background:
-              "linear-gradient(to bottom, transparent 30%, rgba(24,24,28,0.3) 45%, rgba(24,24,28,0.5) 55%, rgba(24,24,28,0.65) 70%, rgba(24,24,28,0.75) 85%)",
+              "linear-gradient(to bottom, transparent 35%, rgba(24,24,28,0.4) 50%, rgba(24,24,28,0.7) 65%, rgba(24,24,28,0.85) 80%, #18181C 95%)",
           }}
         />
 
@@ -175,7 +176,7 @@ export default function HeroCarousel({ tutors }: { tutors: CarouselTutor[] }) {
             />
             <p
               className="text-[1.25rem] xl:text-[1.40625rem] font-light leading-snug mb-6"
-              style={{ color: tutor.hero?.textColor ?? "#18181C", opacity: 0.7, textShadow: tutor.hero?.textShadow }}
+              style={{ color: tutor.hero?.textColor ?? "#18181C", textShadow: tutor.hero?.textShadow }}
               dangerouslySetInnerHTML={{ __html: tutor.subtitle }}
             />
           </div>
@@ -189,7 +190,7 @@ export default function HeroCarousel({ tutors }: { tutors: CarouselTutor[] }) {
             />
             <p
               className="text-[1.05rem] font-normal leading-relaxed max-w-sm"
-              style={{ color: "rgba(255,255,255,0.7)", textShadow: tutor.hero?.textShadow }}
+              style={{ color: "#FFFFFF", textShadow: tutor.hero?.textShadow }}
               dangerouslySetInnerHTML={{ __html: tutor.subtitle }}
             />
           </div>

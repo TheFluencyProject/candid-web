@@ -235,7 +235,7 @@ export default async function GuidePage({ params }: Props) {
           />
           <p
             className={`text-[1.25rem] xl:text-[1.40625rem] font-light leading-snug mb-6 animate-fade-in-up-delay-1`}
-            style={{ color: config.hero?.textColor ?? "#18181C", opacity: 0.7, textShadow: config.hero?.textShadow }}
+            style={{ color: config.hero?.textColor ?? "#18181C", textShadow: config.hero?.textShadow }}
             dangerouslySetInnerHTML={{ __html: subtitleHtml }}
           />
           <div className="animate-fade-in-up-delay-2 self-start">
@@ -253,7 +253,7 @@ export default async function GuidePage({ params }: Props) {
           />
           <p
             className="text-[1.05rem] font-normal leading-relaxed max-w-sm animate-fade-in-up-delay-1"
-            style={{ color: "rgba(255,255,255,0.7)", textShadow: config.hero?.textShadow }}
+            style={{ color: "#FFFFFF", textShadow: config.hero?.textShadow }}
             dangerouslySetInnerHTML={{ __html: subtitleHtml }}
           />
         </div>
