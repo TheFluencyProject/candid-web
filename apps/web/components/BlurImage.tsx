@@ -44,7 +44,7 @@ export default function BlurImage({
       className={`transition-[opacity,filter,transform] duration-700 ease-out ${
         isVisible
           ? "opacity-100 blur-0 translate-y-0"
-          : "opacity-0 blur-2xl translate-y-8"
+          : "opacity-0 blur-md translate-y-8"
       } ${className}`}
     />
   );
