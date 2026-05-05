@@ -238,7 +238,7 @@ export default async function GuidePage({ params }: Props) {
             dangerouslySetInnerHTML={{ __html: coolTitle }}
           />
           <p
-            className={`text-[1.5rem] xl:text-[1.6875rem] font-light ${config.hero?.textColor ? "lg:font-medium" : ""} leading-snug mb-6 max-w-xl animate-fade-in-up-delay-1`}
+            className={`text-[1.25rem] xl:text-[1.40625rem] font-light ${config.hero?.textColor ? "lg:font-medium" : ""} leading-snug mb-6 animate-fade-in-up-delay-1`}
             style={{ color: config.hero?.textColor ?? "#18181C", opacity: 0.7, textShadow: config.hero?.textShadow }}
             dangerouslySetInnerHTML={{ __html: subtitleHtml }}
           />
