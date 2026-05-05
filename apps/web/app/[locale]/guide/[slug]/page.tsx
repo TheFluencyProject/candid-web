@@ -246,7 +246,7 @@ export default async function GuidePage({ params }: Props) {
 
         {/* Mobile text content — bottom, centered. Slim bottom padding so the
             headline sits ~10% lower in the hero. */}
-        <div className="relative z-10 lg:hidden flex flex-col items-center justify-end min-h-[80vh] px-6 pb-0 text-center">
+        <div className="relative z-10 lg:hidden flex flex-col items-center justify-end min-h-[80vh] px-6 pb-[3svh] text-center">
           <h1
             className="hero-heading font-light leading-tight mb-4 animate-fade-in-up"
             style={{ color: "#FFFFFF", fontSize: "clamp(1.65rem, 7.7vw, 2.75rem)", textShadow: config.hero?.textShadow }}
