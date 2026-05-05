@@ -144,10 +144,16 @@ export default function HeroCarousel({ tutors }: { tutors: CarouselTutor[] }) {
           </div>
         ))}
 
-        {/* No bottom-fade gradient on the carousel — that aggressive fade
-            belongs to the per-tutor guide pages where the hero merges into
-            the page background. Here the carousel lives inside a rounded
-            container and ends at its own border, so a fade looks broken. */}
+        {/* Mobile-only bottom fade — keeps subtitle/headline legible against
+            busy photos. No desktop fade since the carousel ends at its own
+            rounded border there and a fade would look broken. */}
+        <div
+          className="block lg:hidden absolute inset-0 pointer-events-none"
+          style={{
+            background:
+              "linear-gradient(to bottom, transparent 30%, rgba(24,24,28,0.3) 45%, rgba(24,24,28,0.5) 55%, rgba(24,24,28,0.65) 70%, rgba(24,24,28,0.75) 85%)",
+          }}
+        />
 
         {/* Content overlay — fades with tutor change */}
         <div
