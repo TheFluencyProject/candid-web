@@ -108,24 +108,20 @@ export default function HeroCarousel({ tutors }: { tutors: CarouselTutor[] }) {
             className="absolute inset-0 transition-opacity duration-[400ms] ease-in-out"
             style={{ opacity: i === currentIndex ? 1 : 0 }}
           >
-            {/* Desktop. priority only on slide 0 — others are hidden, preload would steal LCP bandwidth. */}
-            <Image
+            {/* Desktop. Plain <img> direct from S3 — bypasses /_next/image transcode hop on Railway. */}
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
               src={t.bgImage}
               alt={t.firstName}
-              fill
-              sizes="(min-width: 1024px) 100vw, 0px"
-              priority={i === 0}
-              className="hidden lg:block object-cover"
+              className="hidden lg:block absolute inset-0 w-full h-full object-cover"
               style={{ objectPosition: t.photoPosition.desktop }}
             />
-            {/* Mobile — scale-[1.15] matches tutor guide pages. priority only on slide 0. */}
-            <Image
+            {/* Mobile — scale-[1.15] matches tutor guide pages */}
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
               src={t.bgImage}
               alt={t.firstName}
-              fill
-              sizes="(max-width: 1023px) 100vw, 0px"
-              priority={i === 0}
-              className="block lg:hidden object-cover scale-[1.15] origin-bottom"
+              className="block lg:hidden absolute inset-0 w-full h-full object-cover scale-[1.15] origin-bottom"
               style={{ objectPosition: t.photoPosition.mobile }}
             />
           </div>

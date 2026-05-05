@@ -195,15 +195,12 @@ export default async function Home({ params }: Props) {
           <ScrollFadeIn>
             <div className="flex justify-center px-6 pb-24 md:pb-32">
               <div className="w-full max-w-sm md:max-w-[500px] lg:max-w-[420px]">
-                <Image
+                {/* Plain <img> direct from S3 — bypasses /_next/image transcode hop; PNGs stream progressively. */}
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
                   src={s.screenshotUrl}
                   alt={s.title}
-                  width={840}
-                  height={1820}
-                  sizes="(min-width: 1024px) 420px, (min-width: 768px) 500px, 384px"
-                  // eager-load all screenshots so they're ready before the user scrolls; ~50KB each post-AVIF, page-defining content.
-                  loading="eager"
-                  className="w-full h-auto rounded-[2.5rem] shadow-2xl"
+                  className="w-full rounded-[2.5rem] shadow-2xl"
                 />
               </div>
             </div>

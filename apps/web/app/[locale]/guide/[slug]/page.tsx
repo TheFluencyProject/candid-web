@@ -168,24 +168,20 @@ export default async function GuidePage({ params }: Props) {
         {/* Photo background */}
         {(tutor.web_bg_picture_url || tutor.large_profile_picture_url) ? (
           <>
-            {/* Desktop photo */}
-            <Image
+            {/* Desktop photo. Plain <img> direct from S3 — bypasses /_next/image transcode hop. */}
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
               src={tutor.web_bg_picture_url || tutor.large_profile_picture_url!}
               alt={tutor.name}
-              fill
-              sizes="(min-width: 1024px) 100vw, 0px"
-              priority
-              className="object-cover hidden lg:block"
+              className="absolute inset-0 w-full h-full object-cover hidden lg:block"
               style={{ objectPosition: config.photo.desktop }}
             />
             {/* Mobile photo */}
-            <Image
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
               src={tutor.web_bg_picture_url || tutor.large_profile_picture_url!}
               alt={tutor.name}
-              fill
-              sizes="(max-width: 1023px) 100vw, 0px"
-              priority
-              className="object-cover lg:hidden origin-bottom"
+              className="absolute inset-0 w-full h-full object-cover lg:hidden origin-bottom"
               style={{
                 objectPosition: config.photo.mobile,
                 transform: `scale(${config.photo.mobileScale ?? 1.15})`,
@@ -351,15 +347,12 @@ export default async function GuidePage({ params }: Props) {
             <ScrollFadeIn>
               <div className="flex justify-center px-6 pb-16 md:pb-24">
                 <div className="w-full max-w-sm md:max-w-[500px] lg:max-w-[420px]">
-                  <Image
+                  {/* Plain <img> direct from S3 — bypasses /_next/image transcode hop; PNGs stream progressively. */}
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
                     src={s.url!}
                     alt={s.title}
-                    width={840}
-                    height={1820}
-                    sizes="(min-width: 1024px) 420px, (min-width: 768px) 500px, 384px"
-                    // eager-load all screenshots so they're ready before the user scrolls; ~50KB each post-AVIF, page-defining content.
-                    loading="eager"
-                    className="w-full h-auto rounded-[2.5rem] shadow-2xl"
+                    className="w-full rounded-[2.5rem] shadow-2xl"
                   />
                 </div>
               </div>
