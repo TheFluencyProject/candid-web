@@ -189,7 +189,7 @@ export default function HeroCarousel({ tutors }: { tutors: CarouselTutor[] }) {
           {/* Mobile text — bottom, centered, same as tutor pages. Tighter pb
               than per-tutor (which has no pagination pill); just enough to
               clear the language pill cleanly. */}
-          <div className="flex lg:hidden absolute inset-x-0 bottom-0 z-10 flex-col items-center justify-end px-6 pb-16 text-center">
+          <div className="flex lg:hidden absolute inset-x-0 bottom-0 z-10 flex-col items-center justify-end px-6 pb-20 text-center">
             <h1
               className={`hero-heading ${tutor.hero?.textShadow ? "hero-heading--shadowed" : ""} font-light leading-tight mb-4`}
               style={{ color: "#FFFFFF", fontSize: "clamp(1.65rem, 7.7vw, 2.75rem)", textShadow: tutor.hero?.textShadow }}
