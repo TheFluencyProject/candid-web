@@ -332,7 +332,7 @@ export default async function GuidePage({ params }: Props) {
 
         return (
           <div className="pt-20 md:pt-28 lg:pt-32">
-          {screenshots.map((s) => (
+          {screenshots.map((s, idx) => (
           <section key={s.url} className="relative">
             <StickyHeader>
               <ScrollFadeIn>
@@ -351,6 +351,8 @@ export default async function GuidePage({ params }: Props) {
                     width={840}
                     height={1820}
                     sizes="(min-width: 1024px) 420px, (min-width: 768px) 500px, 384px"
+                    // eager-load first 2 so they're ready before the user scrolls down; rest stay lazy.
+                    loading={idx < 2 ? "eager" : "lazy"}
                     className="w-full h-auto rounded-[2.5rem] shadow-2xl"
                   />
                 </div>

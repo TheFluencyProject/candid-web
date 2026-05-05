@@ -6,6 +6,8 @@ const withNextIntl = createNextIntlPlugin("./i18n/request.ts");
 const nextConfig = {
   images: {
     formats: ["image/avif", "image/webp"],
+    // 1y cache for /_next/image outputs — URLs are content-addressed; new content = new URL.
+    minimumCacheTTL: 31536000,
     remotePatterns: [
       {
         protocol: "https",
