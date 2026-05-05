@@ -247,11 +247,11 @@ export default async function GuidePage({ params }: Props) {
         <div className="relative z-10 lg:hidden flex flex-col items-center justify-end min-h-[80vh] px-6 pb-10 text-center">
           <h1
             className="hero-heading font-light leading-tight mb-4 animate-fade-in-up"
-            style={{ color: "#FFFFFF", fontSize: "clamp(1.5rem, 7vw, 2.5rem)", textShadow: config.hero?.textShadow }}
+            style={{ color: "#FFFFFF", fontSize: "clamp(1.65rem, 7.7vw, 2.75rem)", textShadow: config.hero?.textShadow }}
             dangerouslySetInnerHTML={{ __html: coolTitle }}
           />
           <p
-            className="text-sm font-normal leading-relaxed max-w-sm animate-fade-in-up-delay-1"
+            className="text-[1.05rem] font-normal leading-relaxed max-w-sm animate-fade-in-up-delay-1"
             style={{ color: "rgba(255,255,255,0.7)", textShadow: config.hero?.textShadow }}
             dangerouslySetInnerHTML={{ __html: stripEmojis(t("subtitle", { name: locale === "ko" ? withKoreanParticle(localizedFirstName) : localizedFirstName, language: langLabel })) }}
           />
@@ -322,8 +322,8 @@ export default async function GuidePage({ params }: Props) {
         const country = localizeMapCountry(tutor.teaching_language, locale);
         const screenshots = [
           { url: tutor.screenshot_listen_url, title: t("listen", tVars) },
-          { url: tutor.screenshot_week_url, title: t("week", tVars) },
           { url: tutor.screenshot_map_url, title: t("map", { firstName: localizedFirstName, country }) },
+          { url: tutor.screenshot_week_url, title: t("week", tVars) },
           { url: tutor.screenshot_community_url, title: t("community") },
           { url: tutor.screenshot_intro_url, title: t("intro", tVars) },
         ].filter((s) => s.url);

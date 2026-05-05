@@ -5,7 +5,7 @@ export function localizeLanguageName(lang: string, locale: string): string {
   return capitalize(lang);
 }
 
-const MAP_COUNTRY_EN: Record<string, string> = { english: "America", korean: "Seoul" };
+const MAP_COUNTRY_EN: Record<string, string> = { english: "America", korean: "Korea" };
 const MAP_COUNTRY_KO: Record<string, string> = { english: "미국인", korean: "한국인" };
 
 export function localizeMapCountry(teachingLanguage: string, locale: string): string {
