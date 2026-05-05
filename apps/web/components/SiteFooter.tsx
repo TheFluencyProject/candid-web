@@ -27,7 +27,7 @@ export default function SiteFooter() {
 
         {/* Pages — mobile col 1 row 1 */}
         <div>
-          <h4 className="text-xl font-bold uppercase tracking-wider mb-3 opacity-70">{t("pages_heading")}</h4>
+          <h4 className="text-xl font-bold uppercase tracking-wider mb-3 text-white">{t("pages_heading")}</h4>
           <ul className="space-y-2">
             <li>
               <Link href="/" className="text-sm font-normal text-white hover:opacity-70 transition-opacity">{t("home")}</Link>
@@ -37,13 +37,13 @@ export default function SiteFooter() {
 
         {/* Programs — desktop col 3, mobile row 2 (separated from Pages by a hairline on mobile) */}
         <div className="mt-14 lg:mt-0">
-          <h4 className="text-xl font-bold uppercase tracking-wider mb-3 opacity-70">{t("programs_heading")}</h4>
+          <h4 className="text-xl font-bold uppercase tracking-wider mb-3 text-white">{t("programs_heading")}</h4>
           <div className="space-y-5">
             <div>
               <p className="text-sm font-bold uppercase tracking-widest text-white/35 mb-2">{localizeLanguageName("english", locale)}</p>
               <ul className="space-y-2">
                 <li>
-                  <Link href="/guide/english-adam" className="text-sm font-normal text-white hover:opacity-70 transition-opacity">AMERICAN DREAM</Link>
+                  <Link href="/guide/english-adam" className="text-sm font-normal text-white hover:opacity-70 transition-opacity">American Dream</Link>
                 </li>
               </ul>
             </div>
@@ -53,7 +53,7 @@ export default function SiteFooter() {
                   for now — add her back here when she's flipped live. */}
               <ul className="space-y-2">
                 <li>
-                  <Link href="/guide/korean-mia" className="text-sm font-normal text-white hover:opacity-70 transition-opacity">UNNI</Link>
+                  <Link href="/guide/korean-mia" className="text-sm font-normal text-white hover:opacity-70 transition-opacity">Unni</Link>
                 </li>
               </ul>
             </div>
@@ -62,7 +62,7 @@ export default function SiteFooter() {
 
         {/* Socials — desktop col 4, mobile last (separated from Programs by a hairline on mobile) */}
         <div className="mt-14 lg:mt-0">
-          <h4 className="text-xl font-bold uppercase tracking-wider mb-3 opacity-70">{t("connect_heading")}</h4>
+          <h4 className="text-xl font-bold uppercase tracking-wider mb-3 text-white">{t("connect_heading")}</h4>
           <ul className="space-y-2">
             <li>
               <a
