@@ -93,9 +93,11 @@ export default async function Home({ params }: Props) {
           : firstName;
       const langLabel = localizeLanguageName(tutor.teaching_language, locale);
       const nameForSubtitle = locale === "ko" ? withKoreanParticle(localizedFirstName) : localizedFirstName;
-      const subtitle = stripEmojis(guideT("subtitle", { name: nameForSubtitle, language: langLabel }));
+      // Per-tutor English subtitle override; Korean keeps the i18n default.
+      const enOverride = locale === "en" ? config.subtitle?.en : undefined;
+      const subtitle: string = enOverride ?? stripEmojis(guideT("subtitle", { name: nameForSubtitle, language: langLabel }));
 
-      return {
+      const item: CarouselTutor = {
         slug: tutor.slug,
         firstName,
         city: tutor.city,
@@ -105,7 +107,9 @@ export default async function Home({ params }: Props) {
         subtitle,
         photoPosition: config.photo,
         arrowPosition: config.arrow,
+        hero: config.hero,
       };
+      return item;
     })
     .filter((t): t is CarouselTutor => t !== null);
 

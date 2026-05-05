@@ -11,10 +11,15 @@ export interface CarouselTutor {
   bgImage: string;
   coolTitle: string;
   subtitle: string;
-  photoPosition: { desktop: string; mobile: string };
+  photoPosition: { desktop: string; mobile: string; mobileScale?: number };
   arrowPosition: {
     desktop: { top: string; left: string; rotation?: string };
     mobile: { top: string; right: string; rotation?: string };
+  };
+  hero?: {
+    textColor?: string;
+    textShadow?: string;
+    overlay?: string;
   };
 }
 
@@ -116,14 +121,26 @@ export default function HeroCarousel({ tutors }: { tutors: CarouselTutor[] }) {
               className="hidden lg:block absolute inset-0 w-full h-full object-cover"
               style={{ objectPosition: t.photoPosition.desktop }}
             />
-            {/* Mobile — scale-[1.15] matches tutor guide pages */}
+            {/* Mobile — scale matches tutor guide pages (default 1.15, per-tutor override allowed) */}
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={t.bgImage}
               alt={t.firstName}
-              className="block lg:hidden absolute inset-0 w-full h-full object-cover scale-[1.15] origin-bottom"
-              style={{ objectPosition: t.photoPosition.mobile }}
+              className="block lg:hidden absolute inset-0 w-full h-full object-cover origin-bottom"
+              style={{
+                objectPosition: t.photoPosition.mobile,
+                transform: `scale(${t.photoPosition.mobileScale ?? 1.15})`,
+              }}
             />
+            {/* Per-tutor radial overlay (e.g. dark corner behind white headline).
+                Only rendered for tutors with a white-hero override; sits above
+                the bg photo and below the gradient + content. */}
+            {t.hero?.textColor && t.hero?.overlay && (
+              <div
+                className="absolute inset-0 pointer-events-none"
+                style={{ background: t.hero.overlay }}
+              />
+            )}
           </div>
         ))}
 
@@ -152,27 +169,27 @@ export default function HeroCarousel({ tutors }: { tutors: CarouselTutor[] }) {
           {/* Desktop text — left side, no card bg, same as tutor pages */}
           <div className="hidden lg:flex flex-col justify-start absolute inset-y-0 left-0 px-12 pt-12 pb-24">
             <h1
-              className="hero-heading text-5xl xl:text-6xl font-light leading-[1.15] mb-6"
-              style={{ color: "#18181C" }}
+              className={`hero-heading ${tutor.hero?.textShadow ? "hero-heading--shadowed" : ""} text-5xl xl:text-6xl font-light lg:font-medium leading-[1.15] mb-6`}
+              style={{ color: tutor.hero?.textColor ?? "#18181C", textShadow: tutor.hero?.textShadow }}
               dangerouslySetInnerHTML={{ __html: tutor.coolTitle }}
             />
             <p
-              className="text-base xl:text-lg font-light leading-relaxed"
-              style={{ color: "#18181C", opacity: 0.7 }}
+              className="text-[1.25rem] xl:text-[1.40625rem] font-light leading-snug"
+              style={{ color: tutor.hero?.textColor ?? "#18181C", opacity: 0.7, textShadow: tutor.hero?.textShadow }}
               dangerouslySetInnerHTML={{ __html: tutor.subtitle }}
             />
           </div>
 
           {/* Mobile text — bottom, centered, same as tutor pages */}
-          <div className="flex lg:hidden absolute inset-x-0 bottom-0 z-10 flex-col items-center justify-end px-6 pb-16 text-center">
+          <div className="flex lg:hidden absolute inset-x-0 bottom-0 z-10 flex-col items-center justify-end px-6 pb-[calc(4rem+5svh)] text-center">
             <h1
-              className="hero-heading font-light leading-tight mb-4"
-              style={{ color: "#FFFFFF", fontSize: "clamp(1.5rem, 7vw, 2.5rem)" }}
+              className={`hero-heading ${tutor.hero?.textShadow ? "hero-heading--shadowed" : ""} font-light leading-tight mb-4`}
+              style={{ color: "#FFFFFF", fontSize: "clamp(1.65rem, 7.7vw, 2.75rem)", textShadow: tutor.hero?.textShadow }}
               dangerouslySetInnerHTML={{ __html: tutor.coolTitle }}
             />
             <p
-              className="text-sm font-normal leading-relaxed"
-              style={{ color: "rgba(255,255,255,0.7)" }}
+              className="text-[1.05rem] font-normal leading-relaxed"
+              style={{ color: "rgba(255,255,255,0.7)", textShadow: tutor.hero?.textShadow }}
               dangerouslySetInnerHTML={{ __html: tutor.subtitle }}
             />
           </div>
