@@ -243,8 +243,9 @@ export default async function GuidePage({ params }: Props) {
           </div>
         </div>
 
-        {/* Mobile text content — bottom, centered */}
-        <div className="relative z-10 lg:hidden flex flex-col items-center justify-end min-h-[80vh] px-6 pb-10 text-center">
+        {/* Mobile text content — bottom, centered. Slim bottom padding so the
+            headline sits ~10% lower in the hero. */}
+        <div className="relative z-10 lg:hidden flex flex-col items-center justify-end min-h-[80vh] px-6 pb-2 text-center">
           <h1
             className="hero-heading font-light leading-tight mb-4 animate-fade-in-up"
             style={{ color: "#FFFFFF", fontSize: "clamp(1.65rem, 7.7vw, 2.75rem)", textShadow: config.hero?.textShadow }}
@@ -323,6 +324,7 @@ export default async function GuidePage({ params }: Props) {
         const screenshots = [
           { url: tutor.screenshot_listen_url, title: t("listen", tVars) },
           { url: tutor.screenshot_map_url, title: t("map", { firstName: localizedFirstName, country }) },
+          { url: tutor.screenshot_shadow_url, title: t("shadow", tVars) },
           { url: tutor.screenshot_week_url, title: t("week", tVars) },
           { url: tutor.screenshot_community_url, title: t("community") },
           { url: tutor.screenshot_intro_url, title: t("intro", tVars) },
