@@ -343,20 +343,20 @@ export default async function GuidePage({ params }: Props) {
                 </h2>
               </ScrollFadeIn>
             </StickyHeader>
-            {/* Screenshot */}
-            <ScrollFadeIn>
-              <div className="flex justify-center px-6 pb-16 md:pb-24">
-                <div className="w-full max-w-sm md:max-w-[500px] lg:max-w-[420px]">
-                  {/* Plain <img> direct from S3 — bypasses /_next/image transcode hop; PNGs stream progressively. */}
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={s.url!}
-                    alt={s.title}
-                    className="w-full rounded-[2.5rem] shadow-2xl"
-                  />
-                </div>
+            {/* Screenshot — no ScrollFadeIn: 700ms opacity fade raced the
+                ~5MB PNG download and caused a "pop-in" mid-fade. Just let
+                the image render whenever its bytes arrive. */}
+            <div className="flex justify-center px-6 pb-16 md:pb-24">
+              <div className="w-full max-w-sm md:max-w-[500px] lg:max-w-[420px]">
+                {/* Plain <img> direct from S3 — bypasses /_next/image transcode hop. */}
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={s.url!}
+                  alt={s.title}
+                  className="w-full rounded-[2.5rem] shadow-2xl"
+                />
               </div>
-            </ScrollFadeIn>
+            </div>
           </section>
         ))}
           </div>
