@@ -144,23 +144,10 @@ export default function HeroCarousel({ tutors }: { tutors: CarouselTutor[] }) {
           </div>
         ))}
 
-        {/* Gradient overlays — same as tutor pages */}
-        {/* Desktop: bottom fade */}
-        <div
-          className="hidden lg:block absolute inset-0 pointer-events-none"
-          style={{
-            background: "linear-gradient(to bottom, transparent 70%, #18181C 100%)",
-          }}
-        />
-        {/* Mobile: stronger bottom fade — fades fully to bg color so the
-            subtitle reads as cleanly white as it does on the guide page. */}
-        <div
-          className="block lg:hidden absolute inset-0 pointer-events-none"
-          style={{
-            background:
-              "linear-gradient(to bottom, transparent 35%, rgba(24,24,28,0.4) 50%, rgba(24,24,28,0.7) 65%, rgba(24,24,28,0.85) 80%, #18181C 95%)",
-          }}
-        />
+        {/* No bottom-fade gradient on the carousel — that aggressive fade
+            belongs to the per-tutor guide pages where the hero merges into
+            the page background. Here the carousel lives inside a rounded
+            container and ends at its own border, so a fade looks broken. */}
 
         {/* Content overlay — fades with tutor change */}
         <div
