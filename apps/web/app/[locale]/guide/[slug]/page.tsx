@@ -185,7 +185,7 @@ export default async function GuidePage({ params }: Props) {
               className="absolute inset-0 w-full h-full object-cover lg:hidden origin-bottom"
               style={{
                 objectPosition: config.photo.mobile,
-                transform: `scale(${config.photo.mobileScale ?? 1.15})`,
+                transform: `scale(${config.photo.mobileScale ?? 1.15}) translate(${config.photo.mobileTranslateX ?? '0'}, ${config.photo.mobileTranslateY ?? '0'})`,
               }}
             />
           </>
@@ -228,7 +228,7 @@ export default async function GuidePage({ params }: Props) {
 
         {/* Desktop text content — left side. Bumped weight on desktop when the
             hero text override is white so it stays readable on busy backgrounds. */}
-        <div className="relative z-10 hidden lg:flex flex-col justify-start min-h-screen px-12 pt-[120px] pb-24">
+        <div className="relative z-10 hidden lg:flex flex-col justify-start min-h-screen px-12 pt-[100px] pb-24">
           <h1
             className={`hero-heading ${config.hero?.textShadow ? "hero-heading--shadowed" : ""} text-5xl xl:text-6xl font-light lg:font-medium leading-[1.15] mb-6 animate-fade-in-up`}
             style={{ color: config.hero?.textColor ?? "#18181C", textShadow: config.hero?.textShadow }}

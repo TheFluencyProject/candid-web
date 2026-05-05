@@ -12,6 +12,18 @@ export interface TutorPageConfig {
     // baseline zoom-in applied via Tailwind). Set <1.15 to zoom out for tutors
     // whose photo benefits from more breathing room.
     mobileScale?: number;
+    // Optional vertical translate on mobile, applied AFTER scale so it actually
+    // shifts the rendered photo within the hero box. We need this because most
+    // source photos have the same aspect ratio as the mobile container after
+    // object-cover scales them to fit height — meaning object-position Y% has
+    // zero effect (no vertical room to slide). translateY operates on the
+    // already-rendered IMG, so it's the only knob that actually moves the
+    // subject up/down on mobile. Use any CSS length, e.g. "5%" or "-30px".
+    mobileTranslateY?: string;
+    // Optional horizontal translate on mobile (same rationale as translateY,
+    // for the case where object-position X% has hit its 0/100% rail). Negative
+    // values move the subject left in the frame.
+    mobileTranslateX?: string;
   };
   arrow: {
     desktop: { top: string; left: string; rotation?: string };
@@ -38,8 +50,10 @@ export interface TutorPageConfig {
 const tutorPageConfig: Record<string, TutorPageConfig> = {
   "korean-mia": {
     photo: {
-      desktop: "center 15%",
-      mobile: "98% 35%",
+      desktop: "55% 15%",
+      mobile: "98% 50%",
+      mobileTranslateY: "10%",
+      mobileTranslateX: "-3%",
     },
     arrow: {
       desktop: { top: "65%", left: "85%" },
@@ -56,8 +70,10 @@ const tutorPageConfig: Record<string, TutorPageConfig> = {
   },
   "english-adam": {
     photo: {
-      desktop: "82% 28%",
-      mobile: "100% 38%",
+      desktop: "87% 33%",
+      mobile: "100% 50%",
+      mobileTranslateY: "7%",
+      mobileTranslateX: "-3%",
     },
     arrow: {
       desktop: { top: "73%", left: "76%" },
@@ -75,8 +91,10 @@ const tutorPageConfig: Record<string, TutorPageConfig> = {
   "korean-chan": {
     photo: {
       desktop: "center top",
-      mobile: "80% 20%",
-      mobileScale: 1.0,
+      mobile: "85% 20%",
+      mobileScale: 1.08,
+      mobileTranslateY: "-6%",
+      mobileTranslateX: "-2%",
     },
     arrow: {
       desktop: { top: "50%", left: "55%" },

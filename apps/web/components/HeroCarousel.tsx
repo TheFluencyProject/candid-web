@@ -11,7 +11,7 @@ export interface CarouselTutor {
   bgImage: string;
   coolTitle: string;
   subtitle: string;
-  photoPosition: { desktop: string; mobile: string; mobileScale?: number };
+  photoPosition: { desktop: string; mobile: string; mobileScale?: number; mobileTranslateY?: string; mobileTranslateX?: string };
   arrowPosition: {
     desktop: { top: string; left: string; rotation?: string };
     mobile: { top: string; right: string; rotation?: string };
@@ -129,7 +129,7 @@ export default function HeroCarousel({ tutors }: { tutors: CarouselTutor[] }) {
               className="block lg:hidden absolute inset-0 w-full h-full object-cover origin-bottom"
               style={{
                 objectPosition: t.photoPosition.mobile,
-                transform: `scale(${t.photoPosition.mobileScale ?? 1.15})`,
+                transform: `scale(${t.photoPosition.mobileScale ?? 1.15}) translate(${t.photoPosition.mobileTranslateX ?? '0'}, ${t.photoPosition.mobileTranslateY ?? '0'})`,
               }}
             />
             {/* Per-tutor radial overlay (e.g. dark corner behind white headline).
