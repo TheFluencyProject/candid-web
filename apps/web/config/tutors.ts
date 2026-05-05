@@ -63,7 +63,7 @@ const tutorPageConfig: Record<string, TutorPageConfig> = {
       overlay: "radial-gradient(ellipse 95% 65% at 0% 0%, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0) 100%)",
     },
     subtitle: {
-      en: "Get Adam's weekly set of English listening & speaking lessons<br/>centered around his daily life as an American entrepreneur",
+      en: "Get Adam's weekly set of English listening & speaking lessons<br/>centered around his daily life across New York City & Seoul",
     },
   },
   "korean-chan": {
