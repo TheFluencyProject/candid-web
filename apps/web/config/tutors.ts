@@ -45,7 +45,7 @@ const tutorPageConfig: Record<string, TutorPageConfig> = {
       overlay: "radial-gradient(ellipse 95% 65% at 0% 0%, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0) 100%)",
     },
     subtitle: {
-      en: "Get Mia's weekly set of Korean listening & speaking lessons<br/>based on her daily life in Korea",
+      en: "Get Mia's weekly set of Korean listening & speaking lessons<br/>centered around her daily life in Korea",
     },
   },
   "english-adam": {
@@ -58,7 +58,7 @@ const tutorPageConfig: Record<string, TutorPageConfig> = {
       mobile: { top: "50%", right: "8%" },
     },
     subtitle: {
-      en: "Get Adam's weekly set of English listening & speaking lessons<br/>based on his daily life as an American entrepreneur",
+      en: "Get Adam's weekly set of English listening & speaking lessons<br/>centered around his daily life as an American entrepreneur",
     },
   },
   "korean-chan": {
@@ -82,7 +82,7 @@ const tutorPageConfig: Record<string, TutorPageConfig> = {
       overlay: "radial-gradient(ellipse 95% 65% at 0% 0%, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0) 100%)",
     },
     subtitle: {
-      en: "Get Chan's weekly set of Korean listening & speaking lessons<br/>based on his daily life in Korea",
+      en: "Get Chan's weekly set of Korean listening & speaking lessons<br/>centered around his daily life in Korea",
     },
   },
 };
