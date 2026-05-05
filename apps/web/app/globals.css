@@ -63,6 +63,13 @@ html {
   font-weight: 700;
 }
 
+/* The cursive em renders shadow much heavier than the sans-serif line1
+   (thicker strokes catch the blur). Halve the inherited shadow alpha so the
+   cursive doesn't feel oppressive on tutors with white hero text. */
+.hero-heading em {
+  text-shadow: 0 0 14px rgba(0, 0, 0, 0.18), 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
 /* Hero heading line break controls */
 .hero-break-mobile {
   display: none;

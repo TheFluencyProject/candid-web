@@ -22,6 +22,11 @@ export interface TutorPageConfig {
     // (where the headline sits on desktop) needs darkening for legibility.
     overlay?: string;
   };
+  // Optional per-tutor subtitle override (HTML allowed; use <br/> for line
+  // break). Falls back to the i18n "guide.subtitle" string when absent.
+  subtitle?: {
+    en?: string;
+  };
 }
 
 const tutorPageConfig: Record<string, TutorPageConfig> = {
@@ -39,6 +44,9 @@ const tutorPageConfig: Record<string, TutorPageConfig> = {
       textShadow: "0 0 14px rgba(0,0,0,0.35), 0 1px 2px rgba(0,0,0,0.4)",
       overlay: "radial-gradient(ellipse 95% 65% at 0% 0%, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0) 100%)",
     },
+    subtitle: {
+      en: "Get Mia's weekly set of Korean listening & speaking lessons<br/>based on her daily life in Korea",
+    },
   },
   "english-adam": {
     photo: {
@@ -48,6 +56,9 @@ const tutorPageConfig: Record<string, TutorPageConfig> = {
     arrow: {
       desktop: { top: "73%", left: "76%" },
       mobile: { top: "50%", right: "8%" },
+    },
+    subtitle: {
+      en: "Get Adam's weekly set of English listening & speaking lessons<br/>based on his daily life as an American entrepreneur",
     },
   },
   "korean-chan": {
@@ -69,6 +80,9 @@ const tutorPageConfig: Record<string, TutorPageConfig> = {
       // Radial oval anchored to the top-left, fading to transparent ~2/3
       // across — darkens the area behind the headline without dimming the rest.
       overlay: "radial-gradient(ellipse 95% 65% at 0% 0%, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0) 100%)",
+    },
+    subtitle: {
+      en: "Get Chan's weekly set of Korean listening & speaking lessons<br/>based on his daily life in Korea",
     },
   },
 };
