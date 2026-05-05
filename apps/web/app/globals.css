@@ -69,7 +69,7 @@ html {
    `--hero-shadowed` class is added only when the h1 has a parent shadow,
    so default (dark-text) tutors keep no shadow at all on the em. */
 .hero-heading--shadowed em {
-  text-shadow: 0 0 14px rgba(0, 0, 0, 0.13), 0 1px 2px rgba(0, 0, 0, 0.14);
+  text-shadow: 0 0 14px rgba(0, 0, 0, 0.09), 0 1px 2px rgba(0, 0, 0, 0.1);
 }
 
 /* Hero heading line break controls */
