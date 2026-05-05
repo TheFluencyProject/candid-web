@@ -39,12 +39,13 @@ export default function BlurImage({
       ref={ref}
       src={src}
       alt={alt}
-      // 150ms delay so the image trails the sibling H2's fade slightly.
-      style={{ transitionDelay: "150ms" }}
-      className={`transition-[opacity,filter,transform] duration-700 ease-out ${
+      // Match the H2's ScrollFadeIn animation exactly (opacity + translate-y,
+      // no blur) and ride a tiny 50ms delay so it lands just after the title.
+      style={{ transitionDelay: "50ms" }}
+      className={`transition-all duration-700 ease-out ${
         isVisible
-          ? "opacity-100 blur-0 translate-y-0"
-          : "opacity-0 blur-md translate-y-8"
+          ? "opacity-100 translate-y-0"
+          : "opacity-0 translate-y-8"
       } ${className}`}
     />
   );
