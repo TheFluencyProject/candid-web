@@ -39,8 +39,12 @@ export default function BlurImage({
       ref={ref}
       src={src}
       alt={alt}
-      className={`transition-[opacity,filter] duration-700 ease-out ${
-        isVisible ? "opacity-100 blur-0" : "opacity-0 blur-2xl"
+      // 150ms delay so the image trails the sibling H2's fade slightly.
+      style={{ transitionDelay: "150ms" }}
+      className={`transition-[opacity,filter,transform] duration-700 ease-out ${
+        isVisible
+          ? "opacity-100 blur-0 translate-y-0"
+          : "opacity-0 blur-2xl translate-y-8"
       } ${className}`}
     />
   );
