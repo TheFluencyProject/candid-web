@@ -92,13 +92,18 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     return { title: "Guide Not Found — Candid" };
   }
 
+  // Format: "<TITLE> - <Language> with <Name>" so each tutor's tab reads like
+  // their program ("AMERICAN DREAM - English with Adam"). Falls back to the
+  // legacy "Candid | …" form when title is empty.
   let title: string;
   if (locale === "ko") {
     const koreanLang = localizeLanguageName(tutor.teaching_language, "ko");
     const koreanName = (tutor.metadata?.name_kr as string) ?? tutor.name;
-    title = `Candid | ${koreanLang}, ${withKoreanParticle(koreanName)} 함께`;
+    const suffix = `${koreanLang}, ${withKoreanParticle(koreanName)} 함께`;
+    title = tutor.title ? `${tutor.title} - ${suffix}` : `Candid | ${suffix}`;
   } else {
-    title = `Candid | ${capitalize(tutor.teaching_language)} with ${tutor.name}`;
+    const suffix = `${capitalize(tutor.teaching_language)} with ${tutor.name}`;
+    title = tutor.title ? `${tutor.title} - ${suffix}` : `Candid | ${suffix}`;
   }
   // Flatten the \n in cool_title for HTML meta description (single-line expected).
   const description = (tutor.cool_title ?? tutor.short_description ?? "").replace(/\n/g, " ");
@@ -152,7 +157,7 @@ export default async function GuidePage({ params }: Props) {
       style={{ backgroundColor: "#18181C", color: "#FFFFFF" }}
     >
       {/* ─── Fixed Navbar ─── */}
-      <GuideNavbar sentinelId="hero-sentinel" downloadUrl={`/download/${slug}`} />
+      <GuideNavbar sentinelId="hero-sentinel" downloadUrl={`/download/${slug}`} alwaysWhite={Boolean(config.hero?.textColor)} />
 
       {/* ─── Full-Viewport Hero ─── */}
       <section className="relative min-h-[80vh] lg:min-h-screen overflow-hidden">
@@ -176,8 +181,11 @@ export default async function GuidePage({ params }: Props) {
               fill
               sizes="(max-width: 1023px) 100vw, 0px"
               priority
-              className="object-cover lg:hidden scale-[1.15] origin-bottom"
-              style={{ objectPosition: config.photo.mobile }}
+              className="object-cover lg:hidden origin-bottom"
+              style={{
+                objectPosition: config.photo.mobile,
+                transform: `scale(${config.photo.mobileScale ?? 1.15})`,
+              }}
             />
           </>
         ) : (
@@ -187,6 +195,16 @@ export default async function GuidePage({ params }: Props) {
               background:
                 "linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%)",
             }}
+          />
+        )}
+
+        {/* Optional per-tutor overlay (e.g. dark radial behind the headline).
+            Only rendered when the hero text is white — the overlay's whole
+            purpose is to keep white text legible on a busy/light photo. */}
+        {config.hero?.textColor && config.hero?.overlay && (
+          <div
+            className="absolute inset-0 pointer-events-none"
+            style={{ background: config.hero.overlay }}
           />
         )}
 
@@ -207,15 +225,16 @@ export default async function GuidePage({ params }: Props) {
           }}
         />
 
-        {/* Desktop text content — left side */}
+        {/* Desktop text content — left side. Bumped weight on desktop when the
+            hero text override is white so it stays readable on busy backgrounds. */}
         <div className="relative z-10 hidden lg:flex flex-col justify-start min-h-screen px-12 pt-[120px] pb-24">
           <h1
-            className="hero-heading text-5xl xl:text-6xl font-light leading-[1.15] mb-6 animate-fade-in-up"
+            className={`hero-heading text-5xl xl:text-6xl font-light ${config.hero?.textColor ? "lg:font-medium" : ""} leading-[1.15] mb-6 animate-fade-in-up`}
             style={{ color: config.hero?.textColor ?? "#18181C", textShadow: config.hero?.textShadow }}
             dangerouslySetInnerHTML={{ __html: coolTitle }}
           />
           <p
-            className="text-base xl:text-lg font-light leading-relaxed mb-6 max-w-md animate-fade-in-up-delay-1"
+            className={`text-base xl:text-lg font-light ${config.hero?.textColor ? "lg:font-medium" : ""} leading-relaxed mb-6 max-w-md animate-fade-in-up-delay-1`}
             style={{ color: config.hero?.textColor ?? "#18181C", opacity: 0.7, textShadow: config.hero?.textShadow }}
             dangerouslySetInnerHTML={{ __html: stripEmojis(t("subtitle", { name: locale === "ko" ? withKoreanParticle(localizedFirstName) : localizedFirstName, language: langLabel })) }}
           />

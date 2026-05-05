@@ -18,7 +18,7 @@ export function capitalize(s: string): string {
 }
 
 export function withKoreanParticle(name: string): string {
-  return name === "미아" ? `${name}와` : `${name}과`;
+  return `${name}쌤과`;
 }
 
 export function stripEmojis(text: string): string {
@@ -53,5 +53,16 @@ export function formatHeroTitle(text: string | null | undefined): string {
   if (idx === -1) return cleaned;
   const line1 = cleaned.slice(0, idx);
   const line2 = cleaned.slice(idx + 1);
-  return `<span class="hero-line1">${line1}</span><span class="hero-break-all"></span><em>${line2}</em>`;
+
+  // On mobile only, break line 1 after " to " so "Your guide to" sits on its own
+  // line above the rest. Desktop keeps line 1 single-line via `.hero-line1`'s
+  // white-space:nowrap. The trailing space stays in the prefix so desktop reads
+  // "Your guide to conversational …" when the break-span is display:none.
+  // Korean line 1 has no " to " — no-op there, wraps naturally.
+  const toIdx = line1.indexOf(" to ");
+  const line1Html = toIdx === -1
+    ? line1
+    : `${line1.slice(0, toIdx + 4)}<span class="hero-break-mobile"></span>${line1.slice(toIdx + 4)}`;
+
+  return `<span class="hero-line1">${line1Html}</span><span class="hero-break-all"></span><em>${line2}</em>`;
 }

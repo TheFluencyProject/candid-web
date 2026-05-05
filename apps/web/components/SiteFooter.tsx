@@ -1,16 +1,18 @@
 "use client";
 
 import Image from "next/image";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import { Link } from "@/i18n/routing";
+import { localizeLanguageName } from "@/lib/i18n-helpers";
 
 export default function SiteFooter() {
   const t = useTranslations("footer");
+  const locale = useLocale();
 
   return (
     <footer className="border-t border-white/10">
       {/* Main footer grid */}
-      <div className="grid grid-cols-2 gap-8 px-6 py-10 lg:grid-cols-4 lg:px-12 lg:py-12">
+      <div className="grid grid-cols-1 px-6 py-14 lg:grid-cols-4 lg:gap-8 lg:px-12 lg:py-12">
         {/* App Store — desktop only */}
         <div className="hidden lg:flex flex-col items-start">
           <Link href="/download">
@@ -23,39 +25,51 @@ export default function SiteFooter() {
           </Link>
         </div>
 
-        {/* Pages */}
+        {/* Pages — mobile col 1 row 1 */}
         <div>
-          <h4 className="text-sm font-bold uppercase tracking-wider mb-4 opacity-70">{t("pages_heading")}</h4>
+          <h4 className="text-xl font-bold uppercase tracking-wider mb-3 opacity-70">{t("pages_heading")}</h4>
           <ul className="space-y-2">
             <li>
-              <Link href="/" className="text-sm opacity-50 hover:opacity-70 transition-opacity">{t("home")}</Link>
+              <Link href="/" className="text-sm font-normal text-white hover:opacity-70 transition-opacity">{t("home")}</Link>
             </li>
           </ul>
         </div>
 
-        {/* Programs */}
-        <div>
-          <h4 className="text-sm font-bold uppercase tracking-wider mb-4 opacity-70">{t("programs_heading")}</h4>
-          <ul className="space-y-2">
-            <li>
-              <Link href="/guide/english-adam" className="text-sm opacity-50 hover:opacity-70 transition-opacity">{t("english_with_adam")}</Link>
-            </li>
-            <li>
-              <Link href="/guide/korean-mia" className="text-sm opacity-50 hover:opacity-70 transition-opacity">{t("korean_with_mia")}</Link>
-            </li>
-          </ul>
+        {/* Programs — desktop col 3, mobile row 2 (separated from Pages by a hairline on mobile) */}
+        <div className="mt-14 lg:mt-0">
+          <h4 className="text-xl font-bold uppercase tracking-wider mb-3 opacity-70">{t("programs_heading")}</h4>
+          <div className="space-y-5">
+            <div>
+              <p className="text-sm font-bold uppercase tracking-widest text-white/35 mb-2">{localizeLanguageName("english", locale)}</p>
+              <ul className="space-y-2">
+                <li>
+                  <Link href="/guide/english-adam" className="text-sm font-normal text-white hover:opacity-70 transition-opacity">AMERICAN DREAM</Link>
+                </li>
+              </ul>
+            </div>
+            <div>
+              <p className="text-sm font-bold uppercase tracking-widest text-white/35 mb-2">{localizeLanguageName("korean", locale)}</p>
+              {/* Footer lists active tutors only. Chan (CHINGU) is is_enabled=false
+                  for now — add her back here when she's flipped live. */}
+              <ul className="space-y-2">
+                <li>
+                  <Link href="/guide/korean-mia" className="text-sm font-normal text-white hover:opacity-70 transition-opacity">UNNI</Link>
+                </li>
+              </ul>
+            </div>
+          </div>
         </div>
 
-        {/* Socials */}
-        <div>
-          <h4 className="text-sm font-bold uppercase tracking-wider mb-4 opacity-70">{t("connect_heading")}</h4>
+        {/* Socials — desktop col 4, mobile last (separated from Programs by a hairline on mobile) */}
+        <div className="mt-14 lg:mt-0">
+          <h4 className="text-xl font-bold uppercase tracking-wider mb-3 opacity-70">{t("connect_heading")}</h4>
           <ul className="space-y-2">
             <li>
               <a
                 href="https://instagram.com/join.candid"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-sm opacity-50 hover:opacity-70 transition-opacity flex items-center gap-2"
+                className="text-sm font-normal text-white hover:opacity-70 transition-opacity flex items-center gap-2"
               >
                 <svg className="w-4 h-4 shrink-0" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
                 @join.candid
@@ -64,7 +78,7 @@ export default function SiteFooter() {
             <li>
               <a
                 href="mailto:adam@thefluencyproject.co"
-                className="text-sm opacity-50 hover:opacity-70 transition-opacity flex items-center gap-2"
+                className="text-sm font-normal text-white hover:opacity-70 transition-opacity flex items-center gap-2"
               >
                 <svg className="w-4 h-4 shrink-0" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
                 adam@thefluencyproject.co
@@ -77,10 +91,10 @@ export default function SiteFooter() {
       {/* Bottom bar — always visible */}
       <div className="px-6 py-6 pb-32 md:pb-6 md:px-12 flex items-center justify-between flex-wrap gap-4 border-t border-white/5">
         <div className="flex gap-6 items-center">
-          <Link href="/privacy" className="text-sm opacity-50 hover:opacity-70 transition-opacity">
+          <Link href="/privacy" className="text-sm font-normal text-white hover:opacity-70 transition-opacity">
             {t("privacy")}
           </Link>
-          <Link href="/terms" className="text-sm opacity-50 hover:opacity-70 transition-opacity">
+          <Link href="/terms" className="text-sm font-normal text-white hover:opacity-70 transition-opacity">
             {t("terms")}
           </Link>
           <span className="text-sm opacity-50">
@@ -88,7 +102,7 @@ export default function SiteFooter() {
           </span>
         </div>
         <p className="text-sm opacity-30">
-          &copy; {new Date().getFullYear()} The Fluency Project
+          &copy; {new Date().getFullYear()} The Fluency Project Inc.
         </p>
       </div>
     </footer>

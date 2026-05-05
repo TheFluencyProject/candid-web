@@ -2,6 +2,10 @@ export interface TutorPageConfig {
   photo: {
     desktop: string; // CSS object-position, e.g. "70% 20%"
     mobile: string;
+    // Optional CSS transform-scale on mobile only. Defaults to 1.15 (matches the
+    // baseline zoom-in applied via Tailwind). Set <1.15 to zoom out for tutors
+    // whose photo benefits from more breathing room.
+    mobileScale?: number;
   };
   arrow: {
     desktop: { top: string; left: string; rotation?: string };
@@ -13,6 +17,10 @@ export interface TutorPageConfig {
   hero?: {
     textColor?: string;
     textShadow?: string;
+    // Optional radial/linear overlay drawn above the bg photo and below the
+    // text. Use any CSS background value. Helpful when the photo's top-left
+    // (where the headline sits on desktop) needs darkening for legibility.
+    overlay?: string;
   };
 }
 
@@ -40,7 +48,8 @@ const tutorPageConfig: Record<string, TutorPageConfig> = {
   "korean-chan": {
     photo: {
       desktop: "center top",
-      mobile: "center top",
+      mobile: "80% 20%",
+      mobileScale: 1.0,
     },
     arrow: {
       desktop: { top: "50%", left: "55%" },
@@ -48,7 +57,13 @@ const tutorPageConfig: Record<string, TutorPageConfig> = {
     },
     hero: {
       textColor: "#FFFFFF",
-      textShadow: "0 2px 6px rgba(0,0,0,0.55)",
+      // Soft glow + tight drop. The glow detaches the text from the busy
+      // cherry-blossom photo; the tight drop adds crisp definition without
+      // looking blurry.
+      textShadow: "0 0 14px rgba(0,0,0,0.35), 0 1px 2px rgba(0,0,0,0.4)",
+      // Radial oval anchored to the top-left, fading to transparent ~2/3
+      // across — darkens the area behind the headline without dimming the rest.
+      overlay: "radial-gradient(ellipse 95% 65% at 0% 0%, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0) 100%)",
     },
   },
 };
