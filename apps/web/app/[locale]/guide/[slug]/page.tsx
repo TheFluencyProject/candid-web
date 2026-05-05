@@ -222,7 +222,7 @@ export default async function GuidePage({ params }: Props) {
           className="absolute inset-0 pointer-events-none lg:hidden"
           style={{
             background:
-              "linear-gradient(to bottom, transparent 35%, rgba(24,24,28,0.4) 50%, rgba(24,24,28,0.7) 65%, rgba(24,24,28,0.85) 80%, #18181C 95%)",
+              "linear-gradient(to bottom, transparent 45%, rgba(24,24,28,0.4) 60%, rgba(24,24,28,0.7) 75%, rgba(24,24,28,0.85) 90%, #18181C 100%)",
           }}
         />
 
@@ -246,7 +246,7 @@ export default async function GuidePage({ params }: Props) {
 
         {/* Mobile text content — bottom, centered. Slim bottom padding so the
             headline sits ~10% lower in the hero. */}
-        <div className="relative z-10 lg:hidden flex flex-col items-center justify-end min-h-[80vh] px-6 pb-[5svh] text-center">
+        <div className="relative z-10 lg:hidden flex flex-col items-center justify-end min-h-[80vh] px-6 pb-0 text-center">
           <h1
             className="hero-heading font-light leading-tight mb-4 animate-fade-in-up"
             style={{ color: "#FFFFFF", fontSize: "clamp(1.65rem, 7.7vw, 2.75rem)", textShadow: config.hero?.textShadow }}
