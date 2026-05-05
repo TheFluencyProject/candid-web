@@ -125,6 +125,11 @@ const nextConfig = {
         destination: "/guide/misshoney",
         permanent: true,
       },
+      {
+        source: "/chan",
+        destination: "/guide/korean-chan",
+        permanent: true,
+      },
     ];
   },
 };
