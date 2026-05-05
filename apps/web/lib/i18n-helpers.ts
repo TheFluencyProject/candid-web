@@ -34,13 +34,21 @@ export function stripEmojis(text: string): string {
 
 /**
  * Renders a tutor's cool_title with the second line emphasized.
- * The DB value comes with a literal `\n` separating the two lines; we wrap the
- * second line in <em>, which globals.css styles with Sriracha/italic/bold.
- * Single-line values are returned as-is.
+ * The DB value typically embeds a literal `\n` to separate the two lines;
+ * we also auto-insert one before " & " when the value is single-line so new
+ * tutors don't have to remember the convention. The second line is wrapped in
+ * <em>, which globals.css styles with Sriracha/italic/bold.
  */
 export function formatHeroTitle(text: string | null | undefined): string {
   if (!text) return "";
-  const cleaned = stripEmojis(text);
+  let cleaned = stripEmojis(text);
+  // Auto-break before " & " for values without an explicit newline.
+  if (!cleaned.includes("\n")) {
+    const ampIdx = cleaned.indexOf(" & ");
+    if (ampIdx !== -1) {
+      cleaned = cleaned.slice(0, ampIdx) + "\n&" + cleaned.slice(ampIdx + 2);
+    }
+  }
   const idx = cleaned.indexOf("\n");
   if (idx === -1) return cleaned;
   const line1 = cleaned.slice(0, idx);

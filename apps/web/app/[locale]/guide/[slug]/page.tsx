@@ -211,12 +211,12 @@ export default async function GuidePage({ params }: Props) {
         <div className="relative z-10 hidden lg:flex flex-col justify-start min-h-screen px-12 pt-[120px] pb-24">
           <h1
             className="hero-heading text-5xl xl:text-6xl font-light leading-[1.15] mb-6 animate-fade-in-up"
-            style={{ color: "#18181C" }}
+            style={{ color: config.hero?.textColor ?? "#18181C", textShadow: config.hero?.textShadow }}
             dangerouslySetInnerHTML={{ __html: coolTitle }}
           />
           <p
             className="text-base xl:text-lg font-light leading-relaxed mb-6 max-w-md animate-fade-in-up-delay-1"
-            style={{ color: "#18181C", opacity: 0.7 }}
+            style={{ color: config.hero?.textColor ?? "#18181C", opacity: 0.7, textShadow: config.hero?.textShadow }}
             dangerouslySetInnerHTML={{ __html: stripEmojis(t("subtitle", { name: locale === "ko" ? withKoreanParticle(localizedFirstName) : localizedFirstName, language: langLabel })) }}
           />
           <div className="animate-fade-in-up-delay-2 self-start">
@@ -228,12 +228,12 @@ export default async function GuidePage({ params }: Props) {
         <div className="relative z-10 lg:hidden flex flex-col items-center justify-end min-h-[80vh] px-6 pb-10 text-center">
           <h1
             className="hero-heading font-light leading-tight mb-4 animate-fade-in-up"
-            style={{ color: "#FFFFFF", fontSize: "clamp(1.5rem, 7vw, 2.5rem)" }}
+            style={{ color: "#FFFFFF", fontSize: "clamp(1.5rem, 7vw, 2.5rem)", textShadow: config.hero?.textShadow }}
             dangerouslySetInnerHTML={{ __html: coolTitle }}
           />
           <p
             className="text-sm font-normal leading-relaxed max-w-sm animate-fade-in-up-delay-1"
-            style={{ color: "rgba(255,255,255,0.7)" }}
+            style={{ color: "rgba(255,255,255,0.7)", textShadow: config.hero?.textShadow }}
             dangerouslySetInnerHTML={{ __html: stripEmojis(t("subtitle", { name: locale === "ko" ? withKoreanParticle(localizedFirstName) : localizedFirstName, language: langLabel })) }}
           />
         </div>
