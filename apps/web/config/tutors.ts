@@ -65,7 +65,7 @@ const tutorPageConfig: Record<string, TutorPageConfig> = {
     },
     hero: {
       textColor: "#FFFFFF",
-      textShadow: "0 0 14px rgba(0,0,0,0.35), 0 1px 2px rgba(0,0,0,0.4)",
+      textShadow: "0 0 8px rgba(0,0,0,0.2), 0 1px 2px rgba(0,0,0,0.25)",
       overlay: "radial-gradient(ellipse 95% 65% at 0% 0%, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0) 100%)",
     },
     subtitle: {
@@ -86,7 +86,7 @@ const tutorPageConfig: Record<string, TutorPageConfig> = {
     },
     hero: {
       textColor: "#FFFFFF",
-      textShadow: "0 0 14px rgba(0,0,0,0.35), 0 1px 2px rgba(0,0,0,0.4)",
+      textShadow: "0 0 8px rgba(0,0,0,0.2), 0 1px 2px rgba(0,0,0,0.25)",
       overlay: "radial-gradient(ellipse 95% 65% at 0% 0%, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0) 100%)",
     },
     subtitle: {
@@ -112,7 +112,7 @@ const tutorPageConfig: Record<string, TutorPageConfig> = {
       // Soft glow + tight drop. The glow detaches the text from the busy
       // cherry-blossom photo; the tight drop adds crisp definition without
       // looking blurry.
-      textShadow: "0 0 14px rgba(0,0,0,0.35), 0 1px 2px rgba(0,0,0,0.4)",
+      textShadow: "0 0 8px rgba(0,0,0,0.2), 0 1px 2px rgba(0,0,0,0.25)",
       // Radial oval anchored to the top-left, fading to transparent ~2/3
       // across — darkens the area behind the headline without dimming the rest.
       overlay: "radial-gradient(ellipse 95% 65% at 0% 0%, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0) 100%)",
