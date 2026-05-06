@@ -89,6 +89,23 @@ export default function HeroCarousel({ tutors }: { tutors: CarouselTutor[] }) {
     setTimeout(() => setIsTransitioning(false), 450);
   }, [isTransitioning, tutors.length]);
 
+  // Horizontal swipe to advance/goBack on touch devices.
+  const touchStartRef = useRef({ x: 0, y: 0 });
+  const handleTouchStart = useCallback((e: React.TouchEvent) => {
+    touchStartRef.current = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+  }, []);
+  const handleTouchEnd = useCallback(
+    (e: React.TouchEvent) => {
+      const dx = e.changedTouches[0].clientX - touchStartRef.current.x;
+      const dy = e.changedTouches[0].clientY - touchStartRef.current.y;
+      if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy)) {
+        if (dx < 0) advance();
+        else goBack();
+      }
+    },
+    [advance, goBack]
+  );
+
   if (tutors.length === 0) return null;
   const tutor = tutors[currentIndex];
 
@@ -106,6 +123,8 @@ export default function HeroCarousel({ tutors }: { tutors: CarouselTutor[] }) {
           height: "calc(100svh - var(--navbar-height, 52px) - 24px)",
         }}
         onClick={advance}
+        onTouchStart={handleTouchStart}
+        onTouchEnd={handleTouchEnd}
       >
         {/* Background images — all preloaded, only active one visible */}
         {tutors.map((t, i) => (
@@ -164,12 +183,12 @@ export default function HeroCarousel({ tutors }: { tutors: CarouselTutor[] }) {
           {/* Desktop text — left side, no card bg, same as tutor pages */}
           <div className="hidden lg:flex flex-col justify-start absolute inset-y-0 left-0 px-12 pt-12 pb-24">
             <h1
-              className={`hero-heading ${tutor.hero?.textShadow ? "hero-heading--shadowed" : ""} text-5xl xl:text-6xl font-light lg:font-medium leading-[1.15] mb-6`}
+              className={`hero-heading ${tutor.hero?.textShadow ? "hero-heading--shadowed" : ""} text-5xl xl:text-6xl font-light lg:font-medium leading-[1.15] mb-[1.125rem]`}
               style={{ color: tutor.hero?.textColor ?? "#18181C", textShadow: tutor.hero?.textShadow }}
               dangerouslySetInnerHTML={{ __html: tutor.coolTitle }}
             />
             <p
-              className="text-[1.25rem] xl:text-[1.40625rem] font-light leading-snug mb-5"
+              className="text-[1.5625rem] xl:text-[1.7578125rem] font-light leading-snug mb-5"
               style={{ color: tutor.hero?.textColor ?? "#18181C", textShadow: tutor.hero?.textShadow }}
               dangerouslySetInnerHTML={{ __html: tutor.subtitle }}
             />
