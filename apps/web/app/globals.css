@@ -83,15 +83,19 @@ html {
 
 /* Hero heading line break controls */
 .hero-break-mobile {
-  display: none;
+  display: block;
 }
 .hero-break-all {
   display: block;
 }
 
 /* Desktop only: keep each cool_title line intact so the headline reads as authored.
-   Mobile lets it wrap naturally because the viewport is too narrow for the long line. */
+   Mobile forces a break after "to" via .hero-break-mobile so the English headline
+   always reads as three lines (Your guide to / conversational X / & Y). */
 @media (min-width: 1024px) {
+  .hero-break-mobile {
+    display: none;
+  }
   .hero-heading .hero-line1,
   .hero-heading em {
     white-space: nowrap;

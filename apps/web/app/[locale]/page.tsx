@@ -101,6 +101,12 @@ export default async function Home({ params }: Props) {
       // Per-tutor English subtitle override; Korean keeps the i18n default.
       const enOverride = locale === "en" ? config.subtitle?.en : undefined;
       const subtitle: string = enOverride ?? stripEmojis(guideT("subtitle", { name: nameForSubtitle, language: langLabel }));
+      // Mobile English drops the <br/> so the subtitle wraps naturally as one
+      // sentence. Korean keeps its <br/> on every viewport.
+      const subtitleMobile: string =
+        locale === "en"
+          ? subtitle.replace(/<br\s*\/?>/gi, " ").replace(/\s+/g, " ").trim()
+          : subtitle;
 
       const item: CarouselTutor = {
         slug: tutor.slug,
@@ -110,6 +116,7 @@ export default async function Home({ params }: Props) {
         bgImage,
         coolTitle,
         subtitle,
+        subtitleMobile,
         photoPosition: config.photo,
         arrowPosition: config.arrow,
         hero: config.hero,
