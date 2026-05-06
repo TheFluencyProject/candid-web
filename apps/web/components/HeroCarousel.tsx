@@ -215,11 +215,11 @@ export default function HeroCarousel({ tutors }: { tutors: CarouselTutor[] }) {
           <div className="flex lg:hidden absolute inset-x-0 bottom-0 z-10 flex-col items-center justify-end px-8 pb-20 text-center pointer-events-none">
             <h1
               className={`hero-heading ${tutor.hero?.textShadow ? "hero-heading--shadowed" : ""} font-medium leading-tight mb-4`}
-              style={{ color: "#FFFFFF", fontSize: "clamp(1.4rem, 6.5vw, 2.5rem)", textShadow: tutor.hero?.textShadow }}
+              style={{ color: "#FFFFFF", fontSize: "clamp(1.55rem, 7vw, 2.75rem)", textShadow: tutor.hero?.textShadow }}
               dangerouslySetInnerHTML={{ __html: tutor.coolTitle }}
             />
             <p
-              className="text-sm font-light leading-relaxed max-w-sm"
+              className="text-[0.95rem] font-light leading-relaxed max-w-sm"
               style={{ color: "#FFFFFF", textShadow: tutor.hero?.textShadow }}
               dangerouslySetInnerHTML={{ __html: tutor.subtitleMobile }}
             />
