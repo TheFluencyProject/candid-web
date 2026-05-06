@@ -11,8 +11,6 @@ import { getTutorPageConfig } from "@/config/tutors";
 import { localizeLanguageName, withKoreanParticle, formatHeroTitle, stripEmojis } from "@/lib/i18n-helpers";
 
 const API_BASE_URL = "https://api.joincandid.co";
-// english-adam first so carousel starts with Adam
-const TUTOR_SLUGS = ["english-adam", "korean-mia"];
 
 interface TutorMetadata {
   name_kr?: string;
@@ -65,6 +63,12 @@ type Props = {
 export default async function Home({ params }: Props) {
   const { locale } = await params;
   setRequestLocale(locale);
+
+  // Korean locale → Adam first (Korean speakers learn English); else Mia first.
+  const TUTOR_SLUGS =
+    locale === "ko"
+      ? ["english-adam", "korean-mia"]
+      : ["korean-mia", "english-adam"];
 
   const [t, guideT] = await Promise.all([
     getTranslations({ locale }),
