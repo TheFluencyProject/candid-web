@@ -256,7 +256,7 @@ export default async function GuidePage({ params }: Props) {
             hero text override is white so it stays readable on busy backgrounds. */}
         <div className="relative z-10 hidden lg:flex flex-col justify-start min-h-screen px-12 pt-[100px] pb-24">
           <h1
-            className={`hero-heading ${config.hero?.textShadow ? "hero-heading--shadowed" : ""} text-5xl xl:text-6xl font-light lg:font-medium leading-[1.15] mb-[1.125rem] animate-fade-in-up`}
+            className={`hero-heading ${config.hero?.textShadow ? "hero-heading--shadowed" : ""} text-[2.7rem] xl:text-[3.375rem] font-light lg:font-medium leading-[1.15] mb-[1.125rem] animate-fade-in-up`}
             style={{ color: config.hero?.textColor ?? "#18181C", textShadow: config.hero?.textShadow }}
             dangerouslySetInnerHTML={{ __html: coolTitle }}
           />

@@ -181,7 +181,7 @@ export default function HeroCarousel({ tutors }: { tutors: CarouselTutor[] }) {
           {/* Desktop text — left side, no card bg, same as tutor pages */}
           <div className="hidden lg:flex flex-col justify-start absolute inset-y-0 left-0 px-12 pt-12 pb-24">
             <h1
-              className={`hero-heading ${tutor.hero?.textShadow ? "hero-heading--shadowed" : ""} text-5xl xl:text-6xl font-light lg:font-medium leading-[1.15] mb-[1.125rem]`}
+              className={`hero-heading ${tutor.hero?.textShadow ? "hero-heading--shadowed" : ""} text-[2.7rem] xl:text-[3.375rem] font-light lg:font-medium leading-[1.15] mb-[1.125rem]`}
               style={{ color: tutor.hero?.textColor ?? "#18181C", textShadow: tutor.hero?.textShadow }}
               dangerouslySetInnerHTML={{ __html: tutor.coolTitle }}
             />
