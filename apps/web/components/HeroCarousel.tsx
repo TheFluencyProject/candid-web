@@ -291,14 +291,13 @@ export default function HeroCarousel({ tutors }: { tutors: CarouselTutor[] }) {
               WebkitBackdropFilter: "blur(40px)",
             }}
           >
-            {/* Progress fill */}
+            {/* Width (not scaleX): iOS Safari escapes parent's rounded overflow when GPU-compositing a transform during carousel transitions. */}
             <div
-              className="absolute inset-0"
+              className="absolute inset-y-0 left-0"
               style={{
+                width: `${progress * 100}%`,
                 background: "rgba(255,255,255,0.85)",
-                transformOrigin: "left",
-                transform: `scaleX(${progress})`,
-                transition: progress === 0 ? "none" : "transform 30ms linear",
+                transition: progress === 0 ? "none" : "width 30ms linear",
               }}
             />
             <span
