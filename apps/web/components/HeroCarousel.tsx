@@ -212,14 +212,14 @@ export default function HeroCarousel({ tutors }: { tutors: CarouselTutor[] }) {
               clear the language pill cleanly. pointer-events-none so iOS
               doesn't intercept swipes on the text — gestures fall through
               to the carousel's swipe handlers. */}
-          <div className="flex lg:hidden absolute inset-x-0 bottom-0 z-10 flex-col items-center justify-end px-8 pb-20 text-center pointer-events-none">
+          <div className="flex lg:hidden absolute inset-x-0 bottom-0 z-10 flex-col items-center justify-end px-7 pb-20 text-center pointer-events-none">
             <h1
               className={`hero-heading ${tutor.hero?.textShadow ? "hero-heading--shadowed" : ""} font-medium leading-tight mb-4`}
-              style={{ color: "#FFFFFF", fontSize: "clamp(1.75rem, 8vw, 3rem)", textShadow: tutor.hero?.textShadow }}
+              style={{ color: "#FFFFFF", fontSize: "clamp(1.6rem, 7.5vw, 2.85rem)", textShadow: tutor.hero?.textShadow }}
               dangerouslySetInnerHTML={{ __html: tutor.coolTitle }}
             />
             <p
-              className="text-base font-light leading-relaxed max-w-sm"
+              className="text-[1.0625rem] font-light leading-relaxed max-w-sm"
               style={{ color: "#FFFFFF", textShadow: tutor.hero?.textShadow }}
               dangerouslySetInnerHTML={{ __html: tutor.subtitleMobile }}
             />
