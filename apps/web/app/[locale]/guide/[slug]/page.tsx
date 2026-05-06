@@ -287,12 +287,12 @@ export default async function GuidePage({ params }: Props) {
             headline sits ~10% lower in the hero. */}
         <div className="relative z-10 lg:hidden flex flex-col items-center justify-end min-h-[80vh] px-6 pb-[3svh] text-center">
           <h1
-            className="hero-heading font-light leading-tight mb-4 animate-fade-in-up"
+            className="hero-heading font-medium leading-tight mb-4 animate-fade-in-up"
             style={{ color: "#FFFFFF", fontSize: "clamp(1.65rem, 7.7vw, 2.75rem)", textShadow: config.hero?.textShadow }}
             dangerouslySetInnerHTML={{ __html: coolTitle }}
           />
           <p
-            className="text-[1.05rem] font-normal leading-relaxed max-w-sm animate-fade-in-up-delay-1"
+            className="text-[1.05rem] font-light leading-relaxed max-w-sm animate-fade-in-up-delay-1"
             style={{ color: "#FFFFFF", textShadow: config.hero?.textShadow }}
             dangerouslySetInnerHTML={{ __html: subtitleHtml }}
           />
