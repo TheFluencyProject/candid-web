@@ -144,12 +144,19 @@ export default async function Home({ params }: Props) {
       const tutor = preferred?.[key] ? preferred : tutors.find((t) => t?.[key]);
       const url = tutor?.[key];
       if (!tutor || !url) return null;
+      const br = '<br class="mobile-only"/>';
       const titleMap = {
         screenshot_listen_url: guideT("home_listen"),
-        screenshot_week_url: guideT("week"),
+        screenshot_week_url: locale === "en"
+          ? `Daily video lessons,${br} new every week`
+          : guideT("week"),
         screenshot_map_url: guideT("home_map"),
-        screenshot_intro_url: guideT("intro"),
-        screenshot_community_url: guideT("community"),
+        screenshot_intro_url: locale === "en"
+          ? `Get tutored${br} through it all`
+          : guideT("intro"),
+        screenshot_community_url: locale === "en"
+          ? `Get answers${br} to your questions`
+          : guideT("community"),
       };
       return {
         key,
@@ -206,9 +213,10 @@ export default async function Home({ params }: Props) {
         <section key={s.key} className="relative">
           <StickyHeader>
             <ScrollFadeIn>
-              <h2 className="text-center text-2xl md:text-3xl lg:text-4xl font-black uppercase tracking-tight">
-                {s.title}
-              </h2>
+              <h2
+                className="text-center text-2xl md:text-3xl lg:text-4xl font-black uppercase tracking-tight"
+                dangerouslySetInnerHTML={{ __html: s.title }}
+              />
             </ScrollFadeIn>
           </StickyHeader>
           <div className="flex justify-center px-6 pb-24 md:pb-32">

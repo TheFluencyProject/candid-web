@@ -102,6 +102,13 @@ html {
   }
 }
 
+/* Mobile-only line break for section headings */
+@media (min-width: 1024px) {
+  br.mobile-only {
+    display: none;
+  }
+}
+
 /* Carousel fade-in animation */
 @keyframes carouselFadeIn {
   from { opacity: 0; }

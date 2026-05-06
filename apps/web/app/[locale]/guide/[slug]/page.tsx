@@ -247,8 +247,8 @@ export default async function GuidePage({ params }: Props) {
         <div
           className="absolute inset-0 pointer-events-none lg:hidden"
           style={{
-            background:
-              "linear-gradient(to bottom, transparent 45%, rgba(24,24,28,0.4) 60%, rgba(24,24,28,0.7) 75%, rgba(24,24,28,0.85) 90%, #18181C 100%)",
+            background: config.photo.mobileFade
+              ?? "linear-gradient(to bottom, transparent 45%, rgba(24,24,28,0.4) 60%, rgba(24,24,28,0.7) 75%, rgba(24,24,28,0.85) 90%, #18181C 100%)",
           }}
         />
 

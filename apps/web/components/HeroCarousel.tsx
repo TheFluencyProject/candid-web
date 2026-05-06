@@ -12,7 +12,7 @@ export interface CarouselTutor {
   coolTitle: string;
   subtitle: string;
   subtitleMobile: string;
-  photoPosition: { desktop: string; mobile: string; mobileScale?: number; mobileTranslateY?: string; mobileTranslateX?: string };
+  photoPosition: { desktop: string; mobile: string; mobileScale?: number; mobileTranslateY?: string; mobileTranslateX?: string; mobileFade?: string };
   arrowPosition: {
     desktop: { top: string; left: string; rotation?: string };
     mobile: { top: string; right: string; rotation?: string };
@@ -162,19 +162,16 @@ export default function HeroCarousel({ tutors }: { tutors: CarouselTutor[] }) {
                 style={{ background: t.hero.overlay }}
               />
             )}
+            {/* Per-tutor mobile bottom fade */}
+            <div
+              className="block lg:hidden absolute inset-0 pointer-events-none"
+              style={{
+                background: t.photoPosition.mobileFade
+                  ?? "linear-gradient(to bottom, transparent 30%, rgba(24,24,28,0.3) 45%, rgba(24,24,28,0.5) 55%, rgba(24,24,28,0.65) 70%, rgba(24,24,28,0.75) 85%)",
+              }}
+            />
           </div>
         ))}
-
-        {/* Mobile-only bottom fade — keeps subtitle/headline legible against
-            busy photos. No desktop fade since the carousel ends at its own
-            rounded border there and a fade would look broken. */}
-        <div
-          className="block lg:hidden absolute inset-0 pointer-events-none"
-          style={{
-            background:
-              "linear-gradient(to bottom, transparent 30%, rgba(24,24,28,0.3) 45%, rgba(24,24,28,0.5) 55%, rgba(24,24,28,0.65) 70%, rgba(24,24,28,0.75) 85%)",
-          }}
-        />
 
         {/* Content overlay — fades with tutor change */}
         <div
