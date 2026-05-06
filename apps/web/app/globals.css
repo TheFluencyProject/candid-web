@@ -88,11 +88,6 @@ html {
 .hero-break-all {
   display: block;
 }
-@media (max-width: 1023px) {
-  .hero-break-mobile {
-    display: block;
-  }
-}
 
 /* Desktop only: keep each cool_title line intact so the headline reads as authored.
    Mobile lets it wrap naturally because the viewport is too narrow for the long line. */

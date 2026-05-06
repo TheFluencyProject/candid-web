@@ -230,7 +230,7 @@ export default async function GuidePage({ params }: Props) {
             purpose is to keep white text legible on a busy/light photo. */}
         {config.hero?.textColor && config.hero?.overlay && (
           <div
-            className="absolute inset-0 pointer-events-none"
+            className="hidden lg:block absolute inset-0 pointer-events-none"
             style={{ background: config.hero.overlay }}
           />
         )}
@@ -288,7 +288,7 @@ export default async function GuidePage({ params }: Props) {
         <div className="relative z-10 lg:hidden flex flex-col items-center justify-end min-h-[80vh] px-6 pb-[3svh] text-center">
           <h1
             className="hero-heading font-medium leading-tight mb-4 animate-fade-in-up"
-            style={{ color: "#FFFFFF", fontSize: "clamp(1.65rem, 7.7vw, 2.75rem)", textShadow: config.hero?.textShadow }}
+            style={{ color: "#FFFFFF", fontSize: "clamp(1.15rem, 5.2vw, 2.25rem)", textShadow: config.hero?.textShadow }}
             dangerouslySetInnerHTML={{ __html: coolTitle }}
           />
           <p

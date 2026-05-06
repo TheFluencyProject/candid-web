@@ -157,7 +157,7 @@ export default function HeroCarousel({ tutors }: { tutors: CarouselTutor[] }) {
                 the bg photo and below the gradient + content. */}
             {t.hero?.textColor && t.hero?.overlay && (
               <div
-                className="absolute inset-0 pointer-events-none"
+                className="hidden lg:block absolute inset-0 pointer-events-none"
                 style={{ background: t.hero.overlay }}
               />
             )}
@@ -214,7 +214,7 @@ export default function HeroCarousel({ tutors }: { tutors: CarouselTutor[] }) {
           <div className="flex lg:hidden absolute inset-x-0 bottom-0 z-10 flex-col items-center justify-end px-6 pb-20 text-center pointer-events-none">
             <h1
               className={`hero-heading ${tutor.hero?.textShadow ? "hero-heading--shadowed" : ""} font-medium leading-tight mb-4`}
-              style={{ color: "#FFFFFF", fontSize: "clamp(1.65rem, 7.7vw, 2.75rem)", textShadow: tutor.hero?.textShadow }}
+              style={{ color: "#FFFFFF", fontSize: "clamp(1.15rem, 5.2vw, 2.25rem)", textShadow: tutor.hero?.textShadow }}
               dangerouslySetInnerHTML={{ __html: tutor.coolTitle }}
             />
             <p
