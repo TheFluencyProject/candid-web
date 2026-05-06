@@ -99,8 +99,9 @@ export default function HeroCarousel({ tutors }: { tutors: CarouselTutor[] }) {
         marginTop: "var(--navbar-height, 52px)",
       }}
     >
+      {/* pointer-coarse:cursor-pointer: iOS Safari only fires click on non-button elements with pointer cursor; touch-only so desktop keeps default. */}
       <div
-        className="relative rounded-3xl md:rounded-[2.5rem] overflow-hidden cursor-default select-none"
+        className="relative rounded-3xl md:rounded-[2.5rem] overflow-hidden cursor-default pointer-coarse:cursor-pointer select-none"
         style={{
           height: "calc(100svh - var(--navbar-height, 52px) - 24px)",
         }}
