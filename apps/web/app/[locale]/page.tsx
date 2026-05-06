@@ -101,11 +101,14 @@ export default async function Home({ params }: Props) {
       // Per-tutor English subtitle override; Korean keeps the i18n default.
       const enOverride = locale === "en" ? config.subtitle?.en : undefined;
       const subtitle: string = enOverride ?? stripEmojis(guideT("subtitle", { name: nameForSubtitle, language: langLabel }));
-      // Mobile English drops the <br/> so the subtitle wraps naturally as one
-      // sentence. Korean keeps its <br/> on every viewport.
+      // Mobile English uses the per-tutor `enMobile` override when present
+      // (hand-authored 3-line break since the mobile column is narrower).
+      // Falls back to stripping <br/> so the subtitle wraps naturally.
+      // Korean keeps its desktop <br/> on every viewport.
       const subtitleMobile: string =
         locale === "en"
-          ? subtitle.replace(/<br\s*\/?>/gi, " ").replace(/\s+/g, " ").trim()
+          ? (config.subtitle?.enMobile
+              ?? subtitle.replace(/<br\s*\/?>/gi, " ").replace(/\s+/g, " ").trim())
           : subtitle;
 
       const item: CarouselTutor = {

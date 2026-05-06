@@ -42,8 +42,11 @@ export interface TutorPageConfig {
   };
   // Optional per-tutor subtitle override (HTML allowed; use <br/> for line
   // break). Falls back to the i18n "guide.subtitle" string when absent.
+  // `en` is the desktop string; `enMobile` overrides it on mobile (used to
+  // hand-author the line breaks since the mobile column is narrower).
   subtitle?: {
     en?: string;
+    enMobile?: string;
   };
 }
 
@@ -66,6 +69,7 @@ const tutorPageConfig: Record<string, TutorPageConfig> = {
     },
     subtitle: {
       en: "Get Mia's weekly set of Korean listening & speaking lessons<br/>centered around her daily life in Korea",
+      enMobile: "Get Mia's weekly set of<br/>Korean listening & speaking lessons<br/>centered around her daily life in Korea",
     },
   },
   "english-adam": {
@@ -86,6 +90,7 @@ const tutorPageConfig: Record<string, TutorPageConfig> = {
     },
     subtitle: {
       en: "Get Adam's weekly set of English listening & speaking lessons<br/>centered around his daily life across New York City & Seoul",
+      enMobile: "Get Adam's weekly set of English lessons<br/>centered around his daily life<br/>across New York City & Seoul",
     },
   },
   "korean-chan": {
@@ -112,6 +117,7 @@ const tutorPageConfig: Record<string, TutorPageConfig> = {
     },
     subtitle: {
       en: "Get Chan's weekly set of Korean listening & speaking lessons<br/>centered around his daily life in Korea",
+      enMobile: "Get Chan's weekly set of<br/>Korean listening & speaking lessons<br/>centered around his daily life in Korea",
     },
   },
 };
