@@ -186,7 +186,7 @@ export default function HeroCarousel({ tutors }: { tutors: CarouselTutor[] }) {
               dangerouslySetInnerHTML={{ __html: tutor.coolTitle }}
             />
             <p
-              className="text-[1.375rem] xl:text-[1.546875rem] font-light leading-snug mb-5"
+              className="text-[1.2375rem] xl:text-[1.39rem] font-light leading-snug mb-5"
               style={{ color: tutor.hero?.textColor ?? "#18181C", textShadow: tutor.hero?.textShadow }}
               dangerouslySetInnerHTML={{ __html: tutor.subtitle }}
             />
@@ -216,7 +216,7 @@ export default function HeroCarousel({ tutors }: { tutors: CarouselTutor[] }) {
               dangerouslySetInnerHTML={{ __html: tutor.coolTitle }}
             />
             <p
-              className="text-lg font-light leading-relaxed max-w-sm"
+              className="text-base font-light leading-relaxed max-w-sm"
               style={{ color: "#FFFFFF", textShadow: tutor.hero?.textShadow }}
               dangerouslySetInnerHTML={{ __html: tutor.subtitleMobile }}
             />

@@ -261,7 +261,7 @@ export default async function GuidePage({ params }: Props) {
             dangerouslySetInnerHTML={{ __html: coolTitle }}
           />
           <p
-            className={`text-[1.375rem] xl:text-[1.546875rem] font-light leading-snug mb-5 animate-fade-in-up-delay-1`}
+            className={`text-[1.2375rem] xl:text-[1.39rem] font-light leading-snug mb-5 animate-fade-in-up-delay-1`}
             style={{ color: config.hero?.textColor ?? "#18181C", textShadow: config.hero?.textShadow }}
             dangerouslySetInnerHTML={{ __html: subtitleHtml }}
           />
@@ -288,11 +288,11 @@ export default async function GuidePage({ params }: Props) {
         <div className="relative z-10 lg:hidden flex flex-col items-center justify-end min-h-[80vh] px-6 pb-[3svh] text-center">
           <h1
             className="hero-heading font-medium leading-tight mb-4 animate-fade-in-up"
-            style={{ color: "#FFFFFF", fontSize: "clamp(1.15rem, 5.2vw, 2.25rem)", textShadow: config.hero?.textShadow }}
+            style={{ color: "#FFFFFF", fontSize: "clamp(1.6rem, 7.5vw, 2.85rem)", textShadow: config.hero?.textShadow }}
             dangerouslySetInnerHTML={{ __html: coolTitle }}
           />
           <p
-            className="text-[1.05rem] font-light leading-relaxed max-w-sm animate-fade-in-up-delay-1"
+            className="text-base font-light leading-relaxed max-w-sm animate-fade-in-up-delay-1"
             style={{ color: "#FFFFFF", textShadow: config.hero?.textShadow }}
             dangerouslySetInnerHTML={{ __html: subtitleHtml }}
           />
