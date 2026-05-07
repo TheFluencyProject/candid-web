@@ -13,6 +13,10 @@ const nextConfig = {
         protocol: "https",
         hostname: "tfp-tutors.s3.us-west-1.amazonaws.com",
       },
+      {
+        protocol: "https",
+        hostname: "*.cloudfront.net",
+      },
     ],
   },
   async redirects() {
