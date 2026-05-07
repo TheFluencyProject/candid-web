@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 
+import { APP_STORE_URL, WAITLIST_URL, WAITLIST_ENABLED } from "@/lib/platform";
+
 const API_BASE_URL = "https://api.joincandid.co";
-const APP_STORE_URL = "https://apps.apple.com/app/id6754859158";
 
 interface VideoMeta {
   source_id: string | null;
@@ -60,6 +61,13 @@ export default async function VideoPage({
   const { id } = await params;
   await fetchVideoMeta(id);
 
+  const redirectScript = `
+    var ua = navigator.userAgent;
+    var isIOS = /iPhone|iPad|iPod/i.test(ua);
+    var dest = (${!WAITLIST_ENABLED} || isIOS) ? ${JSON.stringify(APP_STORE_URL)} : ${JSON.stringify(WAITLIST_URL)};
+    window.location.replace(dest);
+  `;
+
   return (
     <>
       <main
@@ -77,7 +85,7 @@ export default async function VideoPage({
         }}
       >
         <p style={{ fontSize: "1.125rem", color: "#9ca3af" }}>
-          Opening in App Store…
+          Redirecting…
         </p>
         <p style={{ marginTop: "1rem", fontSize: "0.875rem", color: "#6b7280" }}>
           <a
@@ -88,11 +96,7 @@ export default async function VideoPage({
           </a>
         </p>
       </main>
-      <script
-        dangerouslySetInnerHTML={{
-          __html: `window.location.replace(${JSON.stringify(APP_STORE_URL)});`,
-        }}
-      />
+      <script dangerouslySetInnerHTML={{ __html: redirectScript }} />
     </>
   );
 }

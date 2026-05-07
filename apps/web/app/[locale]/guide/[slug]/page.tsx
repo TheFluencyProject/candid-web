@@ -13,7 +13,6 @@ import SiteFooter from "@/components/SiteFooter";
 import { localizeLanguageName, localizeMapCountry, capitalize, withKoreanParticle, formatHeroTitle, stripEmojis } from "@/lib/i18n-helpers";
 
 const API_BASE_URL = "https://api.joincandid.co";
-const APP_STORE_URL = "https://apps.apple.com/app/id6754859158";
 
 interface TutorLanguageProficiency {
   language: string;

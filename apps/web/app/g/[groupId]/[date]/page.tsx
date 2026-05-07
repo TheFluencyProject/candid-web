@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
-
-const APP_STORE_URL = "https://apps.apple.com/app/id6754859158";
+import { APP_STORE_URL, WAITLIST_URL, WAITLIST_ENABLED } from "@/lib/platform";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://joincandid.co"),
@@ -21,6 +20,13 @@ export const metadata: Metadata = {
 };
 
 export default function GroupDatePage() {
+  const redirectScript = `
+    var ua = navigator.userAgent;
+    var isIOS = /iPhone|iPad|iPod/i.test(ua);
+    var dest = (${!WAITLIST_ENABLED} || isIOS) ? ${JSON.stringify(APP_STORE_URL)} : ${JSON.stringify(WAITLIST_URL)};
+    window.location.replace(dest);
+  `;
+
   return (
     <>
       <main
@@ -38,7 +44,7 @@ export default function GroupDatePage() {
         }}
       >
         <p style={{ fontSize: "1.125rem", color: "#9ca3af" }}>
-          Opening in App Store…
+          Redirecting…
         </p>
         <p style={{ marginTop: "1rem", fontSize: "0.875rem", color: "#6b7280" }}>
           <a
@@ -49,11 +55,7 @@ export default function GroupDatePage() {
           </a>
         </p>
       </main>
-      <script
-        dangerouslySetInnerHTML={{
-          __html: `window.location.replace(${JSON.stringify(APP_STORE_URL)});`,
-        }}
-      />
+      <script dangerouslySetInnerHTML={{ __html: redirectScript }} />
     </>
   );
 }
