@@ -367,8 +367,8 @@ export default async function GuidePage({ params }: Props) {
         const screenshots = [
           { url: tutor.screenshot_listen_url, title: t("listen", tVars) },
           { url: tutor.screenshot_week_url, title: t("week", tVars) },
-          { url: tutor.screenshot_map_url, title: t("map", { firstName: localizedFirstName, country }) },
           { url: tutor.screenshot_shadow_url, title: t("shadow", tVars) },
+          { url: tutor.screenshot_map_url, title: t("map", { firstName: localizedFirstName, country }) },
           { url: tutor.screenshot_community_url, title: t("community") },
           { url: tutor.screenshot_intro_url, title: t("intro", tVars) },
         ].filter((s) => s.url);
