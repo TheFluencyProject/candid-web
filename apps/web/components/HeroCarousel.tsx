@@ -121,7 +121,7 @@ export default function HeroCarousel({ tutors }: { tutors: CarouselTutor[] }) {
       <div
         className="relative rounded-3xl md:rounded-[2.5rem] overflow-hidden cursor-default pointer-coarse:cursor-pointer select-none"
         style={{
-          height: "calc(100svh - var(--navbar-height, 52px) - 24px)",
+          height: "calc(100svh - var(--navbar-height, 52px) - 24px - var(--mobile-cta-offset, 0px))",
         }}
         onClick={advance}
         onTouchStart={handleTouchStart}

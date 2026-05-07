@@ -195,7 +195,7 @@ export default async function Home({ params }: Props) {
 
       {/* ─── Footer ─── */}
       <SiteFooter />
-      <MobileCTABar hideUntilScroll />
+      <MobileCTABar />
     </main>
   );
 }

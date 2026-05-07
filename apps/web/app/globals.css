@@ -15,7 +15,14 @@ body {
 
 html {
   --navbar-height: 60px;
+  --mobile-cta-offset: 100px;
   background-color: #18181C;
+}
+
+@media (min-width: 768px) {
+  html {
+    --mobile-cta-offset: 0px;
+  }
 }
 
 body {
