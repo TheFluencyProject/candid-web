@@ -7,11 +7,14 @@ export default function GuideNavbar({
   sentinelId,
   downloadUrl,
   alwaysWhite,
+  mobileDark,
   rightElement,
 }: {
   sentinelId: string;
   downloadUrl: string;
   alwaysWhite?: boolean;
+  /** Force dark wordmark on mobile even when alwaysWhite is true. */
+  mobileDark?: boolean;
   rightElement?: React.ReactNode;
 }) {
   const [pastHero, setPastHero] = useState(false);
@@ -40,6 +43,9 @@ export default function GuideNavbar({
   }, []);
 
   const showWhite = alwaysWhite || pastHero;
+  // When mobileDark is active and still in the hero, CSS overrides force dark
+  // on mobile — no JS media query needed, so no white flash on hydration.
+  const mobileDarkActive = mobileDark && !pastHero;
   const showBg = scrolled;
 
   return (
@@ -59,7 +65,7 @@ export default function GuideNavbar({
             alt="Candid"
             width={80}
             height={21}
-            className="absolute inset-0 transition-opacity duration-500"
+            className={`absolute inset-0 transition-opacity duration-500${mobileDarkActive ? " max-lg:!opacity-100" : ""}`}
             style={{ opacity: showWhite ? 0 : 1 }}
             priority
           />
@@ -68,7 +74,7 @@ export default function GuideNavbar({
             alt="Candid"
             width={80}
             height={21}
-            className="absolute inset-0 transition-opacity duration-500"
+            className={`absolute inset-0 transition-opacity duration-500${mobileDarkActive ? " max-lg:!opacity-0" : ""}`}
             style={{ opacity: showWhite ? 1 : 0 }}
             priority
           />

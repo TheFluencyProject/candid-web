@@ -147,7 +147,9 @@ export default async function Home({ params }: Props) {
       if (!tutor || !url) return null;
       const br = '<br class="mobile-only"/>';
       const titleMap = {
-        screenshot_listen_url: guideT("home_listen"),
+        screenshot_listen_url: locale === "en"
+          ? `<span class="text-xl md:text-[inherit]">Learn the language through your tutor's daily life</span>`
+          : guideT("home_listen"),
         screenshot_week_url: locale === "en"
           ? `Daily video lessons,${br} new every week`
           : guideT("week"),
@@ -216,7 +218,7 @@ export default async function Home({ params }: Props) {
           <StickyHeader>
             <ScrollFadeIn>
               <h2
-                className="text-center text-xl md:text-3xl lg:text-4xl font-black uppercase tracking-tight"
+                className="text-center text-2xl md:text-3xl lg:text-4xl font-black uppercase tracking-tight"
                 dangerouslySetInnerHTML={{ __html: s.title }}
               />
             </ScrollFadeIn>

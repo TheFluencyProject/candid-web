@@ -169,6 +169,7 @@ export default async function GuidePage({ params }: Props) {
         sentinelId="hero-sentinel"
         downloadUrl={`/download/${slug}`}
         alwaysWhite={Boolean(config.hero?.textColor)}
+        mobileDark={slug === "english-adam"}
         rightElement={
           <>
             {/* Desktop: Get the app pill (App Store badge moves inline under hero) */}
@@ -356,7 +357,7 @@ export default async function GuidePage({ params }: Props) {
         </div>
 
         {/* Sentinel for navbar wordmark swap — at ~80% height */}
-        <div id="hero-sentinel" className="absolute w-full h-1" style={{ top: "60%" }} />
+        <div id="hero-sentinel" className="absolute w-full h-1" style={{ top: slug === "english-adam" ? "30%" : "60%" }} />
       </section>
 
 
@@ -381,7 +382,7 @@ export default async function GuidePage({ params }: Props) {
           <section key={s.url} className="relative">
             <StickyHeader>
               <ScrollFadeIn>
-                <h2 className="text-center text-xl md:text-3xl lg:text-4xl font-black uppercase tracking-tight">
+                <h2 className="text-center text-2xl md:text-3xl lg:text-4xl font-black uppercase tracking-tight">
                   {s.title}
                 </h2>
               </ScrollFadeIn>
