@@ -4,6 +4,7 @@ import { NextIntlClientProvider } from "next-intl";
 import { getMessages, setRequestLocale } from "next-intl/server";
 import { routing } from "@/i18n/routing";
 import { notFound } from "next/navigation";
+import { PostHogProvider } from "@/components/PostHogProvider";
 
 type Props = {
   children: React.ReactNode;
@@ -88,7 +89,7 @@ export default async function LocaleLayout({ children, params }: Props) {
       </head>
       <body>
         <NextIntlClientProvider messages={messages}>
-          {children}
+          <PostHogProvider>{children}</PostHogProvider>
         </NextIntlClientProvider>
       </body>
     </html>
