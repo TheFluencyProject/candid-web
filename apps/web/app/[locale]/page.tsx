@@ -133,6 +133,7 @@ export default async function Home({ params }: Props) {
     "screenshot_listen_url",
     "screenshot_week_url",
     "screenshot_map_url",
+    "screenshot_shadow_url",
     "screenshot_community_url",
     "screenshot_intro_url",
   ] as const;
@@ -151,6 +152,7 @@ export default async function Home({ params }: Props) {
           ? `Daily video lessons,${br} new every week`
           : guideT("week"),
         screenshot_map_url: guideT("home_map"),
+        screenshot_shadow_url: guideT("home_shadow"),
         screenshot_intro_url: locale === "en"
           ? `Get tutored${br} through it all`
           : guideT("intro"),
