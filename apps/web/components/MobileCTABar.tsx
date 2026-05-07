@@ -7,6 +7,13 @@ const DEFAULT_URL = "/download";
 export default function MobileCTABar({ downloadUrl, ctaLabel, ctaSubtext, hideUntilScroll }: { downloadUrl?: string; ctaLabel?: string; ctaSubtext?: string; hideUntilScroll?: boolean }) {
   const href = downloadUrl ?? DEFAULT_URL;
   const [visible, setVisible] = useState(!hideUntilScroll);
+  const [isSafariIOS, setIsSafariIOS] = useState(false);
+
+  useEffect(() => {
+    const ua = navigator.userAgent;
+    const isIOS = /iPhone|iPad|iPod/.test(ua) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+    if (isIOS && /Safari/.test(ua) && !/CriOS|FxiOS|OPiOS|EdgiOS/.test(ua)) setIsSafariIOS(true);
+  }, []);
 
   useEffect(() => {
     if (!hideUntilScroll) return;
@@ -25,7 +32,7 @@ export default function MobileCTABar({ downloadUrl, ctaLabel, ctaSubtext, hideUn
         className="pt-12 px-6 flex flex-col items-center pointer-events-auto"
         style={{
           background: "linear-gradient(to top, #18181C 60%, transparent 100%)",
-          paddingBottom: "max(1.5rem, env(safe-area-inset-bottom))",
+          paddingBottom: isSafariIOS ? "env(safe-area-inset-bottom, 0.5rem)" : "max(1.5rem, env(safe-area-inset-bottom))",
         }}
       >
         <a
