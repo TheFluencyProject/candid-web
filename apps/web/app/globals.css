@@ -109,6 +109,16 @@ html {
   }
 }
 
+/* Slightly smaller section title on mobile only */
+.section-title-snug {
+  font-size: 1.25rem;
+}
+@media (min-width: 768px) {
+  .section-title-snug {
+    font-size: inherit;
+  }
+}
+
 /* Carousel fade-in animation */
 @keyframes carouselFadeIn {
   from { opacity: 0; }

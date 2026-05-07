@@ -148,7 +148,7 @@ export default async function Home({ params }: Props) {
       const br = '<br class="mobile-only"/>';
       const titleMap = {
         screenshot_listen_url: locale === "en"
-          ? `<span class="text-xl md:text-[inherit]">Learn the language through your tutor's daily life</span>`
+          ? `<span class="section-title-snug">Learn the language through your tutor's daily life</span>`
           : guideT("home_listen"),
         screenshot_week_url: locale === "en"
           ? `Daily video lessons,${br} new every week`
