@@ -69,7 +69,7 @@ const tutorPageConfig: Record<string, TutorPageConfig> = {
       overlay: "radial-gradient(ellipse 95% 65% at 0% 0%, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0) 100%)",
     },
     subtitle: {
-      en: "Get Mia's weekly set of Korean lessons<br/>centered around her daily life in Korea",
+      en: "Get Mia's weekly set of Korean listening & speaking lessons<br/>centered around her daily life in Korea",
       enMobile: "Get Mia's weekly set of Korean lessons<br/>centered around her daily life in Korea",
     },
   },
@@ -90,7 +90,7 @@ const tutorPageConfig: Record<string, TutorPageConfig> = {
       overlay: "radial-gradient(ellipse 95% 65% at 0% 0%, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0) 100%)",
     },
     subtitle: {
-      en: "Get Adam's weekly set of English lessons<br/>centered around his daily life in NYC & Seoul",
+      en: "Get Adam's weekly set of English listening & speaking lessons<br/>centered around his daily life in NYC & Seoul",
       enMobile: "Get Adam's weekly set of English lessons<br/>centered around his daily life in NYC & Seoul",
     },
   },
@@ -101,7 +101,7 @@ const tutorPageConfig: Record<string, TutorPageConfig> = {
       mobileScale: 1.08,
       mobileTranslateY: "-2%",
       mobileTranslateX: "-2%",
-      mobileFade: "linear-gradient(to bottom, transparent 30%, rgba(24,24,28,0.4) 45%, rgba(24,24,28,0.7) 60%, rgba(24,24,28,0.85) 75%, #18181C 90%)",
+      mobileFade: "linear-gradient(to bottom, transparent 30%, rgba(24,24,28,0.52) 45%, rgba(24,24,28,0.91) 60%, rgba(24,24,28,1) 75%, #18181C 90%)",
     },
     arrow: {
       desktop: { top: "50%", left: "55%" },
@@ -118,7 +118,7 @@ const tutorPageConfig: Record<string, TutorPageConfig> = {
       overlay: "radial-gradient(ellipse 95% 65% at 0% 0%, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0) 100%)",
     },
     subtitle: {
-      en: "Get Chan's weekly set of Korean lessons<br/>centered around his daily life in Korea",
+      en: "Get Chan's weekly set of Korean listening & speaking lessons<br/>centered around his daily life in Korea",
       enMobile: "Get Chan's weekly set of Korean lessons<br/>centered around his daily life in Korea",
     },
   },

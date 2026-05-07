@@ -155,6 +155,9 @@ export default async function GuidePage({ params }: Props) {
   const subtitleHtml = locale === "en" && config.subtitle?.en
     ? config.subtitle.en
     : stripEmojis(t("subtitle", { name: locale === "ko" ? withKoreanParticle(localizedFirstName) : localizedFirstName, language: langLabel }));
+  const subtitleMobileHtml = locale === "en" && config.subtitle?.enMobile
+    ? config.subtitle.enMobile
+    : subtitleHtml.replace(/<br\s*\/?>/gi, " ").replace(/\s+/g, " ").trim();
 
   return (
     <main
@@ -248,7 +251,7 @@ export default async function GuidePage({ params }: Props) {
           className="absolute inset-0 pointer-events-none lg:hidden"
           style={{
             background: config.photo.mobileFade
-              ?? "linear-gradient(to bottom, transparent 45%, rgba(24,24,28,0.4) 60%, rgba(24,24,28,0.7) 75%, rgba(24,24,28,0.85) 90%, #18181C 100%)",
+              ?? "linear-gradient(to bottom, transparent 45%, rgba(24,24,28,0.52) 60%, rgba(24,24,28,0.91) 75%, rgba(24,24,28,1) 90%, #18181C 100%)",
           }}
         />
 
@@ -294,7 +297,7 @@ export default async function GuidePage({ params }: Props) {
           <p
             className="text-base font-light leading-relaxed max-w-sm animate-fade-in-up-delay-1"
             style={{ color: "#FFFFFF", textShadow: config.hero?.textShadow }}
-            dangerouslySetInnerHTML={{ __html: subtitleHtml }}
+            dangerouslySetInnerHTML={{ __html: subtitleMobileHtml }}
           />
         </div>
 
@@ -363,9 +366,9 @@ export default async function GuidePage({ params }: Props) {
         const country = localizeMapCountry(tutor.teaching_language, locale);
         const screenshots = [
           { url: tutor.screenshot_listen_url, title: t("listen", tVars) },
+          { url: tutor.screenshot_week_url, title: t("week", tVars) },
           { url: tutor.screenshot_map_url, title: t("map", { firstName: localizedFirstName, country }) },
           { url: tutor.screenshot_shadow_url, title: t("shadow", tVars) },
-          { url: tutor.screenshot_week_url, title: t("week", tVars) },
           { url: tutor.screenshot_community_url, title: t("community") },
           { url: tutor.screenshot_intro_url, title: t("intro", tVars) },
         ].filter((s) => s.url);
@@ -378,7 +381,7 @@ export default async function GuidePage({ params }: Props) {
           <section key={s.url} className="relative">
             <StickyHeader>
               <ScrollFadeIn>
-                <h2 className="text-center text-2xl md:text-3xl lg:text-4xl font-black uppercase tracking-tight">
+                <h2 className="text-center text-xl md:text-3xl lg:text-4xl font-black uppercase tracking-tight">
                   {s.title}
                 </h2>
               </ScrollFadeIn>

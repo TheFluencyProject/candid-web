@@ -216,7 +216,7 @@ export default async function Home({ params }: Props) {
           <StickyHeader>
             <ScrollFadeIn>
               <h2
-                className="text-center text-2xl md:text-3xl lg:text-4xl font-black uppercase tracking-tight"
+                className="text-center text-xl md:text-3xl lg:text-4xl font-black uppercase tracking-tight"
                 dangerouslySetInnerHTML={{ __html: s.title }}
               />
             </ScrollFadeIn>

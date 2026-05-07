@@ -167,7 +167,7 @@ export default function HeroCarousel({ tutors }: { tutors: CarouselTutor[] }) {
               className="block lg:hidden absolute inset-0 pointer-events-none"
               style={{
                 background: t.photoPosition.mobileFade
-                  ?? "linear-gradient(to bottom, transparent 30%, rgba(24,24,28,0.3) 45%, rgba(24,24,28,0.5) 55%, rgba(24,24,28,0.65) 70%, rgba(24,24,28,0.75) 85%)",
+                  ?? "linear-gradient(to bottom, transparent 30%, rgba(24,24,28,0.39) 45%, rgba(24,24,28,0.65) 55%, rgba(24,24,28,0.85) 70%, rgba(24,24,28,0.97) 85%)",
               }}
             />
           </div>
