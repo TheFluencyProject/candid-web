@@ -1,13 +1,21 @@
-"use client";
-
 import Image from "next/image";
-import { useTranslations, useLocale } from "next-intl";
+import { getTranslations, getLocale } from "next-intl/server";
 import { Link } from "@/i18n/routing";
-import { localizeLanguageName } from "@/lib/i18n-helpers";
+import { localizeLanguageName, titleCase } from "@/lib/i18n-helpers";
+import { fetchTutor } from "@/lib/api";
 
-export default function SiteFooter() {
-  const t = useTranslations("footer");
-  const locale = useLocale();
+export default async function SiteFooter() {
+  const t = await getTranslations("footer");
+  const locale = await getLocale();
+
+  const [adam, mia] = await Promise.all([
+    fetchTutor("english-adam", locale),
+    fetchTutor("korean-mia", locale),
+  ]);
+
+  // DB titles are uppercase; title-case for footer display, fallback if API down
+  const adamTitle = titleCase(adam?.title ?? "American Dream");
+  const miaTitle = titleCase(mia?.title ?? "Seoulmates");
 
   return (
     <footer className="border-t border-white/10">
@@ -43,7 +51,7 @@ export default function SiteFooter() {
               <p className="text-sm font-bold uppercase tracking-widest text-white/70 mb-2">{localizeLanguageName("english", locale)}</p>
               <ul className="space-y-2">
                 <li>
-                  <Link href="/guide/english-adam" className="text-sm font-normal text-white hover:opacity-70 transition-opacity">American Dream</Link>
+                  <Link href="/guide/english-adam" className="text-sm font-normal text-white hover:opacity-70 transition-opacity">{adamTitle}</Link>
                 </li>
               </ul>
             </div>
@@ -53,7 +61,7 @@ export default function SiteFooter() {
                   for now — add her back here when she's flipped live. */}
               <ul className="space-y-2">
                 <li>
-                  <Link href="/guide/korean-mia" className="text-sm font-normal text-white hover:opacity-70 transition-opacity">Unni</Link>
+                  <Link href="/guide/korean-mia" className="text-sm font-normal text-white hover:opacity-70 transition-opacity">{miaTitle}</Link>
                 </li>
               </ul>
             </div>

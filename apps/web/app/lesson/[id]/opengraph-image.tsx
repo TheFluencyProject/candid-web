@@ -1,4 +1,5 @@
 import { ImageResponse } from "next/og";
+import { API_BASE_URL } from "@/lib/api";
 
 export const revalidate = 604800; // 1 week
 
@@ -10,8 +11,6 @@ export const size = {
 };
 
 export const contentType = "image/png";
-
-const API_BASE_URL = "https://api.joincandid.co";
 
 interface LessonMeta {
   lesson_id: string;

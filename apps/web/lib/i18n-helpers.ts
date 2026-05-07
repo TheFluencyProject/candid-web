@@ -17,6 +17,10 @@ export function capitalize(s: string): string {
   return s.charAt(0).toUpperCase() + s.slice(1);
 }
 
+export function titleCase(s: string): string {
+  return s.toLowerCase().split(/\s+/).map(capitalize).join(" ");
+}
+
 export function withKoreanParticle(name: string): string {
   return `${name}쌤과`;
 }

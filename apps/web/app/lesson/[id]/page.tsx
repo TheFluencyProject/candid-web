@@ -2,8 +2,7 @@ import type { Metadata } from "next";
 import { headers } from "next/headers";
 
 import { APP_STORE_URL, WAITLIST_URL, WAITLIST_ENABLED } from "@/lib/platform";
-
-const API_BASE_URL = "https://api.joincandid.co";
+import { API_BASE_URL } from "@/lib/api";
 
 const SHARE_DESCRIPTIONS: Record<"en" | "ko", string> = {
   en: "Candid is your guide to real, spoken language through a tutor's real life in the country.",

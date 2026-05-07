@@ -11,64 +11,7 @@ import ScrollFadeIn from "@/components/ScrollFadeIn";
 import BlurImage from "@/components/BlurImage";
 import SiteFooter from "@/components/SiteFooter";
 import { localizeLanguageName, localizeMapCountry, capitalize, withKoreanParticle, formatHeroTitle, stripEmojis } from "@/lib/i18n-helpers";
-
-const API_BASE_URL = "https://api.joincandid.co";
-
-interface TutorLanguageProficiency {
-  language: string;
-  level: string;
-}
-
-interface TutorMetadata {
-  name_kr?: string;
-  [key: string]: unknown;
-}
-
-interface Tutor {
-  slug: string;
-  name: string;
-  title: string;
-  // Backend field during iOS transition: dev-deployed API may still return only short_description.
-  cool_title?: string;
-  // Optional web-only override; falls back to cool_title when null.
-  web_title_override?: string | null;
-  short_description?: string;
-  city: string | null;
-  birthday: string | null;
-  instagram_handle: string | null;
-  tiktok_handle: string | null;
-  youtube_handle: string | null;
-  profile_picture_url: string | null;
-  large_profile_picture_url: string | null;
-  intro_video_url: string | null;
-  screenshot_community_url: string | null;
-  screenshot_intro_url: string | null;
-  screenshot_learn_url: string | null;
-  screenshot_listen_url: string | null;
-  screenshot_map_url: string | null;
-  screenshot_shadow_url: string | null;
-  screenshot_week_url: string | null;
-  web_bg_picture_url: string | null;
-  languages: TutorLanguageProficiency[];
-  teaching_language: string;
-  metadata: TutorMetadata | null;
-}
-
-async function fetchTutor(
-  slug: string,
-  locale: string
-): Promise<Tutor | null> {
-  try {
-    const res = await fetch(
-      `${API_BASE_URL}/public/tutors/${slug}?locale=${locale}`,
-      { next: { revalidate: 300 } }
-    );
-    if (!res.ok) return null;
-    return res.json();
-  } catch {
-    return null;
-  }
-}
+import { type Tutor, type TutorLanguageProficiency, fetchTutor } from "@/lib/api";
 
 function formatLanguages(languages: TutorLanguageProficiency[]): string {
   return languages

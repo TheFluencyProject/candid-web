@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
 
 import { APP_STORE_URL, WAITLIST_URL, WAITLIST_ENABLED } from "@/lib/platform";
-
-const API_BASE_URL = "https://api.joincandid.co";
+import { API_BASE_URL } from "@/lib/api";
 
 interface VideoMeta {
   source_id: string | null;
