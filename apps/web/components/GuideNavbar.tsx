@@ -58,7 +58,7 @@ export default function GuideNavbar({
         WebkitBackdropFilter: showBg ? "blur(24px)" : "none",
       }}
     >
-      <div className="flex justify-between items-center">
+      <div className="flex justify-between items-center h-full">
         <a href="/" className="relative flex items-center" style={{ width: 80, height: 21 }}>
           <Image
             src="/wordmark-dark.svg"
