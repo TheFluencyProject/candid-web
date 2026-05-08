@@ -12,9 +12,7 @@ export function isIOSUserAgent(ua: string): boolean {
 // These in-app browsers block navigation to apps.apple.com links.
 export function isRestrictedInAppBrowser(): boolean {
   if (typeof navigator === "undefined") return false;
-  return /TikTok|BytedanceWebview|musical_ly|Instagram|FBAN|FBAV|Snapchat/i.test(
-    navigator.userAgent,
-  );
+  return /TikTok|BytedanceWebview|musical_ly/i.test(navigator.userAgent);
 }
 
 export function getRedirectUrl(
