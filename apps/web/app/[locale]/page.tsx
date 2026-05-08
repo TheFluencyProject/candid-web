@@ -150,8 +150,8 @@ export default async function Home({ params }: Props) {
             >
               Get the app
             </a>
-            {/* Mobile: App Store badge — hidden for now, doesn't look good with the always-visible CTA button */}
-            {/* <a href="/download" className="lg:hidden">
+            {/* Mobile: App Store badge */}
+            <a href="/download" className="lg:hidden">
               <Image
                 src="/download.svg"
                 alt="Download on the App Store"
@@ -159,7 +159,7 @@ export default async function Home({ params }: Props) {
                 height={40}
                 priority
               />
-            </a> */}
+            </a>
           </>
         }
       />
