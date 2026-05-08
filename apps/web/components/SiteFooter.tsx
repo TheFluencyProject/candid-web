@@ -97,7 +97,7 @@ export default async function SiteFooter() {
       </div>
 
       {/* Bottom bar — always visible */}
-      <div className="px-6 py-6 pb-32 md:pb-6 md:px-12 flex items-center justify-between flex-wrap gap-4 border-t border-white/5">
+      <div className="px-6 py-6 pb-20 md:pb-6 md:px-12 flex items-center justify-between flex-wrap gap-4 border-t border-white/5">
         <div className="flex gap-6 items-center">
           <Link href="/privacy" className="text-sm font-normal text-white hover:opacity-70 transition-opacity">
             {t("privacy")}
