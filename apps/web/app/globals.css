@@ -15,7 +15,7 @@ body {
 
 html {
   --navbar-height: 60px;
-  --mobile-cta-offset: 64px;
+  --mobile-cta-offset: 0px;
   background-color: #18181C;
 }
 
