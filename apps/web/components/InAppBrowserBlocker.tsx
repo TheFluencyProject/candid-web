@@ -24,41 +24,35 @@ export default function InAppBrowserBlocker() {
     return () => document.removeEventListener("click", handleClick, { capture: true });
   }, [handleClick]);
 
-  if (!open) return null;
-
   return (
-    <div
-      className="fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-black px-8"
-      style={{ paddingTop: "env(safe-area-inset-top)", paddingBottom: "env(safe-area-inset-bottom)" }}
-    >
-      <button
-        onClick={() => setOpen(false)}
-        className="absolute top-4 right-4 text-white/60 hover:text-white p-2"
-        style={{ marginTop: "env(safe-area-inset-top)" }}
-        aria-label="Close"
-      >
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <line x1="18" y1="6" x2="6" y2="18" />
-          <line x1="6" y1="6" x2="18" y2="18" />
-        </svg>
-      </button>
+    <>
+      {/* Preload image so it renders instantly when modal opens */}
+      <link rel="preload" as="image" href="/appstore-search.png" />
 
-      <h2 className="text-2xl font-bold text-white text-center mb-1">
-        Search &ldquo;Candid fluency&rdquo;
-      </h2>
-      <p className="text-2xl font-bold text-white text-center mb-2">
-        in the App Store :)
-      </p>
+      {open && (
+        <div
+          className="fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-black px-8"
+          style={{ paddingTop: "env(safe-area-inset-top)", paddingBottom: "env(safe-area-inset-bottom)" }}
+          onClick={() => setOpen(false)}
+        >
+          <h2 className="text-2xl font-bold text-white text-center mb-1">
+            Search &ldquo;Candid fluency&rdquo;
+          </h2>
+          <p className="text-2xl font-bold text-white text-center mb-2">
+            in the App Store :)
+          </p>
 
-      <div className="mb-8" />
-      <Image
-        src="/appstore-search.png"
-        alt="Search Candid Fluency on the App Store"
-        width={500}
-        height={600}
-        className="w-full max-w-md rounded-2xl"
-        priority
-      />
-    </div>
+          <div className="mb-8" />
+          <Image
+            src="/appstore-search.png"
+            alt="Search Candid Fluency on the App Store"
+            width={500}
+            height={600}
+            className="w-full max-w-md rounded-2xl"
+            priority
+          />
+        </div>
+      )}
+    </>
   );
 }
