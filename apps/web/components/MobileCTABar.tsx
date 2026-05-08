@@ -15,6 +15,7 @@ export default function MobileCTABar({ downloadUrl, ctaLabel, ctaSubtext }: { do
   useEffect(() => {
     if (isTikTokOrInstagram()) {
       setVisible(true);
+      document.documentElement.style.setProperty("--mobile-cta-offset", "64px");
       return;
     }
     const onScroll = () => setVisible(window.scrollY > 100);
