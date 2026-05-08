@@ -86,6 +86,7 @@ export default async function LocaleLayout({ children, params }: Props) {
         />
         <meta name="apple-itunes-app" content="app-id=6754859158" />
         <meta name="color-scheme" content="dark" />
+        <meta name="theme-color" content="#18181C" />
       </head>
       <body>
         <NextIntlClientProvider messages={messages}>
