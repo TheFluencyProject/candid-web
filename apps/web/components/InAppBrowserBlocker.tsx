@@ -24,6 +24,12 @@ export default function InAppBrowserBlocker() {
     return () => document.removeEventListener("click", handleClick, { capture: true });
   }, [handleClick]);
 
+  useEffect(() => {
+    if (!open) return;
+    document.body.style.overflow = "hidden";
+    return () => { document.body.style.overflow = ""; };
+  }, [open]);
+
   return (
     <>
       {/* Preload image so it renders instantly when modal opens */}

@@ -1,19 +1,26 @@
 "use client";
 
 import { useState, useEffect } from "react";
-
 const DEFAULT_URL = "/download";
 
-export default function MobileCTABar({ downloadUrl, ctaLabel, ctaSubtext, hideUntilScroll }: { downloadUrl?: string; ctaLabel?: string; ctaSubtext?: string; hideUntilScroll?: boolean }) {
+function isTikTokOrInstagram(): boolean {
+  if (typeof navigator === "undefined") return false;
+  return /TikTok|BytedanceWebview|musical_ly|Instagram/i.test(navigator.userAgent);
+}
+
+export default function MobileCTABar({ downloadUrl, ctaLabel, ctaSubtext }: { downloadUrl?: string; ctaLabel?: string; ctaSubtext?: string }) {
   const href = downloadUrl ?? DEFAULT_URL;
-  const [visible, setVisible] = useState(!hideUntilScroll);
+  const [visible, setVisible] = useState(false);
 
   useEffect(() => {
-    if (!hideUntilScroll) return;
+    if (isTikTokOrInstagram()) {
+      setVisible(true);
+      return;
+    }
     const onScroll = () => setVisible(window.scrollY > 100);
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
-  }, [hideUntilScroll]);
+  }, []);
 
   return (
     <div
