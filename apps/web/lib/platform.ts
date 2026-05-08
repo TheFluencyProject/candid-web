@@ -9,6 +9,14 @@ export function isIOSUserAgent(ua: string): boolean {
   return /iPhone|iPad|iPod/i.test(ua);
 }
 
+// These in-app browsers block navigation to apps.apple.com links.
+export function isRestrictedInAppBrowser(): boolean {
+  if (typeof navigator === "undefined") return false;
+  return /TikTok|BytedanceWebview|musical_ly|Instagram|FBAN|FBAV|Snapchat/i.test(
+    navigator.userAgent,
+  );
+}
+
 export function getRedirectUrl(
   ua: string,
   appStoreUrl = APP_STORE_URL,

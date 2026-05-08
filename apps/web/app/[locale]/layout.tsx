@@ -5,6 +5,7 @@ import { getMessages, setRequestLocale } from "next-intl/server";
 import { routing } from "@/i18n/routing";
 import { notFound } from "next/navigation";
 import { PostHogProvider } from "@/components/PostHogProvider";
+import InAppBrowserBlocker from "@/components/InAppBrowserBlocker";
 
 type Props = {
   children: React.ReactNode;
@@ -91,7 +92,10 @@ export default async function LocaleLayout({ children, params }: Props) {
       </head>
       <body>
         <NextIntlClientProvider messages={messages}>
-          <PostHogProvider>{children}</PostHogProvider>
+          <PostHogProvider>
+            {children}
+            <InAppBrowserBlocker />
+          </PostHogProvider>
         </NextIntlClientProvider>
       </body>
     </html>
