@@ -10,16 +10,18 @@ interface VideoMeta {
   title: string;
 }
 
+// Returns null only for genuine 404 ("no such video"). Transient failures
+// (timeout, 5xx, network) THROW so Next.js keeps the previous good cached
+// value instead of caching the failure for the 1-week revalidate window.
 async function fetchVideoMeta(id: string): Promise<VideoMeta | null> {
-  try {
-    const res = await fetch(`${API_BASE_URL}/public/videos/${id}`, {
-      next: { revalidate: 604800 },
-    });
-    if (!res.ok) return null;
-    return res.json();
-  } catch {
-    return null;
+  const res = await fetch(`${API_BASE_URL}/public/videos/${id}`, {
+    next: { revalidate: 604800 },
+  });
+  if (res.status === 404) return null;
+  if (!res.ok) {
+    throw new Error(`fetchVideoMeta(${id}): HTTP ${res.status}`);
   }
+  return res.json();
 }
 
 export async function generateMetadata({

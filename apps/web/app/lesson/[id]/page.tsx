@@ -21,16 +21,18 @@ interface LessonMeta {
   teaching_language: string;
 }
 
+// Returns null only for genuine 404 ("no such lesson"). Transient failures
+// (timeout, 5xx, network) THROW so Next.js keeps the previous good cached
+// value instead of caching the failure for the 1-week revalidate window.
 async function fetchLessonMeta(id: string, locale: string): Promise<LessonMeta | null> {
-  try {
-    const res = await fetch(`${API_BASE_URL}/public/lessons/${id}?locale=${locale}`, {
-      next: { revalidate: 604800 },
-    });
-    if (!res.ok) return null;
-    return res.json();
-  } catch {
-    return null;
+  const res = await fetch(`${API_BASE_URL}/public/lessons/${id}?locale=${locale}`, {
+    next: { revalidate: 604800 },
+  });
+  if (res.status === 404) return null;
+  if (!res.ok) {
+    throw new Error(`fetchLessonMeta(${id}, ${locale}): HTTP ${res.status}`);
   }
+  return res.json();
 }
 
 function parseLocale(acceptLanguage: string | null): "en" | "ko" {
