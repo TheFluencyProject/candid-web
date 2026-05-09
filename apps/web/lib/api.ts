@@ -49,7 +49,8 @@ export async function fetchTutor(
   try {
     const res = await fetch(
       `${API_BASE_URL}/public/tutors/${slug}?locale=${locale}`,
-      { next: { revalidate: 300 } }
+      // 8s ceiling so a stalled API can't hold SSR hostage; existing catch returns null.
+      { next: { revalidate: 300 }, signal: AbortSignal.timeout(8000) }
     );
     if (!res.ok) return null;
     return res.json();
