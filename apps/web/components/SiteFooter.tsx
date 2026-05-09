@@ -43,26 +43,6 @@ export default async function SiteFooter() {
           </ul>
         </div>
 
-        {/* Company */}
-        <div className="mt-14 lg:mt-0">
-          <h4 className="text-xl font-bold uppercase tracking-wider mb-3 text-white">{t("company_heading")}</h4>
-          <ul className="space-y-2">
-            <li>
-              <a href="https://thefluencyproject.co" target="_blank" rel="noopener noreferrer" className="text-sm font-normal text-white hover:opacity-70 transition-opacity">The Fluency Project</a>
-            </li>
-            <li>
-              <a href="https://thefluencyfiles.com" target="_blank" rel="noopener noreferrer" className="text-sm font-normal text-white hover:opacity-70 transition-opacity">The Fluency Files</a>
-            </li>
-            <li>
-              <a href="https://thefluencyproject.org" target="_blank" rel="noopener noreferrer" className="text-sm font-normal text-white hover:opacity-70 transition-opacity">TheFluencyProject.org</a>
-            </li>
-            <li>
-              {/* Placeholder until the letter page exists */}
-              <a href="#" className="text-sm font-normal text-white hover:opacity-70 transition-opacity">{t("company_letter")}</a>
-            </li>
-          </ul>
-        </div>
-
         {/* Programs */}
         <div className="mt-14 lg:mt-0">
           <h4 className="text-xl font-bold uppercase tracking-wider mb-3 text-white">{t("programs_heading")}</h4>
@@ -86,6 +66,26 @@ export default async function SiteFooter() {
               </ul>
             </div>
           </div>
+        </div>
+
+        {/* Company */}
+        <div className="mt-14 lg:mt-0">
+          <h4 className="text-xl font-bold uppercase tracking-wider mb-3 text-white">{t("company_heading")}</h4>
+          <ul className="space-y-2">
+            <li>
+              <a href="https://thefluencyproject.co" target="_blank" rel="noopener noreferrer" className="text-sm font-normal text-white hover:opacity-70 transition-opacity">The Fluency Project</a>
+            </li>
+            <li>
+              <a href="https://thefluencyfiles.com" target="_blank" rel="noopener noreferrer" className="text-sm font-normal text-white hover:opacity-70 transition-opacity">The Fluency Files</a>
+            </li>
+            <li>
+              <a href="https://thefluencyproject.org" target="_blank" rel="noopener noreferrer" className="text-sm font-normal text-white hover:opacity-70 transition-opacity">TheFluencyProject.org</a>
+            </li>
+            <li>
+              {/* Placeholder until the letter page exists */}
+              <a href="#" className="text-sm font-normal text-white hover:opacity-70 transition-opacity">{t("company_letter")}</a>
+            </li>
+          </ul>
         </div>
 
         {/* Socials — desktop col 4, mobile last (separated from Programs by a hairline on mobile) */}
