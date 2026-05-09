@@ -17,7 +17,9 @@
     "english_with_adam": "영어, 아담과 함께",
     "korean_with_mia": "한국어, 미아와 함께",
     "connect_heading": "소셜",
-    "elevenlabs_partner": "ElevenLabs 파트너"
+    "elevenlabs_partner": "ElevenLabs 파트너",
+    "company_heading": "회사",
+    "company_letter": "창업자의 편지"
   },
   "privacy": {
     "title": "개인정보 처리방침",

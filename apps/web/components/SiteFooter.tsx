@@ -20,7 +20,7 @@ export default async function SiteFooter() {
   return (
     <footer className="border-t border-white/10">
       {/* Main footer grid */}
-      <div className="grid grid-cols-1 px-6 py-14 lg:grid-cols-4 lg:gap-8 lg:px-12 lg:py-12">
+      <div className="grid grid-cols-1 px-6 py-14 lg:grid-cols-5 lg:gap-8 lg:px-12 lg:py-12">
         {/* App Store — desktop only */}
         <div className="hidden lg:flex flex-col items-start">
           <Link href="/download">
@@ -43,7 +43,27 @@ export default async function SiteFooter() {
           </ul>
         </div>
 
-        {/* Programs — desktop col 3, mobile row 2 (separated from Pages by a hairline on mobile) */}
+        {/* Company */}
+        <div className="mt-14 lg:mt-0">
+          <h4 className="text-xl font-bold uppercase tracking-wider mb-3 text-white">{t("company_heading")}</h4>
+          <ul className="space-y-2">
+            <li>
+              <a href="https://thefluencyproject.co" target="_blank" rel="noopener noreferrer" className="text-sm font-normal text-white hover:opacity-70 transition-opacity">The Fluency Project</a>
+            </li>
+            <li>
+              <a href="https://thefluencyfiles.com" target="_blank" rel="noopener noreferrer" className="text-sm font-normal text-white hover:opacity-70 transition-opacity">The Fluency Files</a>
+            </li>
+            <li>
+              <a href="https://thefluencyproject.org" target="_blank" rel="noopener noreferrer" className="text-sm font-normal text-white hover:opacity-70 transition-opacity">TheFluencyProject.org</a>
+            </li>
+            <li>
+              {/* Placeholder until the letter page exists */}
+              <a href="#" className="text-sm font-normal text-white hover:opacity-70 transition-opacity">{t("company_letter")}</a>
+            </li>
+          </ul>
+        </div>
+
+        {/* Programs */}
         <div className="mt-14 lg:mt-0">
           <h4 className="text-xl font-bold uppercase tracking-wider mb-3 text-white">{t("programs_heading")}</h4>
           <div className="space-y-5">
