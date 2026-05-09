@@ -73,9 +73,6 @@ export default async function SiteFooter() {
           <h4 className="text-xl font-bold uppercase tracking-wider mb-3 text-white">{t("company_heading")}</h4>
           <ul className="space-y-2">
             <li>
-              <a href="https://open.substack.com/pub/thefluencyfiles/p/introducing-candid?utm_source=candid&utm_medium=website&utm_campaign=landing-page" target="_blank" rel="noopener noreferrer" className="text-sm font-normal text-white hover:opacity-70 transition-opacity">{t("company_letter")}</a>
-            </li>
-            <li>
               {/* HTTP-only: Namecheap URL forwarding has no SSL cert, so https:// times out */}
               <a href="http://thefluencyproject.co" target="_blank" rel="noopener noreferrer" className="text-sm font-normal text-white hover:opacity-70 transition-opacity">The Fluency Project</a>
             </li>
@@ -85,6 +82,9 @@ export default async function SiteFooter() {
             </li>
             <li>
               <a href="https://thefluencyproject.org" target="_blank" rel="noopener noreferrer" className="text-sm font-normal text-white hover:opacity-70 transition-opacity">TheFluencyProject.org</a>
+            </li>
+            <li>
+              <a href="https://open.substack.com/pub/thefluencyfiles/p/introducing-candid?utm_source=candid&utm_medium=website&utm_campaign=landing-page" target="_blank" rel="noopener noreferrer" className="text-sm font-normal text-white hover:opacity-70 transition-opacity">{t("company_letter")}</a>
             </li>
           </ul>
         </div>
