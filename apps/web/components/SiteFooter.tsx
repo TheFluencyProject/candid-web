@@ -73,10 +73,12 @@ export default async function SiteFooter() {
           <h4 className="text-xl font-bold uppercase tracking-wider mb-3 text-white">{t("company_heading")}</h4>
           <ul className="space-y-2">
             <li>
-              <a href="https://thefluencyproject.co" target="_blank" rel="noopener noreferrer" className="text-sm font-normal text-white hover:opacity-70 transition-opacity">The Fluency Project</a>
+              {/* HTTP-only: Namecheap URL forwarding has no SSL cert, so https:// times out */}
+              <a href="http://thefluencyproject.co" target="_blank" rel="noopener noreferrer" className="text-sm font-normal text-white hover:opacity-70 transition-opacity">The Fluency Project</a>
             </li>
             <li>
-              <a href="https://thefluencyfiles.com" target="_blank" rel="noopener noreferrer" className="text-sm font-normal text-white hover:opacity-70 transition-opacity">The Fluency Files</a>
+              {/* HTTP-only: Namecheap URL forwarding has no SSL cert, so https:// times out */}
+              <a href="http://thefluencyfiles.com" target="_blank" rel="noopener noreferrer" className="text-sm font-normal text-white hover:opacity-70 transition-opacity">The Fluency Files</a>
             </li>
             <li>
               <a href="https://thefluencyproject.org" target="_blank" rel="noopener noreferrer" className="text-sm font-normal text-white hover:opacity-70 transition-opacity">TheFluencyProject.org</a>
