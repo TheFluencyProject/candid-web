@@ -21,16 +21,18 @@ interface VideoMeta {
   title: string;
 }
 
+// See videos/[id]/page.tsx for the rationale: throw on transient errors
+// so Next.js keeps the last good cached OG image instead of poisoning the
+// 1-week cache with a fallback image generated during a brief API outage.
 async function fetchVideoMeta(id: string): Promise<VideoMeta | null> {
-  try {
-    const res = await fetch(`${API_BASE_URL}/public/videos/${id}`, {
-      next: { revalidate: 604800 },
-    });
-    if (!res.ok) return null;
-    return res.json();
-  } catch {
-    return null;
+  const res = await fetch(`${API_BASE_URL}/public/videos/${id}`, {
+    next: { revalidate: 604800 },
+  });
+  if (res.status === 404) return null;
+  if (!res.ok) {
+    throw new Error(`fetchVideoMeta(${id}): HTTP ${res.status}`);
   }
+  return res.json();
 }
 
 async function resolveYoutubeThumbnail(
