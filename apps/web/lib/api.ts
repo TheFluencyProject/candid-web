@@ -42,19 +42,26 @@ export interface Tutor {
   metadata: TutorMetadata | null;
 }
 
+/**
+ * Fetch a tutor by slug. Returns null only for genuine 404 ("no such tutor").
+ * Transient failures (timeout, 5xx, network) THROW intentionally — Next.js's
+ * data cache keeps the previous good value when the data fn throws, so a
+ * temporary API outage falls back to the last successful render instead of
+ * poisoning the cache with an empty page for the SWR window.
+ */
 export async function fetchTutor(
   slug: string,
   locale: string
 ): Promise<Tutor | null> {
-  try {
-    const res = await fetch(
-      `${API_BASE_URL}/public/tutors/${slug}?locale=${locale}`,
-      // 8s ceiling so a stalled API can't hold SSR hostage; existing catch returns null.
-      { next: { revalidate: 300 }, signal: AbortSignal.timeout(8000) }
-    );
-    if (!res.ok) return null;
-    return res.json();
-  } catch {
-    return null;
+  const res = await fetch(
+    `${API_BASE_URL}/public/tutors/${slug}?locale=${locale}`,
+    // 8s ceiling so a stalled API can't hold SSR hostage. AbortSignal triggers
+    // a TimeoutError which propagates as a thrown error — see fn comment above.
+    { next: { revalidate: 300 }, signal: AbortSignal.timeout(8000) }
+  );
+  if (res.status === 404) return null;
+  if (!res.ok) {
+    throw new Error(`fetchTutor(${slug}, ${locale}): HTTP ${res.status}`);
   }
+  return res.json();
 }
