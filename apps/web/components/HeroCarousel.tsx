@@ -135,12 +135,16 @@ export default function HeroCarousel({ tutors }: { tutors: CarouselTutor[] }) {
             style={{ opacity: i === currentIndex ? 1 : 0 }}
           >
             {/* Desktop. Plain <img> direct from S3 — bypasses /_next/image transcode hop on Railway. */}
+            {/* First slide gets fetchPriority=high so it wins bandwidth on first paint; other slides
+                lazy-load to avoid contending with the visible one (carousel auto-advance is 5s, plenty of time). */}
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={t.bgImage}
               alt={t.firstName}
               className="hidden lg:block absolute inset-0 w-full h-full object-cover"
               style={{ objectPosition: t.photoPosition.desktop }}
+              fetchPriority={i === 0 ? 'high' : 'auto'}
+              loading={i === 0 ? 'eager' : 'lazy'}
             />
             {/* Mobile — scale matches tutor guide pages (default 1.15, per-tutor override allowed) */}
             {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -152,6 +156,8 @@ export default function HeroCarousel({ tutors }: { tutors: CarouselTutor[] }) {
                 objectPosition: t.photoPosition.mobile,
                 transform: `scale(${t.photoPosition.mobileScale ?? 1.15}) translate(${t.photoPosition.mobileTranslateX ?? '0'}, ${t.photoPosition.mobileTranslateY ?? '0'})`,
               }}
+              fetchPriority={i === 0 ? 'high' : 'auto'}
+              loading={i === 0 ? 'eager' : 'lazy'}
             />
             {/* Per-tutor radial overlay (e.g. dark corner behind white headline).
                 Only rendered for tutors with a white-hero override; sits above
