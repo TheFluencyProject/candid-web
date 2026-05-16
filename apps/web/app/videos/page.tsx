@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     description:
       "Learn English with real YouTube videos on Candid. Download the app to start watching.",
     siteName: "Candid",
-    images: [{ url: "/ogimage.png", width: 1200, height: 630, alt: "Candid" }],
+    images: [{ url: "/SS-AppStore-Learn-EN.png", width: 1284, height: 2778, alt: "Candid" }],
   },
   twitter: {
     card: "summary_large_image",
