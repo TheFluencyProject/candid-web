@@ -43,12 +43,14 @@ export default function MobileCTABar({ downloadUrl, ctaLabel, ctaSubtext }: { do
         >
           {ctaLabel ?? "GET STARTED FOR FREE"}
         </a>
+        {/*
         <p
           className="mt-2 text-sm font-medium"
           style={{ color: "#89FFB4" }}
         >
           {ctaSubtext ?? "No Credit Card Required"}
         </p>
+        */}
       </div>
     </div>
   );
