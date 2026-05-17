@@ -8,7 +8,7 @@ const DEFAULT_URL = "/download";
 const CTA_FLAG_KEY = "mobile-cta-copy";
 const CTA_VARIANTS = {
   control: { label: "GET STARTED FOR FREE", subtext: "Available on iOS" },
-  download_app: { label: "DOWNLOAD THE APP", subtext: "Free 7-Day Trial" },
+  download_app: { label: "GET THE APP", subtext: "Free 7-Day Trial" },
 } as const;
 type CTAVariant = keyof typeof CTA_VARIANTS;
 
