@@ -19,6 +19,7 @@ const EXACT_REDIRECTS: Record<string, RedirectEntry> = {
   "/join": { permanent: true },
   "/app": { permanent: true },
   "/download": { permanent: true },
+  "/yooooooooooooooooooooooo": { permanent: true },
   "/studywithus": { permanent: true },
   "/learnwithus": { permanent: true },
   "/startup": { permanent: true },
