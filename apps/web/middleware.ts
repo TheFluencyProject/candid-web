@@ -6,7 +6,19 @@ import { APP_STORE_URL, getRedirectUrl } from "./lib/platform";
 const intlMiddleware = createMiddleware(routing);
 
 const FIRST_VISIT_COOKIE = "candid_locale_seen";
+// Stable anon id for PostHog server-decide + client bootstrap; both sides
+// must read the same value or variants drift and the CTA flashes.
+const DISTINCT_ID_COOKIE = "candid_did";
 const ONE_YEAR_SECONDS = 60 * 60 * 24 * 365;
+
+function ensureDistinctIdCookie(request: NextRequest, response: NextResponse): void {
+  if (request.cookies.has(DISTINCT_ID_COOKIE)) return;
+  response.cookies.set(DISTINCT_ID_COOKIE, crypto.randomUUID(), {
+    path: "/",
+    maxAge: ONE_YEAR_SECONDS,
+    sameSite: "lax",
+  });
+}
 
 // ── App Store redirect map (moved from next.config.js for UA branching) ──
 
@@ -80,6 +92,7 @@ export default function middleware(request: NextRequest) {
       maxAge: ONE_YEAR_SECONDS,
       sameSite: "lax",
     });
+    ensureDistinctIdCookie(request, response);
     return response;
   }
 
@@ -91,6 +104,7 @@ export default function middleware(request: NextRequest) {
       sameSite: "lax",
     });
   }
+  ensureDistinctIdCookie(request, response);
   return response;
 }
 

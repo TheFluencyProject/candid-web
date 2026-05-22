@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { cookies } from "next/headers";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import GuideNavbar from "@/components/GuideNavbar";
 import MobileCTABar from "@/components/MobileCTABar";
@@ -10,6 +11,7 @@ import SiteFooter from "@/components/SiteFooter";
 import { getTutorPageConfig } from "@/config/tutors";
 import { localizeLanguageName, withKoreanParticle, formatHeroTitle, stripEmojis } from "@/lib/i18n-helpers";
 import { type Tutor, fetchTutor } from "@/lib/api";
+import { getMobileCtaVariant } from "@/lib/posthog-server";
 
 type Props = {
   params: Promise<{ locale: string }>;
@@ -18,6 +20,12 @@ type Props = {
 export default async function Home({ params }: Props) {
   const { locale } = await params;
   setRequestLocale(locale);
+
+  // A/B test only runs on English; ko always renders the fixed translated CTA.
+  // React.cache dedupes with the layout's call so this is free.
+  const cookieStore = await cookies();
+  const distinctId = cookieStore.get("candid_did")?.value ?? crypto.randomUUID();
+  const ctaVariant = locale === "en" ? await getMobileCtaVariant(distinctId) : undefined;
 
   // Korean locale → Adam first (Korean speakers learn English); else Mia first.
   const TUTOR_SLUGS =
@@ -195,7 +203,7 @@ export default async function Home({ params }: Props) {
 
       {/* ─── Footer ─── */}
       <SiteFooter />
-      <MobileCTABar />
+      <MobileCTABar ctaVariant={ctaVariant} />
     </main>
   );
 }

@@ -1,29 +1,40 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useLocale, useTranslations } from "next-intl";
 import posthog from "posthog-js";
+import { CTA_FLAG_KEY, type MobileCtaVariant } from "@/lib/posthog-config";
 
 const DEFAULT_URL = "/download";
 
-const CTA_FLAG_KEY = "mobile-cta-copy";
+// i18n keys, not literal strings — single source of truth lives in messages/*.json.
 const CTA_VARIANTS = {
-  control: { label: "GET STARTED FOR FREE", subtext: "Available on iOS" },
-  download_app: { label: "GET THE APP", subtext: "Free 7-Day Trial" },
+  control: { labelKey: "get_started", subtextKey: "no_credit_card" },
+  download_app: { labelKey: "get_the_app", subtextKey: "free_trial" },
 } as const;
-type CTAVariant = keyof typeof CTA_VARIANTS;
 
 function isTikTokOrInstagram(): boolean {
   if (typeof navigator === "undefined") return false;
   return /TikTok|BytedanceWebview|musical_ly|Instagram/i.test(navigator.userAgent);
 }
 
-export default function MobileCTABar({ downloadUrl, ctaLabel, ctaSubtext }: { downloadUrl?: string; ctaLabel?: string; ctaSubtext?: string }) {
-  const href = downloadUrl ?? DEFAULT_URL;
-  const [visible, setVisible] = useState(false);
-  const [variant, setVariant] = useState<CTAVariant>("control");
+type Props = {
+  downloadUrl?: string;
+  ctaLabel?: string;
+  ctaSubtext?: string;
+  // Resolved server-side and passed in so first paint matches the bootstrapped client SDK (no flash).
+  ctaVariant?: MobileCtaVariant;
+};
 
-  // A/B test only when the caller didn't pin the copy (home page, not guide pages)
-  const isABTest = !ctaLabel && !ctaSubtext;
+export default function MobileCTABar({ downloadUrl, ctaLabel, ctaSubtext, ctaVariant }: Props) {
+  const href = downloadUrl ?? DEFAULT_URL;
+  const locale = useLocale();
+  const t = useTranslations("guide");
+  const [visible, setVisible] = useState(false);
+
+  const isPinned = Boolean(ctaLabel || ctaSubtext);
+  const isKoreanTest = !isPinned && locale === "ko";
+  const activeVariant: MobileCtaVariant = ctaVariant ?? "control";
 
   useEffect(() => {
     if (isTikTokOrInstagram()) {
@@ -36,20 +47,36 @@ export default function MobileCTABar({ downloadUrl, ctaLabel, ctaSubtext }: { do
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
+  // Manual exposure: server-decide + client bootstrap skip the SDK's auto-tracking,
+  // so the experiment dashboard needs us to record the variant ourselves.
   useEffect(() => {
-    if (!isABTest) return;
-    return posthog.onFeatureFlags(() => {
-      const v = posthog.getFeatureFlag(CTA_FLAG_KEY);
-      if (v === "download_app" || v === "control") setVariant(v);
+    if (isPinned || isKoreanTest || !ctaVariant) return;
+    posthog.capture("$feature_flag_called", {
+      $feature_flag: CTA_FLAG_KEY,
+      $feature_flag_response: ctaVariant,
     });
-  }, [isABTest]);
+  }, [isPinned, isKoreanTest, ctaVariant]);
 
-  const resolvedLabel = ctaLabel ?? CTA_VARIANTS[variant].label;
-  const resolvedSubtext = ctaSubtext ?? CTA_VARIANTS[variant].subtext;
+  let resolvedLabel: string;
+  let resolvedSubtext: string;
+  let trackedVariant: string;
+  if (isPinned) {
+    resolvedLabel = ctaLabel ?? t("get_started");
+    resolvedSubtext = ctaSubtext ?? t("no_credit_card");
+    trackedVariant = "override";
+  } else if (isKoreanTest) {
+    resolvedLabel = t("get_started");
+    resolvedSubtext = t("no_credit_card");
+    trackedVariant = "ko_fixed";
+  } else {
+    resolvedLabel = t(CTA_VARIANTS[activeVariant].labelKey);
+    resolvedSubtext = t(CTA_VARIANTS[activeVariant].subtextKey);
+    trackedVariant = activeVariant;
+  }
 
   const handleClick = () => {
     posthog.capture("mobile_cta_clicked", {
-      variant: isABTest ? variant : "override",
+      variant: trackedVariant,
       label: resolvedLabel,
       subtext: resolvedSubtext,
     });
