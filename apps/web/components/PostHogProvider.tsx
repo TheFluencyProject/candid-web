@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import { useEffect } from "react";
 
 if (typeof window !== "undefined") {
-  posthog.init("phc_fR2U6mMjgFq6gVgNoHR1zjv8uKRbsDoLfPI950XhUEp", {
+  posthog.init("phc_z63G96rjoQ69KcCvirgWCd65MTRWu8ihGEs24ugqmiAF", {
     api_host: "https://us.i.posthog.com",
     // Manual capture below — auto fires before App Router updates the URL on SPA nav
     capture_pageview: false,
