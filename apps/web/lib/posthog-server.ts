@@ -18,13 +18,12 @@ function getClient(): PostHog {
 }
 
 // React.cache dedupes per-request: layout + page can both call this and we hit PostHog at most once.
-// sendFeatureFlagEvents=false because we fire the exposure manually on the client (after bootstrap).
+// evaluateFlags doesn't auto-fire $feature_flag_called on the server — the client SDK
+// emits the single exposure after bootstrap (see MobileCTABar).
 export const getMobileCtaVariant = cache(
   async (distinctId: string): Promise<MobileCtaVariant> => {
     try {
-      const flags = await getClient().evaluateFlags(distinctId, {
-        sendFeatureFlagEvents: false,
-      });
+      const flags = await getClient().evaluateFlags(distinctId);
       const v = flags.getFlag(CTA_FLAG_KEY);
       return v === "download_app" ? "download_app" : "control";
     } catch {
