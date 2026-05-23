@@ -92,14 +92,26 @@ export default async function Home({ params }: Props) {
     .filter((t): t is CarouselTutor => t !== null);
 
   // Build screenshot sections by alternating tutors. Sections without a screenshot are dropped.
-  const screenshotSectionKeys = [
-    "screenshot_listen_url",
-    "screenshot_week_url",
-    "screenshot_shadow_url",
-    "screenshot_map_url",
-    "screenshot_community_url",
-    "screenshot_intro_url",
-  ] as const;
+  // Korean-only inserts `screenshot_learn_url` between listen + week — kept out of the en array
+  // so the alternation pattern (tutors[i % tutors.length]) doesn't shift on English.
+  const screenshotSectionKeys = locale === "ko"
+    ? [
+        "screenshot_listen_url",
+        "screenshot_learn_url",
+        "screenshot_week_url",
+        "screenshot_shadow_url",
+        "screenshot_map_url",
+        "screenshot_community_url",
+        "screenshot_intro_url",
+      ] as const
+    : [
+        "screenshot_listen_url",
+        "screenshot_week_url",
+        "screenshot_shadow_url",
+        "screenshot_map_url",
+        "screenshot_community_url",
+        "screenshot_intro_url",
+      ] as const;
 
   const sectionsWithTutors = screenshotSectionKeys
     .map((key, i) => {
@@ -113,6 +125,7 @@ export default async function Home({ params }: Props) {
         screenshot_listen_url: locale === "en"
           ? `<span class="section-title-snug">Learn the language through your tutor's daily life</span>`
           : guideT("home_listen"),
+        screenshot_learn_url: guideT("learn"),
         screenshot_week_url: locale === "en"
           ? `Daily video lessons,${br} new every week`
           : guideT("week"),
