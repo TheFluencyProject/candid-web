@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { cookies } from "next/headers";
+import { cookies, headers } from "next/headers";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import TutorNavbar from "@/components/TutorNavbar";
 import MobileCTABar from "@/components/MobileCTABar";
@@ -8,10 +8,13 @@ import ScrollFadeIn from "@/components/ScrollFadeIn";
 import BlurImage from "@/components/BlurImage";
 import HeroCarousel, { type CarouselTutor } from "@/components/HeroCarousel";
 import SiteFooter from "@/components/SiteFooter";
+import BecomeATutorPill from "@/components/BecomeATutorPill";
 import { getTutorPageConfig } from "@/config/tutors";
 import { localizeLanguageName, withKoreanParticle, formatHeroTitle, stripEmojis } from "@/lib/i18n-helpers";
 import { type Tutor, fetchTutor } from "@/lib/api";
 import { getMobileCtaVariant } from "@/lib/posthog-server";
+import { isCandidtutorsHost } from "@/lib/canonical-hosts";
+import { BECOME_A_TUTOR_URL } from "@/lib/platform";
 
 type Props = {
   params: Promise<{ locale: string }>;
@@ -26,6 +29,12 @@ export default async function Home({ params }: Props) {
   const cookieStore = await cookies();
   const distinctId = cookieStore.get("candid_did")?.value ?? crypto.randomUUID();
   const ctaVariant = locale === "en" ? await getMobileCtaVariant(distinctId) : undefined;
+
+  // Tutor-discovery brand on candidtutors.co: swap "Get the app" → "Find your tutor"
+  // and add the "Become a Candid Tutor" secondary pill (Notion link).
+  const host_header = (await headers()).get("host") ?? "";
+  const candidtutors_brand = isCandidtutorsHost(host_header);
+  const t_tutor = await getTranslations("tutor");
 
   // Korean locale → Adam first (Korean speakers learn English); else Mia first.
   const TUTOR_SLUGS =
@@ -162,26 +171,49 @@ export default async function Home({ params }: Props) {
         downloadUrl="/download"
         alwaysWhite
         rightElement={
-          <>
-            {/* Desktop: Get the app pill */}
-            <a
-              href="/download"
-              className="hidden lg:block px-5 py-2 rounded-full text-sm font-semibold"
-              style={{ backgroundColor: "#FFFFFF", color: "#18181C" }}
-            >
-              Get the app
-            </a>
-            {/* Mobile: App Store badge */}
-            <a href="/download" className="lg:hidden">
-              <Image
-                src="/download.svg"
-                alt="Download on the App Store"
-                width={120}
-                height={40}
-                priority
-              />
-            </a>
-          </>
+          candidtutors_brand ? (
+            <div className="flex items-center gap-2">
+              {/* Secondary CTA — less prominent (white text on translucent white). */}
+              <BecomeATutorPill label={t_tutor("become_a_tutor")} href={BECOME_A_TUTOR_URL} variant="navbar-pill" />
+              <BecomeATutorPill label={t_tutor("become_a_tutor_short")} href={BECOME_A_TUTOR_URL} variant="mobile-navbar-pill" />
+              {/* Primary CTA — same App Store behavior as Get the app. */}
+              <a
+                href="/download"
+                className="hidden lg:block px-5 py-2 rounded-full text-sm font-semibold"
+                style={{ backgroundColor: "#FFFFFF", color: "#18181C" }}
+              >
+                {t_tutor("find_your_tutor")}
+              </a>
+              <a
+                href="/download"
+                className="lg:hidden px-3 py-2 rounded-full text-xs font-semibold whitespace-nowrap"
+                style={{ backgroundColor: "#FFFFFF", color: "#18181C" }}
+              >
+                {t_tutor("find_your_tutor")}
+              </a>
+            </div>
+          ) : (
+            <>
+              {/* Desktop: Get the app pill */}
+              <a
+                href="/download"
+                className="hidden lg:block px-5 py-2 rounded-full text-sm font-semibold"
+                style={{ backgroundColor: "#FFFFFF", color: "#18181C" }}
+              >
+                Get the app
+              </a>
+              {/* Mobile: App Store badge */}
+              <a href="/download" className="lg:hidden">
+                <Image
+                  src="/download.svg"
+                  alt="Download on the App Store"
+                  width={120}
+                  height={40}
+                  priority
+                />
+              </a>
+            </>
+          )
         }
       />
 
@@ -216,7 +248,14 @@ export default async function Home({ params }: Props) {
 
       {/* ─── Footer ─── */}
       <SiteFooter />
-      <MobileCTABar ctaVariant={ctaVariant} />
+      {candidtutors_brand ? (
+        <MobileCTABar
+          ctaLabel={t_tutor("find_your_tutor")}
+          ctaSubtext={t_tutor("no_credit_card")}
+        />
+      ) : (
+        <MobileCTABar ctaVariant={ctaVariant} />
+      )}
     </main>
   );
 }
