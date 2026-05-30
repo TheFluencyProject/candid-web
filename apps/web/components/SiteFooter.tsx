@@ -83,9 +83,9 @@ export default async function SiteFooter() {
             <li>
               <a href="https://thefluencyproject.org" target="_blank" rel="noopener noreferrer" className="text-sm font-normal text-white hover:opacity-70 transition-opacity">TheFluencyProject.org</a>
             </li>
-            <li>
+            {/* <li>
               <a href="https://open.substack.com/pub/thefluencyfiles/p/introducing-candid?utm_source=candid&utm_medium=website&utm_campaign=landing-page" target="_blank" rel="noopener noreferrer" className="text-sm font-normal text-white hover:opacity-70 transition-opacity">{t("company_letter")}</a>
-            </li>
+            </li> */}
           </ul>
         </div>
 
