@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "firebase": "^12.14.0",
-    "next": "^15.3.8",
+    "next": "15.5.11",
     "next-intl": "^4.8.2",
     "posthog-js": "^1.372.9",
     "posthog-node": "^5.35.0",
