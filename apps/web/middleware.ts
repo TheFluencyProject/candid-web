@@ -71,7 +71,14 @@ function prefersKorean(request: NextRequest): boolean {
 
 // Canonical hosts pass through to the existing intl pipeline. Anything else is
 // either a tutor's custom domain (rewrite to their guide page) or unmatched (404).
-const CANONICAL_HOSTS = new Set(["joincandid.co", "www.joincandid.co"]);
+// candidtutors.co is a parallel apex that serves the same site — Adam wants the
+// option to brand-swap between the two at any time without code changes.
+const CANONICAL_HOSTS = new Set([
+  "joincandid.co",
+  "www.joincandid.co",
+  "candidtutors.co",
+  "www.candidtutors.co",
+]);
 
 function isCanonicalHost(host: string): boolean {
   if (CANONICAL_HOSTS.has(host)) return true;
