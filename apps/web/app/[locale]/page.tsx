@@ -1,7 +1,7 @@
 import Image from "next/image";
 import { cookies } from "next/headers";
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import GuideNavbar from "@/components/GuideNavbar";
+import TutorNavbar from "@/components/TutorNavbar";
 import MobileCTABar from "@/components/MobileCTABar";
 import StickyHeader from "@/components/StickyHeader";
 import ScrollFadeIn from "@/components/ScrollFadeIn";
@@ -33,9 +33,9 @@ export default async function Home({ params }: Props) {
       ? ["english-adam", "korean-mia"]
       : ["korean-mia", "english-adam"];
 
-  const [t, guideT] = await Promise.all([
+  const [t, tutorT] = await Promise.all([
     getTranslations({ locale }),
-    getTranslations({ locale, namespace: "guide" }),
+    getTranslations({ locale, namespace: "tutor" }),
   ]);
 
   // Fetch all tutors
@@ -63,7 +63,7 @@ export default async function Home({ params }: Props) {
       const nameForSubtitle = locale === "ko" ? withKoreanParticle(localizedFirstName) : localizedFirstName;
       // Per-tutor English subtitle override; Korean keeps the i18n default.
       const enOverride = locale === "en" ? config.subtitle?.en : undefined;
-      const subtitle: string = enOverride ?? stripEmojis(guideT("subtitle", { name: nameForSubtitle, language: langLabel }));
+      const subtitle: string = enOverride ?? stripEmojis(tutorT("subtitle", { name: nameForSubtitle, language: langLabel }));
       // Mobile English uses the per-tutor `enMobile` override when present
       // (hand-authored 3-line break since the mobile column is narrower).
       // Falls back to stripping <br/> so the subtitle wraps naturally.
@@ -124,19 +124,19 @@ export default async function Home({ params }: Props) {
       const titleMap = {
         screenshot_listen_url: locale === "en"
           ? `<span class="section-title-snug">Learn the language through your tutor's daily life</span>`
-          : guideT("home_listen"),
-        screenshot_learn_url: guideT("learn"),
+          : tutorT("home_listen"),
+        screenshot_learn_url: tutorT("learn"),
         screenshot_week_url: locale === "en"
           ? `Daily video lessons,${br} new every week`
-          : guideT("week"),
-        screenshot_map_url: guideT("home_map"),
-        screenshot_shadow_url: guideT("home_shadow"),
+          : tutorT("week"),
+        screenshot_map_url: tutorT("home_map"),
+        screenshot_shadow_url: tutorT("home_shadow"),
         screenshot_intro_url: locale === "en"
           ? `Get tutored${br} through it all`
-          : guideT("intro"),
+          : tutorT("intro"),
         screenshot_community_url: locale === "en"
           ? `Get answers${br} to your questions`
-          : guideT("community"),
+          : tutorT("community"),
       };
       return {
         key,
@@ -157,7 +157,7 @@ export default async function Home({ params }: Props) {
       className="min-h-screen text-white"
       style={{ backgroundColor: "#18181C" }}
     >
-      <GuideNavbar
+      <TutorNavbar
         sentinelId="hero-sentinel"
         downloadUrl="/download"
         alwaysWhite

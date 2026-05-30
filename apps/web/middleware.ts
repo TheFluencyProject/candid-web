@@ -3,6 +3,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { routing } from "./i18n/routing";
 import { APP_STORE_URL, getRedirectUrl } from "./lib/platform";
 import { resolve_tutor_by_host } from "./lib/resolve-domain";
+import { isCanonicalHost } from "./lib/canonical-hosts";
 
 const intlMiddleware = createMiddleware(routing);
 
@@ -69,24 +70,6 @@ function prefersKorean(request: NextRequest): boolean {
   return primary.startsWith("ko");
 }
 
-// Canonical hosts pass through to the existing intl pipeline. Anything else is
-// either a tutor's custom domain (rewrite to their guide page) or unmatched (404).
-// candidtutors.co is a parallel apex that serves the same site — Adam wants the
-// option to brand-swap between the two at any time without code changes.
-const CANONICAL_HOSTS = new Set([
-  "joincandid.co",
-  "www.joincandid.co",
-  "candidtutors.co",
-  "www.candidtutors.co",
-]);
-
-function isCanonicalHost(host: string): boolean {
-  if (CANONICAL_HOSTS.has(host)) return true;
-  // Vercel preview deploys + local dev fall through unmodified.
-  if (host.endsWith(".vercel.app")) return true;
-  if (host.startsWith("localhost") || host.startsWith("127.0.0.1")) return true;
-  return false;
-}
 
 export default async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
@@ -101,7 +84,7 @@ export default async function middleware(request: NextRequest) {
     // Rewrite (not redirect) — URL must stay on the custom domain.
     const locale = prefersKorean(request) ? "ko" : "en";
     const url = request.nextUrl.clone();
-    url.pathname = `/${locale}/guide/${slug}`;
+    url.pathname = `/${locale}/tutor/${slug}`;
     return NextResponse.rewrite(url);
   }
 

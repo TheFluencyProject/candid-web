@@ -51,7 +51,7 @@ export default async function SiteFooter() {
               <p className="text-sm font-bold uppercase tracking-widest text-white/70 mb-2">{localizeLanguageName("english", locale)}</p>
               <ul className="space-y-2">
                 <li>
-                  <Link href="/guide/english-adam" className="text-sm font-normal text-white hover:opacity-70 transition-opacity">{adamTitle}</Link>
+                  <Link href="/tutor/english-adam" className="text-sm font-normal text-white hover:opacity-70 transition-opacity">{adamTitle}</Link>
                 </li>
               </ul>
             </div>
@@ -61,7 +61,7 @@ export default async function SiteFooter() {
                   for now — add her back here when she's flipped live. */}
               <ul className="space-y-2">
                 <li>
-                  <Link href="/guide/korean-mia" className="text-sm font-normal text-white hover:opacity-70 transition-opacity">{miaTitle}</Link>
+                  <Link href="/tutor/korean-mia" className="text-sm font-normal text-white hover:opacity-70 transition-opacity">{miaTitle}</Link>
                 </li>
               </ul>
             </div>

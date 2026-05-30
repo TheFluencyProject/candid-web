@@ -30,22 +30,22 @@ const nextConfig = {
       // middleware.ts so we can branch on User-Agent for non-iOS waitlist.
       {
         source: "/adam",
-        destination: "/guide/english-adam",
+        destination: "/tutor/english-adam",
         permanent: true,
       },
       {
         source: "/mia",
-        destination: "/guide/korean-mia",
+        destination: "/tutor/korean-mia",
         permanent: true,
       },
       {
         source: "/misshoney",
-        destination: "/guide/misshoney",
+        destination: "/tutor/misshoney",
         permanent: true,
       },
       {
         source: "/chan",
-        destination: "/guide/korean-chan",
+        destination: "/tutor/korean-chan",
         permanent: true,
       },
     ];

@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import posthog from "posthog-js";
 import { CTA_FLAG_KEY, type MobileCtaVariant } from "@/lib/posthog-config";
+import { openJoinForFree } from "@/lib/join-for-free-store";
 
 const DEFAULT_URL = "/download";
 
@@ -24,12 +25,15 @@ type Props = {
   ctaSubtext?: string;
   // Resolved server-side and passed in so first paint matches the bootstrapped client SDK (no flash).
   ctaVariant?: MobileCtaVariant;
+  // 'join' opens the Join-for-free sheet instead of routing to the App Store.
+  // Default 'download' keeps the existing behavior for the home page + joincandid.co.
+  mode?: "download" | "join";
 };
 
-export default function MobileCTABar({ downloadUrl, ctaLabel, ctaSubtext, ctaVariant }: Props) {
+export default function MobileCTABar({ downloadUrl, ctaLabel, ctaSubtext, ctaVariant, mode = "download" }: Props) {
   const href = downloadUrl ?? DEFAULT_URL;
   const locale = useLocale();
-  const t = useTranslations("guide");
+  const t = useTranslations("tutor");
   const [visible, setVisible] = useState(false);
 
   const isPinned = Boolean(ctaLabel || ctaSubtext);
@@ -74,12 +78,18 @@ export default function MobileCTABar({ downloadUrl, ctaLabel, ctaSubtext, ctaVar
     trackedVariant = activeVariant;
   }
 
-  const handleClick = () => {
+  const handleClick = (e?: React.MouseEvent) => {
     posthog.capture("mobile_cta_clicked", {
       variant: trackedVariant,
       label: resolvedLabel,
       subtext: resolvedSubtext,
+      mode,
     });
+    if (mode === "join") {
+      // Open the Join-for-free sheet instead of navigating to the App Store.
+      e?.preventDefault();
+      openJoinForFree();
+    }
   };
 
   return (
@@ -95,14 +105,25 @@ export default function MobileCTABar({ downloadUrl, ctaLabel, ctaSubtext, ctaVar
           paddingBottom: "max(1.5rem, env(safe-area-inset-bottom))",
         }}
       >
-        <a
-          href={href}
-          onClick={handleClick}
-          className="w-full max-w-sm py-4 rounded-full text-center text-lg font-bold tracking-wide block"
-          style={{ backgroundColor: "#89FFB4", color: "#000000" }}
-        >
-          {resolvedLabel}
-        </a>
+        {mode === "join" ? (
+          <button
+            type="button"
+            onClick={handleClick}
+            className="w-full max-w-sm py-4 rounded-full text-center text-lg font-bold tracking-wide block"
+            style={{ backgroundColor: "#89FFB4", color: "#000000" }}
+          >
+            {resolvedLabel}
+          </button>
+        ) : (
+          <a
+            href={href}
+            onClick={handleClick}
+            className="w-full max-w-sm py-4 rounded-full text-center text-lg font-bold tracking-wide block"
+            style={{ backgroundColor: "#89FFB4", color: "#000000" }}
+          >
+            {resolvedLabel}
+          </a>
+        )}
         <p
           className="mt-2 text-sm font-medium"
           style={{ color: "#89FFB4" }}

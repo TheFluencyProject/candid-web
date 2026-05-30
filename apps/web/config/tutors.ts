@@ -42,7 +42,7 @@ export interface TutorPageConfig {
     overlay?: string;
   };
   // Optional per-tutor subtitle override (HTML allowed; use <br/> for line
-  // break). Falls back to the i18n "guide.subtitle" string when absent.
+  // break). Falls back to the i18n "tutor.subtitle" string when absent.
   // `en` is the desktop string; `enMobile` overrides it on mobile (used to
   // hand-author the line breaks since the mobile column is narrower).
   subtitle?: {

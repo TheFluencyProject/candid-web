@@ -32,7 +32,7 @@
   "company_info": {
     "title": "Company Info"
   },
-  "guide": {
+  "tutor": {
     "subtitle": "Get {name}'s weekly set of listening & speaking lessons<br/>for real-life, conversational {language}",
     "tutor_label": "Tutor {firstName}",
     "download_qr": "Download & Try for Free",
@@ -62,7 +62,30 @@
     "ready_to_learn": "Ready to learn with {name}?",
     "free_to_try": "Free to try — no credit card required",
     "privacy": "Privacy Policy",
-    "terms": "Terms of Use"
+    "terms": "Terms of Use",
+    "join_for_free": "Join for free",
+    "join_for_free_subtext": "Free — no credit card",
+    "find_your_tutor": "Find your tutor",
+    "become_a_tutor": "Become a Candid Tutor",
+    "become_a_tutor_short": "Become a Tutor"
+  },
+  "join_for_free": {
+    "sheet_title": "Join for free",
+    "sheet_description": "Create your account to join {name}'s community",
+    "signin_step_title": "Join {name}'s community",
+    "signin_step_subtitle": "Create your free Candid account",
+    "signin_continue_with_apple": "Continue with Apple",
+    "signin_continue_with_google": "Continue with Google",
+    "success_title": "You're in",
+    "success_subtitle": "We've sent the invitation to {email}",
+    "success_already_title": "Welcome back",
+    "success_already_subtitle": "Open Candid to follow {name}",
+    "success_close": "Done",
+    "error_title": "Something went wrong",
+    "error_retry": "Try again",
+    "error_no_email": "We couldn't read your email — try Google instead.",
+    "error_signin_failed": "Sign-in didn't complete. Please try again.",
+    "error_signup_failed": "We couldn't save your signup. Please try again."
   },
   "youtube_videos": {
     "title": "Content Rights",

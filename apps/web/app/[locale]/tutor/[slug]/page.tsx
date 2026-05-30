@@ -1,17 +1,23 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import { notFound } from "next/navigation";
+import { headers } from "next/headers";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import MobileCTABar from "@/components/MobileCTABar";
-import GuideNavbar from "@/components/GuideNavbar";
+import TutorNavbar from "@/components/TutorNavbar";
 import QRCode from "@/components/QRCode";
 import { getTutorPageConfig } from "@/config/tutors";
 import StickyHeader from "@/components/StickyHeader";
 import ScrollFadeIn from "@/components/ScrollFadeIn";
 import BlurImage from "@/components/BlurImage";
 import SiteFooter from "@/components/SiteFooter";
+import JoinForFreePill from "@/components/JoinForFree/JoinForFreePill";
+import JoinForFreeSheet from "@/components/JoinForFree/JoinForFreeSheet";
+import BecomeATutorPill from "@/components/BecomeATutorPill";
 import { localizeLanguageName, localizeMapCountry, capitalize, withKoreanParticle, formatHeroTitle, stripEmojis } from "@/lib/i18n-helpers";
 import { type Tutor, type TutorLanguageProficiency, fetchTutor } from "@/lib/api";
+import { isJoinForFreeContext, isCandidtutorsHost } from "@/lib/canonical-hosts";
+import { BECOME_A_TUTOR_URL } from "@/lib/platform";
 
 function formatLanguages(languages: TutorLanguageProficiency[]): string {
   return languages
@@ -72,17 +78,26 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-export default async function GuidePage({ params }: Props) {
+export default async function TutorPage({ params }: Props) {
   const { locale, slug } = await params;
   setRequestLocale(locale);
 
-  const [tutor, t] = await Promise.all([
+  const [tutor, t, host_header] = await Promise.all([
     fetchTutor(slug, locale),
-    getTranslations("guide"),
+    getTranslations("tutor"),
+    headers().then(h => h.get("host") ?? ""),
   ]);
   if (!tutor) {
     notFound();
   }
+
+  // Three CTA modes by host:
+  //  - candidtutors  → "Find your tutor" (App Store) + "Become a Candid Tutor" secondary
+  //  - join_for_free → bottom-sheet web signup (per-tutor custom_domain only)
+  //  - default       → existing "Get the app" / App Store badge (joincandid.co + previews)
+  const candidtutors_brand = isCandidtutorsHost(host_header);
+  const join_for_free = isJoinForFreeContext(host_header);
+  const join_for_free_locale: "en" | "ko" = locale === "ko" ? "ko" : "en";
 
   const firstName = tutor.name.split(" ")[0];
   const localizedFirstName =
@@ -107,32 +122,60 @@ export default async function GuidePage({ params }: Props) {
       style={{ backgroundColor: "#18181C", color: "#FFFFFF" }}
     >
       {/* ─── Fixed Navbar ─── */}
-      <GuideNavbar
+      <TutorNavbar
         sentinelId="hero-sentinel"
         downloadUrl={`/download/${slug}`}
         alwaysWhite={Boolean(config.hero?.textColor)}
         mobileDark={slug === "english-adam"}
         rightElement={
-          <>
-            {/* Desktop: Get the app pill (App Store badge moves inline under hero) */}
-            <a
-              href={`/download/${slug}`}
-              className="hidden lg:block px-5 py-2 rounded-full text-sm font-semibold"
-              style={{ backgroundColor: "#FFFFFF", color: "#18181C" }}
-            >
-              Get the app
-            </a>
-            {/* Mobile: App Store badge */}
-            <a href={`/download/${slug}`} className="lg:hidden">
-              <Image
-                src="/download.svg"
-                alt="Download on the App Store"
-                width={120}
-                height={40}
-                priority
-              />
-            </a>
-          </>
+          join_for_free ? (
+            <>
+              <JoinForFreePill label={t("join_for_free")} variant="navbar-pill" />
+              <JoinForFreePill label={t("join_for_free")} variant="mobile-navbar-pill" />
+            </>
+          ) : candidtutors_brand ? (
+            <div className="flex items-center gap-2">
+              {/* Secondary CTA — less prominent (white text on translucent white). */}
+              <BecomeATutorPill label={t("become_a_tutor")} href={BECOME_A_TUTOR_URL} variant="navbar-pill" />
+              <BecomeATutorPill label={t("become_a_tutor_short")} href={BECOME_A_TUTOR_URL} variant="mobile-navbar-pill" />
+              {/* Primary CTA — same App Store behavior as Get the app. */}
+              <a
+                href={`/download/${slug}`}
+                className="hidden lg:block px-5 py-2 rounded-full text-sm font-semibold"
+                style={{ backgroundColor: "#FFFFFF", color: "#18181C" }}
+              >
+                {t("find_your_tutor")}
+              </a>
+              <a
+                href={`/download/${slug}`}
+                className="lg:hidden px-3 py-2 rounded-full text-xs font-semibold whitespace-nowrap"
+                style={{ backgroundColor: "#FFFFFF", color: "#18181C" }}
+              >
+                {t("find_your_tutor")}
+              </a>
+            </div>
+          ) : (
+            <>
+              {/* Desktop: Get the app pill (App Store badge moves inline under hero) */}
+              <a
+                href={`/download/${slug}`}
+                className="hidden lg:block px-5 py-2 rounded-full text-sm font-semibold"
+                style={{ backgroundColor: "#FFFFFF", color: "#18181C" }}
+              >
+                Get the app
+              </a>
+              {/* Mobile: App Store badge */}
+              <a href={`/download/${slug}`} className="lg:hidden">
+                <Image
+                  src="/download.svg"
+                  alt="Download on the App Store"
+                  width={120}
+                  height={40}
+                  priority
+                />
+              </a>
+            </>
+          )
         }
       />
 
@@ -211,18 +254,20 @@ export default async function GuidePage({ params }: Props) {
             style={{ color: config.hero?.textColor ?? "#18181C", textShadow: config.hero?.textShadow }}
             dangerouslySetInnerHTML={{ __html: subtitleHtml }}
           />
-          <a
-            href={`/download/${slug}`}
-            className="animate-fade-in-up-delay-2 self-start"
-          >
-            <Image
-              src="/download.svg"
-              alt="Download on the App Store"
-              width={140}
-              height={46}
-              priority
-            />
-          </a>
+          {!join_for_free && (
+            <a
+              href={`/download/${slug}`}
+              className="animate-fade-in-up-delay-2 self-start"
+            >
+              <Image
+                src="/download.svg"
+                alt="Download on the App Store"
+                width={140}
+                height={46}
+                priority
+              />
+            </a>
+          )}
           {/* Hidden until further notice; superseded by inline App Store badge above. */}
           <div className="hidden">
             <QRCode slug={slug} label={t("download_qr")} />
@@ -350,7 +395,31 @@ export default async function GuidePage({ params }: Props) {
 
       {/* ─── Footer ─── */}
       <SiteFooter />
-      <MobileCTABar downloadUrl={`/download/${slug}`} ctaLabel={t("get_started")} ctaSubtext={t("no_credit_card")} />
+      <MobileCTABar
+        downloadUrl={`/download/${slug}`}
+        ctaLabel={
+          join_for_free
+            ? t("join_for_free")
+            : candidtutors_brand
+              ? t("find_your_tutor")
+              : t("get_started")
+        }
+        ctaSubtext={
+          join_for_free
+            ? t("join_for_free_subtext")
+            : candidtutors_brand
+              ? t("no_credit_card")
+              : t("no_credit_card")
+        }
+        mode={join_for_free ? "join" : "download"}
+      />
+      {join_for_free && (
+        <JoinForFreeSheet
+          tutor_name={localizedFirstName}
+          tutor_slug={slug}
+          locale={join_for_free_locale}
+        />
+      )}
     </main>
   );
 }

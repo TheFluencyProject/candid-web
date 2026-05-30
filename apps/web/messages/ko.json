@@ -32,7 +32,7 @@
   "company_info": {
     "title": "사업자정보"
   },
-  "guide": {
+  "tutor": {
     "subtitle": "{name} 함께 실생활 {language} 말하기 듣기<br/>프로그램을 시작해보세요",
     "tutor_label": "{firstName} 쌤",
     "download_qr": "무료로 다운로드 & 체험",
@@ -60,7 +60,30 @@
     "ready_to_learn": "{name} 배울 준비 되셨나요?",
     "free_to_try": "무료 체험 — 카드 정보 입력 없이",
     "privacy": "개인정보 처리방침",
-    "terms": "이용약관"
+    "terms": "이용약관",
+    "join_for_free": "무료로 시작하기",
+    "join_for_free_subtext": "무료 — 카드 정보 입력 없이",
+    "find_your_tutor": "튜터 찾기",
+    "become_a_tutor": "Candid 튜터 되기",
+    "become_a_tutor_short": "튜터 되기"
+  },
+  "join_for_free": {
+    "sheet_title": "무료로 시작하기",
+    "sheet_description": "{name} 커뮤니티에 가입하려면 계정을 만드세요",
+    "signin_step_title": "{name} 커뮤니티에 가입하기",
+    "signin_step_subtitle": "Candid 무료 계정을 만들어 보세요",
+    "signin_continue_with_apple": "Apple로 계속하기",
+    "signin_continue_with_google": "Google로 계속하기",
+    "success_title": "가입 완료",
+    "success_subtitle": "초대장을 {email}로 보냈어요",
+    "success_already_title": "다시 만나서 반가워요",
+    "success_already_subtitle": "Candid를 열어 {name} 님을 팔로우하세요",
+    "success_close": "완료",
+    "error_title": "문제가 발생했어요",
+    "error_retry": "다시 시도",
+    "error_no_email": "이메일을 가져올 수 없어요 — Google로 다시 시도해 주세요.",
+    "error_signin_failed": "로그인이 완료되지 않았어요. 다시 시도해 주세요.",
+    "error_signup_failed": "가입 정보를 저장하지 못했어요. 다시 시도해 주세요."
   },
   "youtube_videos": {
     "title": "콘텐츠 사용 권한",
