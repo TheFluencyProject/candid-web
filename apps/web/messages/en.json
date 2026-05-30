@@ -75,8 +75,8 @@
   "join_for_free": {
     "sheet_title": "Join for free",
     "sheet_description": "Create your account to join {name}'s community",
-    "signin_step_title": "Join {name}'s community",
-    "signin_step_subtitle": "Create your free Candid account",
+    "signin_step_title": "Join {name}'s study club",
+    "signin_step_subtitle": "Receive your invite over email:",
     "signin_continue_with_apple": "Continue with Apple",
     "signin_continue_with_google": "Continue with Google",
     "success_title": "You're in",

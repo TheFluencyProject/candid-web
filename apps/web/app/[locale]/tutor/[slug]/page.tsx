@@ -108,6 +108,10 @@ export default async function TutorPage({ params, searchParams }: Props) {
   // and ?v=meta). joincandid.co/tutor stays on the App Store path.
   const uses_join_sheet = join_for_free || candidtutors_brand;
 
+  // "Join {name}'s study club for conversational {lang}" framing — default on
+  // candidtutors.co AND on the ?v=meta ad variant; original subtitle otherwise.
+  const use_study_club_framing = is_meta_variant || candidtutors_brand;
+
   const firstName = tutor.name.split(" ")[0];
   const localizedFirstName =
     locale === "ko" && tutor.metadata?.name_kr
@@ -126,8 +130,8 @@ export default async function TutorPage({ params, searchParams }: Props) {
     name: locale === "ko" ? withKoreanParticle(localizedFirstName) : localizedFirstName,
     language: langLabel,
   }));
-  const subtitleHtml = is_meta_variant ? metaSubtitleHtml : defaultSubtitleHtml;
-  const subtitleMobileHtml = is_meta_variant
+  const subtitleHtml = use_study_club_framing ? metaSubtitleHtml : defaultSubtitleHtml;
+  const subtitleMobileHtml = use_study_club_framing
     ? metaSubtitleHtml.replace(/<br\s*\/?>/gi, " ").replace(/\s+/g, " ").trim()
     : (locale === "en" && config.subtitle?.enMobile
         ? config.subtitle.enMobile
@@ -408,7 +412,7 @@ export default async function TutorPage({ params, searchParams }: Props) {
       <MobileCTABar
         downloadUrl={`/download/${slug}`}
         ctaLabel={
-          is_meta_variant || candidtutors_brand
+          use_study_club_framing
             ? t("study_with", { name: localizedFirstName })
             : join_for_free
               ? t("join_for_free")

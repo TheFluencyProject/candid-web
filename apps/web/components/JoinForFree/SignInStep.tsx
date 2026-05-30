@@ -55,7 +55,7 @@ export default function SignInStep({ tutor_name, tutor_slug, locale, onSuccess, 
       <h2 className="text-2xl font-semibold mb-2 text-center" style={{ color: "#18181C" }}>
         {t("signin_step_title", { name: tutor_name })}
       </h2>
-      <p className="text-sm text-center mb-6" style={{ color: "#666666" }}>
+      <p className="text-base text-center mb-8" style={{ color: "#666666" }}>
         {t("signin_step_subtitle")}
       </p>
       <div className="flex flex-col gap-3">
