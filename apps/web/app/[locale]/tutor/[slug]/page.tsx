@@ -103,6 +103,11 @@ export default async function TutorPage({ params, searchParams }: Props) {
   // Meta-ad landing variant: ?v=meta swaps hero copy + CTA, always-shows mobile sticky.
   const is_meta_variant = sp.v === "meta";
 
+  // CTAs that open the Join-for-free sheet (instead of routing to the App Store):
+  // custom_domain tutor pages AND every candidtutors.co tutor page (both default
+  // and ?v=meta). joincandid.co/tutor stays on the App Store path.
+  const uses_join_sheet = join_for_free || candidtutors_brand;
+
   const firstName = tutor.name.split(" ")[0];
   const localizedFirstName =
     locale === "ko" && tutor.metadata?.name_kr
@@ -249,15 +254,17 @@ export default async function TutorPage({ params, searchParams }: Props) {
             style={{ color: config.hero?.textColor ?? "#18181C", textShadow: config.hero?.textShadow }}
             dangerouslySetInnerHTML={{ __html: subtitleHtml }}
           />
-          {is_meta_variant ? (
-            <a
-              href={`/download/${slug}`}
-              className="animate-fade-in-up-delay-2 self-start px-7 py-3 rounded-full text-base font-bold tracking-wide"
-              style={{ backgroundColor: "#89FFB4", color: "#000000" }}
-            >
-              {t("study_with", { name: localizedFirstName })}
-            </a>
-          ) : !join_for_free && (
+          {uses_join_sheet ? (
+            // candidtutors.co + custom_domain → opens the Join-for-free sheet, not the App Store.
+            <JoinForFreePill
+              label={
+                candidtutors_brand
+                  ? t("study_with", { name: localizedFirstName })
+                  : t("join_for_free")
+              }
+              variant="hero-pill"
+            />
+          ) : (
             <a
               href={`/download/${slug}`}
               className="animate-fade-in-up-delay-2 self-start"
@@ -410,10 +417,10 @@ export default async function TutorPage({ params, searchParams }: Props) {
         ctaSubtext={
           join_for_free ? t("join_for_free_subtext") : t("no_credit_card")
         }
-        mode={join_for_free && !is_meta_variant ? "join" : "download"}
+        mode={uses_join_sheet ? "join" : "download"}
         alwaysVisible
       />
-      {join_for_free && (
+      {uses_join_sheet && (
         <JoinForFreeSheet
           tutor_name={localizedFirstName}
           tutor_slug={slug}
