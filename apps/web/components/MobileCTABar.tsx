@@ -28,20 +28,25 @@ type Props = {
   // 'join' opens the Join-for-free sheet instead of routing to the App Store.
   // Default 'download' keeps the existing behavior for the home page + joincandid.co.
   mode?: "download" | "join";
+  // Force the bar visible on first paint regardless of scroll position. Used by
+  // high-intent landing surfaces like the ?v=meta ad variant where waiting for
+  // scroll would hide the CTA above the fold.
+  alwaysVisible?: boolean;
 };
 
-export default function MobileCTABar({ downloadUrl, ctaLabel, ctaSubtext, ctaVariant, mode = "download" }: Props) {
+export default function MobileCTABar({ downloadUrl, ctaLabel, ctaSubtext, ctaVariant, mode = "download", alwaysVisible = false }: Props) {
   const href = downloadUrl ?? DEFAULT_URL;
   const locale = useLocale();
   const t = useTranslations("tutor");
-  const [visible, setVisible] = useState(false);
+  // Initial state matches alwaysVisible so meta-variant first paint shows the bar (no flash).
+  const [visible, setVisible] = useState(alwaysVisible);
 
   const isPinned = Boolean(ctaLabel || ctaSubtext);
   const isKoreanTest = !isPinned && locale === "ko";
   const activeVariant: MobileCtaVariant = ctaVariant ?? "control";
 
   useEffect(() => {
-    if (isTikTokOrInstagram()) {
+    if (alwaysVisible || isTikTokOrInstagram()) {
       setVisible(true);
       document.documentElement.style.setProperty("--mobile-cta-offset", "64px");
       return;
@@ -49,7 +54,7 @@ export default function MobileCTABar({ downloadUrl, ctaLabel, ctaSubtext, ctaVar
     const onScroll = () => setVisible(window.scrollY > 100);
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
-  }, []);
+  }, [alwaysVisible]);
 
   // Manual exposure: server-decide + client bootstrap skip the SDK's auto-tracking,
   // so the experiment dashboard needs us to record the variant ourselves.

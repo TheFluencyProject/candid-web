@@ -68,7 +68,9 @@
     "find_your_tutor": "Find your tutor",
     "become_a_tutor": "Become a Candid Tutor",
     "become_a_tutor_short": "Become a Tutor",
-    "study_with": "Study with {name}"
+    "study_with": "Study with {name}",
+    "try_for_free": "Try for free",
+    "meta_subtitle": "Join {name}'s study club<br/>for conversational {language}"
   },
   "join_for_free": {
     "sheet_title": "Join for free",

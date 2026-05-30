@@ -29,6 +29,8 @@ function formatLanguages(languages: TutorLanguageProficiency[]): string {
 
 type Props = {
   params: Promise<{ locale: string; slug: string }>;
+  // ?v=meta toggles the Meta-ad landing variant (different headline + CTA).
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -76,14 +78,15 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-export default async function TutorPage({ params }: Props) {
+export default async function TutorPage({ params, searchParams }: Props) {
   const { locale, slug } = await params;
   setRequestLocale(locale);
 
-  const [tutor, t, host_header] = await Promise.all([
+  const [tutor, t, host_header, sp] = await Promise.all([
     fetchTutor(slug, locale),
     getTranslations("tutor"),
     headers().then(h => h.get("host") ?? ""),
+    searchParams,
   ]);
   if (!tutor) {
     notFound();
@@ -97,6 +100,9 @@ export default async function TutorPage({ params }: Props) {
   const join_for_free = isJoinForFreeContext(host_header);
   const join_for_free_locale: "en" | "ko" = locale === "ko" ? "ko" : "en";
 
+  // Meta-ad landing variant: ?v=meta swaps hero copy + CTA, always-shows mobile sticky.
+  const is_meta_variant = sp.v === "meta";
+
   const firstName = tutor.name.split(" ")[0];
   const localizedFirstName =
     locale === "ko" && tutor.metadata?.name_kr
@@ -107,12 +113,20 @@ export default async function TutorPage({ params }: Props) {
   // Web-only override; falls back to cool_title (and short_description for legacy API responses) when null.
   const coolTitle = formatHeroTitle(tutor.web_title_override ?? tutor.cool_title ?? tutor.short_description);
   // Per-tutor English subtitle override (HTML allowed). Korean keeps the i18n default.
-  const subtitleHtml = locale === "en" && config.subtitle?.en
+  const defaultSubtitleHtml = locale === "en" && config.subtitle?.en
     ? config.subtitle.en
     : stripEmojis(t("subtitle", { name: locale === "ko" ? withKoreanParticle(localizedFirstName) : localizedFirstName, language: langLabel }));
-  const subtitleMobileHtml = locale === "en" && config.subtitle?.enMobile
-    ? config.subtitle.enMobile
-    : subtitleHtml.replace(/<br\s*\/?>/gi, " ").replace(/\s+/g, " ").trim();
+  // Meta variant subtitle uses the same i18n key on both desktop + mobile (no per-tutor override).
+  const metaSubtitleHtml = stripEmojis(t("meta_subtitle", {
+    name: locale === "ko" ? withKoreanParticle(localizedFirstName) : localizedFirstName,
+    language: langLabel,
+  }));
+  const subtitleHtml = is_meta_variant ? metaSubtitleHtml : defaultSubtitleHtml;
+  const subtitleMobileHtml = is_meta_variant
+    ? metaSubtitleHtml.replace(/<br\s*\/?>/gi, " ").replace(/\s+/g, " ").trim()
+    : (locale === "en" && config.subtitle?.enMobile
+        ? config.subtitle.enMobile
+        : subtitleHtml.replace(/<br\s*\/?>/gi, " ").replace(/\s+/g, " ").trim());
 
   return (
     <main
@@ -132,23 +146,9 @@ export default async function TutorPage({ params }: Props) {
               <JoinForFreePill label={t("join_for_free")} variant="mobile-navbar-pill" />
             </>
           ) : candidtutors_brand ? (
-            <>
-              {/* Tutor-specific surface — pill reads "Study with <name>". Same App Store behavior. */}
-              <a
-                href={`/download/${slug}`}
-                className="hidden lg:block px-5 py-2 rounded-full text-sm font-semibold whitespace-nowrap"
-                style={{ backgroundColor: "#FFFFFF", color: "#18181C" }}
-              >
-                {t("study_with", { name: localizedFirstName })}
-              </a>
-              <a
-                href={`/download/${slug}`}
-                className="lg:hidden px-3 py-2 rounded-full text-xs font-semibold whitespace-nowrap"
-                style={{ backgroundColor: "#FFFFFF", color: "#18181C" }}
-              >
-                {t("study_with", { name: localizedFirstName })}
-              </a>
-            </>
+            // Top-right intentionally empty on tutor pages: desktop has the inline
+            // hero badge, mobile has the bottom sticky CTA — top-right pill is redundant.
+            <></>
           ) : (
             <>
               {/* Desktop: Get the app pill (App Store badge moves inline under hero) */}
@@ -249,7 +249,15 @@ export default async function TutorPage({ params }: Props) {
             style={{ color: config.hero?.textColor ?? "#18181C", textShadow: config.hero?.textShadow }}
             dangerouslySetInnerHTML={{ __html: subtitleHtml }}
           />
-          {!join_for_free && (
+          {is_meta_variant ? (
+            <a
+              href={`/download/${slug}`}
+              className="animate-fade-in-up-delay-2 self-start px-7 py-3 rounded-full text-base font-bold tracking-wide"
+              style={{ backgroundColor: "#89FFB4", color: "#000000" }}
+            >
+              {t("try_for_free")}
+            </a>
+          ) : !join_for_free && (
             <a
               href={`/download/${slug}`}
               className="animate-fade-in-up-delay-2 self-start"
@@ -393,16 +401,19 @@ export default async function TutorPage({ params }: Props) {
       <MobileCTABar
         downloadUrl={`/download/${slug}`}
         ctaLabel={
-          join_for_free
-            ? t("join_for_free")
-            : candidtutors_brand
-              ? t("study_with", { name: localizedFirstName })
-              : t("get_started")
+          is_meta_variant
+            ? t("try_for_free")
+            : join_for_free
+              ? t("join_for_free")
+              : candidtutors_brand
+                ? t("study_with", { name: localizedFirstName })
+                : t("get_started")
         }
         ctaSubtext={
           join_for_free ? t("join_for_free_subtext") : t("no_credit_card")
         }
-        mode={join_for_free ? "join" : "download"}
+        mode={join_for_free && !is_meta_variant ? "join" : "download"}
+        alwaysVisible={is_meta_variant}
       />
       {join_for_free && (
         <JoinForFreeSheet
