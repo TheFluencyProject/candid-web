@@ -13,11 +13,9 @@ import BlurImage from "@/components/BlurImage";
 import SiteFooter from "@/components/SiteFooter";
 import JoinForFreePill from "@/components/JoinForFree/JoinForFreePill";
 import JoinForFreeSheet from "@/components/JoinForFree/JoinForFreeSheet";
-import BecomeATutorPill from "@/components/BecomeATutorPill";
 import { localizeLanguageName, localizeMapCountry, capitalize, withKoreanParticle, formatHeroTitle, stripEmojis } from "@/lib/i18n-helpers";
 import { type Tutor, type TutorLanguageProficiency, fetchTutor } from "@/lib/api";
 import { isJoinForFreeContext, isCandidtutorsHost } from "@/lib/canonical-hosts";
-import { BECOME_A_TUTOR_URL } from "@/lib/platform";
 
 function formatLanguages(languages: TutorLanguageProficiency[]): string {
   return languages
@@ -134,26 +132,23 @@ export default async function TutorPage({ params }: Props) {
               <JoinForFreePill label={t("join_for_free")} variant="mobile-navbar-pill" />
             </>
           ) : candidtutors_brand ? (
-            <div className="flex items-center gap-2">
-              {/* Secondary CTA — less prominent (white text on translucent white). */}
-              <BecomeATutorPill label={t("become_a_tutor")} href={BECOME_A_TUTOR_URL} variant="navbar-pill" />
-              <BecomeATutorPill label={t("become_a_tutor_short")} href={BECOME_A_TUTOR_URL} variant="mobile-navbar-pill" />
-              {/* Primary CTA — same App Store behavior as Get the app. */}
+            <>
+              {/* Tutor-specific surface — pill reads "Study with <name>". Same App Store behavior. */}
               <a
                 href={`/download/${slug}`}
-                className="hidden lg:block px-5 py-2 rounded-full text-sm font-semibold"
+                className="hidden lg:block px-5 py-2 rounded-full text-sm font-semibold whitespace-nowrap"
                 style={{ backgroundColor: "#FFFFFF", color: "#18181C" }}
               >
-                {t("find_your_tutor")}
+                {t("study_with", { name: localizedFirstName })}
               </a>
               <a
                 href={`/download/${slug}`}
                 className="lg:hidden px-3 py-2 rounded-full text-xs font-semibold whitespace-nowrap"
                 style={{ backgroundColor: "#FFFFFF", color: "#18181C" }}
               >
-                {t("find_your_tutor")}
+                {t("study_with", { name: localizedFirstName })}
               </a>
-            </div>
+            </>
           ) : (
             <>
               {/* Desktop: Get the app pill (App Store badge moves inline under hero) */}
@@ -401,15 +396,11 @@ export default async function TutorPage({ params }: Props) {
           join_for_free
             ? t("join_for_free")
             : candidtutors_brand
-              ? t("find_your_tutor")
+              ? t("study_with", { name: localizedFirstName })
               : t("get_started")
         }
         ctaSubtext={
-          join_for_free
-            ? t("join_for_free_subtext")
-            : candidtutors_brand
-              ? t("no_credit_card")
-              : t("no_credit_card")
+          join_for_free ? t("join_for_free_subtext") : t("no_credit_card")
         }
         mode={join_for_free ? "join" : "download"}
       />

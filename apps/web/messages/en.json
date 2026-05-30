@@ -67,7 +67,8 @@
     "join_for_free_subtext": "Free — no credit card",
     "find_your_tutor": "Find your tutor",
     "become_a_tutor": "Become a Candid Tutor",
-    "become_a_tutor_short": "Become a Tutor"
+    "become_a_tutor_short": "Become a Tutor",
+    "study_with": "Study with {name}"
   },
   "join_for_free": {
     "sheet_title": "Join for free",

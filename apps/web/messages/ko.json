@@ -65,7 +65,8 @@
     "join_for_free_subtext": "무료 — 카드 정보 입력 없이",
     "find_your_tutor": "튜터 찾기",
     "become_a_tutor": "Candid 튜터 되기",
-    "become_a_tutor_short": "튜터 되기"
+    "become_a_tutor_short": "튜터 되기",
+    "study_with": "{name}와 공부하기"
   },
   "join_for_free": {
     "sheet_title": "무료로 시작하기",
