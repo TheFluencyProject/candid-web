@@ -255,7 +255,7 @@ export default async function TutorPage({ params, searchParams }: Props) {
               className="animate-fade-in-up-delay-2 self-start px-7 py-3 rounded-full text-base font-bold tracking-wide"
               style={{ backgroundColor: "#89FFB4", color: "#000000" }}
             >
-              {t("try_for_free")}
+              {t("study_with", { name: localizedFirstName })}
             </a>
           ) : !join_for_free && (
             <a
@@ -401,13 +401,11 @@ export default async function TutorPage({ params, searchParams }: Props) {
       <MobileCTABar
         downloadUrl={`/download/${slug}`}
         ctaLabel={
-          is_meta_variant
-            ? t("try_for_free")
+          is_meta_variant || candidtutors_brand
+            ? t("study_with", { name: localizedFirstName })
             : join_for_free
               ? t("join_for_free")
-              : candidtutors_brand
-                ? t("study_with", { name: localizedFirstName })
-                : t("get_started")
+              : t("get_started")
         }
         ctaSubtext={
           join_for_free ? t("join_for_free_subtext") : t("no_credit_card")
