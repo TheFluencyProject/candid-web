@@ -2,6 +2,7 @@ import createMiddleware from "next-intl/middleware";
 import { NextResponse, type NextRequest } from "next/server";
 import { routing } from "./i18n/routing";
 import { APP_STORE_URL, getRedirectUrl } from "./lib/platform";
+import { resolve_tutor_by_host } from "./lib/resolve-domain";
 
 const intlMiddleware = createMiddleware(routing);
 
@@ -68,8 +69,34 @@ function prefersKorean(request: NextRequest): boolean {
   return primary.startsWith("ko");
 }
 
-export default function middleware(request: NextRequest) {
+// Canonical hosts pass through to the existing intl pipeline. Anything else is
+// either a tutor's custom domain (rewrite to their guide page) or unmatched (404).
+const CANONICAL_HOSTS = new Set(["joincandid.co", "www.joincandid.co"]);
+
+function isCanonicalHost(host: string): boolean {
+  if (CANONICAL_HOSTS.has(host)) return true;
+  // Vercel preview deploys + local dev fall through unmodified.
+  if (host.endsWith(".vercel.app")) return true;
+  if (host.startsWith("localhost") || host.startsWith("127.0.0.1")) return true;
+  return false;
+}
+
+export default async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
+
+  // ── Custom-domain rewrite ──
+  // Strip port + lowercase: host headers vary by proxy.
+  const host = (request.headers.get("host") ?? "").toLowerCase().split(":")[0];
+  if (!isCanonicalHost(host)) {
+    const slug = await resolve_tutor_by_host(host);
+    if (!slug) return new NextResponse("Not found", { status: 404 });
+
+    // Rewrite (not redirect) — URL must stay on the custom domain.
+    const locale = prefersKorean(request) ? "ko" : "en";
+    const url = request.nextUrl.clone();
+    url.pathname = `/${locale}/guide/${slug}`;
+    return NextResponse.rewrite(url);
+  }
 
   // ── App Store / waitlist redirects (UA-aware) ──
   const redirect = resolveAppStoreRedirect(pathname);
