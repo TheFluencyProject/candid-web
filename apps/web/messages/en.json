@@ -70,7 +70,7 @@
     "become_a_tutor_short": "Become a Tutor",
     "study_with": "Study with {name}",
     "try_for_free": "Try for free",
-    "meta_subtitle": "Join {name}'s study club<br/>for conversational {language}"
+    "meta_subtitle": "Join {name}'s<br/>study club for<br/>conversational {language}"
   },
   "join_for_free": {
     "sheet_title": "Join for free",
