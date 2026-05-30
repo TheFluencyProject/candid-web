@@ -50,6 +50,7 @@ export interface SignInResult {
   id_token: string;
   email: string | null;
   display_name: string | null;
+  provider: 'apple' | 'google';
 }
 
 export async function sign_in_with_apple(): Promise<SignInResult> {
@@ -64,6 +65,7 @@ export async function sign_in_with_apple(): Promise<SignInResult> {
     id_token,
     email: cred.user.email,
     display_name: cred.user.displayName,
+    provider: 'apple',
   };
 }
 
@@ -77,5 +79,6 @@ export async function sign_in_with_google(): Promise<SignInResult> {
     id_token,
     email: cred.user.email,
     display_name: cred.user.displayName,
+    provider: 'google',
   };
 }

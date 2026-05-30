@@ -31,6 +31,7 @@ export default function SignInStep({ tutor_name, tutor_slug, locale, onSuccess, 
         tutor_slug,
         display_name: result.display_name,
         locale,
+        auth_provider: result.provider,
       });
       onSuccess(result.email, res.already_has_account);
     } catch (e) {

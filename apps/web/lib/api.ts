@@ -73,6 +73,7 @@ export interface WebSignupPayload {
   tutor_slug: string;
   display_name?: string | null;
   locale: "en" | "ko";
+  auth_provider: "apple" | "google";
 }
 
 export interface WebSignupResponse {
