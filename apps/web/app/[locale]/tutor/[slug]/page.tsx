@@ -411,7 +411,7 @@ export default async function TutorPage({ params, searchParams }: Props) {
           join_for_free ? t("join_for_free_subtext") : t("no_credit_card")
         }
         mode={join_for_free && !is_meta_variant ? "join" : "download"}
-        alwaysVisible={is_meta_variant}
+        alwaysVisible
       />
       {join_for_free && (
         <JoinForFreeSheet
