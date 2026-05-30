@@ -65,3 +65,39 @@ export async function fetchTutor(
   }
   return res.json();
 }
+
+// ── Web signup (Join-for-free) ───────────────────────────────────────
+
+export interface WebSignupPayload {
+  id_token: string;
+  tutor_slug: string;
+  display_name?: string | null;
+  locale: "en" | "ko";
+}
+
+export interface WebSignupResponse {
+  status: "ok";
+  already_has_account: boolean;
+}
+
+/**
+ * Submit the web "Join for free" signup. The backend creates a web_signups
+ * row keyed on firebase_uid and fires the welcome email — both are idempotent,
+ * so a flaky retry is safe.
+ */
+export async function submit_web_signup(payload: WebSignupPayload): Promise<WebSignupResponse> {
+  const { id_token, ...body } = payload;
+  const res = await fetch(`${API_BASE_URL}/account/web-signup`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${id_token}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(body),
+    signal: AbortSignal.timeout(10000),
+  });
+  if (!res.ok) {
+    throw new Error(`submit_web_signup: HTTP ${res.status}`);
+  }
+  return res.json();
+}
