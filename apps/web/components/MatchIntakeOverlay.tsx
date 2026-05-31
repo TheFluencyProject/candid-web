@@ -187,7 +187,9 @@ export default function MatchIntakeOverlay() {
 interface BodyProps {
   step: Step;
   answers: Answers;
-  setAnswers: (a: Answers) => void;
+  // Functional setter — rapid synchronous clicks (e.g. two pills in the same tick)
+  // would otherwise read a stale `answers` closure and lose one selection.
+  setAnswers: React.Dispatch<React.SetStateAction<Answers>>;
   native_other: string;
   setNativeOther: (s: string) => void;
   first_name: string;
@@ -270,11 +272,11 @@ function OverlayBody(p: BodyProps) {
               options={NATIVE_OPTIONS.map(l => ({ value: l, label: l }))}
               selected={p.answers.native_languages ?? []}
               multi
-              onToggle={(v) => {
-                const cur = p.answers.native_languages ?? [];
+              onToggle={(v) => p.setAnswers(prev => {
+                const cur = prev.native_languages ?? [];
                 const next = cur.includes(v) ? cur.filter(x => x !== v) : [...cur, v];
-                p.setAnswers({ ...p.answers, native_languages: next });
-              }}
+                return { ...prev, native_languages: next };
+              })}
             />
             <input
               type="text"
@@ -293,11 +295,11 @@ function OverlayBody(p: BodyProps) {
               options={FOCUS_OPTIONS.map(l => ({ value: l, label: l }))}
               selected={p.answers.focus_areas ?? []}
               multi
-              onToggle={(v) => {
-                const cur = p.answers.focus_areas ?? [];
+              onToggle={(v) => p.setAnswers(prev => {
+                const cur = prev.focus_areas ?? [];
                 const next = cur.includes(v) ? cur.filter(x => x !== v) : [...cur, v];
-                p.setAnswers({ ...p.answers, focus_areas: next });
-              }}
+                return { ...prev, focus_areas: next };
+              })}
             />
           </StepShell>
         )}
