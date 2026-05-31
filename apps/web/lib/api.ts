@@ -102,3 +102,30 @@ export async function submit_web_signup(payload: WebSignupPayload): Promise<WebS
   }
   return res.json();
 }
+
+// ── Match request (candidtutors.co/ intake) ───────────────────────────
+
+export interface MatchRequestPayload {
+  first_name: string;
+  last_name: string;
+  email: string;
+  answers: Record<string, unknown>;
+}
+
+/**
+ * Submit the candidtutors.co/ "Get matched with a tutor" intake. Public
+ * endpoint (no auth) — backend stores the row in tutor_match_requests and
+ * pings Slack for manual followup.
+ */
+export async function submit_match_request(payload: MatchRequestPayload): Promise<{ id: string }> {
+  const res = await fetch(`${API_BASE_URL}/public/match-requests`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+    signal: AbortSignal.timeout(10000),
+  });
+  if (!res.ok) {
+    throw new Error(`submit_match_request: HTTP ${res.status}`);
+  }
+  return res.json();
+}

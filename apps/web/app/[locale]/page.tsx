@@ -15,6 +15,7 @@ import { type Tutor, fetchTutor } from "@/lib/api";
 import { getMobileCtaVariant } from "@/lib/posthog-server";
 import { isCandidtutorsHost } from "@/lib/canonical-hosts";
 import { BECOME_A_TUTOR_URL } from "@/lib/platform";
+import CandidtutorsLanding from "@/components/CandidtutorsLanding";
 
 type Props = {
   params: Promise<{ locale: string }>;
@@ -24,16 +25,22 @@ export default async function Home({ params }: Props) {
   const { locale } = await params;
   setRequestLocale(locale);
 
+  // Host-conditional: candidtutors.co/ renders the stripped landing instead of
+  // the carousel. joincandid.co (+ previews + localhost) keep the carousel
+  // below. Early return BEFORE any expensive fetches (tutor data, posthog A/B)
+  // since the landing needs none of them.
+  const host_header = (await headers()).get("host") ?? "";
+  const candidtutors_brand = isCandidtutorsHost(host_header);
+  if (candidtutors_brand) {
+    return <CandidtutorsLanding />;
+  }
+
   // A/B test only runs on English; ko always renders the fixed translated CTA.
   // React.cache dedupes with the layout's call so this is free.
   const cookieStore = await cookies();
   const distinctId = cookieStore.get("candid_did")?.value ?? crypto.randomUUID();
   const ctaVariant = locale === "en" ? await getMobileCtaVariant(distinctId) : undefined;
 
-  // Tutor-discovery brand on candidtutors.co: swap "Get the app" → "Find your tutor"
-  // and add the "Become a Candid Tutor" secondary pill (Notion link).
-  const host_header = (await headers()).get("host") ?? "";
-  const candidtutors_brand = isCandidtutorsHost(host_header);
   const t_tutor = await getTranslations("tutor");
 
   // Korean locale → Adam first (Korean speakers learn English); else Mia first.
