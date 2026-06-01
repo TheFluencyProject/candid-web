@@ -213,18 +213,21 @@ export default function MatchIntakeOverlay() {
       )}
 
       {/* Desktop: centered modal.
-          - No click-outside-to-dismiss: backdrop has no onClick. The only way
-            to close is the X (or the success step's Close). Prevents accidental
-            dismissals mid-flow.
+          - Tap outside the panel dismisses (standard modal UX). Clicks on the
+            panel itself stopPropagation so they don't bubble to the backdrop.
           - Darker backdrop (bg-black/75) so the underlying hero is visibly
             de-emphasized — at 40% you could read the page through.
           - Wider + min-h so the panel commands the viewport rather than feeling
             like a tile floating over the page. */}
       {open && (
-        <div className="hidden lg:flex fixed inset-0 z-[70] items-center justify-center p-6 bg-black/75">
+        <div
+          className="hidden lg:flex fixed inset-0 z-[70] items-center justify-center p-6 bg-black/75"
+          onClick={closeMatchIntake}
+        >
           <div
             className="w-full max-w-2xl min-h-[600px] max-h-[90vh] rounded-3xl shadow-2xl flex flex-col"
             style={{ backgroundColor: "#F8F5EE" }}
+            onClick={(e) => e.stopPropagation()}
           >
             {body}
           </div>
