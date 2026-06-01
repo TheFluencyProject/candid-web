@@ -41,7 +41,7 @@ export default function CandidtutorsLanding() {
               A better, more human way to learn languages
             </h1>
             <p className="text-lg md:text-xl leading-relaxed mb-10 text-gray-300">
-              Candid Tutors help their students speak like no app alone could — with daily speaking practice, live classes, and a community of fellow learners.
+              Candid Tutors help their students speak like no app alone could. Daily speaking practice, structured lessons, live classes, & more.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
               {/* Primary CTA — recruit tutors. External Notion form. */}
