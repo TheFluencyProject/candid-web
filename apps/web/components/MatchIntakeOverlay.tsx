@@ -159,7 +159,12 @@ export default function MatchIntakeOverlay() {
             <Drawer.Overlay className="lg:hidden fixed inset-0 bg-black/40 z-[60]" />
             <Drawer.Content
               className="lg:hidden fixed bottom-0 left-0 right-0 z-[70] flex flex-col rounded-t-3xl"
-              style={{ maxHeight: "92vh", backgroundColor: "#F8F5EE" }}
+              // dvh (NOT vh): when the iOS keyboard opens, vh stays at the full
+              // viewport so the sheet overflows past the visible area, and iOS
+              // scrolls the focused input into view — yanking the fixed sheet
+              // up and exposing the dark page underneath. dvh tracks the
+              // keyboard-adjusted viewport so the sheet stays bounded.
+              style={{ maxHeight: "92dvh", backgroundColor: "#F8F5EE" }}
             >
               <Drawer.Title className="sr-only">Get matched with a tutor</Drawer.Title>
               <Drawer.Description className="sr-only">A short intake to match you with a Candid tutor</Drawer.Description>
@@ -249,8 +254,10 @@ function OverlayBody(p: BodyProps) {
       )}
 
       <div className="flex-1 overflow-y-auto px-6 pt-2 pb-4">
+        {/* StepShell subtitles intentionally omitted for now — prop stays so we
+            can re-add per-step microcopy later without rewiring. */}
         {p.step === 1 && (
-          <StepShell title="What language are you learning?" subtitle="We'll match you with a tutor who teaches it.">
+          <StepShell title="What language are you learning?">
             <PillGroup
               options={[{ value: "english", label: "English" }, { value: "korean", label: "Korean" }]}
               selected={p.answers.target_language ? [p.answers.target_language] : []}
@@ -260,7 +267,7 @@ function OverlayBody(p: BodyProps) {
         )}
 
         {p.step === 2 && (
-          <StepShell title="What level are you at?" subtitle="Approximate is fine — your tutor will calibrate.">
+          <StepShell title="What level are you at?">
             <PillGroup
               options={LEVEL_OPTIONS.map(l => ({ value: l, label: l }))}
               selected={p.answers.level ? [p.answers.level] : []}
@@ -270,7 +277,7 @@ function OverlayBody(p: BodyProps) {
         )}
 
         {p.step === 3 && (
-          <StepShell title="What's your native language?" subtitle="Pick all that apply.">
+          <StepShell title="What's your native language?">
             <PillGroup
               options={NATIVE_OPTIONS.map(l => ({ value: l, label: l }))}
               selected={p.answers.native_languages ?? []}
@@ -293,7 +300,7 @@ function OverlayBody(p: BodyProps) {
         )}
 
         {p.step === 4 && (
-          <StepShell title="What do you want to focus on most?" subtitle="Pick all that apply.">
+          <StepShell title="What do you want to focus on most?">
             <PillGroup
               options={FOCUS_OPTIONS.map(l => ({ value: l, label: l }))}
               selected={p.answers.focus_areas ?? []}
@@ -308,7 +315,7 @@ function OverlayBody(p: BodyProps) {
         )}
 
         {p.step === 5 && (
-          <StepShell title="Anything else you'd like us to know?" subtitle="Optional — anything that'd help us match you well.">
+          <StepShell title="Anything else you'd like us to know?">
             <textarea
               placeholder="e.g. I want to feel comfortable at work, or I'm preparing for a trip..."
               value={p.answers.details ?? ""}
@@ -321,7 +328,7 @@ function OverlayBody(p: BodyProps) {
         )}
 
         {p.step === 6 && (
-          <StepShell title="Where can your tutor contact you?" subtitle="We'll personally email you within 24 hours.">
+          <StepShell title="Where can your tutor contact you?">
             <div className="flex flex-col gap-3">
               <ContactInput placeholder="First name" value={p.first_name} onChange={p.setFirstName} />
               <ContactInput placeholder="Last name" value={p.last_name} onChange={p.setLastName} />
