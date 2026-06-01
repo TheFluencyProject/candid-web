@@ -22,6 +22,7 @@
 import { useEffect, useState } from "react";
 import { useMatchIntakeOpen, closeMatchIntake } from "@/lib/match-intake-store";
 import { submit_match_request } from "@/lib/api";
+import ResponsiveOverlay from "@/components/ResponsiveOverlay";
 
 // ── Step config ─────────────────────────────────────────────────────────
 
@@ -174,66 +175,17 @@ export default function MatchIntakeOverlay() {
     };
   }, [open]);
 
-  // Lock body scroll while open so the page underneath can't slide around.
-  useEffect(() => {
-    if (!open) return;
-    const prev = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-    return () => { document.body.style.overflow = prev; };
-  }, [open]);
-
   return (
-    <>
-      {/* Mobile: hand-rolled bottom sheet (no vaul) so we own the keyboard handling.
-          Tap on backdrop dismisses (standard bottom-sheet UX). Desktop modal
-          intentionally does NOT — see comment on the desktop backdrop. */}
-      {open && (
-        <div
-          className="lg:hidden fixed inset-0 z-[60] bg-black/40"
-          onClick={closeMatchIntake}
-        />
-      )}
-      {open && (
-        <div
-          className="lg:hidden fixed left-0 right-0 bottom-0 z-[70] flex flex-col rounded-t-3xl shadow-2xl"
-          style={{
-            // Sheet stays anchored to the LAYOUT viewport bottom (bottom: 0), so
-            // the cream extends under the iOS Safari URL pill + the keyboard —
-            // no dark-page gap peeking through. Total height = visible portion
-            // (50% of visible viewport) + keyboard area below it.
-            // paddingBottom shifts CONTENT above the keyboard while the cream
-            // bg fills everything down to layout bottom.
-            height: visible_h != null ? `${visible_h * 0.5 + kbd_inset}px` : "50dvh",
-            paddingBottom: kbd_inset,
-            backgroundColor: "#F8F5EE",
-          }}
-        >
-          {body}
-        </div>
-      )}
-
-      {/* Desktop: centered modal.
-          - Tap outside the panel dismisses (standard modal UX). Clicks on the
-            panel itself stopPropagation so they don't bubble to the backdrop.
-          - Darker backdrop (bg-black/75) so the underlying hero is visibly
-            de-emphasized — at 40% you could read the page through.
-          - Wider + min-h so the panel commands the viewport rather than feeling
-            like a tile floating over the page. */}
-      {open && (
-        <div
-          className="hidden lg:flex fixed inset-0 z-[70] items-center justify-center p-6 bg-black/75"
-          onClick={closeMatchIntake}
-        >
-          <div
-            className="w-full max-w-2xl min-h-[600px] max-h-[90vh] rounded-3xl shadow-2xl flex flex-col"
-            style={{ backgroundColor: "#F8F5EE" }}
-            onClick={(e) => e.stopPropagation()}
-          >
-            {body}
-          </div>
-        </div>
-      )}
-    </>
+    <ResponsiveOverlay
+      open={open}
+      onClose={closeMatchIntake}
+      mobileVisibleHeight={visible_h}
+      keyboardInset={kbd_inset}
+      desktopMinHeight="600px"
+      desktopMaxWidthClass="max-w-2xl"
+    >
+      {body}
+    </ResponsiveOverlay>
   );
 }
 

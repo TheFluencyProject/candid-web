@@ -25,7 +25,7 @@ export default function SuccessStep({ email, tutor_name, already_has_account, on
       <p className="text-base mb-6" style={{ color: "#666666" }}>
         {already_has_account
           ? t("success_already_subtitle", { name: tutor_name })
-          : t("success_subtitle", { email })}
+          : t("success_subtitle_v2", { name: tutor_name })}
       </p>
       <button
         type="button"

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useTranslations } from "next-intl";
+import Link from "next/link";
 import AppleSignInButton from "./AppleSignInButton";
 import GoogleSignInButton from "./GoogleSignInButton";
 import { submit_web_signup } from "@/lib/api";
@@ -53,10 +54,10 @@ export default function SignInStep({ tutor_name, tutor_slug, locale, onSuccess, 
   return (
     <div className="px-6 pb-8 pt-2">
       <h2 className="text-2xl font-semibold mb-2 text-center" style={{ color: "#18181C" }}>
-        {t("signin_step_title", { name: tutor_name })}
+        {t("signin_step_title_v2")}
       </h2>
       <p className="text-base text-center mb-8" style={{ color: "#666666" }}>
-        {t("signin_step_subtitle")}
+        {t("signin_step_subtitle_v2", { name: tutor_name })}
       </p>
       <div className="flex flex-col gap-3">
         <AppleSignInButton
@@ -72,6 +73,20 @@ export default function SignInStep({ tutor_name, tutor_slug, locale, onSuccess, 
           disabled={submitting}
         />
       </div>
+      <p className="text-xs text-center mt-6" style={{ color: "#666666" }}>
+        {t.rich("signin_step_disclaimer", {
+          terms: (chunks) => (
+            <Link href="/terms" className="underline">
+              {chunks}
+            </Link>
+          ),
+          privacy: (chunks) => (
+            <Link href="/privacy" className="underline">
+              {chunks}
+            </Link>
+          ),
+        })}
+      </p>
     </div>
   );
 }

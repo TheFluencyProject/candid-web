@@ -4,7 +4,7 @@ import { openJoinForFree } from "@/lib/join-for-free-store";
 
 interface Props {
   label: string;
-  variant?: "navbar-pill" | "mobile-navbar-pill" | "hero-pill";
+  variant?: "navbar-pill" | "mobile-navbar-pill" | "hero-pill" | "card";
 }
 
 export default function JoinForFreePill({ label, variant = "navbar-pill" }: Props) {
@@ -17,6 +17,21 @@ export default function JoinForFreePill({ label, variant = "navbar-pill" }: Prop
         onClick={onClick}
         className="lg:hidden px-4 py-2 rounded-full text-sm font-semibold"
         style={{ backgroundColor: "#FFFFFF", color: "#18181C" }}
+      >
+        {label}
+      </button>
+    );
+  }
+
+  if (variant === "card") {
+    // Full-width green CTA used as the join button inside the simplified
+    // candidtutors.co/tutor/[slug] card layout.
+    return (
+      <button
+        type="button"
+        onClick={onClick}
+        className="w-full px-7 py-4 rounded-full text-base font-bold tracking-wide"
+        style={{ backgroundColor: "#89FFB4", color: "#000000" }}
       >
         {label}
       </button>

@@ -16,6 +16,7 @@ export interface Tutor {
   title: string;
   cool_title?: string;
   web_title_override?: string | null;
+  web_letter?: string | null;
   short_description?: string;
   city: string | null;
   birthday: string | null;

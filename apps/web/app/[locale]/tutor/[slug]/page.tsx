@@ -137,6 +137,62 @@ export default async function TutorPage({ params, searchParams }: Props) {
         ? config.subtitle.enMobile
         : subtitleHtml.replace(/<br\s*\/?>/gi, " ").replace(/\s+/g, " ").trim());
 
+  // ─── candidtutors.co simplified card layout ─────────────────────────────
+  // Single centered card on the dark page — no navbar, no app screenshots,
+  // no footer, no App Store badge. joincandid.co + custom_domain pages keep
+  // the existing full-bleed hero (see the main return below).
+  if (candidtutors_brand) {
+    const heroImage = tutor.web_bg_picture_url || tutor.large_profile_picture_url;
+    return (
+      <main
+        className="min-h-screen flex items-center justify-center px-4 py-12 lg:py-20"
+        style={{ backgroundColor: "#18181C", color: "#FFFFFF" }}
+      >
+        <div
+          className="w-full max-w-2xl rounded-3xl overflow-hidden shadow-2xl"
+          style={{ backgroundColor: "rgba(255,255,255,0.04)" }}
+        >
+          {heroImage ? (
+            // Plain <img> direct from S3 — bypasses /_next/image transcode hop.
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={heroImage}
+              alt={tutor.name}
+              className="w-full aspect-[16/9] object-cover"
+            />
+          ) : (
+            <div
+              className="w-full aspect-[16/9]"
+              style={{ background: "linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%)" }}
+            />
+          )}
+          <div className="p-6 md:p-8">
+            <h1 className="text-2xl md:text-3xl font-semibold mb-2">{tutor.name}</h1>
+            <p
+              className="text-base md:text-lg font-light leading-snug mb-6"
+              style={{ color: "rgba(255,255,255,0.75)" }}
+              dangerouslySetInnerHTML={{ __html: coolTitle }}
+            />
+            {tutor.web_letter && (
+              <p className="text-base leading-relaxed mb-8 whitespace-pre-line" style={{ color: "rgba(255,255,255,0.9)" }}>
+                {tutor.web_letter}
+              </p>
+            )}
+            <JoinForFreePill
+              label={t("study_with", { name: localizedFirstName })}
+              variant="card"
+            />
+          </div>
+        </div>
+        <JoinForFreeSheet
+          tutor_name={localizedFirstName}
+          tutor_slug={slug}
+          locale={join_for_free_locale}
+        />
+      </main>
+    );
+  }
+
   return (
     <main
       className="min-h-screen"
