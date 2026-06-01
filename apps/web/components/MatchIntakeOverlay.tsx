@@ -149,13 +149,16 @@ export default function MatchIntakeOverlay() {
 
   return (
     <>
-      {/* Mobile: vaul bottom-sheet. */}
+      {/* Mobile: vaul bottom-sheet.
+          NOTE: vaul portals to document.body, so a parent `lg:hidden` wrapper
+          does NOT hide the portaled content on desktop — the lg:hidden class
+          must live on Overlay + Content themselves. */}
       <div className="lg:hidden">
         <Drawer.Root open={open} onOpenChange={(o) => { if (!o) closeMatchIntake(); }}>
           <Drawer.Portal>
-            <Drawer.Overlay className="fixed inset-0 bg-black/40 z-[60]" />
+            <Drawer.Overlay className="lg:hidden fixed inset-0 bg-black/40 z-[60]" />
             <Drawer.Content
-              className="fixed bottom-0 left-0 right-0 z-[70] flex flex-col rounded-t-3xl"
+              className="lg:hidden fixed bottom-0 left-0 right-0 z-[70] flex flex-col rounded-t-3xl"
               style={{ maxHeight: "92vh", backgroundColor: "#F8F5EE" }}
             >
               <Drawer.Title className="sr-only">Get matched with a tutor</Drawer.Title>
