@@ -194,8 +194,10 @@ export default function MatchIntakeOverlay() {
           style={{
             // bottom tracks the keyboard so the sheet sits ABOVE it, not behind.
             bottom: kbd_inset,
-            // sheet is 92% of the visible viewport (NOT the full window).
-            height: visible_h != null ? `${visible_h * 0.92}px` : "92dvh",
+            // max-height (NOT height): sheet sizes to its content and only caps
+            // at 92% of the visible viewport for long steps (textarea, contact
+            // form). Short steps stay short — no acres of empty cream.
+            maxHeight: visible_h != null ? `${visible_h * 0.92}px` : "92dvh",
             backgroundColor: "#F8F5EE",
           }}
         >
