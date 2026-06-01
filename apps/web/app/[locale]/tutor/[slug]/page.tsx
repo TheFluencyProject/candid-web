@@ -150,7 +150,19 @@ export default async function TutorPage({ params, searchParams }: Props) {
         className="min-h-screen flex flex-col"
         style={{ backgroundColor: "#18181C", color: "#FFFFFF" }}
       >
-        <div className="flex-1 flex items-center justify-center px-4 py-12 lg:py-20">
+        <header className="px-6 md:px-10 pt-8">
+          <a href="/" className="inline-block">
+            <Image
+              src="/wordmark-white.svg"
+              alt="Candid"
+              width={72}
+              height={36}
+              priority
+              className="hover:opacity-80 transition-opacity"
+            />
+          </a>
+        </header>
+        <div className="flex-1 flex items-center justify-center px-4 py-8 lg:py-12">
           <div
             className="w-full max-w-2xl rounded-3xl overflow-hidden shadow-2xl"
             style={{ backgroundColor: "rgba(255,255,255,0.04)" }}
