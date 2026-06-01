@@ -174,13 +174,19 @@ export default function MatchIntakeOverlay() {
         </Drawer.Root>
       </div>
 
-      {/* Desktop: centered modal. */}
+      {/* Desktop: centered modal.
+          - No click-outside-to-dismiss: backdrop has no onClick. The only way
+            to close is the X (or the success step's Close). Prevents accidental
+            dismissals mid-flow.
+          - Darker backdrop (bg-black/75) so the underlying hero is visibly
+            de-emphasized — at 40% you could read the page through.
+          - Wider + min-h so the panel commands the viewport rather than feeling
+            like a tile floating over the page. */}
       {open && (
-        <div className="hidden lg:flex fixed inset-0 z-[70] items-center justify-center p-6 bg-black/40" onClick={closeMatchIntake}>
+        <div className="hidden lg:flex fixed inset-0 z-[70] items-center justify-center p-6 bg-black/75">
           <div
-            className="w-full max-w-xl rounded-3xl shadow-2xl flex flex-col max-h-[90vh]"
+            className="w-full max-w-2xl min-h-[600px] max-h-[90vh] rounded-3xl shadow-2xl flex flex-col"
             style={{ backgroundColor: "#F8F5EE" }}
-            onClick={(e) => e.stopPropagation()}
           >
             {body}
           </div>
@@ -217,17 +223,21 @@ interface BodyProps {
 function OverlayBody(p: BodyProps) {
   const is_question_step = typeof p.step === "number";
 
+  // flex-1 + min-h-0 (NOT h-full): the parent modal sizes via min-h/max-h with
+  // no explicit height, so h-full resolves to content height and leaves the
+  // Next button floating in the middle of the panel. flex-1 makes the wrapper
+  // grow to fill the modal so Next pins to the bottom.
   return (
-    <div className="flex flex-col h-full overflow-hidden">
+    <div className="flex flex-col flex-1 min-h-0 overflow-hidden">
       {/* Top chrome: back / progress / close */}
       {is_question_step && (
         <div className="flex items-center gap-3 px-5 pt-5 pb-3">
+          {/* `invisible` (not removed) keeps progress bar centered between back + close. */}
           <button
             type="button"
             onClick={p.handle_back}
-            disabled={p.step === 1}
             aria-label="Back"
-            className="w-9 h-9 rounded-full flex items-center justify-center disabled:opacity-30"
+            className={`w-9 h-9 rounded-full flex items-center justify-center ${p.step === 1 ? "invisible" : ""}`}
             style={{ backgroundColor: "rgba(0,0,0,0.05)" }}
           >
             <span className="text-xl" style={{ color: "#18181C" }}>‹</span>
