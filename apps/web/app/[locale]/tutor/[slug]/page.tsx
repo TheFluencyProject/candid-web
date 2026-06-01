@@ -408,7 +408,9 @@ export default async function TutorPage({ params, searchParams }: Props) {
 
 
       {/* ─── Footer ─── */}
-      <SiteFooter />
+      {/* tutor variant on candidtutors.co + per-tutor custom_domain — drops
+          App Store + Programs, swaps IG to @candidtutors. */}
+      <SiteFooter variant={uses_join_sheet ? "tutor" : "joincandid"} />
       <MobileCTABar
         downloadUrl={`/download/${slug}`}
         ctaLabel={
