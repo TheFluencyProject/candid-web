@@ -439,10 +439,14 @@ function OverlayBody(p: BodyProps) {
 // ── Small pieces ────────────────────────────────────────────────────────
 
 function StepShell({ title, subtitle, children }: { title: string; subtitle?: string; children: React.ReactNode }) {
+  // Wrap title+subtitle so spacing to children is consistent whether or not a
+  // subtitle is rendered.
   return (
     <div className="pt-2">
-      <h2 className="text-2xl md:text-3xl font-semibold mb-2" style={{ color: "#18181C" }}>{title}</h2>
-      {subtitle && <p className="text-base mb-6" style={{ color: "#666666" }}>{subtitle}</p>}
+      <div className="mb-8">
+        <h2 className="text-2xl md:text-3xl font-semibold mb-2" style={{ color: "#18181C" }}>{title}</h2>
+        {subtitle && <p className="text-base" style={{ color: "#666666" }}>{subtitle}</p>}
+      </div>
       {children}
     </div>
   );
