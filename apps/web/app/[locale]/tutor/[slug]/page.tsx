@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Image from "next/image";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { headers } from "next/headers";
 import { getTranslations, setRequestLocale } from "next-intl/server";
@@ -82,9 +83,10 @@ export default async function TutorPage({ params, searchParams }: Props) {
   const { locale, slug } = await params;
   setRequestLocale(locale);
 
-  const [tutor, t, host_header, sp] = await Promise.all([
+  const [tutor, t, t_footer, host_header, sp] = await Promise.all([
     fetchTutor(slug, locale),
     getTranslations("tutor"),
+    getTranslations("footer"),
     headers().then(h => h.get("host") ?? ""),
     searchParams,
   ]);
@@ -145,45 +147,58 @@ export default async function TutorPage({ params, searchParams }: Props) {
     const heroImage = tutor.web_bg_picture_url || tutor.large_profile_picture_url;
     return (
       <main
-        className="min-h-screen flex items-center justify-center px-4 py-12 lg:py-20"
+        className="min-h-screen flex flex-col"
         style={{ backgroundColor: "#18181C", color: "#FFFFFF" }}
       >
-        <div
-          className="w-full max-w-2xl rounded-3xl overflow-hidden shadow-2xl"
-          style={{ backgroundColor: "rgba(255,255,255,0.04)" }}
-        >
-          {heroImage ? (
-            // Plain <img> direct from S3 — bypasses /_next/image transcode hop.
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={heroImage}
-              alt={tutor.name}
-              className="w-full aspect-[16/9] object-cover"
-            />
-          ) : (
-            <div
-              className="w-full aspect-[16/9]"
-              style={{ background: "linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%)" }}
-            />
-          )}
-          <div className="p-6 md:p-8">
-            <h1 className="text-2xl md:text-3xl font-semibold mb-2">{tutor.name}</h1>
-            <p
-              className="text-base md:text-lg font-light leading-snug mb-6"
-              style={{ color: "rgba(255,255,255,0.75)" }}
-              dangerouslySetInnerHTML={{ __html: coolTitle }}
-            />
-            {tutor.web_letter && (
-              <p className="text-base leading-relaxed mb-8 whitespace-pre-line" style={{ color: "rgba(255,255,255,0.9)" }}>
-                {tutor.web_letter}
-              </p>
+        <div className="flex-1 flex items-center justify-center px-4 py-12 lg:py-20">
+          <div
+            className="w-full max-w-2xl rounded-3xl overflow-hidden shadow-2xl"
+            style={{ backgroundColor: "rgba(255,255,255,0.04)" }}
+          >
+            {heroImage ? (
+              // Plain <img> direct from S3 — bypasses /_next/image transcode hop.
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={heroImage}
+                alt={tutor.name}
+                className="w-full aspect-[16/9] object-cover"
+              />
+            ) : (
+              <div
+                className="w-full aspect-[16/9]"
+                style={{ background: "linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%)" }}
+              />
             )}
-            <JoinForFreePill
-              label={t("study_with", { name: localizedFirstName })}
-              variant="card"
-            />
+            <div className="p-6 md:p-8">
+              <h1 className="text-2xl md:text-3xl font-semibold mb-2">{tutor.name}</h1>
+              <p
+                className="text-base md:text-lg font-light leading-snug mb-6"
+                style={{ color: "rgba(255,255,255,0.75)" }}
+                dangerouslySetInnerHTML={{ __html: coolTitle }}
+              />
+              {tutor.web_letter && (
+                <p className="text-base leading-relaxed mb-8 whitespace-pre-line" style={{ color: "rgba(255,255,255,0.9)" }}>
+                  {tutor.web_letter}
+                </p>
+              )}
+              <JoinForFreePill
+                label={t("study_with", { name: localizedFirstName })}
+                variant="card"
+              />
+            </div>
           </div>
         </div>
+        <footer className="px-6 py-6 flex items-center justify-between flex-wrap gap-4 text-sm" style={{ color: "rgba(255,255,255,0.5)" }}>
+          <p>&copy; {new Date().getFullYear()} The Fluency Project Inc.</p>
+          <div className="flex gap-6">
+            <Link href="/privacy" className="hover:opacity-70 transition-opacity">
+              {t_footer("privacy")}
+            </Link>
+            <Link href="/terms" className="hover:opacity-70 transition-opacity">
+              {t_footer("terms")}
+            </Link>
+          </div>
+        </footer>
         <JoinForFreeSheet
           tutor_name={localizedFirstName}
           tutor_slug={slug}
