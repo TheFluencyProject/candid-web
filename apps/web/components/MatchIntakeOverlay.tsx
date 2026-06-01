@@ -7,16 +7,19 @@
  * advance". Split-into-files (à la JoinForFree/) isn't justified here.
  *
  * Two presentations driven by Tailwind breakpoints (single mounted instance):
- *  - mobile (<lg): vaul Drawer bottom-sheet (top image, cream card below)
- *  - desktop (≥lg): centered modal-card over a blurred backdrop
+ *  - mobile (<lg): bottom-sheet whose bottom edge tracks visualViewport.height
+ *    so the iOS keyboard doesn't shove the whole panel offscreen
+ *  - desktop (≥lg): centered modal-card over a dark backdrop
+ *
+ * The mobile sheet is hand-rolled (not vaul) because vaul's keyboard handling
+ * was fighting with iOS's input-into-view scrolling and the whole sheet kept
+ * flying up past the top of the viewport.
  *
  * Cream palette deviates from the dark site theme — intentional (matches the
- * Fora Travel reference). The aesthetic shift makes the intake feel personal
- * vs. the rest of the marketing site.
+ * Fora Travel reference).
  */
 
 import { useEffect, useState } from "react";
-import { Drawer } from "vaul";
 import { useMatchIntakeOpen, closeMatchIntake } from "@/lib/match-intake-store";
 import { submit_match_request } from "@/lib/api";
 
@@ -147,32 +150,58 @@ export default function MatchIntakeOverlay() {
     />
   );
 
+  // visualViewport tracker — pushes the mobile sheet up by the keyboard height
+  // and shrinks it to the visible area. position:fixed bottom:0 alone uses the
+  // LAYOUT viewport on iOS, so the sheet ends up behind the keyboard and iOS
+  // scrolls the focused input into view, yanking the whole sheet offscreen.
+  const [kbd_inset, setKbdInset] = useState(0);
+  const [visible_h, setVisibleH] = useState<number | null>(null);
+  useEffect(() => {
+    if (!open || typeof window === "undefined" || !window.visualViewport) return;
+    const vv = window.visualViewport;
+    const update = () => {
+      // gap between layout viewport bottom and visual viewport bottom = keyboard.
+      const inset = Math.max(0, window.innerHeight - vv.height - vv.offsetTop);
+      setKbdInset(inset);
+      setVisibleH(vv.height);
+    };
+    update();
+    vv.addEventListener("resize", update);
+    vv.addEventListener("scroll", update);
+    return () => {
+      vv.removeEventListener("resize", update);
+      vv.removeEventListener("scroll", update);
+    };
+  }, [open]);
+
+  // Lock body scroll while open so the page underneath can't slide around.
+  useEffect(() => {
+    if (!open) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => { document.body.style.overflow = prev; };
+  }, [open]);
+
   return (
     <>
-      {/* Mobile: vaul bottom-sheet.
-          NOTE: vaul portals to document.body, so a parent `lg:hidden` wrapper
-          does NOT hide the portaled content on desktop — the lg:hidden class
-          must live on Overlay + Content themselves. */}
-      <div className="lg:hidden">
-        <Drawer.Root open={open} onOpenChange={(o) => { if (!o) closeMatchIntake(); }}>
-          <Drawer.Portal>
-            <Drawer.Overlay className="lg:hidden fixed inset-0 bg-black/40 z-[60]" />
-            <Drawer.Content
-              className="lg:hidden fixed bottom-0 left-0 right-0 z-[70] flex flex-col rounded-t-3xl"
-              // dvh (NOT vh): when the iOS keyboard opens, vh stays at the full
-              // viewport so the sheet overflows past the visible area, and iOS
-              // scrolls the focused input into view — yanking the fixed sheet
-              // up and exposing the dark page underneath. dvh tracks the
-              // keyboard-adjusted viewport so the sheet stays bounded.
-              style={{ maxHeight: "92dvh", backgroundColor: "#F8F5EE" }}
-            >
-              <Drawer.Title className="sr-only">Get matched with a tutor</Drawer.Title>
-              <Drawer.Description className="sr-only">A short intake to match you with a Candid tutor</Drawer.Description>
-              {body}
-            </Drawer.Content>
-          </Drawer.Portal>
-        </Drawer.Root>
-      </div>
+      {/* Mobile: hand-rolled bottom sheet (no vaul) so we own the keyboard handling. */}
+      {open && (
+        <div className="lg:hidden fixed inset-0 z-[60] bg-black/40" />
+      )}
+      {open && (
+        <div
+          className="lg:hidden fixed left-0 right-0 z-[70] flex flex-col rounded-t-3xl shadow-2xl"
+          style={{
+            // bottom tracks the keyboard so the sheet sits ABOVE it, not behind.
+            bottom: kbd_inset,
+            // sheet is 92% of the visible viewport (NOT the full window).
+            height: visible_h != null ? `${visible_h * 0.92}px` : "92dvh",
+            backgroundColor: "#F8F5EE",
+          }}
+        >
+          {body}
+        </div>
+      )}
 
       {/* Desktop: centered modal.
           - No click-outside-to-dismiss: backdrop has no onClick. The only way
