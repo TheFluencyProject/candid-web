@@ -376,7 +376,7 @@ function OverlayBody(p: BodyProps) {
         )}
 
         {p.step === 6 && (
-          <StepShell title="Where can your tutor contact you?">
+          <StepShell title="Where can your tutor contact you?" subtitle="We'll match you with a Candid Tutor who will reach out to your email below.">
             <div className="flex flex-col gap-3">
               <ContactInput placeholder="First name" value={p.first_name} onChange={p.setFirstName} />
               <ContactInput placeholder="Last name" value={p.last_name} onChange={p.setLastName} />
