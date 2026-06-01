@@ -32,9 +32,11 @@ export default async function SiteFooter({ variant = "joincandid" }: SiteFooterP
 
   return (
     <footer className="border-t border-white/10">
-      {/* Main footer grid */}
+      {/* Main footer grid — commented out for now; only the bottom bar remains.
+          Email moved into the bottom bar below. Restore this block to bring
+          back PAGES / PROGRAMS / COMPANY / CONNECT columns. */}
+      {/*
       <div className={`grid grid-cols-1 px-6 py-14 ${grid_cols} lg:gap-8 lg:px-12 lg:py-12`}>
-        {/* App Store — desktop only — skipped on tutor variant */}
         {!is_tutor && (
           <div className="hidden lg:flex flex-col items-start">
             <Link href="/download">
@@ -48,7 +50,6 @@ export default async function SiteFooter({ variant = "joincandid" }: SiteFooterP
           </div>
         )}
 
-        {/* Pages — mobile col 1 row 1 */}
         <div>
           <h4 className="text-xl font-bold uppercase tracking-wider mb-3 text-white">{t("pages_heading")}</h4>
           <ul className="space-y-2">
@@ -58,7 +59,6 @@ export default async function SiteFooter({ variant = "joincandid" }: SiteFooterP
           </ul>
         </div>
 
-        {/* Programs — skipped on tutor variant */}
         {!is_tutor && (
           <div className="mt-14 lg:mt-0">
             <h4 className="text-xl font-bold uppercase tracking-wider mb-3 text-white">{t("programs_heading")}</h4>
@@ -73,8 +73,6 @@ export default async function SiteFooter({ variant = "joincandid" }: SiteFooterP
               </div>
               <div>
                 <p className="text-sm font-bold uppercase tracking-widest text-white/70 mb-2">{localizeLanguageName("korean", locale)}</p>
-                {/* Footer lists active tutors only. Chan (CHINGU) is is_enabled=false
-                    for now — add her back here when she's flipped live. */}
                 <ul className="space-y-2">
                   <li>
                     <Link href="/tutor/korean-mia" className="text-sm font-normal text-white hover:opacity-70 transition-opacity">{miaTitle}</Link>
@@ -85,28 +83,21 @@ export default async function SiteFooter({ variant = "joincandid" }: SiteFooterP
           </div>
         )}
 
-        {/* Company */}
         <div className="mt-14 lg:mt-0">
           <h4 className="text-xl font-bold uppercase tracking-wider mb-3 text-white">{t("company_heading")}</h4>
           <ul className="space-y-2">
             <li>
-              {/* HTTP-only: Namecheap URL forwarding has no SSL cert, so https:// times out */}
               <a href="http://thefluencyproject.co" target="_blank" rel="noopener noreferrer" className="text-sm font-normal text-white hover:opacity-70 transition-opacity">The Fluency Project</a>
             </li>
             <li>
-              {/* HTTP-only: Namecheap URL forwarding has no SSL cert, so https:// times out */}
               <a href="http://thefluencyfiles.com" target="_blank" rel="noopener noreferrer" className="text-sm font-normal text-white hover:opacity-70 transition-opacity">The Fluency Files</a>
             </li>
             <li>
               <a href="https://thefluencyproject.org" target="_blank" rel="noopener noreferrer" className="text-sm font-normal text-white hover:opacity-70 transition-opacity">TheFluencyProject.org</a>
             </li>
-            {/* <li>
-              <a href="https://open.substack.com/pub/thefluencyfiles/p/introducing-candid?utm_source=candid&utm_medium=website&utm_campaign=landing-page" target="_blank" rel="noopener noreferrer" className="text-sm font-normal text-white hover:opacity-70 transition-opacity">{t("company_letter")}</a>
-            </li> */}
           </ul>
         </div>
 
-        {/* Socials — desktop col 4, mobile last (separated from Programs by a hairline on mobile) */}
         <div className="mt-14 lg:mt-0">
           <h4 className="text-xl font-bold uppercase tracking-wider mb-3 text-white">{t("connect_heading")}</h4>
           <ul className="space-y-2">
@@ -133,16 +124,23 @@ export default async function SiteFooter({ variant = "joincandid" }: SiteFooterP
           </ul>
         </div>
       </div>
+      */}
 
       {/* Bottom bar — always visible */}
-      <div className="px-6 py-6 pb-20 md:pb-6 md:px-12 flex items-center justify-between flex-wrap gap-4 border-t border-white/5">
-        <div className="flex gap-6 items-center">
+      <div className="px-6 py-6 pb-20 md:pb-6 md:px-12 flex items-center justify-between flex-wrap gap-4">
+        <div className="flex gap-6 items-center flex-wrap">
           <Link href="/privacy" className="text-sm font-normal text-white hover:opacity-70 transition-opacity">
             {t("privacy")}
           </Link>
           <Link href="/terms" className="text-sm font-normal text-white hover:opacity-70 transition-opacity">
             {t("terms")}
           </Link>
+          <a
+            href="mailto:adam@thefluencyproject.co"
+            className="text-sm font-normal text-white hover:opacity-70 transition-opacity"
+          >
+            adam@thefluencyproject.co
+          </a>
           <span className="text-sm opacity-50">
             {t("elevenlabs_partner")}
           </span>
