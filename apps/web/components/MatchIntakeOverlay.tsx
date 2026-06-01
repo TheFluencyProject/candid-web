@@ -184,20 +184,27 @@ export default function MatchIntakeOverlay() {
 
   return (
     <>
-      {/* Mobile: hand-rolled bottom sheet (no vaul) so we own the keyboard handling. */}
+      {/* Mobile: hand-rolled bottom sheet (no vaul) so we own the keyboard handling.
+          Tap on backdrop dismisses (standard bottom-sheet UX). Desktop modal
+          intentionally does NOT — see comment on the desktop backdrop. */}
       {open && (
-        <div className="lg:hidden fixed inset-0 z-[60] bg-black/40" />
+        <div
+          className="lg:hidden fixed inset-0 z-[60] bg-black/40"
+          onClick={closeMatchIntake}
+        />
       )}
       {open && (
         <div
-          className="lg:hidden fixed left-0 right-0 z-[70] flex flex-col rounded-t-3xl shadow-2xl"
+          className="lg:hidden fixed left-0 right-0 bottom-0 z-[70] flex flex-col rounded-t-3xl shadow-2xl"
           style={{
-            // bottom tracks the keyboard so the sheet sits ABOVE it, not behind.
-            bottom: kbd_inset,
-            // Fixed at half the visible viewport so the sheet doesn't grow/shrink
-            // between steps. body's flex-1 + overflow-y-auto handles long steps
-            // (textarea, contact form) via internal scroll.
-            height: visible_h != null ? `${visible_h * 0.5}px` : "50dvh",
+            // Sheet stays anchored to the LAYOUT viewport bottom (bottom: 0), so
+            // the cream extends under the iOS Safari URL pill + the keyboard —
+            // no dark-page gap peeking through. Total height = visible portion
+            // (50% of visible viewport) + keyboard area below it.
+            // paddingBottom shifts CONTENT above the keyboard while the cream
+            // bg fills everything down to layout bottom.
+            height: visible_h != null ? `${visible_h * 0.5 + kbd_inset}px` : "50dvh",
+            paddingBottom: kbd_inset,
             backgroundColor: "#F8F5EE",
           }}
         >
