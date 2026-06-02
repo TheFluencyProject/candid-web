@@ -18,7 +18,6 @@ interface LessonMeta {
   thumbnail_url: string;
   localized_title: string;
   tutor_name: string;
-  teaching_language: string;
 }
 
 // Returns null only for genuine 404 ("no such lesson"). Transient failures
@@ -43,13 +42,10 @@ function parseLocale(acceptLanguage: string | null): "en" | "ko" {
 }
 
 function buildTitle(lesson: LessonMeta | null): string {
-  if (!lesson) return "Candid";
-  const { localized_title, tutor_name, teaching_language } = lesson;
-  if (teaching_language && tutor_name && localized_title) {
-    const lang = teaching_language.charAt(0).toUpperCase() + teaching_language.slice(1);
-    return `${lang} with ${tutor_name}: ${localized_title}`;
-  }
-  return localized_title || "Candid";
+  const title = lesson?.localized_title;
+  if (!title) return "Candid";
+  if (lesson.tutor_name) return `${lesson.tutor_name} on Candid: ${title}`;
+  return `Candid: ${title}`;
 }
 
 export async function generateMetadata({

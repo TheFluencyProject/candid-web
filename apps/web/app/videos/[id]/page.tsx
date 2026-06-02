@@ -32,7 +32,7 @@ export async function generateMetadata({
   const { id } = await params;
   const video = await fetchVideoMeta(id);
 
-  const title = video ? `${video.title} — Candid` : "Candid";
+  const title = video?.title ? `Candid: ${video.title}` : "Candid";
   const description =
     "Learn English with real YouTube videos on Candid. Open in the app to start watching.";
 
