@@ -67,8 +67,9 @@ export default async function SimpleLanding({ locale }: Props) {
 
   return (
     <main className="text-white" style={{ backgroundColor: "#18181C" }}>
-      {/* Hero fills the viewport so the footer stays below the fold until scroll. */}
-      <section className="flex min-h-dvh flex-col">
+      {/* min-h-screen keeps the footer below the fold; the hero + screenshot row are
+          centered in the space below the header so empty room is balanced top/bottom. */}
+      <section className="flex min-h-screen flex-col">
         {/* Wordmark left; App Store badge top-right on mobile only (desktop badge
             sits under the hero instead). */}
         <header className="flex items-center justify-between px-6 md:px-10 pt-8">
@@ -89,21 +90,21 @@ export default async function SimpleLanding({ locale }: Props) {
           </a>
         </header>
 
-        <div className="px-6 pt-16 md:pt-24 text-center">
-          <h1 className="text-4xl md:text-6xl font-light tracking-tight leading-[1.1] mb-5">
-            Not another AI tutor
-          </h1>
-          <p className="max-w-2xl mx-auto text-lg md:text-xl leading-relaxed text-gray-300">
-            Learn real-life Korean with daily listening &amp; speaking practice from your favorite creators
-          </p>
-          {/* Desktop only: App Store badge under the hero. */}
-          <a href="/download" className="hidden lg:inline-block mt-8">
-            <img src="/download.svg" alt="Download on the App Store" width={150} className="h-auto" />
-          </a>
-        </div>
+        {/* Center the hero + screenshot row in the space below the header. */}
+        <div className="flex flex-1 flex-col justify-center">
+          <div className="px-6 text-center">
+            <h1 className="text-4xl md:text-6xl font-light tracking-tight leading-[1.1] mb-5">
+              Not another AI tutor
+            </h1>
+            <p className="max-w-2xl mx-auto text-lg md:text-xl leading-relaxed text-gray-300">
+              Learn real-life Korean with daily listening &amp; speaking practice from your favorite creators
+            </p>
+            {/* Desktop only: App Store badge under the hero. */}
+            <a href="/download" className="hidden lg:inline-block mt-8">
+              <img src="/download.svg" alt="Download on the App Store" width={150} className="h-auto" />
+            </a>
+          </div>
 
-        {/* mt-auto pins the screenshot row to the bottom of the first viewport. */}
-        <div className="mt-auto">
           <ScreenshotMarquee urls={screenshots} />
         </div>
       </section>
