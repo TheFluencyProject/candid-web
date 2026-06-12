@@ -174,8 +174,7 @@ html {
   to { transform: translateX(-50%); }
 }
 .animate-marquee {
+  /* No prefers-reduced-motion opt-out: this showcase row is meant to always
+     drift (iOS "Reduce Motion" would otherwise freeze it on many phones). */
   animation: marquee 90s linear infinite;
-}
-@media (prefers-reduced-motion: reduce) {
-  .animate-marquee { animation: none; }
 }

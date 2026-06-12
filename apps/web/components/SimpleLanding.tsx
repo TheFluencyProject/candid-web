@@ -5,6 +5,7 @@ import MobileCTABar from "@/components/MobileCTABar";
 import ScreenshotMarquee from "@/components/ScreenshotMarquee";
 import { type Tutor, fetchTutor } from "@/lib/api";
 import { getMobileCtaVariant } from "@/lib/posthog-server";
+import { BECOME_A_TUTOR_URL } from "@/lib/platform";
 
 // Active/featured tutors. The public tutor API exposes no active flag, so the
 // set is listed here (matches the old home); korean-chan has a profile page but
@@ -70,8 +71,9 @@ export default async function SimpleLanding({ locale }: Props) {
       {/* min-h-screen keeps the footer below the fold; the hero + screenshot row are
           centered in the space below the header so empty room is balanced top/bottom. */}
       <section className="flex min-h-screen flex-col">
-        {/* Wordmark left; App Store badge top-right on every breakpoint. */}
-        <header className="flex items-center justify-between px-6 md:px-10 pt-8">
+        {/* Wordmark left; App Store badge top-right on every breakpoint. Padding
+            matches the original TutorNavbar (px-4 md:px-8) so it isn't too wide. */}
+        <header className="flex items-center justify-between px-4 md:px-8 pt-5">
           <a href="/" className="inline-block">
             <Image
               src="/wordmark-white.svg"
@@ -96,19 +98,33 @@ export default async function SimpleLanding({ locale }: Props) {
               Not another AI tutor
             </h1>
             <p className="max-w-2xl mx-auto text-lg md:text-xl leading-relaxed text-gray-300">
-              Learn real-life Korean with daily listening &amp; speaking practice from your favorite creators
+              Learn real-life Korean with daily listening &amp; speaking practice
+              <br />
+              from your favorite tutors
             </p>
-            {/* Primary hero CTA → /download (UA-aware App Store redirect). */}
-            <a
-              href="/download"
-              className="mt-8 inline-block rounded-full bg-white px-8 py-3.5 text-base font-semibold tracking-wide text-[#18181C] hover:opacity-90 transition-opacity"
-            >
-              JOIN CANDID
-            </a>
+            <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3">
+              {/* Primary — learn (→ /download, UA-aware App Store redirect). */}
+              <a
+                href="/download"
+                className="inline-block rounded-full bg-white px-8 py-3.5 text-base font-semibold tracking-wide text-[#18181C] hover:opacity-90 transition-opacity"
+              >
+                LEARN WITH CANDID
+              </a>
+              {/* Secondary — teach (become a tutor). Translucent = less prominent. */}
+              <a
+                href={BECOME_A_TUTOR_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-block rounded-full bg-white/10 px-8 py-3.5 text-base font-semibold tracking-wide text-white hover:bg-white/20 transition-colors"
+              >
+                TEACH ON CANDID
+              </a>
+            </div>
           </div>
 
-          {/* Extra breathing room between the hero and the screenshot row. */}
-          <div className="mt-12 md:mt-20">
+          {/* Breathing room between the hero and the screenshot row (less on
+              mobile, where vertical space is tight). */}
+          <div className="mt-8 md:mt-20">
             <ScreenshotMarquee urls={screenshots} />
           </div>
         </div>

@@ -6,9 +6,11 @@
 //   1. Each group carries pr-* equal to its internal gap, so the spacing across
 //      the group→group boundary matches the spacing between items. Padding (not
 //      a trailing margin) is always included in the box width, so -50% is exact.
-//   2. Each image uses a fixed aspect-ratio box (screenshots are all 2000x4069),
-//      so a lazy image reserves its width before it loads. Without this the
-//      width would pop from 0 on load, shifting the -50% target mid-scroll.
+//   2. Each image uses a fixed aspect-ratio box (screenshots are all 2000x4069)
+//      so its width is reserved before it loads — no reflow shifting the -50%
+//      target. Images load eagerly (not lazy): off-screen marquee items never
+//      intersect the viewport, so lazy-loading made them pop in one-by-one as
+//      they scrolled in. Eager loads the whole row up-front.
 export default function ScreenshotMarquee({ urls }: { urls: string[] }) {
   if (urls.length === 0) return null;
 
@@ -20,8 +22,7 @@ export default function ScreenshotMarquee({ urls }: { urls: string[] }) {
           src={url}
           alt=""
           draggable={false}
-          loading="lazy"
-          className="h-[380px] md:h-[460px] aspect-[2000/4069] object-cover rounded-[2rem] shadow-2xl select-none"
+          className="h-[320px] md:h-[460px] aspect-[2000/4069] object-cover rounded-[2rem] shadow-2xl select-none"
         />
       ))}
     </div>
