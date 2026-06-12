@@ -48,6 +48,21 @@ const nextConfig = {
         destination: "/tutor/korean-chan",
         permanent: true,
       },
+      // /guide/:slug was renamed to /tutor/:slug (commit c4ce9b5). The short
+      // links above used to 308 → /guide/:slug, and browsers cache permanent
+      // redirects — so already-visited /adam etc. still point at /guide. Keep
+      // this rule so those cached/bookmarked/indexed URLs resolve instead of
+      // 404ing. Do NOT hard-cut /guide again.
+      {
+        source: "/guide/:slug",
+        destination: "/tutor/:slug",
+        permanent: true,
+      },
+      {
+        source: "/ko/guide/:slug",
+        destination: "/ko/tutor/:slug",
+        permanent: true,
+      },
     ];
   },
 };
