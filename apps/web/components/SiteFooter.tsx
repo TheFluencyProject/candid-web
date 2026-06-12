@@ -129,23 +129,23 @@ export default async function SiteFooter({ variant = "joincandid" }: SiteFooterP
       {/* Bottom bar — always visible */}
       <div className="px-6 py-6 pb-20 md:pb-6 md:px-12 flex items-center justify-between flex-wrap gap-4">
         <div className="flex gap-6 items-center flex-wrap">
-          <Link href="/privacy" className="text-sm font-normal text-white hover:opacity-70 transition-opacity">
+          <Link href="/privacy" className="text-sm font-normal text-white/70 hover:text-white transition-colors">
             {t("privacy")}
           </Link>
-          <Link href="/terms" className="text-sm font-normal text-white hover:opacity-70 transition-opacity">
+          <Link href="/terms" className="text-sm font-normal text-white/70 hover:text-white transition-colors">
             {t("terms")}
           </Link>
           <a
             href="mailto:adam@thefluencyproject.co"
-            className="text-sm font-normal text-white hover:opacity-70 transition-opacity"
+            className="text-sm font-normal text-white/70 hover:text-white transition-colors"
           >
             adam@thefluencyproject.co
           </a>
-          <span className="text-sm opacity-50">
+          <span className="text-sm font-normal text-white/70">
             {t("elevenlabs_partner")}
           </span>
         </div>
-        <p className="text-sm opacity-30">
+        <p className="text-sm font-normal text-white/70">
           &copy; {new Date().getFullYear()} The Fluency Project Inc.
         </p>
       </div>
