@@ -70,8 +70,7 @@ export default async function SimpleLanding({ locale }: Props) {
       {/* min-h-screen keeps the footer below the fold; the hero + screenshot row are
           centered in the space below the header so empty room is balanced top/bottom. */}
       <section className="flex min-h-screen flex-col">
-        {/* Wordmark left; App Store badge top-right on mobile only (desktop badge
-            sits under the hero instead). */}
+        {/* Wordmark left; App Store badge top-right on every breakpoint. */}
         <header className="flex items-center justify-between px-6 md:px-10 pt-8">
           <a href="/" className="inline-block">
             <Image
@@ -83,9 +82,9 @@ export default async function SimpleLanding({ locale }: Props) {
               className="hover:opacity-80 transition-opacity"
             />
           </a>
-          {/* Plain <img>: an SVG badge needs no next/image optimization, and it
-              avoids next/image's aspect warning under Tailwind's base height:auto. */}
-          <a href="/download" className="lg:hidden">
+          {/* App Store badge — plain <img> (an SVG needs no next/image optimization
+              and avoids its aspect warning under Tailwind's base height:auto). */}
+          <a href="/download">
             <img src="/download.svg" alt="Download on the App Store" width={120} className="h-auto" />
           </a>
         </header>
@@ -99,13 +98,19 @@ export default async function SimpleLanding({ locale }: Props) {
             <p className="max-w-2xl mx-auto text-lg md:text-xl leading-relaxed text-gray-300">
               Learn real-life Korean with daily listening &amp; speaking practice from your favorite creators
             </p>
-            {/* Desktop only: App Store badge under the hero. */}
-            <a href="/download" className="hidden lg:inline-block mt-8">
-              <img src="/download.svg" alt="Download on the App Store" width={150} className="h-auto" />
+            {/* Primary hero CTA → /download (UA-aware App Store redirect). */}
+            <a
+              href="/download"
+              className="mt-8 inline-block rounded-full bg-white px-8 py-3.5 text-base font-semibold tracking-wide text-[#18181C] hover:opacity-90 transition-opacity"
+            >
+              JOIN CANDID
             </a>
           </div>
 
-          <ScreenshotMarquee urls={screenshots} />
+          {/* Extra breathing room between the hero and the screenshot row. */}
+          <div className="mt-12 md:mt-20">
+            <ScreenshotMarquee urls={screenshots} />
+          </div>
         </div>
       </section>
 
