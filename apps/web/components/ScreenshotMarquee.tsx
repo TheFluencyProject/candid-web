@@ -28,8 +28,8 @@ export default function ScreenshotMarquee({ urls }: { urls: string[] }) {
   );
 
   return (
-    <div className="group overflow-hidden w-full py-4 md:py-8">
-      <div className="flex w-max animate-marquee group-hover:[animation-play-state:paused]">
+    <div className="overflow-hidden w-full py-4 md:py-8">
+      <div className="flex w-max animate-marquee">
         {renderGroup(false)}
         {renderGroup(true)}
       </div>

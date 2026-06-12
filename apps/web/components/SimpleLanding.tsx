@@ -6,8 +6,10 @@ import ScreenshotMarquee from "@/components/ScreenshotMarquee";
 import { type Tutor, fetchTutor } from "@/lib/api";
 import { getMobileCtaVariant } from "@/lib/posthog-server";
 
-// All web tutors (config/tutors.ts). Each contributes its app screenshots to the row.
-const TUTOR_SLUGS = ["korean-mia", "english-adam", "korean-chan"];
+// Active/featured tutors. The public tutor API exposes no active flag, so the
+// set is listed here (matches the old home); korean-chan has a profile page but
+// is inactive, so it's excluded. Each tutor contributes its app screenshots.
+const TUTOR_SLUGS = ["korean-mia", "english-adam"];
 
 const SCREENSHOT_KEYS = [
   "screenshot_listen_url",
@@ -64,42 +66,47 @@ export default async function SimpleLanding({ locale }: Props) {
   );
 
   return (
-    <main className="min-h-screen text-white" style={{ backgroundColor: "#18181C" }}>
-      {/* Wordmark left; App Store badge top-right on mobile only (desktop badge
-          sits under the hero instead). */}
-      <header className="flex items-center justify-between px-6 md:px-10 pt-8">
-        <a href="/" className="inline-block">
-          <Image
-            src="/wordmark-white.svg"
-            alt="Candid"
-            width={80}
-            height={21}
-            priority
-            className="hover:opacity-80 transition-opacity"
-          />
-        </a>
-        {/* Plain <img>: an SVG badge needs no next/image optimization, and it
-            avoids next/image's aspect warning under Tailwind's base height:auto. */}
-        <a href="/download" className="lg:hidden">
-          <img src="/download.svg" alt="Download on the App Store" width={120} className="h-auto" />
-        </a>
-      </header>
+    <main className="text-white" style={{ backgroundColor: "#18181C" }}>
+      {/* Hero fills the viewport so the footer stays below the fold until scroll. */}
+      <section className="flex min-h-dvh flex-col">
+        {/* Wordmark left; App Store badge top-right on mobile only (desktop badge
+            sits under the hero instead). */}
+        <header className="flex items-center justify-between px-6 md:px-10 pt-8">
+          <a href="/" className="inline-block">
+            <Image
+              src="/wordmark-white.svg"
+              alt="Candid"
+              width={80}
+              height={21}
+              priority
+              className="hover:opacity-80 transition-opacity"
+            />
+          </a>
+          {/* Plain <img>: an SVG badge needs no next/image optimization, and it
+              avoids next/image's aspect warning under Tailwind's base height:auto. */}
+          <a href="/download" className="lg:hidden">
+            <img src="/download.svg" alt="Download on the App Store" width={120} className="h-auto" />
+          </a>
+        </header>
 
-      {/* Compact hero so the screenshot row sits right below it. */}
-      <section className="px-6 pt-16 md:pt-24 pb-12 text-center">
-        <h1 className="text-4xl md:text-6xl font-light tracking-tight leading-[1.1] mb-5">
-          Not another AI tutor
-        </h1>
-        <p className="max-w-2xl mx-auto text-lg md:text-xl leading-relaxed text-gray-300">
-          Learn real-life Korean with daily listening &amp; speaking practice from your favorite creators
-        </p>
-        {/* Desktop only: App Store badge under the hero. */}
-        <a href="/download" className="hidden lg:inline-block mt-8">
-          <img src="/download.svg" alt="Download on the App Store" width={150} className="h-auto" />
-        </a>
+        <div className="px-6 pt-16 md:pt-24 text-center">
+          <h1 className="text-4xl md:text-6xl font-light tracking-tight leading-[1.1] mb-5">
+            Not another AI tutor
+          </h1>
+          <p className="max-w-2xl mx-auto text-lg md:text-xl leading-relaxed text-gray-300">
+            Learn real-life Korean with daily listening &amp; speaking practice from your favorite creators
+          </p>
+          {/* Desktop only: App Store badge under the hero. */}
+          <a href="/download" className="hidden lg:inline-block mt-8">
+            <img src="/download.svg" alt="Download on the App Store" width={150} className="h-auto" />
+          </a>
+        </div>
+
+        {/* mt-auto pins the screenshot row to the bottom of the first viewport. */}
+        <div className="mt-auto">
+          <ScreenshotMarquee urls={screenshots} />
+        </div>
       </section>
-
-      <ScreenshotMarquee urls={screenshots} />
 
       <SiteFooter />
       <MobileCTABar ctaVariant={ctaVariant} />
