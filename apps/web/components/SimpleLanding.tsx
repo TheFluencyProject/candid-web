@@ -1,10 +1,7 @@
 import Image from "next/image";
-import { cookies } from "next/headers";
 import SiteFooter from "@/components/SiteFooter";
-import MobileCTABar from "@/components/MobileCTABar";
 import ScreenshotMarquee from "@/components/ScreenshotMarquee";
 import { type Tutor, fetchTutor } from "@/lib/api";
-import { getMobileCtaVariant } from "@/lib/posthog-server";
 import { BECOME_A_TUTOR_URL } from "@/lib/platform";
 
 // Active/featured tutors. The public tutor API exposes no active flag, so the
@@ -22,8 +19,8 @@ const SCREENSHOT_KEYS = [
   "screenshot_learn_url",
 ] as const;
 
-// Fisher–Yates. Runs server-side (page is dynamic via cookies), so the order is
-// fixed before hydration — no SSR/client mismatch.
+// Fisher–Yates. Runs server-side (the route is dynamic — page.tsx reads
+// headers()), so the order is fixed before hydration — no SSR/client mismatch.
 function shuffle<T>(arr: T[]): T[] {
   const a = [...arr];
   for (let i = a.length - 1; i > 0; i--) {
@@ -49,11 +46,6 @@ function interleave(lists: string[][]): string[] {
 type Props = { locale: string };
 
 export default async function SimpleLanding({ locale }: Props) {
-  // A/B variant only for en; ko renders MobileCTABar's fixed translated copy.
-  // React.cache dedupes with the layout's call, so this is free.
-  const distinctId = (await cookies()).get("candid_did")?.value ?? crypto.randomUUID();
-  const ctaVariant = locale === "en" ? await getMobileCtaVariant(distinctId) : undefined;
-
   // Promise.all + filter(null): a 404 drops out; a transient throw → Next serves
   // the last cached render (see fetchTutor) instead of a blank row.
   const tutors = (
@@ -94,20 +86,20 @@ export default async function SimpleLanding({ locale }: Props) {
 
         {/* Center the hero + screenshot row in the space below the header. */}
         <div className="flex flex-1 flex-col justify-center">
-          <div className="px-6 text-center">
+          <div className="px-6 text-center pt-3 md:pt-0">
             <h1 className="text-4xl md:text-6xl font-light tracking-tight leading-[1.1] mb-5">
               Real-Life Fluency
             </h1>
             <p className="max-w-2xl mx-auto text-lg md:text-xl leading-relaxed text-gray-300">
-              Learn real-life Korean with daily listening &amp; speaking practice
-              <br />
+              Learn real-life Korean with daily listening &amp; speaking practice{" "}
+              <br className="hidden md:inline" />
               from your favorite tutors
             </p>
-            <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3">
+            <div className="mt-6 md:mt-8 flex flex-col sm:flex-row items-center justify-center gap-2.5 sm:gap-3">
               {/* Primary — learn (→ /download, UA-aware App Store redirect). */}
               <a
                 href="/download"
-                className="inline-block rounded-full bg-white px-8 py-3 text-base font-semibold tracking-wide text-[#18181C] hover:opacity-90 transition-opacity"
+                className="inline-block rounded-full bg-white px-8 py-2.5 md:py-3 text-base font-semibold tracking-wide text-[#18181C] hover:opacity-90 transition-opacity"
               >
                 LEARN WITH CANDID
               </a>
@@ -116,7 +108,7 @@ export default async function SimpleLanding({ locale }: Props) {
                 href={BECOME_A_TUTOR_URL}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-block rounded-full bg-white/10 px-8 py-3 text-base font-semibold tracking-wide text-white hover:bg-white/20 transition-colors"
+                className="inline-block rounded-full bg-white/10 px-8 py-2.5 md:py-3 text-base font-semibold tracking-wide text-white hover:bg-white/20 transition-colors"
               >
                 TEACH ON CANDID
               </a>
@@ -125,14 +117,13 @@ export default async function SimpleLanding({ locale }: Props) {
 
           {/* Breathing room between the hero and the screenshot row (less on
               mobile, where vertical space is tight). */}
-          <div className="mt-8 md:mt-20">
+          <div className="mt-6 md:mt-20">
             <ScreenshotMarquee urls={screenshots} />
           </div>
         </div>
       </section>
 
       <SiteFooter />
-      <MobileCTABar ctaVariant={ctaVariant} />
     </main>
   );
 }
