@@ -68,9 +68,10 @@ export default async function SimpleLanding({ locale }: Props) {
 
   return (
     <main className="text-white" style={{ backgroundColor: "#18181C" }}>
-      {/* min-h-screen keeps the footer below the fold; the hero + screenshot row are
-          centered in the space below the header so empty room is balanced top/bottom. */}
-      <section className="flex min-h-screen flex-col">
+      {/* Desktop: min-h-screen + centered hero/row keeps the footer below the fold.
+          Mobile: natural top-down flow (no forced viewport height) so the spacing
+          isn't stretched to fill the screen. */}
+      <section className="flex flex-col md:min-h-screen">
         {/* Wordmark left; App Store badge top-right on every breakpoint. Padding
             matches the original TutorNavbar (px-4 md:px-8) so it isn't too wide. */}
         <header className="flex items-center justify-between px-4 md:px-8 pt-5">
@@ -95,7 +96,7 @@ export default async function SimpleLanding({ locale }: Props) {
         <div className="flex flex-1 flex-col justify-center">
           <div className="px-6 text-center">
             <h1 className="text-4xl md:text-6xl font-light tracking-tight leading-[1.1] mb-5">
-              Not another AI tutor
+              Real-Life Fluency
             </h1>
             <p className="max-w-2xl mx-auto text-lg md:text-xl leading-relaxed text-gray-300">
               Learn real-life Korean with daily listening &amp; speaking practice
@@ -106,7 +107,7 @@ export default async function SimpleLanding({ locale }: Props) {
               {/* Primary — learn (→ /download, UA-aware App Store redirect). */}
               <a
                 href="/download"
-                className="inline-block rounded-full bg-white px-8 py-3.5 text-base font-semibold tracking-wide text-[#18181C] hover:opacity-90 transition-opacity"
+                className="inline-block rounded-full bg-white px-8 py-3 text-base font-semibold tracking-wide text-[#18181C] hover:opacity-90 transition-opacity"
               >
                 LEARN WITH CANDID
               </a>
@@ -115,7 +116,7 @@ export default async function SimpleLanding({ locale }: Props) {
                 href={BECOME_A_TUTOR_URL}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-block rounded-full bg-white/10 px-8 py-3.5 text-base font-semibold tracking-wide text-white hover:bg-white/20 transition-colors"
+                className="inline-block rounded-full bg-white/10 px-8 py-3 text-base font-semibold tracking-wide text-white hover:bg-white/20 transition-colors"
               >
                 TEACH ON CANDID
               </a>
