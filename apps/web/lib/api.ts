@@ -67,6 +67,45 @@ export async function fetchTutor(
   return res.json();
 }
 
+// ── Marketing clips (joincandid.co hero) ─────────────────────────────
+
+export interface WordLevelCaption {
+  text: string;
+  start_time: number;
+  end_time: number;
+}
+
+export interface MarketingClip {
+  lesson_id: string;
+  caption_segment_id: string;
+  tutor_name: string;
+  title: string;
+  text: string;
+  translation: string | null;
+  word_level_captions: WordLevelCaption[] | null;
+  start_time: number;
+  end_time: number;
+  mux_playback_id: string;
+  thumbnail_url: string | null;
+}
+
+/**
+ * Fetch the live hero clips (one caption segment per recent lesson of each active
+ * tutor, with a ready Mux asset). Throws on transient failure so Next's data cache
+ * serves the last good render; callers fall back to static screenshots on throw.
+ */
+export async function fetchMarketingClips(locale: string): Promise<MarketingClip[]> {
+  const res = await fetch(
+    `${API_BASE_URL}/public/marketing-clips?locale=${locale}`,
+    { next: { revalidate: 300 }, signal: AbortSignal.timeout(8000) }
+  );
+  if (!res.ok) {
+    throw new Error(`fetchMarketingClips(${locale}): HTTP ${res.status}`);
+  }
+  const body = (await res.json()) as { clips?: MarketingClip[] };
+  return body.clips ?? [];
+}
+
 // ── Web signup (Join-for-free) ───────────────────────────────────────
 
 export interface WebSignupPayload {

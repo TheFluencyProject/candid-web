@@ -1,7 +1,8 @@
 import Image from "next/image";
 import SiteFooter from "@/components/SiteFooter";
 import ScreenshotMarquee from "@/components/ScreenshotMarquee";
-import { type Tutor, fetchTutor } from "@/lib/api";
+import MarketingClipMarquee from "@/components/MarketingClipMarquee";
+import { type Tutor, type MarketingClip, fetchTutor, fetchMarketingClips } from "@/lib/api";
 import { BECOME_A_TUTOR_URL } from "@/lib/platform";
 
 // Active/featured tutors. The public tutor API exposes no active flag, so the
@@ -57,6 +58,15 @@ export default async function SimpleLanding({ locale }: Props) {
       shuffle(SCREENSHOT_KEYS.map((k) => t[k]).filter((u): u is string => !!u))
     )
   );
+
+  // Live hero clips. A throw (backend hiccup, or the endpoint not deployed yet)
+  // falls back to the static screenshot marquee below — the hero is never blank.
+  let clips: MarketingClip[] = [];
+  try {
+    clips = shuffle(await fetchMarketingClips(locale));
+  } catch {
+    clips = [];
+  }
 
   return (
     <main className="text-white" style={{ backgroundColor: "#18181C" }}>
@@ -118,7 +128,11 @@ export default async function SimpleLanding({ locale }: Props) {
           {/* Breathing room between the hero and the screenshot row (less on
               mobile, where vertical space is tight). */}
           <div className="mt-6 md:mt-20">
-            <ScreenshotMarquee urls={screenshots} />
+            {clips.length > 0 ? (
+              <MarketingClipMarquee clips={clips} />
+            ) : (
+              <ScreenshotMarquee urls={screenshots} />
+            )}
           </div>
         </div>
       </section>
