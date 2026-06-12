@@ -1,0 +1,268 @@
+import Image from "next/image";
+import { cookies, headers } from "next/headers";
+import { getTranslations, setRequestLocale } from "next-intl/server";
+import TutorNavbar from "@/components/TutorNavbar";
+import MobileCTABar from "@/components/MobileCTABar";
+import StickyHeader from "@/components/StickyHeader";
+import ScrollFadeIn from "@/components/ScrollFadeIn";
+import BlurImage from "@/components/BlurImage";
+import HeroCarousel, { type CarouselTutor } from "@/components/HeroCarousel";
+import SiteFooter from "@/components/SiteFooter";
+import BecomeATutorPill from "@/components/BecomeATutorPill";
+import { getTutorPageConfig } from "@/config/tutors";
+import { localizeLanguageName, withKoreanParticle, formatHeroTitle, stripEmojis } from "@/lib/i18n-helpers";
+import { type Tutor, fetchTutor } from "@/lib/api";
+import { getMobileCtaVariant } from "@/lib/posthog-server";
+import { isCandidtutorsHost } from "@/lib/canonical-hosts";
+import { BECOME_A_TUTOR_URL } from "@/lib/platform";
+import CandidtutorsLanding from "@/components/CandidtutorsLanding";
+
+type Props = {
+  params: Promise<{ locale: string }>;
+};
+
+export default async function Home({ params }: Props) {
+  const { locale } = await params;
+  setRequestLocale(locale);
+
+  // Host-conditional: candidtutors.co/ renders the stripped landing instead of
+  // the carousel. joincandid.co (+ previews + localhost) keep the carousel
+  // below. Early return BEFORE any expensive fetches (tutor data, posthog A/B)
+  // since the landing needs none of them.
+  const host_header = (await headers()).get("host") ?? "";
+  const candidtutors_brand = isCandidtutorsHost(host_header);
+  if (candidtutors_brand) {
+    return <CandidtutorsLanding />;
+  }
+
+  // A/B test only runs on English; ko always renders the fixed translated CTA.
+  // React.cache dedupes with the layout's call so this is free.
+  const cookieStore = await cookies();
+  const distinctId = cookieStore.get("candid_did")?.value ?? crypto.randomUUID();
+  const ctaVariant = locale === "en" ? await getMobileCtaVariant(distinctId) : undefined;
+
+  const t_tutor = await getTranslations("tutor");
+
+  // Korean locale → Adam first (Korean speakers learn English); else Mia first.
+  const TUTOR_SLUGS =
+    locale === "ko"
+      ? ["english-adam", "korean-mia"]
+      : ["korean-mia", "english-adam"];
+
+  const [t, tutorT] = await Promise.all([
+    getTranslations({ locale }),
+    getTranslations({ locale, namespace: "tutor" }),
+  ]);
+
+  // Fetch all tutors
+  const tutors = (
+    await Promise.all(TUTOR_SLUGS.map((slug) => fetchTutor(slug, locale)))
+  ).filter((t): t is Tutor => t !== null);
+
+  // Build carousel tutor data
+  const carouselTutors: CarouselTutor[] = tutors
+    .map((tutor) => {
+      const bgImage =
+        tutor.web_bg_picture_url ||
+        tutor.large_profile_picture_url;
+      if (!bgImage) return null;
+
+      const config = getTutorPageConfig(tutor.slug);
+      // Web-only override; falls back to cool_title (and short_description for legacy API responses) when null.
+      const coolTitle = formatHeroTitle(tutor.web_title_override ?? tutor.cool_title ?? tutor.short_description);
+      const firstName = tutor.name.split(" ")[0];
+      const localizedFirstName =
+        locale === "ko" && tutor.metadata?.name_kr
+          ? (tutor.metadata.name_kr as string)
+          : firstName;
+      const langLabel = localizeLanguageName(tutor.teaching_language, locale);
+      const nameForSubtitle = locale === "ko" ? withKoreanParticle(localizedFirstName) : localizedFirstName;
+      // Per-tutor English subtitle override; Korean keeps the i18n default.
+      const enOverride = locale === "en" ? config.subtitle?.en : undefined;
+      const subtitle: string = enOverride ?? stripEmojis(tutorT("subtitle", { name: nameForSubtitle, language: langLabel }));
+      // Mobile English uses the per-tutor `enMobile` override when present
+      // (hand-authored 3-line break since the mobile column is narrower).
+      // Falls back to stripping <br/> so the subtitle wraps naturally.
+      // Korean keeps its desktop <br/> on every viewport.
+      const subtitleMobile: string =
+        locale === "en"
+          ? (config.subtitle?.enMobile
+              ?? subtitle.replace(/<br\s*\/?>/gi, " ").replace(/\s+/g, " ").trim())
+          : subtitle;
+
+      const item: CarouselTutor = {
+        slug: tutor.slug,
+        firstName,
+        city: tutor.city,
+        language: langLabel,
+        bgImage,
+        coolTitle,
+        subtitle,
+        subtitleMobile,
+        photoPosition: config.photo,
+        arrowPosition: config.arrow,
+        hero: config.hero,
+      };
+      return item;
+    })
+    .filter((t): t is CarouselTutor => t !== null);
+
+  // Build screenshot sections by alternating tutors. Sections without a screenshot are dropped.
+  // Korean-only inserts `screenshot_learn_url` between listen + week — kept out of the en array
+  // so the alternation pattern (tutors[i % tutors.length]) doesn't shift on English.
+  const screenshotSectionKeys = locale === "ko"
+    ? [
+        "screenshot_listen_url",
+        "screenshot_learn_url",
+        "screenshot_week_url",
+        "screenshot_shadow_url",
+        "screenshot_map_url",
+        "screenshot_community_url",
+        "screenshot_intro_url",
+      ] as const
+    : [
+        "screenshot_listen_url",
+        "screenshot_week_url",
+        "screenshot_shadow_url",
+        "screenshot_map_url",
+        "screenshot_community_url",
+        "screenshot_intro_url",
+      ] as const;
+
+  const sectionsWithTutors = screenshotSectionKeys
+    .map((key, i) => {
+      // Prefer the alternation pick; if that tutor doesn't have this screenshot, use any tutor that does.
+      const preferred = tutors[i % tutors.length];
+      const tutor = preferred?.[key] ? preferred : tutors.find((t) => t?.[key]);
+      const url = tutor?.[key];
+      if (!tutor || !url) return null;
+      const br = '<br class="mobile-only"/>';
+      const titleMap = {
+        screenshot_listen_url: locale === "en"
+          ? `<span class="section-title-snug">Learn the language through your tutor's daily life</span>`
+          : tutorT("home_listen"),
+        screenshot_learn_url: tutorT("learn"),
+        screenshot_week_url: locale === "en"
+          ? `Daily video lessons,${br} new every week`
+          : tutorT("week"),
+        screenshot_map_url: tutorT("home_map"),
+        screenshot_shadow_url: tutorT("home_shadow"),
+        screenshot_intro_url: locale === "en"
+          ? `Get tutored${br} through it all`
+          : tutorT("intro"),
+        screenshot_community_url: locale === "en"
+          ? `Get answers${br} to your questions`
+          : tutorT("community"),
+      };
+      return {
+        key,
+        title: titleMap[key],
+        screenshotUrl: url,
+        tutorName: tutor.name.split(" ")[0],
+      };
+    })
+    .filter(Boolean) as Array<{
+    key: string;
+    title: string;
+    screenshotUrl: string;
+    tutorName: string;
+  }>;
+
+  return (
+    <main
+      className="min-h-screen text-white"
+      style={{ backgroundColor: "#18181C" }}
+    >
+      <TutorNavbar
+        sentinelId="hero-sentinel"
+        downloadUrl="/download"
+        alwaysWhite
+        rightElement={
+          candidtutors_brand ? (
+            <div className="flex items-center gap-2">
+              {/* Secondary CTA — less prominent (white text on translucent white). */}
+              <BecomeATutorPill label={t_tutor("become_a_tutor")} href={BECOME_A_TUTOR_URL} variant="navbar-pill" />
+              <BecomeATutorPill label={t_tutor("become_a_tutor_short")} href={BECOME_A_TUTOR_URL} variant="mobile-navbar-pill" />
+              {/* Primary CTA — same App Store behavior as Get the app. */}
+              <a
+                href="/download"
+                className="hidden lg:block px-5 py-2 rounded-full text-sm font-semibold"
+                style={{ backgroundColor: "#FFFFFF", color: "#18181C" }}
+              >
+                {t_tutor("find_your_tutor")}
+              </a>
+              <a
+                href="/download"
+                className="lg:hidden px-3 py-2 rounded-full text-xs font-semibold whitespace-nowrap"
+                style={{ backgroundColor: "#FFFFFF", color: "#18181C" }}
+              >
+                {t_tutor("find_your_tutor")}
+              </a>
+            </div>
+          ) : (
+            <>
+              {/* Desktop: Get the app pill */}
+              <a
+                href="/download"
+                className="hidden lg:block px-5 py-2 rounded-full text-sm font-semibold"
+                style={{ backgroundColor: "#FFFFFF", color: "#18181C" }}
+              >
+                Get the app
+              </a>
+              {/* Mobile: App Store badge */}
+              <a href="/download" className="lg:hidden">
+                <Image
+                  src="/download.svg"
+                  alt="Download on the App Store"
+                  width={120}
+                  height={40}
+                  priority
+                />
+              </a>
+            </>
+          )
+        }
+      />
+
+      {/* ─── Hero Carousel ─── */}
+      <HeroCarousel tutors={carouselTutors} />
+
+      {/* ─── Screenshot Sections ─── */}
+      {sectionsWithTutors.map((s) => (
+        <section key={s.key} className="relative">
+          <StickyHeader>
+            <ScrollFadeIn>
+              <h2
+                className="text-center text-2xl md:text-3xl lg:text-4xl font-black uppercase tracking-tight"
+                dangerouslySetInnerHTML={{ __html: s.title }}
+              />
+            </ScrollFadeIn>
+          </StickyHeader>
+          <div className="flex justify-center px-6 pb-24 md:pb-32">
+            <div className="w-full max-w-sm md:max-w-[500px] lg:max-w-[420px]">
+              {/* BlurImage = own intersection observer + opacity/blur transition,
+                  decoupled from any sibling fade so the image's animation always
+                  anchors to its own viewport rect. */}
+              <BlurImage
+                src={s.screenshotUrl}
+                alt={s.title}
+                className="w-full rounded-[2.5rem] shadow-2xl"
+              />
+            </div>
+          </div>
+        </section>
+      ))}
+
+      {/* ─── Footer ─── */}
+      <SiteFooter />
+      {candidtutors_brand ? (
+        <MobileCTABar
+          ctaLabel={t_tutor("find_your_tutor")}
+          ctaSubtext={t_tutor("no_credit_card")}
+        />
+      ) : (
+        <MobileCTABar ctaVariant={ctaVariant} />
+      )}
+    </main>
+  );
+}
