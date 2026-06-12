@@ -141,14 +141,6 @@ export default async function SiteFooter({ variant = "joincandid" }: SiteFooterP
           >
             adam@thefluencyproject.co
           </a>
-          <a
-            href="https://appclip.apple.com/id?p=com.adobe.aero.clip"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-sm font-normal text-white hover:opacity-70 transition-opacity"
-          >
-            App Clip
-          </a>
           <span className="text-sm opacity-50">
             {t("elevenlabs_partner")}
           </span>
