@@ -11,7 +11,7 @@ const KARAOKE_ACCENT = "#89FFB4";
 const PLAYBACK_RATE = 0.8;
 
 // Mux Data env key — public/client-safe (like the PostHog key). From Mux → Settings → Data. Empty = off.
-const MUX_DATA_ENV_KEY = "";
+const MUX_DATA_ENV_KEY = "cgtcg54i9amt7o6nidcm9g8di";
 // Sample ~15% of page loads (rolled once): the always-on marquee would otherwise log a Mux view on
 // every visit. Gates SDK download + monitoring together, so unsampled visits pay nothing.
 const MUX_SAMPLE = typeof window !== "undefined" && Math.random() < 0.15;
@@ -78,7 +78,9 @@ function MarketingClipCard({ clip, dataKey, isActive, shouldLoad, onSegmentEnd }
     const video = videoRef.current;
     if (!video) return;
 
-    const src = `https://stream.mux.com/${clip.mux_playback_id}.m3u8`;
+    // Cap renditions (drops 1080p+) so the small marquee card loads fast on mobile — applies to
+    // BOTH native iOS HLS and hls.js. Verified Mux accepts the param.
+    const src = `https://stream.mux.com/${clip.mux_playback_id}.m3u8?max_resolution=720p`;
     const playerInitTime = Date.now(); // before load → accurate Mux "player startup time"
     const wantMux = !!MUX_DATA_ENV_KEY && MUX_SAMPLE;
     // caption_segment_id (not dataKey) so the marquee's two copies of a clip dedupe to one Mux video.
@@ -108,7 +110,12 @@ function MarketingClipCard({ clip, dataKey, isActive, shouldLoad, onSegmentEnd }
       if (cancelled) return;
       const mux = muxMod?.default;
       if (Hls.isSupported()) {
-        hls = new Hls({ startPosition: clip.start_time, maxBufferLength: Math.ceil(clip.end_time - clip.start_time) + 4 });
+        hls = new Hls({
+          startPosition: clip.start_time,
+          maxBufferLength: Math.ceil(clip.end_time - clip.start_time) + 4,
+          startLevel: 0, // start at the lowest rendition → fast first frame, then ABR upgrades
+          capLevelToPlayerSize: true, // never fetch a rendition bigger than the small card needs
+        });
         hls.on(Hls.Events.MANIFEST_PARSED, on_ready);
         hls.loadSource(src);
         hls.attachMedia(video);
