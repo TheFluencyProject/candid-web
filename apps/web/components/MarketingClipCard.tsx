@@ -101,14 +101,14 @@ export default function MarketingClipCard({ clip, dataKey, isActive, shouldLoad,
     };
   }, [shouldLoad, clip]);
 
-  // Play only while active; pause + rewind otherwise. Karaoke + end-of-segment via rAF.
+  // Play only while active; pause IN PLACE otherwise (freeze on the current/last frame —
+  // no rewind, so a finished or interrupted clip rests where it stopped). Karaoke + end via rAF.
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
 
     if (!isActive) {
-      video.pause();
-      try { video.currentTime = clip.start_time; } catch { /* ignore */ }
+      video.pause(); // freeze on the current frame — do NOT rewind to start
       return;
     }
 
@@ -133,6 +133,8 @@ export default function MarketingClipCard({ clip, dataKey, isActive, shouldLoad,
 
       if (t >= clip.end_time) {
         cancelled = true;
+        try { video.currentTime = clip.end_time; } catch { /* ignore */ } // rest on the last frame
+        video.pause();
         onSegmentEndRef.current(); // play once, then the marquee hands off to the centered card
         return;
       }
