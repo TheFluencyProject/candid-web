@@ -1,7 +1,7 @@
 import createMiddleware from "next-intl/middleware";
 import { NextResponse, type NextRequest } from "next/server";
 import { routing } from "./i18n/routing";
-import { APP_STORE_URL, getRedirectUrl, APP_CLIP_ENABLED } from "./lib/platform";
+import { APP_STORE_URL, getRedirectUrl } from "./lib/platform";
 import { resolve_tutor_by_host } from "./lib/resolve-domain";
 import { isCanonicalHost } from "./lib/canonical-hosts";
 
@@ -63,12 +63,6 @@ function resolveAppStoreRedirect(pathname: string): { dest: string; status: numb
   return null;
 }
 
-// iPhone iOS major from the UA ("iPhone OS 18_5" → 18), or 0 when not an iPhone.
-function iphoneIOSMajor(ua: string): number {
-  const m = ua.match(/iPhone OS (\d+)_/);
-  return m ? parseInt(m[1], 10) : 0;
-}
-
 // Detect Korean from Accept-Language. Anything else → leave on default (`en`).
 function prefersKorean(request: NextRequest): boolean {
   const header = request.headers.get("accept-language") ?? "";
@@ -98,12 +92,9 @@ export default async function middleware(request: NextRequest) {
   const redirect = resolveAppStoreRedirect(pathname);
   if (redirect) {
     const ua = request.headers.get("user-agent") ?? "";
-    // App Clip funnel: /download/<slug> on an iOS 18+ iPhone (the clip's min target) renders the
-    // landing page so Safari surfaces the App Clip card. Gated on APP_CLIP_ENABLED — while the clip
-    // is disabled, iOS 18+ falls through to the App Store redirect too (no dead-end clip landing).
-    if (APP_CLIP_ENABLED && pathname.startsWith("/download/") && iphoneIOSMajor(ua) >= 18) {
-      return NextResponse.next();
-    }
+    // /download/<slug> always redirects to the App Store. When the App Clip is set up, iOS
+    // auto-presents it from the registered App Clip Experience (and from QR/camera) before this
+    // ever runs — this redirect is just the fallback for everything else.
     const dest = getRedirectUrl(ua, redirect.dest);
     return NextResponse.redirect(dest, { status: redirect.status });
   }
