@@ -77,6 +77,29 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 // App-screenshot sections are hidden for now — kept in code for a later day.
 const SHOW_APP_SCREENSHOTS: boolean = false;
 
+// Round-robin the language's clips across tutors so the row alternates one-by-one
+// (mirrors SimpleLanding's interleave). The current tutor's group goes first.
+function interleaveByTutor(clips: MarketingClip[], currentTutorName: string): MarketingClip[] {
+  const groups = new Map<string, MarketingClip[]>();
+  for (const c of clips) {
+    const g = groups.get(c.tutor_name) ?? [];
+    g.push(c);
+    groups.set(c.tutor_name, g);
+  }
+  const ordered = [
+    ...(groups.has(currentTutorName) ? [groups.get(currentTutorName)!] : []),
+    ...[...groups.entries()].filter(([name]) => name !== currentTutorName).map(([, g]) => g),
+  ];
+  const out: MarketingClip[] = [];
+  const max = Math.max(0, ...ordered.map((g) => g.length));
+  for (let i = 0; i < max; i++) {
+    for (const g of ordered) {
+      if (i < g.length) out.push(g[i]);
+    }
+  }
+  return out;
+}
+
 export default async function TutorPage({ params, searchParams }: Props) {
   const { locale, slug } = await params;
   setRequestLocale(locale);
@@ -87,7 +110,7 @@ export default async function TutorPage({ params, searchParams }: Props) {
     getTranslations("footer"),
     headers().then(h => h.get("host") ?? ""),
     searchParams,
-    fetchMarketingClips(locale, slug).catch(() => [] as MarketingClip[]),
+    fetchMarketingClips(locale, { slug }).catch(() => [] as MarketingClip[]),
   ]);
   if (!tutor) {
     notFound();
@@ -216,6 +239,13 @@ export default async function TutorPage({ params, searchParams }: Props) {
     );
   }
 
+  // joincandid.co / custom_domain full page. The clips row pulls from EVERY active tutor
+  // teaching this language (not just this one) and alternates one-by-one, current first.
+  const languageClips = await fetchMarketingClips(locale, { language: tutor.teaching_language }).catch(
+    () => [] as MarketingClip[],
+  );
+  const creatorClips = interleaveByTutor(languageClips, tutor.name);
+
   return (
     <main
       className="min-h-screen"
@@ -254,7 +284,7 @@ export default async function TutorPage({ params, searchParams }: Props) {
 
       {/* ─── Speaking-screenshot hero ─── */}
       <section className="relative px-6 md:px-12 pt-[84px] md:pt-[96px] pb-12 md:pb-16 lg:flex lg:items-center lg:min-h-screen lg:pt-0 lg:pb-0">
-        <div className="mx-auto w-full max-w-6xl flex flex-col lg:flex-row lg:items-center lg:justify-center lg:gap-20">
+        <div className="mx-auto w-full max-w-6xl flex flex-col lg:flex-row lg:items-center lg:justify-center lg:gap-32">
           {/* Text column */}
           <div className="lg:max-w-xl">
             <h1
@@ -297,7 +327,7 @@ export default async function TutorPage({ params, searchParams }: Props) {
               <img
                 src={speakingShot}
                 alt={t("shadow", { firstName: localizedFirstName, language: langLabel })}
-                className="block w-full max-w-[270px] rounded-[2.5rem] shadow-2xl"
+                className="block w-full max-w-[270px] lg:max-w-[400px] lg:max-h-[80vh] rounded-[2.5rem] shadow-2xl"
               />
             </div>
           )}
@@ -328,10 +358,17 @@ export default async function TutorPage({ params, searchParams }: Props) {
         </section>
       )}
 
-      {/* ─── Horizontal scrolling clips — only when the tutor has at least 3 ─── */}
-      {clips.length >= 3 && (
+      {/* ─── "Learn with {name} & other creators" — clips from every tutor of this
+             language, alternating one-by-one (current tutor first). Min 3 to show. ─── */}
+      {creatorClips.length >= 3 && (
         <div className="w-full pb-4 md:pb-8">
-          <MarketingClipMarquee clips={clips} />
+          <h2
+            className="mx-auto max-w-6xl px-6 md:px-12 mb-5 md:mb-6 text-2xl md:text-3xl font-medium leading-tight"
+            style={{ color: "#FFFFFF" }}
+          >
+            {t("learn_with_creators", { name: localizedFirstName })}
+          </h2>
+          <MarketingClipMarquee clips={creatorClips} />
         </div>
       )}
 

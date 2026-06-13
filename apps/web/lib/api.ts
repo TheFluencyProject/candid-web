@@ -90,22 +90,29 @@ export interface MarketingClip {
 }
 
 /**
- * Fetch live marketing clips. With no `slug`: the home hero (one caption segment per
- * recent lesson of each active tutor). With a `slug`: that tutor's own random handful
- * for their card marquee. Throws on transient failure so Next's data cache serves the
- * last good render; callers fall back (static screenshots / empty marquee) on throw.
+ * Fetch live marketing clips. No opts → the home hero (one caption segment per recent
+ * lesson of every active tutor). `opts.slug` → that tutor's own random handful (card
+ * marquee). `opts.language` → one clip per recent lesson of every active tutor teaching
+ * that language (the tutor page's "other creators" row). Throws on transient failure so
+ * Next's data cache serves the last good render; callers fall back on throw.
  */
-export async function fetchMarketingClips(locale: string, slug?: string): Promise<MarketingClip[]> {
-  const path = slug ? `/public/tutors/${slug}/marketing-clips` : `/public/marketing-clips`;
+export async function fetchMarketingClips(
+  locale: string,
+  opts?: { slug?: string; language?: string },
+): Promise<MarketingClip[]> {
+  const { slug, language } = opts ?? {};
+  const path = slug
+    ? `/public/tutors/${slug}/marketing-clips?locale=${locale}`
+    : `/public/marketing-clips?locale=${locale}${language ? `&language=${encodeURIComponent(language)}` : ""}`;
   const res = await fetch(
-    `${API_BASE_URL}${path}?locale=${locale}`,
+    `${API_BASE_URL}${path}`,
     { next: { revalidate: 300 }, signal: AbortSignal.timeout(8000) }
   );
   // 404 = endpoint not deployed yet / unknown slug → treat as "no clips", not an error,
   // so web can ship ahead of the backend without the marquee throwing.
   if (res.status === 404) return [];
   if (!res.ok) {
-    throw new Error(`fetchMarketingClips(${locale}${slug ? `, ${slug}` : ""}): HTTP ${res.status}`);
+    throw new Error(`fetchMarketingClips(${locale}${slug ? `, slug=${slug}` : language ? `, language=${language}` : ""}): HTTP ${res.status}`);
   }
   const body = (await res.json()) as { clips?: MarketingClip[] };
   return body.clips ?? [];
