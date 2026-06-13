@@ -416,8 +416,8 @@ export default function MarketingClipMarquee({ clips, karaoke = true }: { clips:
         </div>
       </div>
       {/* Mute toggle, centered under the row — no background, just the dimmed white icon + label.
-          md:-mt pulls it up into the row's md:py-8 bottom padding so it sits closer to the cards on desktop. */}
-      <div className="mt-3 flex justify-center md:-mt-3">
+          md:mt-0 cancels the base mt-3 on desktop, so the gap is just the row's md:py-8 bottom padding (~32px). */}
+      <div className="mt-3 flex justify-center md:mt-0">
         <button
           type="button"
           onClick={() => setMuted((m) => !m)}
