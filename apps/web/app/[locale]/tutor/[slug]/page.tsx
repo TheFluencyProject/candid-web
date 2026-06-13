@@ -251,6 +251,8 @@ export default async function TutorPage({ params, searchParams }: Props) {
     () => [] as MarketingClip[],
   );
   const creatorClips = interleaveByTutor(languageClips, tutor.name);
+  // Only this tutor's clips in the row → "their daily dose"; multiple creators → discovery title.
+  const singleCreator = new Set(creatorClips.map((c) => c.tutor_name)).size <= 1;
 
   return (
     <main
@@ -373,7 +375,9 @@ export default async function TutorPage({ params, searchParams }: Props) {
               className="hero-heading font-medium leading-[1.05] text-[clamp(1.95rem,9vw,2.8rem)] lg:text-[3.15rem]"
               style={{ color: "#FFFFFF" }}
             >
-              {t("learn_with_creators", { name: localizedFirstName })}
+              {singleCreator
+                ? t("daily_dose_with_tutor", { language: langLabel, name: heroName })
+                : t("learn_with_creators", { name: localizedFirstName })}
             </h2>
             <p
               className="mt-3 text-lg md:text-xl font-light leading-snug max-w-2xl"
