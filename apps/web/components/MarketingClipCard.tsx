@@ -62,6 +62,10 @@ function MarketingClipCard({ clip, dataKey, isActive, shouldLoad, onSegmentEnd }
   isActiveRef.current = isActive;
 
   const play_from_start = (video: HTMLVideoElement) => {
+    // iOS: React's `muted`/`playsInline` props don't reliably set the real state, so iOS
+    // blocks muted-autoplay (→ "no video"). Force them imperatively before play().
+    video.muted = true;
+    video.playsInline = true;
     try { video.currentTime = clip.start_time; } catch { /* not seekable yet */ }
     video.defaultPlaybackRate = PLAYBACK_RATE;
     video.playbackRate = PLAYBACK_RATE;
