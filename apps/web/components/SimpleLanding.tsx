@@ -44,9 +44,9 @@ function interleave(lists: string[][]): string[] {
   return out;
 }
 
-type Props = { locale: string };
+type Props = { locale: string; karaoke?: boolean };
 
-export default async function SimpleLanding({ locale }: Props) {
+export default async function SimpleLanding({ locale, karaoke = true }: Props) {
   // Promise.all + filter(null): a 404 drops out; a transient throw → Next serves
   // the last cached render (see fetchTutor) instead of a blank row.
   const tutors = (
@@ -125,7 +125,7 @@ export default async function SimpleLanding({ locale }: Props) {
               marquee's own py-4 adds ~16px, so mb-8 ≈ the pt-12 above the title). */}
           <div className="mt-6 md:mt-20 mb-8 md:mb-0">
             {clips.length > 0 ? (
-              <MarketingClipMarquee clips={clips} />
+              <MarketingClipMarquee clips={clips} karaoke={karaoke} />
             ) : (
               <ScreenshotMarquee urls={screenshots} />
             )}

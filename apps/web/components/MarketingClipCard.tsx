@@ -1,6 +1,6 @@
 "use client";
 
-import { memo, useEffect, useRef, useState } from "react";
+import { Fragment, memo, useEffect, useRef, useState } from "react";
 import type { MarketingClip } from "@/lib/api";
 
 // iOS AccentColor (display-p3 0x89/0xFF/0xB4) — the karaoke word sweep, by role not appearance.
@@ -61,9 +61,11 @@ type Props = {
   /** Fires when the active video actually starts playing — lets the marquee defer
    *  neighbor prebuffering until the first clip is established (mobile cold-start). */
   onReady: () => void;
+  /** Apple-Music karaoke captions + Speak-now pill + darker bg (the default). `?karaoke=0` → false. */
+  karaoke?: boolean;
 };
 
-function MarketingClipCard({ clip, dataKey, isActive, shouldLoad, onSegmentEnd, onReady }: Props) {
+function MarketingClipCard({ clip, dataKey, isActive, shouldLoad, onSegmentEnd, onReady, karaoke = true }: Props) {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const [activeWordIdx, setActiveWordIdx] = useState(-1);
   const [ready, setReady] = useState(false); // first frame buffered → fade video over poster
@@ -71,6 +73,9 @@ function MarketingClipCard({ clip, dataKey, isActive, shouldLoad, onSegmentEnd, 
   // the clip plays. NOT reset on deactivate, so a card holds its fill where it stopped.
   const start_fill = 0.15 + seeded_unit(clip.caption_segment_id) * 0.75;
   const [progress, setProgress] = useState(start_fill);
+  // Live playback position (absolute video time) driving the karaoke reveal. Separate from
+  // activeWordIdx so the classic path's frozen captions stay unchanged.
+  const [playhead, setPlayhead] = useState(clip.start_time);
 
   const onSegmentEndRef = useRef(onSegmentEnd);
   onSegmentEndRef.current = onSegmentEnd;
@@ -179,6 +184,7 @@ function MarketingClipCard({ clip, dataKey, isActive, shouldLoad, onSegmentEnd, 
       if (video.playbackRate !== PLAYBACK_RATE) video.playbackRate = PLAYBACK_RATE; // hls/seek can reset it
       if (video.paused && video.readyState >= 2) video.play().catch(() => {}); // re-assert if play stalled/was blocked
       const t = video.currentTime;
+      setPlayhead(t);
       const dur = clip.end_time - clip.start_time;
       if (dur > 0) setProgress(start_fill + PROGRESS_ADVANCE * Math.min(1, Math.max(0, (t - clip.start_time) / dur)));
       const wlc = clip.word_level_captions;
@@ -258,16 +264,48 @@ function MarketingClipCard({ clip, dataKey, isActive, shouldLoad, onSegmentEnd, 
 
       {/* Bottom — caption (word-level karaoke) + translation. Gradient is lighter at the
           very bottom and sustains darkness higher up so the caption stays legible. */}
-      <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-[62%] bg-gradient-to-t from-black/60 via-black/45 to-transparent" />
+      <div className={`pointer-events-none absolute inset-x-0 bottom-0 z-10 h-[62%] bg-gradient-to-t to-transparent ${karaoke ? "from-black/85 via-black/70" : "from-black/60 via-black/45"}`} />
+      {/* always-mounted + opacity so it fades OUT too; gated on isActive → one playing card at a time */}
+      {karaoke && (
+        <div className={`pointer-events-none absolute inset-x-0 top-[56%] z-20 flex justify-center -translate-y-[calc(100%+8px)] transition-opacity duration-300 ease-out ${isActive && ready ? "opacity-100" : "opacity-0"}`}>
+          <span className="inline-block rounded-md px-2 py-0.5 text-[11px] font-semibold text-black shadow" style={{ backgroundColor: KARAOKE_ACCENT }}>
+            Speak now…
+          </span>
+        </div>
+      )}
       <div className="absolute inset-x-0 top-[56%] z-10 px-4">
         <p className="text-white text-[1.35rem] md:text-[1.6875rem] font-bold leading-tight drop-shadow">
-          {words && words.length > 0
-            ? words.map((w, i) => (
-                <span key={i} style={i === activeWordIdx ? { color: KARAOKE_ACCENT } : undefined}>
-                  {w.text}{i < words.length - 1 ? " " : ""}
-                </span>
-              ))
-            : clip.text}
+          {karaoke ? (
+            words && words.length > 0 ? (
+              words.map((w, i) => {
+                const next = words[i + 1];
+                // extend a word's sweep into a tight (<0.2s) gap so it doesn't stall between words (iOS parity)
+                const eff_end = next && next.start_time - w.end_time < 0.2 ? next.start_time : w.end_time;
+                const fill = Math.min(1, Math.max(0, (playhead - w.start_time) / Math.max(0.0001, eff_end - w.start_time)));
+                return (
+                  <Fragment key={i}>
+                    {/* dim base + full overlay revealed left→right; fill from live currentTime each frame
+                        (not a CSS anim) so it can't drift from the video and freezes if it buffers */}
+                    <span className="relative inline-block align-baseline">
+                      <span style={{ color: KARAOKE_ACCENT, opacity: 0.4 }}>{w.text}</span>
+                      <span aria-hidden className="absolute inset-0" style={{ color: KARAOKE_ACCENT, clipPath: `inset(0 ${(1 - fill) * 100}% 0 0)` }}>{w.text}</span>
+                    </span>
+                    {i < words.length - 1 ? " " : ""}{/* real space node so the line still wraps between words */}
+                  </Fragment>
+                );
+              })
+            ) : (
+              <span style={{ color: KARAOKE_ACCENT }}>{clip.text}</span>
+            )
+          ) : words && words.length > 0 ? (
+            words.map((w, i) => (
+              <span key={i} style={i === activeWordIdx ? { color: KARAOKE_ACCENT } : undefined}>
+                {w.text}{i < words.length - 1 ? " " : ""}
+              </span>
+            ))
+          ) : (
+            clip.text
+          )}
         </p>
         {clip.translation && clip.translation !== clip.text && (
           <p className="mt-1.5 text-white/90 text-[0.9rem] md:text-[1.0125rem] font-medium leading-snug drop-shadow">{clip.translation}</p>

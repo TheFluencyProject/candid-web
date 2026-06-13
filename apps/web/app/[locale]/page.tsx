@@ -6,11 +6,13 @@ import SimpleLanding from "@/components/SimpleLanding";
 
 type Props = {
   params: Promise<{ locale: string }>;
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 };
 
-export default async function Home({ params }: Props) {
+export default async function Home({ params, searchParams }: Props) {
   const { locale } = await params;
   setRequestLocale(locale);
+  const sp = await searchParams;
 
   // Host-conditional: candidtutors.co/ keeps its stripped landing; joincandid.co
   // (+ previews + localhost) get the new simple landing. The old carousel lives
@@ -20,5 +22,5 @@ export default async function Home({ params }: Props) {
     return <CandidtutorsLanding />;
   }
 
-  return <SimpleLanding locale={locale} />;
+  return <SimpleLanding locale={locale} karaoke={sp.karaoke !== "0"} />;
 }

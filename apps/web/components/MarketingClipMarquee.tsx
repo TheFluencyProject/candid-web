@@ -17,7 +17,7 @@ const useIsomorphicLayoutEffect = typeof window !== "undefined" ? useLayoutEffec
 // scrolls infinitely in both directions instead of hitting the end of two copies. Drag uses
 // pointer events with a touch axis-lock so a vertical swipe still scrolls the page. Exactly
 // one card plays at a time and follows the viewport center as you drag.
-export default function MarketingClipMarquee({ clips }: { clips: MarketingClip[] }) {
+export default function MarketingClipMarquee({ clips, karaoke = true }: { clips: MarketingClip[]; karaoke?: boolean }) {
   const containerRef = useRef<HTMLDivElement | null>(null); // viewport (clips the track)
   const trackRef = useRef<HTMLDivElement | null>(null); // the translated 2-group track
   const offsetRef = useRef(0); // current translateX, kept wrapped to [0, groupWidth)
@@ -129,10 +129,8 @@ export default function MarketingClipMarquee({ clips }: { clips: MarketingClip[]
     let raf = 0;
     let last = 0;
     let sinceInview = 0;
-    // 1.5x faster on mobile (<768px, Tailwind md breakpoint) than desktop.
-    const speed = (typeof window !== "undefined" && window.innerWidth < 768)
-      ? SCROLL_SPEED_PX_PER_SEC * 1.5
-      : SCROLL_SPEED_PX_PER_SEC;
+    // 1.5× the old desktop pace, on mobile AND desktop.
+    const speed = SCROLL_SPEED_PX_PER_SEC * 1.5;
     const step = (ts: number) => {
       const dt = last ? ts - last : 0;
       last = ts;
@@ -348,6 +346,7 @@ export default function MarketingClipMarquee({ clips }: { clips: MarketingClip[]
             shouldLoad={autoKey === key || (prebuffer_neighbors && inView.has(key))}
             onSegmentEnd={handle_segment_end}
             onReady={handle_ready}
+            karaoke={karaoke}
           />
         );
       })}
