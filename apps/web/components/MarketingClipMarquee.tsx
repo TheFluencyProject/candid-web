@@ -77,7 +77,9 @@ export default function MarketingClipMarquee({ clips }: { clips: MarketingClip[]
     const root = containerRef.current;
     if (!root) return;
     const rootRect = root.getBoundingClientRect();
-    const margin = 300;
+    const margin = 120; // preload just the centered card + immediate neighbors (~3 streams):
+    // enough that the next clip is ready before it centers, without the ~6 concurrent streams
+    // that strain mobile Safari.
     setInView((prev) => {
       const next = new Set<string>();
       for (const el of Array.from(root.querySelectorAll<HTMLElement>("[data-key]"))) {
@@ -309,7 +311,7 @@ export default function MarketingClipMarquee({ clips }: { clips: MarketingClip[]
             isActive={autoKey === key}
             // keep the active card loaded even if it drifts past the margin, so a long clip
             // never blanks out mid-play before it hands off
-            shouldLoad={autoKey === key}
+            shouldLoad={inView.has(key) || autoKey === key}
             onSegmentEnd={handle_segment_end}
           />
         );
