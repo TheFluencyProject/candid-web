@@ -111,6 +111,11 @@ export default async function TutorPage({ params, searchParams }: Props) {
   // and ?v=meta). joincandid.co/tutor stays on the App Store path.
   const uses_join_sheet = join_for_free || candidtutors_brand;
 
+  // joincandid.co (+ preview/local) now renders the same compact card as
+  // candidtutors.co, but its CTA routes to the App Clip funnel (/download/[slug])
+  // — not the web-signup sheet. custom_domain pages keep the full-bleed hero.
+  const app_clip_card = !candidtutors_brand && !join_for_free;
+
   // "Join {name}'s study club for conversational {lang}" framing — default on
   // candidtutors.co AND on the ?v=meta ad variant; original subtitle otherwise.
   const use_study_club_framing = is_meta_variant || candidtutors_brand;
@@ -140,11 +145,12 @@ export default async function TutorPage({ params, searchParams }: Props) {
         ? config.subtitle.enMobile
         : subtitleHtml.replace(/<br\s*\/?>/gi, " ").replace(/\s+/g, " ").trim());
 
-  // ─── candidtutors.co simplified card layout ─────────────────────────────
+  // ─── simplified card layout (candidtutors.co + joincandid.co) ───────────
   // Single centered card on the dark page — no navbar, no app screenshots,
-  // no footer, no App Store badge. joincandid.co + custom_domain pages keep
-  // the existing full-bleed hero (see the main return below).
-  if (candidtutors_brand) {
+  // no App Store badge. candidtutors.co's CTA opens the web-signup sheet;
+  // joincandid.co's CTA routes to the App Clip funnel. custom_domain pages
+  // keep the full-bleed hero (see the main return below).
+  if (candidtutors_brand || app_clip_card) {
     const heroImage = tutor.web_bg_picture_url || tutor.large_profile_picture_url;
     // The tutor's own clips for the marquee below the card. Additive chrome — a fetch
     // failure (incl. the pre-deploy 404) falls back to [] so it never breaks the card.
@@ -197,10 +203,24 @@ export default async function TutorPage({ params, searchParams }: Props) {
                   {tutor.web_letter}
                 </p>
               )}
-              <JoinForFreePill
-                label={t("study_with", { name: localizedFirstName })}
-                variant="card"
-              />
+              {candidtutors_brand ? (
+                <JoinForFreePill
+                  label={t("study_with", { name: localizedFirstName })}
+                  variant="card"
+                />
+              ) : (
+                // joincandid.co: green card CTA → App Clip funnel. The global
+                // DownloadQRInterceptor turns this into a scan-to-install QR on
+                // desktop and an App Clip card on iOS; data-tutor-name personalizes both.
+                <a
+                  href={`/download/${slug}`}
+                  data-tutor-name={localizedFirstName}
+                  className="block w-full text-center px-7 py-4 rounded-full text-base font-bold tracking-wide"
+                  style={{ backgroundColor: "#89FFB4", color: "#000000" }}
+                >
+                  {t("start_with_name", { name: localizedFirstName })}
+                </a>
+              )}
             </div>
           </div>
         </div>
@@ -221,11 +241,13 @@ export default async function TutorPage({ params, searchParams }: Props) {
             </Link>
           </div>
         </footer>
-        <JoinForFreeSheet
-          tutor_name={localizedFirstName}
-          tutor_slug={slug}
-          locale={join_for_free_locale}
-        />
+        {candidtutors_brand && (
+          <JoinForFreeSheet
+            tutor_name={localizedFirstName}
+            tutor_slug={slug}
+            locale={join_for_free_locale}
+          />
+        )}
       </main>
     );
   }
