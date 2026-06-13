@@ -63,7 +63,8 @@ export default async function SimpleLanding({ locale, karaoke = true }: Props) {
   // falls back to the static screenshot marquee below — the hero is never blank.
   let clips: MarketingClip[] = [];
   try {
-    clips = shuffle(await fetchMarketingClips(locale));
+    // Home markets Korean — show only Korean creators' clips, not English tutors'.
+    clips = shuffle(await fetchMarketingClips(locale, { language: "korean" }));
   } catch {
     clips = [];
   }
