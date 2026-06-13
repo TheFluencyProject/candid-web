@@ -126,6 +126,8 @@ export default async function TutorPage({ params, searchParams }: Props) {
 
   // Meta-ad landing variant: ?v=meta swaps hero copy + CTA, always-shows mobile sticky.
   const is_meta_variant = sp.v === "meta";
+  // Karaoke captions are the default; ?karaoke=0 shows the old per-word-highlight style.
+  const karaoke = sp.karaoke !== "0";
 
   // CTAs that open the Join-for-free sheet (instead of routing to the App Store):
   // custom_domain tutor pages AND every candidtutors.co tutor page (both default
@@ -216,7 +218,7 @@ export default async function TutorPage({ params, searchParams }: Props) {
         {/* Tutor's own clips — full-width row below the card (breaks out of max-w-2xl). */}
         {clips.length > 0 && (
           <div className="w-full">
-            <MarketingClipMarquee clips={clips} />
+            <MarketingClipMarquee clips={clips} karaoke={karaoke} />
           </div>
         )}
         <footer className="px-6 py-6 flex items-center justify-between flex-wrap gap-4 text-sm" style={{ color: "rgba(255,255,255,0.5)" }}>
@@ -361,14 +363,14 @@ export default async function TutorPage({ params, searchParams }: Props) {
       {/* ─── "Learn with {name} & other creators" — clips from every tutor of this
              language, alternating one-by-one (current tutor first). Min 3 to show. ─── */}
       {creatorClips.length >= 3 && (
-        <div className="w-full pb-4 md:pb-8">
+        <div className="w-full pt-16 md:pt-28 pb-16 md:pb-28">
           <h2
-            className="mx-auto max-w-6xl px-6 md:px-12 mb-5 md:mb-6 text-2xl md:text-3xl font-medium leading-tight"
+            className="mx-auto max-w-6xl px-6 md:px-12 mb-3 md:mb-4 text-3xl md:text-4xl font-medium leading-tight"
             style={{ color: "#FFFFFF" }}
           >
             {t("learn_with_creators", { name: localizedFirstName })}
           </h2>
-          <MarketingClipMarquee clips={creatorClips} />
+          <MarketingClipMarquee clips={creatorClips} karaoke={karaoke} />
         </div>
       )}
 
