@@ -112,6 +112,10 @@ export default function MarketingClipMarquee({ clips }: { clips: MarketingClip[]
     let raf = 0;
     let last = 0;
     let sinceInview = 0;
+    // 1.5x faster on mobile (<768px, Tailwind md breakpoint) than desktop.
+    const speed = (typeof window !== "undefined" && window.innerWidth < 768)
+      ? SCROLL_SPEED_PX_PER_SEC * 1.5
+      : SCROLL_SPEED_PX_PER_SEC;
     const step = (ts: number) => {
       const dt = last ? ts - last : 0;
       last = ts;
@@ -119,7 +123,7 @@ export default function MarketingClipMarquee({ clips }: { clips: MarketingClip[]
         // measure here too, so the drift starts on the first frame even if the measure effect
         // hasn't run yet (mobile first paint can lag) — was "doesn't move immediately on mobile"
         if (groupWidthRef.current <= 0) groupWidthRef.current = group_width();
-        if (groupWidthRef.current > 0) set_offset(offsetRef.current + (SCROLL_SPEED_PX_PER_SEC * dt) / 1000);
+        if (groupWidthRef.current > 0) set_offset(offsetRef.current + (speed * dt) / 1000);
       }
       // Safety net: if nothing is playing (a pick race on load, or a settle that found
       // nothing), choose a centered card so a video is always playing.
