@@ -254,9 +254,9 @@ export default async function TutorPage({ params, searchParams }: Props) {
 
       {/* ─── Speaking-screenshot hero ─── */}
       <section className="relative px-6 md:px-12 pt-[84px] md:pt-[96px] pb-12 md:pb-16 lg:flex lg:items-center lg:min-h-screen lg:pt-0 lg:pb-0">
-        <div className="mx-auto w-full max-w-6xl flex flex-col lg:flex-row lg:items-center lg:gap-12">
+        <div className="mx-auto w-full max-w-6xl flex flex-col lg:flex-row lg:items-center lg:justify-center lg:gap-12">
           {/* Text column */}
-          <div className="lg:flex-1">
+          <div className="lg:max-w-xl">
             <h1
               className="hero-heading font-medium leading-[1.05] whitespace-pre-line text-[clamp(1.95rem,9vw,2.8rem)] lg:text-[3.15rem] mb-4 md:mb-5 animate-fade-in-up"
               style={{ color: "#FFFFFF" }}
@@ -291,7 +291,7 @@ export default async function TutorPage({ params, searchParams }: Props) {
 
           {/* Speaking (shadowing) screenshot — no device frame, just the rounded screen */}
           {speakingShot && (
-            <div className="lg:flex-1 flex justify-center lg:justify-end mt-6 lg:mt-0 animate-fade-in-up-delay-1">
+            <div className="flex justify-center mt-6 lg:mt-0 animate-fade-in-up-delay-1">
               {/* Plain <img> direct from S3 — bypasses the /_next/image transcode hop. */}
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
@@ -304,7 +304,7 @@ export default async function TutorPage({ params, searchParams }: Props) {
         </div>
 
         {/* Sentinel — drives the navbar CTA reveal on scroll. */}
-        <div id="hero-sentinel" className="absolute w-full h-1" style={{ top: "70%" }} />
+        <div id="hero-sentinel" className="absolute inset-x-0 h-1" style={{ top: "70%" }} />
       </section>
 
       {/* ─── Centered profile photo + the tutor's written letter ─── */}
