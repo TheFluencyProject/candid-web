@@ -415,13 +415,14 @@ export default function MarketingClipMarquee({ clips, karaoke = true }: { clips:
           {render_group(1, true)}
         </div>
       </div>
-      {/* Mute toggle, centered under the row — no background, just the white icon + label. */}
-      <div className="mt-3 flex justify-center md:mt-4">
+      {/* Mute toggle, centered under the row — no background, just the dimmed white icon + label.
+          md:-mt pulls it up into the row's md:py-8 bottom padding so it sits closer to the cards on desktop. */}
+      <div className="mt-3 flex justify-center md:-mt-3">
         <button
           type="button"
           onClick={() => setMuted((m) => !m)}
           aria-pressed={!muted}
-          className="inline-flex items-center gap-1.5 text-white/85 transition-colors hover:text-white"
+          className="inline-flex items-center gap-1.5 text-white/50 transition-colors hover:text-white"
         >
           <SpeakerIcon muted={muted} />
           <span className="text-sm font-medium">{muted ? "Tap to unmute" : "Tap to mute"}</span>
