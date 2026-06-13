@@ -167,15 +167,8 @@ export default function MarketingClipCard({ clip, dataKey, isActive, shouldLoad,
       <div className="absolute inset-x-0 top-0 z-10 px-4 pt-3 pb-6 bg-gradient-to-b from-black/45 to-transparent">
         <div className="flex items-center justify-between gap-2">
           <span className="min-w-0 flex-1 truncate text-white text-xs md:text-sm font-semibold drop-shadow">{title_text}</span>
-          {/* SF Symbols switch.2 (iOS immersion toggle): two identical, vertically-stacked
-              capsule tracks (same x extent — aligned, not offset) with filled knobs on
-              opposite sides — top-left, bottom-right. */}
-          <svg width="22" height="15.6" viewBox="0 0 24 17" fill="none" preserveAspectRatio="xMidYMid meet" className="shrink-0 text-white" aria-hidden>
-            <rect x="1" y="1.2" width="22" height="6.8" rx="3.4" stroke="currentColor" strokeWidth="1.6" />
-            <rect x="3" y="2.9" width="6" height="3.4" rx="1.7" fill="currentColor" />
-            <rect x="1" y="9" width="22" height="6.8" rx="3.4" stroke="currentColor" strokeWidth="1.6" />
-            <rect x="15" y="10.7" width="6" height="3.4" rx="1.7" fill="currentColor" />
-          </svg>
+          {/* SF Symbols switch.2 (iOS immersion toggle) — the exact asset from /public. */}
+          <img src="/switch.2.svg" alt="" aria-hidden draggable={false} className="shrink-0 h-[18px] w-[18px] drop-shadow" />
         </div>
         {/* Progress bars UNDER the title; the fill tracks the clip's actual playback position. */}
         <div className="mt-2.5 flex gap-1">
