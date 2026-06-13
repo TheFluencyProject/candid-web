@@ -11,7 +11,7 @@ const KARAOKE_ACCENT = "#89FFB4";
 const PLAYBACK_RATE = 0.8;
 
 // How far the stories bar creeps forward over one clip's playback — small on purpose.
-const PROGRESS_ADVANCE = 0.05;
+const PROGRESS_ADVANCE = 0.025;
 
 // Deterministic pseudo-random in [0,1) from a string — stable across SSR/client so the
 // per-card story-bar start fill doesn't cause a hydration mismatch.
