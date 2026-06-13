@@ -121,9 +121,9 @@ export default async function SimpleLanding({ locale, karaoke = true }: Props) {
             </div>
           </div>
 
-          {/* Breathing room above the row, plus matching space below it on mobile (the
-              marquee's own py-4 adds ~16px, so mb-8 ≈ the pt-12 above the title). */}
-          <div className="mt-6 md:mt-20 mb-8 md:mb-0">
+          {/* Normal gap above the row — matches the rest of the hero spacing. On mobile,
+              mb-8 below ≈ the pt-12 above the title (the marquee's own py-4 adds ~16px). */}
+          <div className="mt-6 md:mt-8 mb-8 md:mb-0">
             {clips.length > 0 ? (
               <MarketingClipMarquee clips={clips} karaoke={karaoke} />
             ) : (

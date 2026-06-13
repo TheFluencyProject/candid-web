@@ -364,12 +364,20 @@ export default async function TutorPage({ params, searchParams }: Props) {
              language, alternating one-by-one (current tutor first). Min 3 to show. ─── */}
       {creatorClips.length >= 3 && (
         <div className="w-full pt-16 md:pt-28 pb-16 md:pb-28">
-          <h2
-            className="mx-auto max-w-6xl px-6 md:px-12 mb-3 md:mb-4 text-3xl md:text-4xl font-medium leading-tight"
-            style={{ color: "#FFFFFF" }}
-          >
-            {t("learn_with_creators", { name: localizedFirstName })}
-          </h2>
+          <div className="mx-auto max-w-6xl px-6 md:px-12 mb-4 md:mb-6">
+            <h2
+              className="text-3xl md:text-4xl font-medium leading-tight"
+              style={{ color: "#FFFFFF" }}
+            >
+              {t("learn_with_creators", { name: localizedFirstName })}
+            </h2>
+            <p
+              className="mt-2 text-base md:text-lg leading-snug max-w-2xl"
+              style={{ color: "rgba(255,255,255,0.7)" }}
+            >
+              {t("creators_subtitle", { language: langLabel })}
+            </p>
+          </div>
           <MarketingClipMarquee clips={creatorClips} karaoke={karaoke} />
         </div>
       )}
