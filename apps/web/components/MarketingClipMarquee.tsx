@@ -22,6 +22,9 @@ export default function MarketingClipMarquee({ clips }: { clips: MarketingClip[]
   const dragRef = useRef({ dragging: false, pending: false, startX: 0, startY: 0, startOffset: 0 });
   const centerRafRef = useRef(0); // coalesces the during-drag "which card is centered" recompute
   const lastClipIdRef = useRef<string | null>(null);
+  const velRef = useRef(0); // offset velocity (px/ms) sampled during drag, for release momentum
+  const lastMoveRef = useRef({ x: 0, t: 0 });
+  const momentumRafRef = useRef(0);
 
   const [autoKey, setAutoKey] = useState<string | null>(null);
   const [inView, setInView] = useState<Set<string>>(() => new Set());
@@ -138,7 +141,7 @@ export default function MarketingClipMarquee({ clips }: { clips: MarketingClip[]
     };
   }, [clips, recompute_inview, pick_nearest_center]);
 
-  // End of a drag: resume drift and recompute the centered playing card.
+  // End of a drag/scroll: resume drift and recompute the centered playing card.
   const settle = useCallback(() => {
     if (centerRafRef.current) {
       cancelAnimationFrame(centerRafRef.current);
@@ -149,9 +152,66 @@ export default function MarketingClipMarquee({ clips }: { clips: MarketingClip[]
     setAutoKey(pick_nearest_center(null));
   }, [pick_nearest_center, recompute_inview]);
 
+  // Trackpad / wheel horizontal scroll. There's no native scroll to lean on (the track is a
+  // transform), so move the offset here. Native non-passive listener so we can preventDefault
+  // the horizontal wheel (otherwise it triggers the browser's back/forward swipe); a vertical
+  // wheel is left alone so the page still scrolls.
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+    let endTimer = 0;
+    const on_wheel = (e: WheelEvent) => {
+      const dx = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : 0;
+      if (dx === 0) return; // vertical → let the page scroll
+      e.preventDefault();
+      pausedRef.current = true;
+      set_offset(offsetRef.current + dx);
+      request_center_update(); // playing card follows the center while scrolling
+      clearTimeout(endTimer);
+      endTimer = window.setTimeout(settle, 140);
+    };
+    el.addEventListener("wheel", on_wheel, { passive: false });
+    return () => {
+      el.removeEventListener("wheel", on_wheel);
+      clearTimeout(endTimer);
+    };
+  }, [clips.length, settle, request_center_update]);
+
+  // Stop any in-flight momentum / center rAFs on unmount.
+  useEffect(() => () => {
+    if (momentumRafRef.current) cancelAnimationFrame(momentumRafRef.current);
+    if (centerRafRef.current) cancelAnimationFrame(centerRafRef.current);
+  }, []);
+
+  // Release momentum: glide on with the flick velocity, decelerating, then hand to the drift —
+  // so letting go of a drag keeps scrolling naturally instead of stopping dead.
+  const start_momentum = () => {
+    if (performance.now() - lastMoveRef.current.t > 100) velRef.current = 0; // a held release: no throw
+    if (Math.abs(velRef.current) < 0.08) { settle(); return; } // too slow to be a flick
+    let last = performance.now();
+    const step = () => {
+      const now = performance.now();
+      const dt = now - last;
+      last = now;
+      set_offset(offsetRef.current + velRef.current * dt);
+      request_center_update();
+      velRef.current *= Math.pow(0.95, dt / 16.67); // frame-rate-independent friction
+      if (Math.abs(velRef.current) < 0.04) { // decayed to ~drift speed → let the drift take over
+        momentumRafRef.current = 0;
+        settle();
+        return;
+      }
+      momentumRafRef.current = requestAnimationFrame(step);
+    };
+    momentumRafRef.current = requestAnimationFrame(step);
+  };
+
   // ── Drag. Mouse drags immediately; touch waits one move to lock horizontal vs vertical so
   //    a vertical swipe still scrolls the page (touch-action: pan-y). ──
   const on_pointer_down = (e: React.PointerEvent) => {
+    if (momentumRafRef.current) { cancelAnimationFrame(momentumRafRef.current); momentumRafRef.current = 0; }
+    velRef.current = 0;
+    lastMoveRef.current = { x: e.clientX, t: performance.now() };
     if (e.pointerType === "mouse") {
       dragRef.current = { dragging: true, pending: false, startX: e.clientX, startY: e.clientY, startOffset: offsetRef.current };
       pausedRef.current = true;
@@ -171,6 +231,8 @@ export default function MarketingClipMarquee({ clips }: { clips: MarketingClip[]
         d.dragging = true;
         d.pending = false;
         pausedRef.current = true;
+        velRef.current = 0;
+        lastMoveRef.current = { x: e.clientX, t: performance.now() }; // baseline for flick velocity
         try { e.currentTarget.setPointerCapture(e.pointerId); } catch { /* ignore */ }
       } else {
         d.pending = false; // vertical → let the browser scroll the page
@@ -179,6 +241,13 @@ export default function MarketingClipMarquee({ clips }: { clips: MarketingClip[]
     }
     if (d.dragging) {
       set_offset(d.startOffset - (e.clientX - d.startX));
+      const now = performance.now();
+      const dt = now - lastMoveRef.current.t;
+      if (dt > 0) {
+        const inst = -(e.clientX - lastMoveRef.current.x) / dt; // offset velocity (px/ms)
+        velRef.current = velRef.current * 0.7 + inst * 0.3; // light smoothing for the flick
+        lastMoveRef.current = { x: e.clientX, t: now };
+      }
       request_center_update(); // playing card follows the center DURING the drag
       return;
     }
@@ -196,7 +265,7 @@ export default function MarketingClipMarquee({ clips }: { clips: MarketingClip[]
     dragRef.current = { dragging: false, pending: false, startX: 0, startY: 0, startOffset: 0 };
     if (was_dragging) {
       try { e.currentTarget.releasePointerCapture(e.pointerId); } catch { /* ignore */ }
-      settle();
+      start_momentum(); // glide on from the flick, then settle into the drift
     }
   };
 
