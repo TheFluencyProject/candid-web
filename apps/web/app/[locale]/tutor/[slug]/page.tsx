@@ -254,12 +254,12 @@ export default async function TutorPage({ params, searchParams }: Props) {
       />
 
       {/* ─── Speaking-screenshot hero ─── */}
-      <section className="relative px-6 md:px-12 pt-[110px] md:pt-[128px] pb-12 md:pb-16">
+      <section className="relative px-6 md:px-12 pt-[84px] md:pt-[96px] pb-12 md:pb-16">
         <div className="mx-auto w-full max-w-6xl flex flex-col lg:flex-row lg:items-center lg:gap-12">
           {/* Text column */}
           <div className="lg:flex-1">
             <h1
-              className="hero-heading font-medium leading-[1.05] whitespace-pre-line text-[clamp(2.4rem,11vw,3.4rem)] lg:text-[3.5rem] mb-4 md:mb-5 animate-fade-in-up"
+              className="hero-heading font-medium leading-[1.05] whitespace-pre-line text-[clamp(2.15rem,10vw,3.05rem)] lg:text-[3.15rem] mb-4 md:mb-5 animate-fade-in-up"
               style={{ color: "#FFFFFF" }}
             >
               {heroTitle}
@@ -283,18 +283,16 @@ export default async function TutorPage({ params, searchParams }: Props) {
             )}
           </div>
 
-          {/* Phone-framed speaking (shadowing) screenshot */}
+          {/* Speaking (shadowing) screenshot — no device frame, just the rounded screen */}
           {speakingShot && (
-            <div className="lg:flex-1 flex justify-center lg:justify-end mt-10 lg:mt-0 animate-fade-in-up-delay-1">
-              <div className="relative w-full max-w-[300px] rounded-[2.75rem] bg-black p-2.5 shadow-2xl">
-                {/* Plain <img> direct from S3 — bypasses the /_next/image transcode hop. */}
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={speakingShot}
-                  alt={t("shadow", { firstName: localizedFirstName, language: langLabel })}
-                  className="block w-full rounded-[2.1rem]"
-                />
-              </div>
+            <div className="lg:flex-1 flex justify-center lg:justify-end mt-6 lg:mt-0 animate-fade-in-up-delay-1">
+              {/* Plain <img> direct from S3 — bypasses the /_next/image transcode hop. */}
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={speakingShot}
+                alt={t("shadow", { firstName: localizedFirstName, language: langLabel })}
+                className="block w-full max-w-[270px] rounded-[2.5rem] shadow-2xl"
+              />
             </div>
           )}
         </div>
