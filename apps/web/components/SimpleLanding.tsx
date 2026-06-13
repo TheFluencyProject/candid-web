@@ -97,7 +97,7 @@ export default async function SimpleLanding({ locale }: Props) {
         {/* Desktop centers the hero in the min-h-screen viewport; mobile flows naturally
             from the top (md:justify-center only) with real breathing room above the title. */}
         <div className="flex flex-1 flex-col md:justify-center">
-          <div className="px-6 text-center pt-16 md:pt-0">
+          <div className="px-6 text-center pt-12 md:pt-0">
             <h1 className="text-4xl md:text-6xl font-light tracking-tight leading-[1.1] mb-5">
               Your guide to <br className="md:hidden" />real-life fluency
             </h1>
@@ -126,9 +126,9 @@ export default async function SimpleLanding({ locale }: Props) {
             </div>
           </div>
 
-          {/* Breathing room between the hero and the screenshot row (less on
-              mobile, where vertical space is tight). */}
-          <div className="mt-6 md:mt-20">
+          {/* Breathing room above the row, plus matching space below it on mobile (the
+              marquee's own py-4 adds ~16px, so mb-8 ≈ the pt-12 above the title). */}
+          <div className="mt-6 md:mt-20 mb-8 md:mb-0">
             {clips.length > 0 ? (
               <MarketingClipMarquee clips={clips} />
             ) : (
