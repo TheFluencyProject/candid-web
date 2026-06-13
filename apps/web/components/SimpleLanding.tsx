@@ -110,7 +110,7 @@ export default async function SimpleLanding({ locale }: Props) {
               {/* Primary — learn (→ /download, UA-aware App Store redirect). */}
               <a
                 href="/download"
-                className="inline-block rounded-full bg-white px-8 py-2.5 md:py-3 text-base font-semibold tracking-wide text-[#18181C] hover:opacity-90 transition-opacity"
+                className="inline-block rounded-full bg-[#89FFB4] px-8 py-2.5 md:py-3 text-base font-semibold tracking-wide text-[#18181C] hover:opacity-90 transition-opacity"
               >
                 LEARN WITH CANDID
               </a>

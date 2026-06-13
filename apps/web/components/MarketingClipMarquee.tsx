@@ -100,8 +100,9 @@ export default function MarketingClipMarquee({ clips }: { clips: MarketingClip[]
       centerRafRef.current = 0;
       const k = pick_nearest_center(null);
       if (k) setAutoKey(k);
+      recompute_inview(); // keep cards near centre loaded as you drag, so the next one plays sooner
     });
-  }, [pick_nearest_center]);
+  }, [pick_nearest_center, recompute_inview]);
 
   // ── Continuous drift via transform. Paused while dragging. ──
   useEffect(() => {
@@ -112,8 +113,11 @@ export default function MarketingClipMarquee({ clips }: { clips: MarketingClip[]
     const step = (ts: number) => {
       const dt = last ? ts - last : 0;
       last = ts;
-      if (!pausedRef.current && dt > 0 && groupWidthRef.current > 0) {
-        set_offset(offsetRef.current + (SCROLL_SPEED_PX_PER_SEC * dt) / 1000);
+      if (!pausedRef.current && dt > 0) {
+        // measure here too, so the drift starts on the first frame even if the measure effect
+        // hasn't run yet (mobile first paint can lag) — was "doesn't move immediately on mobile"
+        if (groupWidthRef.current <= 0) groupWidthRef.current = group_width();
+        if (groupWidthRef.current > 0) set_offset(offsetRef.current + (SCROLL_SPEED_PX_PER_SEC * dt) / 1000);
       }
       // Safety net: if nothing is playing (a pick race on load, or a settle that found
       // nothing), choose a centered card so a video is always playing.
