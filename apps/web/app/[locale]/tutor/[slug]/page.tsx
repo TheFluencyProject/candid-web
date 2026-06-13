@@ -6,7 +6,6 @@ import { headers } from "next/headers";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import MobileCTABar from "@/components/MobileCTABar";
 import TutorNavbar from "@/components/TutorNavbar";
-import QRCode from "@/components/QRCode";
 import StickyHeader from "@/components/StickyHeader";
 import ScrollFadeIn from "@/components/ScrollFadeIn";
 import BlurImage from "@/components/BlurImage";
@@ -254,12 +253,12 @@ export default async function TutorPage({ params, searchParams }: Props) {
       />
 
       {/* ─── Speaking-screenshot hero ─── */}
-      <section className="relative px-6 md:px-12 pt-[84px] md:pt-[96px] pb-12 md:pb-16">
+      <section className="relative px-6 md:px-12 pt-[84px] md:pt-[96px] pb-12 md:pb-16 lg:flex lg:items-center lg:min-h-screen lg:pt-0 lg:pb-0">
         <div className="mx-auto w-full max-w-6xl flex flex-col lg:flex-row lg:items-center lg:gap-12">
           {/* Text column */}
           <div className="lg:flex-1">
             <h1
-              className="hero-heading font-medium leading-[1.05] whitespace-pre-line text-[clamp(2.15rem,10vw,3.05rem)] lg:text-[3.15rem] mb-4 md:mb-5 animate-fade-in-up"
+              className="hero-heading font-medium leading-[1.05] whitespace-pre-line text-[clamp(1.95rem,9vw,2.8rem)] lg:text-[3.15rem] mb-4 md:mb-5 animate-fade-in-up"
               style={{ color: "#FFFFFF" }}
             >
               {heroTitle}
@@ -278,7 +277,14 @@ export default async function TutorPage({ params, searchParams }: Props) {
               </div>
             ) : (
               <div className="hidden lg:block mt-8 animate-fade-in-up-delay-2">
-                <QRCode slug={slug} />
+                <a
+                  href={`/download/${slug}`}
+                  data-tutor-name={localizedFirstName}
+                  className="inline-block px-12 py-3.5 rounded-full text-base font-bold"
+                  style={{ backgroundColor: "#89FFB4", color: "#000000" }}
+                >
+                  {t("get_started")}
+                </a>
               </div>
             )}
           </div>
