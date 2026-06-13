@@ -268,7 +268,7 @@ function MarketingClipCard({ clip, dataKey, isActive, shouldLoad, onSegmentEnd, 
       {/* always-mounted + opacity so it fades OUT too; gated on isActive → one playing card at a time */}
       {karaoke && (
         <div className={`pointer-events-none absolute inset-x-0 top-[56%] z-20 flex justify-center -translate-y-[calc(100%+8px)] transition-opacity duration-300 ease-out ${isActive && ready ? "opacity-100" : "opacity-0"}`}>
-          <span className="inline-block rounded-md px-2 py-0.5 text-[11px] font-semibold text-black shadow" style={{ backgroundColor: KARAOKE_ACCENT }}>
+          <span className="inline-block rounded-sm px-2.5 py-0.5 text-xs font-semibold text-black shadow" style={{ backgroundColor: KARAOKE_ACCENT }}>
             Speak now…
           </span>
         </div>
