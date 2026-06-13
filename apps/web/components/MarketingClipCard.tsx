@@ -161,6 +161,11 @@ function MarketingClipCard({ clip, dataKey, isActive, shouldLoad, onSegmentEnd, 
       if (hls) hls.destroy();
       video.removeAttribute("src");
       setReady(false);
+      // Recycle like a LazyHStack: a card torn down off-screen resets its karaoke progress
+      // so it returns as a fresh (dim) preview, not frozen-lit.
+      setPlayhead(clip.start_time);
+      setProgress(start_fill);
+      setActiveWordIdx(-1);
     };
   }, [shouldLoad, clip]);
 
@@ -225,7 +230,9 @@ function MarketingClipCard({ clip, dataKey, isActive, shouldLoad, onSegmentEnd, 
       data-clip-id={clip.caption_segment_id}
       // isolate: own stacking context so the overlay layers always paint above the
       // <video> (mobile promotes playing video to its own layer otherwise).
-      className="relative isolate h-[340px] md:h-[500px] aspect-[9/16] shrink-0 overflow-hidden rounded-[1.25rem] shadow-[0_4px_20px_rgba(0,0,0,0.22)] select-none bg-black"
+      // translateZ(0): give the rounded clip its own layer so the video can't bleed a bright
+      // hairline past the edges at sub-pixel marquee offsets (the "white line" artifact).
+      className="relative isolate [transform:translateZ(0)] h-[340px] md:h-[500px] aspect-[9/16] shrink-0 overflow-hidden rounded-[1.25rem] shadow-[0_4px_20px_rgba(0,0,0,0.22)] select-none bg-black"
     >
       {/* Poster stays mounted: instant paint + stable width before the video buffers. Eager +
           shrunk (POSTER_WIDTH): the 12 unique posters load up front so none pop in as the row
@@ -269,7 +276,7 @@ function MarketingClipCard({ clip, dataKey, isActive, shouldLoad, onSegmentEnd, 
       {karaoke && (
         <div className={`pointer-events-none absolute inset-x-0 top-[56%] z-20 flex justify-center -translate-y-[calc(100%+8px)] transition-opacity duration-300 ease-out ${isActive && ready ? "opacity-100" : "opacity-0"}`}>
           <span className="inline-block rounded-sm px-2.5 py-0.5 text-xs font-semibold text-black shadow" style={{ backgroundColor: KARAOKE_ACCENT }}>
-            Speak now…
+            Speak now
           </span>
         </div>
       )}
@@ -287,7 +294,7 @@ function MarketingClipCard({ clip, dataKey, isActive, shouldLoad, onSegmentEnd, 
                     {/* dim base + full overlay revealed left→right; fill from live currentTime each frame
                         (not a CSS anim) so it can't drift from the video and freezes if it buffers */}
                     <span className="relative inline-block align-baseline">
-                      <span style={{ color: KARAOKE_ACCENT, opacity: 0.4 }}>{w.text}</span>
+                      <span style={{ color: KARAOKE_ACCENT, opacity: 0.6 }}>{w.text}</span>
                       <span aria-hidden className="absolute inset-0" style={{ color: KARAOKE_ACCENT, clipPath: `inset(0 ${(1 - fill) * 100}% 0 0)` }}>{w.text}</span>
                     </span>
                     {i < words.length - 1 ? " " : ""}{/* real space node so the line still wraps between words */}
