@@ -34,6 +34,8 @@ interface Props {
   // Opt-in frosted backdrop (used by the download QR overlay). Off by default so the
   // existing MatchIntake/JoinForFree consumers keep their plain dim backdrop.
   blurBackdrop?: boolean;
+  // Panel background color (default cream). The download QR overlay passes white.
+  panelBackground?: string;
 }
 
 export default function ResponsiveOverlay({
@@ -45,6 +47,7 @@ export default function ResponsiveOverlay({
   desktopMinHeight = "auto",
   desktopMaxWidthClass = "max-w-md",
   blurBackdrop = false,
+  panelBackground = "#F8F5EE",
 }: Props) {
   const blurClass = blurBackdrop ? " backdrop-blur-md" : "";
   useEffect(() => {
@@ -75,7 +78,7 @@ export default function ResponsiveOverlay({
           // no dark-page gap peeking through.
           height: mobileHeight,
           paddingBottom: keyboardInset,
-          backgroundColor: "#F8F5EE",
+          backgroundColor: panelBackground,
         }}
       >
         {children}
@@ -92,7 +95,7 @@ export default function ResponsiveOverlay({
       >
         <div
           className={`w-full ${desktopMaxWidthClass} max-h-[90vh] rounded-3xl shadow-2xl flex flex-col`}
-          style={{ backgroundColor: "#F8F5EE", minHeight: desktopMinHeight }}
+          style={{ backgroundColor: panelBackground, minHeight: desktopMinHeight }}
           onClick={(e) => e.stopPropagation()}
         >
           {children}

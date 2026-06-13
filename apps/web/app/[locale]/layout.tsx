@@ -7,6 +7,7 @@ import { routing } from "@/i18n/routing";
 import { notFound } from "next/navigation";
 import { PostHogProvider } from "@/components/PostHogProvider";
 import InAppBrowserBlocker from "@/components/InAppBrowserBlocker";
+import DownloadQRInterceptor from "@/components/DownloadQRInterceptor";
 import { CTA_FLAG_KEY } from "@/lib/posthog-config";
 import { getMobileCtaVariant } from "@/lib/posthog-server";
 
@@ -105,6 +106,7 @@ export default async function LocaleLayout({ children, params }: Props) {
           <PostHogProvider distinctId={distinctId} bootstrapFlags={bootstrapFlags}>
             {children}
             <InAppBrowserBlocker />
+            <DownloadQRInterceptor />
           </PostHogProvider>
         </NextIntlClientProvider>
       </body>
