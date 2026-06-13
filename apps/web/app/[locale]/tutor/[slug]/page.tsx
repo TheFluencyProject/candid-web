@@ -157,11 +157,17 @@ export default async function TutorPage({ params, searchParams }: Props) {
     const clips = await fetchMarketingClips(locale, slug).catch(() => [] as MarketingClip[]);
     return (
       <main
-        className="min-h-screen flex flex-col"
+        className={`min-h-screen flex flex-col ${app_clip_card ? "pb-40 md:pb-0" : ""}`}
         style={{ backgroundColor: "#18181C", color: "#FFFFFF" }}
       >
         <header className="px-6 md:px-10 pt-8">
-          <a href="/" className="inline-block">
+          {/* joincandid: the wordmark shares the App Clip CTA behavior (desktop QR /
+              mobile App Clip) via the global DownloadQRInterceptor. candidtutors: home. */}
+          <a
+            href={candidtutors_brand ? "/" : `/download/${slug}`}
+            data-tutor-name={candidtutors_brand ? undefined : localizedFirstName}
+            className="inline-block"
+          >
             <Image
               src="/wordmark-white.svg"
               alt="Candid"
@@ -209,13 +215,13 @@ export default async function TutorPage({ params, searchParams }: Props) {
                   variant="card"
                 />
               ) : (
-                // joincandid.co: green card CTA → App Clip funnel. The global
-                // DownloadQRInterceptor turns this into a scan-to-install QR on
-                // desktop and an App Clip card on iOS; data-tutor-name personalizes both.
+                // joincandid.co: green card CTA → App Clip funnel (desktop QR via the
+                // global DownloadQRInterceptor). Desktop only — on mobile the CTA lives
+                // in the fixed MobileCTABar below, sticking out from the bottom.
                 <a
                   href={`/download/${slug}`}
                   data-tutor-name={localizedFirstName}
-                  className="block w-full text-center px-7 py-4 rounded-full text-base font-bold tracking-wide"
+                  className="hidden md:block w-full text-center px-7 py-4 rounded-full text-base font-bold tracking-wide"
                   style={{ backgroundColor: "#89FFB4", color: "#000000" }}
                 >
                   {t("start_with_name", { name: localizedFirstName })}
@@ -246,6 +252,18 @@ export default async function TutorPage({ params, searchParams }: Props) {
             tutor_name={localizedFirstName}
             tutor_slug={slug}
             locale={join_for_free_locale}
+          />
+        )}
+        {/* Mobile only: CTA lives in a fixed bottom bar instead of inside the card.
+            mode="download" → /download/[slug] → App Clip on iOS (the QR interceptor is
+            desktop-only, so on mobile this navigates straight to the clip funnel). */}
+        {app_clip_card && (
+          <MobileCTABar
+            downloadUrl={`/download/${slug}`}
+            ctaLabel={t("start_with_name", { name: localizedFirstName })}
+            ctaSubtext={t("no_credit_card")}
+            mode="download"
+            alwaysVisible
           />
         )}
       </main>

@@ -1,7 +1,7 @@
 import createMiddleware from "next-intl/middleware";
 import { NextResponse, type NextRequest } from "next/server";
 import { routing } from "./i18n/routing";
-import { APP_STORE_URL, getRedirectUrl } from "./lib/platform";
+import { APP_STORE_URL, getRedirectUrl, APP_CLIP_ENABLED } from "./lib/platform";
 import { resolve_tutor_by_host } from "./lib/resolve-domain";
 import { isCanonicalHost } from "./lib/canonical-hosts";
 
@@ -99,8 +99,9 @@ export default async function middleware(request: NextRequest) {
   if (redirect) {
     const ua = request.headers.get("user-agent") ?? "";
     // App Clip funnel: /download/<slug> on an iOS 18+ iPhone (the clip's min target) renders the
-    // landing page so Safari surfaces the App Clip card. Everyone else keeps the App Store redirect.
-    if (pathname.startsWith("/download/") && iphoneIOSMajor(ua) >= 18) {
+    // landing page so Safari surfaces the App Clip card. Gated on APP_CLIP_ENABLED — while the clip
+    // is disabled, iOS 18+ falls through to the App Store redirect too (no dead-end clip landing).
+    if (APP_CLIP_ENABLED && pathname.startsWith("/download/") && iphoneIOSMajor(ua) >= 18) {
       return NextResponse.next();
     }
     const dest = getRedirectUrl(ua, redirect.dest);
