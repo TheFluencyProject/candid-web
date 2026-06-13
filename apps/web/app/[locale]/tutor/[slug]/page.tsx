@@ -7,6 +7,7 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import MobileCTABar from "@/components/MobileCTABar";
 import TutorNavbar from "@/components/TutorNavbar";
 import QRCode from "@/components/QRCode";
+import DownloadCTA from "@/components/DownloadCTA";
 import { getTutorPageConfig } from "@/config/tutors";
 import StickyHeader from "@/components/StickyHeader";
 import ScrollFadeIn from "@/components/ScrollFadeIn";
@@ -244,15 +245,16 @@ export default async function TutorPage({ params, searchParams }: Props) {
           ) : (
             <>
               {/* Desktop: Get the app pill (App Store badge moves inline under hero) */}
-              <a
-                href={`/download/${slug}`}
+              <DownloadCTA
+                slug={slug}
+                tutorName={localizedFirstName}
                 className="hidden lg:block px-5 py-2 rounded-full text-sm font-semibold"
                 style={{ backgroundColor: "#FFFFFF", color: "#18181C" }}
               >
                 Get the app
-              </a>
+              </DownloadCTA>
               {/* Mobile: App Store badge */}
-              <a href={`/download/${slug}`} className="lg:hidden">
+              <DownloadCTA slug={slug} tutorName={localizedFirstName} className="lg:hidden">
                 <Image
                   src="/download.svg"
                   alt="Download on the App Store"
@@ -260,7 +262,7 @@ export default async function TutorPage({ params, searchParams }: Props) {
                   height={40}
                   priority
                 />
-              </a>
+              </DownloadCTA>
             </>
           )
         }
@@ -352,8 +354,9 @@ export default async function TutorPage({ params, searchParams }: Props) {
               variant="hero-pill"
             />
           ) : (
-            <a
-              href={`/download/${slug}`}
+            <DownloadCTA
+              slug={slug}
+              tutorName={localizedFirstName}
               className="animate-fade-in-up-delay-2 self-start"
             >
               <Image
@@ -363,7 +366,7 @@ export default async function TutorPage({ params, searchParams }: Props) {
                 height={46}
                 priority
               />
-            </a>
+            </DownloadCTA>
           )}
           {/* Hidden until further notice; superseded by inline App Store badge above. */}
           <div className="hidden">

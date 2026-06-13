@@ -31,6 +31,9 @@ interface Props {
   desktopMinHeight?: string;
   // Desktop modal — Tailwind max-width class (default max-w-md).
   desktopMaxWidthClass?: string;
+  // Opt-in frosted backdrop (used by the download QR overlay). Off by default so the
+  // existing MatchIntake/JoinForFree consumers keep their plain dim backdrop.
+  blurBackdrop?: boolean;
 }
 
 export default function ResponsiveOverlay({
@@ -41,7 +44,9 @@ export default function ResponsiveOverlay({
   keyboardInset = 0,
   desktopMinHeight = "auto",
   desktopMaxWidthClass = "max-w-md",
+  blurBackdrop = false,
 }: Props) {
+  const blurClass = blurBackdrop ? " backdrop-blur-md" : "";
   useEffect(() => {
     if (!open) return;
     const prev = document.body.style.overflow;
@@ -58,7 +63,7 @@ export default function ResponsiveOverlay({
     <>
       {/* Mobile backdrop */}
       <div
-        className="lg:hidden fixed inset-0 z-[60] bg-black/40"
+        className={`lg:hidden fixed inset-0 z-[60] bg-black/40${blurClass}`}
         onClick={onClose}
       />
       {/* Mobile sheet */}
@@ -82,7 +87,7 @@ export default function ResponsiveOverlay({
           - Darker backdrop (bg-black/75) so the underlying page is visibly
             de-emphasized. */}
       <div
-        className="hidden lg:flex fixed inset-0 z-[70] items-center justify-center p-6 bg-black/75"
+        className={`hidden lg:flex fixed inset-0 z-[70] items-center justify-center p-6 bg-black/75${blurClass}`}
         onClick={onClose}
       >
         <div

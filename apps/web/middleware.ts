@@ -63,6 +63,12 @@ function resolveAppStoreRedirect(pathname: string): { dest: string; status: numb
   return null;
 }
 
+// iPhone iOS major from the UA ("iPhone OS 18_5" → 18), or 0 when not an iPhone.
+function iphoneIOSMajor(ua: string): number {
+  const m = ua.match(/iPhone OS (\d+)_/);
+  return m ? parseInt(m[1], 10) : 0;
+}
+
 // Detect Korean from Accept-Language. Anything else → leave on default (`en`).
 function prefersKorean(request: NextRequest): boolean {
   const header = request.headers.get("accept-language") ?? "";
@@ -92,6 +98,11 @@ export default async function middleware(request: NextRequest) {
   const redirect = resolveAppStoreRedirect(pathname);
   if (redirect) {
     const ua = request.headers.get("user-agent") ?? "";
+    // App Clip funnel: /download/<slug> on an iOS 18+ iPhone (the clip's min target) renders the
+    // landing page so Safari surfaces the App Clip card. Everyone else keeps the App Store redirect.
+    if (pathname.startsWith("/download/") && iphoneIOSMajor(ua) >= 18) {
+      return NextResponse.next();
+    }
     const dest = getRedirectUrl(ua, redirect.dest);
     return NextResponse.redirect(dest, { status: redirect.status });
   }
