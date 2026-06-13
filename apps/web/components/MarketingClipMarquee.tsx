@@ -18,10 +18,12 @@ export default function MarketingClipMarquee({ clips }: { clips: MarketingClip[]
   const lastClipIdRef = useRef<string | null>(null);
 
   const [autoKey, setAutoKey] = useState<string | null>(null);
+  const [hoveredKey, setHoveredKey] = useState<string | null>(null);
   const [inView, setInView] = useState<Set<string>>(() => new Set());
 
-  // Playback follows the auto-rotation only — hovering the row never pauses or hijacks it.
-  const activeKey = autoKey;
+  // Hovering a card plays it (it loops while hovered); otherwise the auto-rotation drives.
+  // Hover never pauses the drift — only dragging does.
+  const activeKey = hoveredKey ?? autoKey;
 
   // ── Continuous auto-scroll. Paused only while dragging (draggingRef). ──
   useEffect(() => {
@@ -137,7 +139,9 @@ export default function MarketingClipMarquee({ clips }: { clips: MarketingClip[]
             dataKey={key}
             clip={clip}
             isActive={activeKey === key}
+            loop={hoveredKey === key}
             shouldLoad={inView.has(key)}
+            onHoverStart={() => setHoveredKey(key)}
             onSegmentEnd={handle_segment_end}
           />
         );
@@ -152,7 +156,8 @@ export default function MarketingClipMarquee({ clips }: { clips: MarketingClip[]
       onPointerMove={on_pointer_move}
       onPointerUp={end_drag}
       onPointerCancel={end_drag}
-      className="w-full overflow-x-auto cursor-grab active:cursor-grabbing select-none py-4 md:py-8 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden [touch-action:pan-y]"
+      onMouseLeave={() => setHoveredKey(null)}
+      className="w-full overflow-x-auto select-none py-4 md:py-8 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden [touch-action:pan-y]"
     >
       <div className="flex w-max">
         {render_group(0, false)}

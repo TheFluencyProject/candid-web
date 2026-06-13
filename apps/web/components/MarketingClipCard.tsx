@@ -29,17 +29,22 @@ type Props = {
   clip: MarketingClip;
   dataKey: string;
   isActive: boolean;
+  /** While true (this card is hovered), replay the segment instead of handing off. */
+  loop: boolean;
   /** Load the video only when the card is near the viewport — bounds simultaneous
    *  <video> elements so mobile (hard media-element limit) doesn't drop later cards. */
   shouldLoad: boolean;
+  onHoverStart: () => void;
   onSegmentEnd: () => void;
 };
 
-export default function MarketingClipCard({ clip, dataKey, isActive, shouldLoad, onSegmentEnd }: Props) {
+export default function MarketingClipCard({ clip, dataKey, isActive, loop, shouldLoad, onHoverStart, onSegmentEnd }: Props) {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const [activeWordIdx, setActiveWordIdx] = useState(-1);
   const [ready, setReady] = useState(false); // first frame buffered → fade video over poster
 
+  const loopRef = useRef(loop);
+  loopRef.current = loop;
   const onSegmentEndRef = useRef(onSegmentEnd);
   onSegmentEndRef.current = onSegmentEnd;
   const isActiveRef = useRef(isActive);
@@ -117,9 +122,13 @@ export default function MarketingClipCard({ clip, dataKey, isActive, shouldLoad,
       }
 
       if (t >= clip.end_time) {
-        cancelled = true;
-        onSegmentEndRef.current();
-        return;
+        if (loopRef.current) {
+          try { video.currentTime = clip.start_time; } catch { /* ignore */ }
+        } else {
+          cancelled = true;
+          onSegmentEndRef.current();
+          return;
+        }
       }
       raf = requestAnimationFrame(tick);
     };
@@ -145,6 +154,7 @@ export default function MarketingClipCard({ clip, dataKey, isActive, shouldLoad,
     <div
       data-key={dataKey}
       data-clip-id={clip.caption_segment_id}
+      onMouseEnter={onHoverStart}
       // isolate: own stacking context so the overlay layers always paint above the
       // <video> (mobile promotes playing video to its own layer otherwise).
       className="relative isolate h-[340px] md:h-[500px] aspect-[9/16] shrink-0 overflow-hidden rounded-[1.25rem] shadow-[0_4px_20px_rgba(0,0,0,0.22)] select-none bg-black"
