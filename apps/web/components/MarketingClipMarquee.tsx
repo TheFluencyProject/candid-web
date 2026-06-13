@@ -43,6 +43,20 @@ export default function MarketingClipMarquee({ clips, karaoke = true }: { clips:
   const [coldStartDone, setColdStartDone] = useState(false);
   const handle_ready = useCallback(() => setColdStartDone(true), []);
 
+  // Few clips (e.g. one tutor's 3) make a single group narrower than the viewport, so the
+  // modulo wrap exposes a gap before the row loops. Repeat the clips per group until one
+  // group is at least as wide as the container — measured, grow-only, converges immediately.
+  const [copies, setCopies] = useState(1);
+  useEffect(() => {
+    const c = containerRef.current;
+    const t = trackRef.current;
+    if (!c || !t) return;
+    const setW = t.scrollWidth / (2 * copies); // width of a single clips-set
+    if (setW <= 0) return;
+    const needed = Math.max(1, Math.ceil((c.clientWidth + 80) / setW));
+    if (needed > copies) setCopies(needed);
+  }, [clips, copies]);
+
   // The card under autoKey is THE playing card. It follows the viewport center while you
   // drag, plays its segment once, then hands off to the near-center card. Hovering a card
   // (real mouse movement) also makes it autoKey.
@@ -65,7 +79,9 @@ export default function MarketingClipMarquee({ clips, karaoke = true }: { clips:
     const off = gw > 0 ? ((v % gw) + gw) % gw : v;
     offsetRef.current = off;
     const track = trackRef.current;
-    if (track) track.style.transform = `translate3d(${-off}px,0,0)`;
+    // Render at a whole pixel (keep sub-pixel `off` for the math) — a fractional translate makes
+    // the rounded cards anti-alias a bright hairline against the page bg ("white line").
+    if (track) track.style.transform = `translate3d(${-Math.round(off)}px,0,0)`;
   };
 
   // Nearest card to the viewport center (rects reflect the live transform), optionally
@@ -177,7 +193,7 @@ export default function MarketingClipMarquee({ clips, karaoke = true }: { clips:
       cancelAnimationFrame(initRaf);
       window.removeEventListener("resize", measure);
     };
-  }, [clips, recompute_inview, pick_nearest_center]);
+  }, [clips, copies, recompute_inview, pick_nearest_center]);
 
   // Pick the visually-centered card as the first playing one, BEFORE first paint — so it (not
   // the leftmost card) starts loading immediately and there's no flash of the wrong card.
@@ -332,24 +348,27 @@ export default function MarketingClipMarquee({ clips, karaoke = true }: { clips:
 
   const render_group = (group_idx: number, duplicate: boolean) => (
     <div className="flex shrink-0 gap-3 md:gap-6 pr-3 md:pr-6" aria-hidden={duplicate || undefined}>
-      {clips.map((clip) => {
-        const key = `${group_idx}::${clip.caption_segment_id}`;
-        return (
-          <MarketingClipCard
-            key={key}
-            dataKey={key}
-            clip={clip}
-            isActive={autoKey === key}
-            // Always load the active card (so a long clip never blanks mid-play before it hands
-            // off); load in-view neighbors only once prebuffering is allowed (always on desktop;
-            // on mobile, after the first clip is playing — avoids the cold-start pipeline pileup).
-            shouldLoad={autoKey === key || (prebuffer_neighbors && inView.has(key))}
-            onSegmentEnd={handle_segment_end}
-            onReady={handle_ready}
-            karaoke={karaoke}
-          />
-        );
-      })}
+      {Array.from({ length: copies }).flatMap((_, copy_idx) =>
+        clips.map((clip) => {
+          // copy_idx lives in the first key segment so split("::")[1] stays the caption_segment_id.
+          const key = `${group_idx}_${copy_idx}::${clip.caption_segment_id}`;
+          return (
+            <MarketingClipCard
+              key={key}
+              dataKey={key}
+              clip={clip}
+              isActive={autoKey === key}
+              // Always load the active card (so a long clip never blanks mid-play before it hands
+              // off); load in-view neighbors only once prebuffering is allowed (always on desktop;
+              // on mobile, after the first clip is playing — avoids the cold-start pipeline pileup).
+              shouldLoad={autoKey === key || (prebuffer_neighbors && inView.has(key))}
+              onSegmentEnd={handle_segment_end}
+              onReady={handle_ready}
+              karaoke={karaoke}
+            />
+          );
+        })
+      )}
     </div>
   );
 

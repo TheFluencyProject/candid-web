@@ -370,14 +370,14 @@ export default async function TutorPage({ params, searchParams }: Props) {
         <div className="w-full pt-16 md:pt-28 pb-16 md:pb-28">
           <div className="mx-auto max-w-6xl px-6 md:px-12 mb-4 md:mb-6">
             <h2
-              className="text-3xl md:text-4xl font-medium leading-tight"
+              className="hero-heading font-medium leading-[1.05] text-[clamp(1.95rem,9vw,2.8rem)] lg:text-[3.15rem]"
               style={{ color: "#FFFFFF" }}
             >
               {t("learn_with_creators", { name: localizedFirstName })}
             </h2>
             <p
-              className="mt-2 text-base md:text-lg leading-snug max-w-2xl"
-              style={{ color: "rgba(255,255,255,0.7)" }}
+              className="mt-3 text-lg md:text-xl font-light leading-snug max-w-2xl"
+              style={{ color: "rgba(255,255,255,0.8)" }}
             >
               {t("creators_subtitle", { language: langLabel })}
             </p>
