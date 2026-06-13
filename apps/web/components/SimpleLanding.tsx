@@ -99,7 +99,7 @@ export default async function SimpleLanding({ locale }: Props) {
         <div className="flex flex-1 flex-col md:justify-center">
           <div className="px-6 text-center pt-16 md:pt-0">
             <h1 className="text-4xl md:text-6xl font-light tracking-tight leading-[1.1] mb-5">
-              Your guide to real-life fluency
+              Your guide to <br className="md:hidden" />real-life fluency
             </h1>
             <p className="max-w-2xl mx-auto text-lg md:text-xl leading-relaxed text-gray-300">
               Learn real-life Korean with daily listening &amp; speaking practice{" "}

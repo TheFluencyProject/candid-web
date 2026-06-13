@@ -51,6 +51,7 @@ export default function MarketingClipCard({ clip, dataKey, isActive, loop, shoul
   isActiveRef.current = isActive;
 
   const play_from_start = (video: HTMLVideoElement) => {
+    video.playbackRate = 0.8; // a touch slower — the clips feel rushed at 1x
     try { video.currentTime = clip.start_time; } catch { /* not seekable yet */ }
     video.play().then(() => setReady(true)).catch(() => {});
   };
@@ -171,8 +172,19 @@ export default function MarketingClipCard({ clip, dataKey, isActive, loop, shoul
         className={`absolute inset-0 z-0 h-full w-full object-cover transition-opacity duration-300 ${ready ? "opacity-100" : "opacity-0"}`}
       />
 
-      {/* Top chrome — emoji + title + decorative 3-bar story header. */}
+      {/* Top chrome — decorative 3-bar story header + emoji + title + toggle icon. */}
       <div className="absolute inset-x-0 top-0 z-10 px-4 pt-3 pb-6 bg-gradient-to-b from-black/45 to-transparent">
+        {/* Stories-style progress bars: a stable, random "mid-story" fill per card. */}
+        <div className="mb-2.5 flex gap-1">
+          {[0, 1, 2].map((i) => (
+            <div key={i} className="h-[4px] flex-1 overflow-hidden rounded-full bg-white/30">
+              <div
+                className="h-full rounded-full bg-white"
+                style={{ width: i < active_bar ? "100%" : i === active_bar ? `${Math.round(partial_fill * 100)}%` : "0%" }}
+              />
+            </div>
+          ))}
+        </div>
         <div className="flex items-center justify-between gap-2">
           <div className="flex min-w-0 flex-1 items-center gap-1.5">
             {emoji && <span className="shrink-0 text-sm md:text-base drop-shadow">{emoji}</span>}
