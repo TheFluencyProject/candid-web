@@ -10,20 +10,6 @@ const KARAOKE_ACCENT = "#89FFB4";
 // re-asserted on play() and every rAF tick (see below), not just set once.
 const PLAYBACK_RATE = 0.8;
 
-// How far the stories-style bar creeps forward over one clip's playback (intentionally slow).
-const PROGRESS_ADVANCE = 0.05;
-
-// Deterministic pseudo-random in [0,1) from a string — stable across SSR/client so the
-// decorative story-bar fills don't cause a hydration mismatch.
-function seeded_unit(s: string): number {
-  let h = 2166136261;
-  for (let i = 0; i < s.length; i++) {
-    h ^= s.charCodeAt(i);
-    h = Math.imul(h, 16777619);
-  }
-  return ((h >>> 0) % 1000) / 1000;
-}
-
 // Strip emoji (plus skin-tone modifiers, regional indicators, ZWJ, variation
 // selectors, keycap) from a title so the chrome stays clean — no emoji shown.
 function strip_emoji(title: string): string {
@@ -45,10 +31,9 @@ export default function MarketingClipCard({ clip, dataKey, isActive, shouldLoad,
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const [activeWordIdx, setActiveWordIdx] = useState(-1);
   const [ready, setReady] = useState(false); // first frame buffered → fade video over poster
-  // Stories-style progress: a seeded starting fill (always ≤90%) that creeps forward by
-  // PROGRESS_ADVANCE across the clip's playback, so it never overflows past full.
-  const start_fill = 0.15 + seeded_unit(clip.caption_segment_id) * 0.75;
-  const [progress, setProgress] = useState(start_fill);
+  // Stories-style bar that tracks the clip's ACTUAL playback position (0→1 across the
+  // segment) so it matches the video, instead of jumping to a random fill per clip.
+  const [progress, setProgress] = useState(0);
 
   const onSegmentEndRef = useRef(onSegmentEnd);
   onSegmentEndRef.current = onSegmentEnd;
@@ -117,6 +102,7 @@ export default function MarketingClipCard({ clip, dataKey, isActive, shouldLoad,
 
     let raf = 0;
     let cancelled = false;
+    setProgress(0); // bar restarts with the clip
     play_from_start(video); // no-op until loaded; on_ready re-fires play once buffered
 
     const tick = () => {
@@ -124,7 +110,7 @@ export default function MarketingClipCard({ clip, dataKey, isActive, shouldLoad,
       if (video.playbackRate !== PLAYBACK_RATE) video.playbackRate = PLAYBACK_RATE; // hls/seek can reset it
       const t = video.currentTime;
       const dur = clip.end_time - clip.start_time;
-      if (dur > 0) setProgress(start_fill + PROGRESS_ADVANCE * Math.min(1, Math.max(0, (t - clip.start_time) / dur)));
+      if (dur > 0) setProgress(Math.min(1, Math.max(0, (t - clip.start_time) / dur))); // track video position
       const wlc = clip.word_level_captions;
       if (wlc) {
         // Keep each word highlighted until the NEXT word starts (or the clip ends) —
@@ -149,8 +135,8 @@ export default function MarketingClipCard({ clip, dataKey, isActive, shouldLoad,
       cancelled = true;
       cancelAnimationFrame(raf);
       setActiveWordIdx(-1);
-      setProgress(start_fill); // reset so the next play starts from its ≤90% fill again
       video.pause();
+      // leave progress where it stopped — the bar matches the frozen frame
     };
   }, [isActive, clip]);
 
@@ -191,7 +177,7 @@ export default function MarketingClipCard({ clip, dataKey, isActive, shouldLoad,
             <rect x="15" y="10.7" width="6" height="3.4" rx="1.7" fill="currentColor" />
           </svg>
         </div>
-        {/* Progress bars UNDER the title; the fill creeps forward from a ≤90% start over playback. */}
+        {/* Progress bars UNDER the title; the fill tracks the clip's actual playback position. */}
         <div className="mt-2.5 flex gap-1">
           {[0, 1, 2].map((i) => {
             const fill = Math.max(0, Math.min(1, (progress - i / 3) * 3));
