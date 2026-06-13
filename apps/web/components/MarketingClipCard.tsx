@@ -202,9 +202,11 @@ function MarketingClipCard({ clip, dataKey, isActive, shouldLoad, onSegmentEnd }
       // <video> (mobile promotes playing video to its own layer otherwise).
       className="relative isolate h-[340px] md:h-[500px] aspect-[9/16] shrink-0 overflow-hidden rounded-[1.25rem] shadow-[0_4px_20px_rgba(0,0,0,0.22)] select-none bg-black"
     >
-      {/* Poster stays mounted: instant paint + stable width before the video buffers. */}
+      {/* Poster stays mounted: instant paint + stable width before the video buffers.
+          loading=lazy: off-screen posters (incl. the duplicate group) don't compete with
+          the first clip's load on a cold mobile connection. */}
       {clip.thumbnail_url && (
-        <img src={clip.thumbnail_url} alt="" draggable={false} className="absolute inset-0 z-0 h-full w-full object-cover" />
+        <img src={clip.thumbnail_url} alt="" draggable={false} loading="lazy" decoding="async" className="absolute inset-0 z-0 h-full w-full object-cover" />
       )}
       <video
         ref={videoRef}

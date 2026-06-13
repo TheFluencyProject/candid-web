@@ -26,14 +26,23 @@ export default function MarketingClipMarquee({ clips }: { clips: MarketingClip[]
   const lastMoveRef = useRef({ x: 0, t: 0 });
   const momentumRafRef = useRef(0);
 
-  const [autoKey, setAutoKey] = useState<string | null>(null);
-  const autoKeyRef = useRef<string | null>(null);
+  // Start with the first card active (it's the centered one at offset 0) so its video begins
+  // loading on the very first render, instead of waiting for the rAF picker post-hydration.
+  const [autoKey, setAutoKey] = useState<string | null>(() =>
+    clips.length > 0 ? `0::${clips[0].caption_segment_id}` : null,
+  );
+  const autoKeyRef = useRef<string | null>(autoKey);
   autoKeyRef.current = autoKey; // mirror for the rAF loop (no stale closure)
   const [inView, setInView] = useState<Set<string>>(() => new Set());
 
   // The card under autoKey is THE playing card. It follows the viewport center while you
   // drag, plays its segment once, then hands off to the near-center card. Hovering a card
   // (real mouse movement) also makes it autoKey.
+
+  // Warm the hls.js chunk on mount so the first clip doesn't wait on its (lazy) download.
+  useEffect(() => {
+    import("hls.js").catch(() => {});
+  }, []);
 
   const group_width = () => {
     const track = trackRef.current;
