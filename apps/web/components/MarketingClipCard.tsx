@@ -166,12 +166,13 @@ export default function MarketingClipCard({ clip, dataKey, isActive, shouldLoad,
       {/* Top chrome — title + toggle icon, with the stories-style progress bars below it. */}
       <div className="absolute inset-x-0 top-0 z-10 px-4 pt-3 pb-6 bg-gradient-to-b from-black/45 to-transparent">
         <div className="flex items-center justify-between gap-2">
-          <span className="min-w-0 flex-1 truncate text-white text-xs md:text-sm font-semibold drop-shadow">{title_text}</span>
-          {/* SF Symbols switch.2 (iOS immersion toggle) — the exact asset from /public. */}
-          <img src="/switch.2.svg" alt="" aria-hidden draggable={false} className="shrink-0 h-[18px] w-[18px] drop-shadow" />
+          <span className="min-w-0 flex-1 truncate text-white text-sm md:text-base font-semibold drop-shadow">{title_text}</span>
+          {/* SF Symbols switch.2 (iOS immersion toggle) — the exact asset from /public.
+              Sized a touch smaller than the title text. */}
+          <img src="/switch.2.svg" alt="" aria-hidden draggable={false} className="shrink-0 h-[13px] w-[13px] md:h-[15px] md:w-[15px] drop-shadow" />
         </div>
         {/* Progress bars UNDER the title; the fill tracks the clip's actual playback position. */}
-        <div className="mt-2.5 flex gap-1">
+        <div className="mt-1.5 flex gap-1">
           {[0, 1, 2].map((i) => {
             const fill = Math.max(0, Math.min(1, (progress - i / 3) * 3));
             return (
