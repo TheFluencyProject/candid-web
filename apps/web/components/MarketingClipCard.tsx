@@ -58,9 +58,12 @@ type Props = {
    *  <video> elements so mobile (hard media-element limit) doesn't drop later cards. */
   shouldLoad: boolean;
   onSegmentEnd: () => void;
+  /** Fires when the active video actually starts playing — lets the marquee defer
+   *  neighbor prebuffering until the first clip is established (mobile cold-start). */
+  onReady: () => void;
 };
 
-function MarketingClipCard({ clip, dataKey, isActive, shouldLoad, onSegmentEnd }: Props) {
+function MarketingClipCard({ clip, dataKey, isActive, shouldLoad, onSegmentEnd, onReady }: Props) {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const [activeWordIdx, setActiveWordIdx] = useState(-1);
   const [ready, setReady] = useState(false); // first frame buffered → fade video over poster
@@ -71,6 +74,8 @@ function MarketingClipCard({ clip, dataKey, isActive, shouldLoad, onSegmentEnd }
 
   const onSegmentEndRef = useRef(onSegmentEnd);
   onSegmentEndRef.current = onSegmentEnd;
+  const onReadyRef = useRef(onReady);
+  onReadyRef.current = onReady;
   const isActiveRef = useRef(isActive);
   isActiveRef.current = isActive;
 
@@ -85,6 +90,7 @@ function MarketingClipCard({ clip, dataKey, isActive, shouldLoad, onSegmentEnd }
     video.play().then(() => {
       video.playbackRate = PLAYBACK_RATE; // re-assert: starting playback can reset it to 1
       setReady(true);
+      onReadyRef.current(); // active clip is established → marquee may now prebuffer neighbors
     }).catch(() => {});
   };
 

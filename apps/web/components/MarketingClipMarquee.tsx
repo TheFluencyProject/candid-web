@@ -37,6 +37,11 @@ export default function MarketingClipMarquee({ clips }: { clips: MarketingClip[]
   const autoKeyRef = useRef<string | null>(autoKey);
   autoKeyRef.current = autoKey; // mirror for the rAF loop (no stale closure)
   const [inView, setInView] = useState<Set<string>>(() => new Set());
+  // Mobile cold start: load ONLY the centered video first (one hls.js/MMS pipeline → fast first
+  // frame; 3 concurrent pipelines stall iOS for several seconds). Flip true once that clip is
+  // actually playing, then neighbors prebuffer so switches stay instant. Desktop ignores this.
+  const [coldStartDone, setColdStartDone] = useState(false);
+  const handle_ready = useCallback(() => setColdStartDone(true), []);
 
   // The card under autoKey is THE playing card. It follows the viewport center while you
   // drag, plays its segment once, then hands off to the near-center card. Hovering a card
@@ -322,6 +327,11 @@ export default function MarketingClipMarquee({ clips }: { clips: MarketingClip[]
 
   if (clips.length === 0) return null;
 
+  // On mobile, gate neighbor prebuffering behind the first clip playing (coldStartDone); desktop
+  // handles concurrent streams fine, so it always prebuffers in-view neighbors.
+  const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
+  const prebuffer_neighbors = !isMobile || coldStartDone;
+
   const render_group = (group_idx: number, duplicate: boolean) => (
     <div className="flex shrink-0 gap-4 md:gap-6 pr-4 md:pr-6" aria-hidden={duplicate || undefined}>
       {clips.map((clip) => {
@@ -332,10 +342,12 @@ export default function MarketingClipMarquee({ clips }: { clips: MarketingClip[]
             dataKey={key}
             clip={clip}
             isActive={autoKey === key}
-            // keep the active card loaded even if it drifts past the margin, so a long clip
-            // never blanks out mid-play before it hands off
-            shouldLoad={inView.has(key) || autoKey === key}
+            // Always load the active card (so a long clip never blanks mid-play before it hands
+            // off); load in-view neighbors only once prebuffering is allowed (always on desktop;
+            // on mobile, after the first clip is playing — avoids the cold-start pipeline pileup).
+            shouldLoad={autoKey === key || (prebuffer_neighbors && inView.has(key))}
             onSegmentEnd={handle_segment_end}
+            onReady={handle_ready}
           />
         );
       })}
