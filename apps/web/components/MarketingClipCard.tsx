@@ -6,6 +6,10 @@ import type { MarketingClip } from "@/lib/api";
 // iOS AccentColor (display-p3 0x89/0xFF/0xB4) — the karaoke word sweep, by role not appearance.
 const KARAOKE_ACCENT = "#89FFB4";
 
+// Clips feel rushed at 1x. hls.js / seeks can reset the element's rate, so this is
+// re-asserted on play() and every rAF tick (see below), not just set once.
+const PLAYBACK_RATE = 0.8;
+
 // Deterministic pseudo-random in [0,1) from a string — stable across SSR/client so the
 // decorative story-bar fills don't cause a hydration mismatch.
 function seeded_unit(s: string): number {
@@ -50,9 +54,13 @@ export default function MarketingClipCard({ clip, dataKey, isActive, loop, shoul
   isActiveRef.current = isActive;
 
   const play_from_start = (video: HTMLVideoElement) => {
-    video.playbackRate = 0.8; // a touch slower — the clips feel rushed at 1x
     try { video.currentTime = clip.start_time; } catch { /* not seekable yet */ }
-    video.play().then(() => setReady(true)).catch(() => {});
+    video.defaultPlaybackRate = PLAYBACK_RATE;
+    video.playbackRate = PLAYBACK_RATE;
+    video.play().then(() => {
+      video.playbackRate = PLAYBACK_RATE; // re-assert: starting playback can reset it to 1
+      setReady(true);
+    }).catch(() => {});
   };
 
   // Load (prebuffer) the video only while near the viewport; attach once, tear down when
@@ -111,6 +119,7 @@ export default function MarketingClipCard({ clip, dataKey, isActive, loop, shoul
 
     const tick = () => {
       if (cancelled) return;
+      if (video.playbackRate !== PLAYBACK_RATE) video.playbackRate = PLAYBACK_RATE; // hls/seek can reset it
       const t = video.currentTime;
       const wlc = clip.word_level_captions;
       if (wlc) {
