@@ -254,7 +254,7 @@ export default async function TutorPage({ params, searchParams }: Props) {
 
       {/* ─── Speaking-screenshot hero ─── */}
       <section className="relative px-6 md:px-12 pt-[84px] md:pt-[96px] pb-12 md:pb-16 lg:flex lg:items-center lg:min-h-screen lg:pt-0 lg:pb-0">
-        <div className="mx-auto w-full max-w-6xl flex flex-col lg:flex-row lg:items-center lg:justify-center lg:gap-12">
+        <div className="mx-auto w-full max-w-6xl flex flex-col lg:flex-row lg:items-center lg:justify-center lg:gap-20">
           {/* Text column */}
           <div className="lg:max-w-xl">
             <h1
