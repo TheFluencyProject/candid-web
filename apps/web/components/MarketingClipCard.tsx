@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { memo, useEffect, useRef, useState } from "react";
 import type { MarketingClip } from "@/lib/api";
 
 // iOS AccentColor (display-p3 0x89/0xFF/0xB4) — the karaoke word sweep, by role not appearance.
@@ -9,6 +9,12 @@ const KARAOKE_ACCENT = "#89FFB4";
 // Clips feel rushed at 1x. hls.js / seeks can reset the element's rate, so this is
 // re-asserted on play() and every rAF tick (see below), not just set once.
 const PLAYBACK_RATE = 0.8;
+
+// Mux Data env key — public/client-safe (like the PostHog key). From Mux → Settings → Data. Empty = off.
+const MUX_DATA_ENV_KEY = "";
+// Sample ~15% of page loads (rolled once): the always-on marquee would otherwise log a Mux view on
+// every visit. Gates SDK download + monitoring together, so unsampled visits pay nothing.
+const MUX_SAMPLE = typeof window !== "undefined" && Math.random() < 0.15;
 
 // How far the stories bar creeps forward over one clip's playback — small on purpose.
 const PROGRESS_ADVANCE = 0.025;
@@ -41,7 +47,7 @@ type Props = {
   onSegmentEnd: () => void;
 };
 
-export default function MarketingClipCard({ clip, dataKey, isActive, shouldLoad, onSegmentEnd }: Props) {
+function MarketingClipCard({ clip, dataKey, isActive, shouldLoad, onSegmentEnd }: Props) {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const [activeWordIdx, setActiveWordIdx] = useState(-1);
   const [ready, setReady] = useState(false); // first frame buffered → fade video over poster
@@ -73,6 +79,18 @@ export default function MarketingClipCard({ clip, dataKey, isActive, shouldLoad,
     if (!video) return;
 
     const src = `https://stream.mux.com/${clip.mux_playback_id}.m3u8`;
+    const playerInitTime = Date.now(); // before load → accurate Mux "player startup time"
+    const wantMux = !!MUX_DATA_ENV_KEY && MUX_SAMPLE;
+    // caption_segment_id (not dataKey) so the marquee's two copies of a clip dedupe to one Mux video.
+    const muxData = {
+      env_key: MUX_DATA_ENV_KEY,
+      player_name: "marketing-clip-marquee",
+      player_init_time: playerInitTime,
+      video_id: clip.caption_segment_id,
+      video_title: clip.title,
+      video_series: clip.tutor_name,
+      video_stream_type: "on-demand",
+    };
     let hls: import("hls.js").default | null = null;
     let cancelled = false;
     const on_ready = () => {
@@ -82,22 +100,29 @@ export default function MarketingClipCard({ clip, dataKey, isActive, shouldLoad,
       if (isActiveRef.current) play_from_start(video); // already active when it finished loading
     };
 
-    // Prefer hls.js (MSE); native HLS is the Safari/iOS-only fallback.
-    import("hls.js").then(({ default: Hls }) => {
+    // Prefer hls.js (MSE); native HLS is the Safari/iOS-only fallback. mux-embed loads only when sampled.
+    Promise.all([
+      import("hls.js"),
+      wantMux ? import("mux-embed") : Promise.resolve(null),
+    ]).then(([{ default: Hls }, muxMod]) => {
       if (cancelled) return;
+      const mux = muxMod?.default;
       if (Hls.isSupported()) {
         hls = new Hls({ startPosition: clip.start_time, maxBufferLength: Math.ceil(clip.end_time - clip.start_time) + 4 });
         hls.on(Hls.Events.MANIFEST_PARSED, on_ready);
         hls.loadSource(src);
         hls.attachMedia(video);
+        mux?.monitor(video, { hlsjs: hls, Hls, data: muxData });
       } else if (video.canPlayType("application/vnd.apple.mpegurl")) {
         video.src = src;
         video.addEventListener("loadedmetadata", on_ready, { once: true });
+        mux?.monitor(video, { data: muxData }); // Safari native HLS: no hls.js instance to pass
       }
     }).catch(() => {});
 
     return () => {
       cancelled = true;
+      (video as { mux?: { destroy(): void } }).mux?.destroy(); // before hls.destroy() — mux hooks hls events; no-op if unattached
       if (hls) hls.destroy();
       video.removeAttribute("src");
       setReady(false);
@@ -219,3 +244,7 @@ export default function MarketingClipCard({ clip, dataKey, isActive, shouldLoad,
     </div>
   );
 }
+
+// memo: during a drag the marquee re-renders every frame as the centered card changes;
+// without this all cards would re-render each frame and jank the detection/playback on mobile.
+export default memo(MarketingClipCard);

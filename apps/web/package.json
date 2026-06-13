@@ -12,6 +12,7 @@
   "dependencies": {
     "firebase": "^12.14.0",
     "hls.js": "^1.6.16",
+    "mux-embed": "^5.18.1",
     "next": "15.5.11",
     "next-intl": "^4.8.2",
     "posthog-js": "^1.372.9",
