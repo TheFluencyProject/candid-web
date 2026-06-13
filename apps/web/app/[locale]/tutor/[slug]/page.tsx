@@ -52,7 +52,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
   // Flatten the \n in cool_title for HTML meta description (single-line expected).
   const description = (tutor.cool_title ?? tutor.short_description ?? "").replace(/\n/g, " ");
-  const ogImage = tutor.web_bg_picture_url || tutor.large_profile_picture_url;
+  // Mia's page uses the hand-made OG preview; other tutors fall back to their hero/profile image.
+  const ogImage =
+    slug === "korean-mia"
+      ? "https://joincandid.co/mia-og-preview.png"
+      : (tutor.web_bg_picture_url || tutor.large_profile_picture_url);
 
   return {
     metadataBase: new URL("https://joincandid.co"),

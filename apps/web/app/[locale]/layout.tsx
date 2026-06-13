@@ -41,7 +41,7 @@ export async function generateMetadata({
       siteName: "Candid",
       images: [
         {
-          url: "https://joincandid.co/SS-AppStore-Learn-EN.png",
+          url: "https://joincandid.co/mia-og-preview.png",
           alt: t.title,
         },
       ],
@@ -50,7 +50,7 @@ export async function generateMetadata({
       card: "summary_large_image",
       title: t.title,
       description: t.description,
-      images: ["https://joincandid.co/SS-AppStore-Learn-EN.png"],
+      images: ["https://joincandid.co/mia-og-preview.png"],
     },
   };
 }
