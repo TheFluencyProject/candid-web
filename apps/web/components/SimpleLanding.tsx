@@ -74,9 +74,9 @@ export default async function SimpleLanding({ locale }: Props) {
           Mobile: natural top-down flow (no forced viewport height) so the spacing
           isn't stretched to fill the screen. */}
       <section className="flex flex-col md:min-h-screen">
-        {/* Wordmark left; App Store badge top-right on every breakpoint. Padding
+        {/* Wordmark only; the App Store badge now lives in the footer. Padding
             matches the original TutorNavbar (px-4 md:px-8) so it isn't too wide. */}
-        <header className="flex items-center justify-between px-4 md:px-8 pt-5">
+        <header className="flex items-center px-4 md:px-8 pt-5">
           <a href="/" className="inline-block">
             <Image
               src="/wordmark-white.svg"
@@ -86,11 +86,6 @@ export default async function SimpleLanding({ locale }: Props) {
               priority
               className="hover:opacity-80 transition-opacity"
             />
-          </a>
-          {/* App Store badge — plain <img> (an SVG needs no next/image optimization
-              and avoids its aspect warning under Tailwind's base height:auto). */}
-          <a href="/download">
-            <img src="/download.svg" alt="Download on the App Store" width={120} className="h-auto" />
           </a>
         </header>
 
@@ -138,7 +133,7 @@ export default async function SimpleLanding({ locale }: Props) {
         </div>
       </section>
 
-      <SiteFooter />
+      <SiteFooter appStoreBadge />
     </main>
   );
 }

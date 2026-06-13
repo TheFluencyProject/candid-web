@@ -8,9 +8,11 @@ interface SiteFooterProps {
   // "tutor" → candidtutors.co + per-tutor custom_domain pages: drops the
   // App Store badge + Programs section, swaps the Instagram handle.
   variant?: "joincandid" | "tutor";
+  // Home page moved its App Store badge out of the header into the footer.
+  appStoreBadge?: boolean;
 }
 
-export default async function SiteFooter({ variant = "joincandid" }: SiteFooterProps = {}) {
+export default async function SiteFooter({ variant = "joincandid", appStoreBadge = false }: SiteFooterProps = {}) {
   const t = await getTranslations("footer");
   const locale = await getLocale();
   const is_tutor = variant === "tutor";
@@ -125,6 +127,15 @@ export default async function SiteFooter({ variant = "joincandid" }: SiteFooterP
         </div>
       </div>
       */}
+
+      {/* App Store badge — home page moved it here from the top-right header. */}
+      {appStoreBadge && (
+        <div className="px-6 pt-10 md:px-12">
+          <a href="/download" className="inline-block">
+            <img src="/download.svg" alt="Download on the App Store" width={140} className="h-auto" />
+          </a>
+        </div>
+      )}
 
       {/* Bottom bar — always visible */}
       <div className="px-6 py-6 pb-20 md:pb-6 md:px-12 flex items-center justify-between flex-wrap gap-4">
