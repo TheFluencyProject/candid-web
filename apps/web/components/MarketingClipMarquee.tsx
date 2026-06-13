@@ -1,11 +1,15 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import type { MarketingClip } from "@/lib/api";
 import MarketingClipCard from "./MarketingClipCard";
 
 // Continuous drift speed; roughly matches the old CSS marquee's slow pace.
 const SCROLL_SPEED_PX_PER_SEC = 38;
+
+// useLayoutEffect on the server warns; fall back to useEffect there (the centered-card pick
+// it runs is client-only anyway).
+const useIsomorphicLayoutEffect = typeof window !== "undefined" ? useLayoutEffect : useEffect;
 
 // A horizontally drifting, drag-scrollable row of live clips. Motion is driven by a
 // translateX transform (NOT scrollLeft): it's subpixel-accurate so the slow drift works on
@@ -26,11 +30,10 @@ export default function MarketingClipMarquee({ clips }: { clips: MarketingClip[]
   const lastMoveRef = useRef({ x: 0, t: 0 });
   const momentumRafRef = useRef(0);
 
-  // Start with the first card active (it's the centered one at offset 0) so its video begins
-  // loading on the very first render, instead of waiting for the rAF picker post-hydration.
-  const [autoKey, setAutoKey] = useState<string | null>(() =>
-    clips.length > 0 ? `0::${clips[0].caption_segment_id}` : null,
-  );
+  // Null until the layout effect below picks the visually-centered card (pre-paint). Can't seed
+  // a specific card here: the useState init has no layout, and the centered card depends on the
+  // viewport width — hardcoding card 0 plays the leftmost (off-centre) one.
+  const [autoKey, setAutoKey] = useState<string | null>(null);
   const autoKeyRef = useRef<string | null>(autoKey);
   autoKeyRef.current = autoKey; // mirror for the rAF loop (no stale closure)
   const [inView, setInView] = useState<Set<string>>(() => new Set());
@@ -172,6 +175,13 @@ export default function MarketingClipMarquee({ clips }: { clips: MarketingClip[]
       window.removeEventListener("resize", measure);
     };
   }, [clips, recompute_inview, pick_nearest_center]);
+
+  // Pick the visually-centered card as the first playing one, BEFORE first paint — so it (not
+  // the leftmost card) starts loading immediately and there's no flash of the wrong card.
+  useIsomorphicLayoutEffect(() => {
+    const k = pick_nearest_center(null);
+    if (k) setAutoKey(k);
+  }, [pick_nearest_center]);
 
   // End of a drag/scroll: resume drift and recompute the centered playing card.
   const settle = useCallback(() => {

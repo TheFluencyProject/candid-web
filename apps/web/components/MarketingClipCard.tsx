@@ -19,6 +19,11 @@ const MUX_SAMPLE = typeof window !== "undefined" && Math.random() < 0.15;
 // How far the stories bar creeps forward over one clip's playback — small on purpose.
 const PROGRESS_ADVANCE = 0.025;
 
+// Poster width: the card renders ≤281px (desktop) / 191px (mobile); 640 covers retina while
+// being ~3x smaller than the backend's 1200px default (sized for full-screen iOS surfaces).
+// Small enough that all 12 unique posters load near-instantly — eager, so none pop in mid-drift.
+const POSTER_WIDTH = 640;
+
 // Deterministic pseudo-random in [0,1) from a string — stable across SSR/client so the
 // per-card story-bar start fill doesn't cause a hydration mismatch.
 function seeded_unit(s: string): number {
@@ -35,6 +40,14 @@ function seeded_unit(s: string): number {
 function strip_emoji(title: string): string {
   const re = /[\p{Extended_Pictographic}\u{1F3FB}-\u{1F3FF}\u{1F1E6}-\u{1F1FF}\u200D\uFE0F\u20E3]/gu;
   return title.replace(re, "").replace(/\s+/g, " ").trim();
+}
+
+// Shrink the Mux poster to the card's size. The size rides on a ?width= query param, so swap
+// it down (or append) \u2014 leaves non-Mux/S3 fallback URLs untouched.
+function poster_url(url: string): string {
+  return /[?&]width=\d+/.test(url)
+    ? url.replace(/([?&]width=)\d+/, `$1${POSTER_WIDTH}`)
+    : url;
 }
 
 type Props = {
@@ -202,11 +215,11 @@ function MarketingClipCard({ clip, dataKey, isActive, shouldLoad, onSegmentEnd }
       // <video> (mobile promotes playing video to its own layer otherwise).
       className="relative isolate h-[340px] md:h-[500px] aspect-[9/16] shrink-0 overflow-hidden rounded-[1.25rem] shadow-[0_4px_20px_rgba(0,0,0,0.22)] select-none bg-black"
     >
-      {/* Poster stays mounted: instant paint + stable width before the video buffers.
-          loading=lazy: off-screen posters (incl. the duplicate group) don't compete with
-          the first clip's load on a cold mobile connection. */}
+      {/* Poster stays mounted: instant paint + stable width before the video buffers. Eager +
+          shrunk (POSTER_WIDTH): the 12 unique posters load up front so none pop in as the row
+          drifts, yet they're small enough not to starve the cold first-clip load. */}
       {clip.thumbnail_url && (
-        <img src={clip.thumbnail_url} alt="" draggable={false} loading="lazy" decoding="async" className="absolute inset-0 z-0 h-full w-full object-cover" />
+        <img src={poster_url(clip.thumbnail_url)} alt="" draggable={false} decoding="async" className="absolute inset-0 z-0 h-full w-full object-cover" />
       )}
       <video
         ref={videoRef}
