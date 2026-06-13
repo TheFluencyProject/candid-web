@@ -27,9 +27,10 @@ export default function MarketingClipMarquee({ clips }: { clips: MarketingClip[]
   const [hoveredKey, setHoveredKey] = useState<string | null>(null);
   const [inView, setInView] = useState<Set<string>>(() => new Set());
 
-  // Hovering a card plays it (it loops while hovered); otherwise the auto-rotation drives.
-  // Hover never pauses the drift — only dragging/scrolling does.
-  const activeKey = hoveredKey ?? autoKey;
+  // Hovering a card makes it THE playing card (sets autoKey) and loops it while the cursor
+  // stays on it. Mouse-leave clears only hoveredKey — autoKey stays, so the card keeps
+  // playing to its end then hands off to the near-center card (no fallback to a stale,
+  // possibly off-screen card). Hover never pauses the drift — only dragging/scrolling does.
 
   // Nearest-to-viewport-center visible card, optionally excluding a just-played clip id.
   const pick_nearest_center = useCallback((exclude_clip_id: string | null): string | null => {
@@ -170,7 +171,7 @@ export default function MarketingClipMarquee({ clips }: { clips: MarketingClip[]
     return () => cancelAnimationFrame(id);
   }, [autoKey, clips.length, pick_nearest_center]);
 
-  const active_clip_id = activeKey ? activeKey.split("::")[1] : null;
+  const active_clip_id = autoKey ? autoKey.split("::")[1] : null;
   useEffect(() => {
     if (active_clip_id) lastClipIdRef.current = active_clip_id;
   }, [active_clip_id]);
@@ -190,10 +191,10 @@ export default function MarketingClipMarquee({ clips }: { clips: MarketingClip[]
             key={key}
             dataKey={key}
             clip={clip}
-            isActive={activeKey === key}
+            isActive={autoKey === key}
             loop={hoveredKey === key}
             shouldLoad={inView.has(key)}
-            onHoverStart={() => setHoveredKey(key)}
+            onHoverStart={() => { setHoveredKey(key); setAutoKey(key); }}
             onSegmentEnd={handle_segment_end}
           />
         );
