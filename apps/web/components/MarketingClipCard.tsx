@@ -230,9 +230,7 @@ function MarketingClipCard({ clip, dataKey, isActive, shouldLoad, onSegmentEnd, 
       data-clip-id={clip.caption_segment_id}
       // isolate: own stacking context so the overlay layers always paint above the
       // <video> (mobile promotes playing video to its own layer otherwise).
-      // translateZ(0): give the rounded clip its own layer so the video can't bleed a bright
-      // hairline past the edges at sub-pixel marquee offsets (the "white line" artifact).
-      className="relative isolate [transform:translateZ(0)] h-[340px] md:h-[500px] aspect-[9/16] shrink-0 overflow-hidden rounded-[1.25rem] shadow-[0_4px_20px_rgba(0,0,0,0.22)] select-none bg-black"
+      className="relative isolate h-[340px] md:h-[500px] aspect-[9/16] shrink-0 overflow-hidden rounded-[1.25rem] shadow-[0_4px_20px_rgba(0,0,0,0.22)] select-none bg-black"
     >
       {/* Poster stays mounted: instant paint + stable width before the video buffers. Eager +
           shrunk (POSTER_WIDTH): the 12 unique posters load up front so none pop in as the row
