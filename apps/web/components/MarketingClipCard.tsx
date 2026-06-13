@@ -66,9 +66,11 @@ type Props = {
   onReady: () => void;
   /** Apple-Music karaoke captions + Speak-now pill + darker bg (the default). `?karaoke=0` → false. */
   karaoke?: boolean;
+  /** Global volume toggle (marquee-owned). Default true (muted); only the active card emits audio. */
+  muted?: boolean;
 };
 
-function MarketingClipCard({ clip, dataKey, isActive, shouldLoad, onSegmentEnd, onReady, karaoke = true }: Props) {
+function MarketingClipCard({ clip, dataKey, isActive, shouldLoad, onSegmentEnd, onReady, karaoke = true, muted = true }: Props) {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const [activeWordIdx, setActiveWordIdx] = useState(-1);
   const [ready, setReady] = useState(false); // first frame buffered → fade video over poster
@@ -86,11 +88,14 @@ function MarketingClipCard({ clip, dataKey, isActive, shouldLoad, onSegmentEnd, 
   onReadyRef.current = onReady;
   const isActiveRef = useRef(isActive);
   isActiveRef.current = isActive;
+  const mutedRef = useRef(muted); // read in play_from_start so a toggle doesn't restart playback
+  mutedRef.current = muted;
 
   const play_from_start = (video: HTMLVideoElement) => {
-    // iOS: React's `muted`/`playsInline` props don't reliably set the real state, so iOS
-    // blocks muted-autoplay (→ "no video"). Force them imperatively before play().
-    video.muted = true;
+    // iOS: React's `muted`/`playsInline` props don't reliably set the real state — force them
+    // imperatively before play(). Defaults muted (autoplay allowed); the user's unmute tap is the
+    // gesture that lets later clips start with sound.
+    video.muted = mutedRef.current;
     video.playsInline = true;
     try { video.currentTime = clip.start_time; } catch { /* not seekable yet */ }
     video.defaultPlaybackRate = PLAYBACK_RATE;
@@ -235,6 +240,13 @@ function MarketingClipCard({ clip, dataKey, isActive, shouldLoad, onSegmentEnd, 
     }
   }, []);
 
+  // Live volume: only the active card emits audio; everything else stays muted. Set the element
+  // property directly — React's `muted` attribute doesn't reliably reflect to the DOM.
+  useEffect(() => {
+    const v = videoRef.current;
+    if (v) v.muted = muted || !isActive;
+  }, [muted, isActive]);
+
   const words = clip.word_level_captions;
   const title_text = strip_emoji(clip.title);
 
@@ -255,7 +267,7 @@ function MarketingClipCard({ clip, dataKey, isActive, shouldLoad, onSegmentEnd, 
       )}
       <video
         ref={videoRef}
-        muted
+        muted={muted || !isActive}
         playsInline
         preload="auto"
         className={`absolute inset-0 z-0 h-full w-full object-cover transition-opacity duration-300 ${ready ? "opacity-100" : "opacity-0"}`}

@@ -11,6 +11,27 @@ const SCROLL_SPEED_PX_PER_SEC = 38;
 // it runs is client-only anyway).
 const useIsomorphicLayoutEffect = typeof window !== "undefined" ? useLayoutEffect : useEffect;
 
+// Speaker glyph for the mute toggle: ×-marked when muted, sound-waves when live. Inherits the
+// button's text color via currentColor, so no background — just the white icon.
+function SpeakerIcon({ muted }: { muted: boolean }) {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" className="h-[18px] w-[18px] shrink-0">
+      <path d="M12 4 7 8H4a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h3l5 4z" fill="currentColor" />
+      {muted ? (
+        <g stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+          <path d="M16 9.5 20.5 14.5" />
+          <path d="M20.5 9.5 16 14.5" />
+        </g>
+      ) : (
+        <g stroke="currentColor" strokeWidth="2" strokeLinecap="round" fill="none">
+          <path d="M15.5 9a4.5 4.5 0 0 1 0 6" />
+          <path d="M18.5 6.5a8 8 0 0 1 0 11" />
+        </g>
+      )}
+    </svg>
+  );
+}
+
 // A horizontally drifting, drag-scrollable row of live clips. Motion is driven by a
 // translateX transform (NOT scrollLeft): it's subpixel-accurate so the slow drift works on
 // iOS (scrollLeft rounds sub-pixel writes to 0 there), and it wraps via modulo so the row
@@ -42,6 +63,10 @@ export default function MarketingClipMarquee({ clips, karaoke = true }: { clips:
   // actually playing, then neighbors prebuffer so switches stay instant. Desktop ignores this.
   const [coldStartDone, setColdStartDone] = useState(false);
   const handle_ready = useCallback(() => setColdStartDone(true), []);
+
+  // Volume off by default (muted autoplay is the only kind browsers allow); the user taps the
+  // affordance below the row to unmute. Only the active card actually emits audio (see the card).
+  const [muted, setMuted] = useState(true);
 
   // Few clips (e.g. one tutor's 3) make a single group narrower than the viewport, so the
   // modulo wrap exposes a gap before the row loops. Repeat the clips per group until one
@@ -365,6 +390,7 @@ export default function MarketingClipMarquee({ clips, karaoke = true }: { clips:
               onSegmentEnd={handle_segment_end}
               onReady={handle_ready}
               karaoke={karaoke}
+              muted={muted}
             />
           );
         })
@@ -373,17 +399,31 @@ export default function MarketingClipMarquee({ clips, karaoke = true }: { clips:
   );
 
   return (
-    <div
-      ref={containerRef}
-      onPointerDown={on_pointer_down}
-      onPointerMove={on_pointer_move}
-      onPointerUp={on_pointer_up}
-      onPointerCancel={on_pointer_up}
-      className="w-full overflow-hidden select-none py-4 md:py-8 [touch-action:pan-y]"
-    >
-      <div ref={trackRef} className="flex w-max will-change-transform">
-        {render_group(0, false)}
-        {render_group(1, true)}
+    <div className="w-full">
+      <div
+        ref={containerRef}
+        onPointerDown={on_pointer_down}
+        onPointerMove={on_pointer_move}
+        onPointerUp={on_pointer_up}
+        onPointerCancel={on_pointer_up}
+        className="w-full overflow-hidden select-none py-4 md:py-8 [touch-action:pan-y]"
+      >
+        <div ref={trackRef} className="flex w-max will-change-transform">
+          {render_group(0, false)}
+          {render_group(1, true)}
+        </div>
+      </div>
+      {/* Mute toggle, centered under the row — no background, just the white icon + label. */}
+      <div className="mt-3 flex justify-center md:mt-4">
+        <button
+          type="button"
+          onClick={() => setMuted((m) => !m)}
+          aria-pressed={!muted}
+          className="inline-flex items-center gap-1.5 text-white/85 transition-colors hover:text-white"
+        >
+          <SpeakerIcon muted={muted} />
+          <span className="text-sm font-medium">{muted ? "Tap to unmute" : "Tap to mute"}</span>
+        </button>
       </div>
     </div>
   );
