@@ -41,14 +41,14 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     return { title: "Guide Not Found — Candid" };
   }
 
-  // Tab title: "<Language> with <Name> | Candid" (e.g. "Korean with Mia | Candid").
+  // Tab title: "Candid | <Language> with <Name>" (e.g. "Candid | Korean with Mia").
   let title: string;
   if (locale === "ko") {
     const koreanLang = localizeLanguageName(tutor.teaching_language, "ko");
     const koreanName = (tutor.metadata?.name_kr as string) ?? tutor.name;
-    title = `${withKoreanParticle(koreanName)} 함께하는 ${koreanLang} | Candid`;
+    title = `Candid | ${withKoreanParticle(koreanName)} 함께하는 ${koreanLang}`;
   } else {
-    title = `${capitalize(tutor.teaching_language)} with ${tutor.name} | Candid`;
+    title = `Candid | ${capitalize(tutor.teaching_language)} with ${tutor.name}`;
   }
   // Flatten the \n in cool_title for HTML meta description (single-line expected).
   const description = (tutor.cool_title ?? tutor.short_description ?? "").replace(/\n/g, " ");
