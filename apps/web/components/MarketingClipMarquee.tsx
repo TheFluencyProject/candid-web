@@ -24,13 +24,12 @@ export default function MarketingClipMarquee({ clips }: { clips: MarketingClip[]
   const lastClipIdRef = useRef<string | null>(null);
 
   const [autoKey, setAutoKey] = useState<string | null>(null);
-  const [hoveredKey, setHoveredKey] = useState<string | null>(null);
   const [inView, setInView] = useState<Set<string>>(() => new Set());
 
-  // Hovering a card makes it THE playing card (sets autoKey) and loops it while the cursor
-  // stays on it. Mouse-leave clears only hoveredKey — autoKey stays, so the card keeps
-  // playing to its end then hands off to the near-center card (no fallback to a stale,
-  // possibly off-screen card). Hover never pauses the drift — only dragging/scrolling does.
+  // The card under autoKey is THE playing card. It plays its segment ONCE, then hands off
+  // to the near-center card (handle_segment_end). Hovering a card (on real cursor movement)
+  // makes it autoKey so it plays; lifting the cursor changes nothing — it keeps playing to
+  // the end, then recomputes. Hover never pauses the drift — only dragging/scrolling does.
 
   // Nearest-to-viewport-center visible card, optionally excluding a just-played clip id.
   const pick_nearest_center = useCallback((exclude_clip_id: string | null): string | null => {
@@ -60,7 +59,6 @@ export default function MarketingClipMarquee({ clips }: { clips: MarketingClip[]
       if (half > 0 && el.scrollLeft >= half) el.scrollLeft -= half;
     }
     pausedRef.current = false;
-    setHoveredKey(null); // a scroll means they're no longer hovering — let center card play
     setAutoKey(pick_nearest_center(null));
   }, [pick_nearest_center]);
 
@@ -104,13 +102,23 @@ export default function MarketingClipMarquee({ clips }: { clips: MarketingClip[]
     }
   };
   const on_pointer_move = (e: React.PointerEvent) => {
-    if (!mouseDragRef.current) return;
-    const el = scrollRef.current;
-    if (!el) return;
-    const half = el.scrollWidth / 2;
-    let next = dragRef.current.startScroll - (e.clientX - dragRef.current.startX);
-    if (half > 0) next = ((next % half) + half) % half; // wrap both directions
-    el.scrollLeft = next;
+    if (mouseDragRef.current) {
+      const el = scrollRef.current;
+      if (!el) return;
+      const half = el.scrollWidth / 2;
+      let next = dragRef.current.startScroll - (e.clientX - dragRef.current.startX);
+      if (half > 0) next = ((next % half) + half) % half; // wrap both directions
+      el.scrollLeft = next;
+      return;
+    }
+    // Hover-to-play, but ONLY on real cursor movement. A drifting row fires pointermove with
+    // movementX/Y === 0 as cards slide under a stationary cursor — honoring those would swap
+    // the playing card mid-clip ("switches before it's done"). Require real movement, then
+    // hit-test which card is under the cursor and make it the playing one.
+    if (e.pointerType !== "mouse" || (e.movementX === 0 && e.movementY === 0)) return;
+    const card = (document.elementFromPoint(e.clientX, e.clientY) as HTMLElement | null)?.closest("[data-key]");
+    const key = card?.getAttribute("data-key");
+    if (key && key !== autoKey) setAutoKey(key);
   };
   const on_pointer_up = (e: React.PointerEvent) => {
     if (mouseDragRef.current) {
@@ -192,9 +200,9 @@ export default function MarketingClipMarquee({ clips }: { clips: MarketingClip[]
             dataKey={key}
             clip={clip}
             isActive={autoKey === key}
-            loop={hoveredKey === key}
-            shouldLoad={inView.has(key)}
-            onHoverStart={() => { setHoveredKey(key); setAutoKey(key); }}
+            // keep the active card loaded even if it drifts past the IO margin, so a long
+            // clip never blanks out mid-play before it hands off
+            shouldLoad={inView.has(key) || autoKey === key}
             onSegmentEnd={handle_segment_end}
           />
         );
@@ -211,7 +219,6 @@ export default function MarketingClipMarquee({ clips }: { clips: MarketingClip[]
       onPointerCancel={on_pointer_up}
       onScroll={on_scroll}
       onWheel={on_wheel}
-      onMouseLeave={() => setHoveredKey(null)}
       className="w-full overflow-x-auto select-none py-4 md:py-8 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden [touch-action:pan-x_pan-y]"
     >
       <div className="flex w-max">
