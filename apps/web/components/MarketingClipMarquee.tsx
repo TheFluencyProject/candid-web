@@ -309,7 +309,7 @@ export default function MarketingClipMarquee({ clips }: { clips: MarketingClip[]
             isActive={autoKey === key}
             // keep the active card loaded even if it drifts past the margin, so a long clip
             // never blanks out mid-play before it hands off
-            shouldLoad={inView.has(key) || autoKey === key}
+            shouldLoad={autoKey === key}
             onSegmentEnd={handle_segment_end}
           />
         );
