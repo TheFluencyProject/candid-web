@@ -97,9 +97,7 @@ export default async function SimpleLanding({ locale }: Props) {
               Less scrolling.<br />More speaking.
             </h1>
             <p className="max-w-2xl mx-auto text-lg md:text-xl leading-relaxed text-gray-300">
-              Learn the language people actually use, with daily listening &amp; speaking practice{" "}
-              <br className="hidden md:inline" />
-              from your favorite creators
+              Learn real-life Korean
             </p>
             <div className="mt-6 md:mt-8 flex flex-col sm:flex-row items-center justify-center gap-2.5 sm:gap-3">
               {/* Primary — learn (→ /download, UA-aware App Store redirect). */}
