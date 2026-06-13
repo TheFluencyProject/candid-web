@@ -122,6 +122,7 @@ export default function MarketingClipCard({ clip, dataKey, isActive, shouldLoad,
     const tick = () => {
       if (cancelled) return;
       if (video.playbackRate !== PLAYBACK_RATE) video.playbackRate = PLAYBACK_RATE; // hls/seek can reset it
+      if (video.paused && video.readyState >= 2) video.play().catch(() => {}); // re-assert if play stalled/was blocked
       const t = video.currentTime;
       const dur = clip.end_time - clip.start_time;
       if (dur > 0) setProgress(start_fill + PROGRESS_ADVANCE * Math.min(1, Math.max(0, (t - clip.start_time) / dur)));

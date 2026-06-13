@@ -27,6 +27,8 @@ export default function MarketingClipMarquee({ clips }: { clips: MarketingClip[]
   const momentumRafRef = useRef(0);
 
   const [autoKey, setAutoKey] = useState<string | null>(null);
+  const autoKeyRef = useRef<string | null>(null);
+  autoKeyRef.current = autoKey; // mirror for the rAF loop (no stale closure)
   const [inView, setInView] = useState<Set<string>>(() => new Set());
 
   // The card under autoKey is THE playing card. It follows the viewport center while you
@@ -60,7 +62,9 @@ export default function MarketingClipMarquee({ clips }: { clips: MarketingClip[]
     for (const el of Array.from(root.querySelectorAll<HTMLElement>("[data-key]"))) {
       if (exclude_clip_id && el.getAttribute("data-clip-id") === exclude_clip_id) continue;
       const rect = el.getBoundingClientRect();
-      if (rect.right < rootRect.left || rect.left > rootRect.right) continue;
+      // No viewport filter: the globally-nearest card to centre is always the on-screen one
+      // (its duplicate is a whole group width away), and skipping the filter guarantees we
+      // never return null when cards exist — so a video is always chosen to play.
       const dist = Math.abs(rect.left + rect.width / 2 - center_x);
       if (!best || dist < best.dist) best = { key: el.getAttribute("data-key")!, dist };
     }
@@ -111,6 +115,15 @@ export default function MarketingClipMarquee({ clips }: { clips: MarketingClip[]
       if (!pausedRef.current && dt > 0 && groupWidthRef.current > 0) {
         set_offset(offsetRef.current + (SCROLL_SPEED_PX_PER_SEC * dt) / 1000);
       }
+      // Safety net: if nothing is playing (a pick race on load, or a settle that found
+      // nothing), choose a centered card so a video is always playing.
+      if (!autoKeyRef.current) {
+        const k = pick_nearest_center(null);
+        if (k) {
+          autoKeyRef.current = k;
+          setAutoKey(k);
+        }
+      }
       sinceInview += dt;
       if (sinceInview >= 200) {
         sinceInview = 0;
@@ -120,7 +133,7 @@ export default function MarketingClipMarquee({ clips }: { clips: MarketingClip[]
     };
     raf = requestAnimationFrame(step);
     return () => cancelAnimationFrame(raf);
-  }, [clips.length, recompute_inview]);
+  }, [clips.length, recompute_inview, pick_nearest_center]);
 
   // Measure one group's width (cached so the drift loop never reads scrollWidth per frame),
   // set the initial in-view set + first playing card, and re-measure on resize.
@@ -149,7 +162,7 @@ export default function MarketingClipMarquee({ clips }: { clips: MarketingClip[]
     }
     pausedRef.current = false;
     recompute_inview();
-    setAutoKey(pick_nearest_center(null));
+    setAutoKey((prev) => pick_nearest_center(null) ?? prev); // never clear to null
   }, [pick_nearest_center, recompute_inview]);
 
   // Trackpad / wheel horizontal scroll. There's no native scroll to lean on (the track is a
