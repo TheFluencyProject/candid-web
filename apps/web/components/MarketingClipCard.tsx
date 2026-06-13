@@ -1,7 +1,10 @@
 "use client";
 
-import { Fragment, memo, useEffect, useRef, useState } from "react";
+import { Fragment, memo, useEffect, useLayoutEffect, useRef, useState } from "react";
 import type { MarketingClip } from "@/lib/api";
+
+// useLayoutEffect warns on the server; fall back to useEffect there (the seed it runs is client-only).
+const useIsomorphicLayoutEffect = typeof window !== "undefined" ? useLayoutEffect : useEffect;
 
 // iOS AccentColor (display-p3 0x89/0xFF/0xB4) — the karaoke word sweep, by role not appearance.
 const KARAOKE_ACCENT = "#89FFB4";
@@ -221,6 +224,17 @@ function MarketingClipCard({ clip, dataKey, isActive, shouldLoad, onSegmentEnd, 
     };
   }, [isActive, clip]);
 
+  // On first load, show cards left of the viewport centre as already-played (captions fully lit)
+  // so the row looks mid-stream, not all-dim. Runs once; play/recycle logic takes over after.
+  useIsomorphicLayoutEffect(() => {
+    const card = videoRef.current?.closest("[data-key]");
+    if (!card) return;
+    const rect = card.getBoundingClientRect();
+    if (rect.right > 0 && rect.left + rect.width / 2 < window.innerWidth / 2) {
+      setPlayhead(clip.end_time);
+    }
+  }, []);
+
   const words = clip.word_level_captions;
   const title_text = strip_emoji(clip.title);
 
@@ -272,8 +286,8 @@ function MarketingClipCard({ clip, dataKey, isActive, shouldLoad, onSegmentEnd, 
       <div className={`pointer-events-none absolute inset-x-0 bottom-0 z-10 h-[62%] bg-gradient-to-t to-transparent ${karaoke ? "from-black/85 via-black/70" : "from-black/60 via-black/45"}`} />
       {/* always-mounted + opacity so it fades OUT too; gated on isActive → one playing card at a time */}
       {karaoke && (
-        <div className={`pointer-events-none absolute inset-x-0 top-[56%] z-20 flex justify-center -translate-y-[calc(100%+8px)] transition-opacity duration-300 ease-out ${isActive && ready ? "opacity-100" : "opacity-0"}`}>
-          <span className="inline-block rounded px-2 py-1 text-xs font-semibold text-black shadow" style={{ backgroundColor: KARAOKE_ACCENT }}>
+        <div className={`pointer-events-none absolute inset-x-0 top-[56%] z-20 flex justify-center -translate-y-[calc(100%+5px)] transition-opacity duration-300 ease-out ${isActive && ready ? "opacity-100" : "opacity-0"}`}>
+          <span className="inline-block rounded px-2.5 py-1 text-sm font-semibold leading-tight text-black shadow" style={{ backgroundColor: KARAOKE_ACCENT }}>
             Speak now
           </span>
         </div>
