@@ -244,20 +244,21 @@ function MarketingClipCard({ clip, dataKey, isActive, shouldLoad, onSegmentEnd, 
       data-clip-id={clip.caption_segment_id}
       // isolate: own stacking context so the overlay layers always paint above the
       // <video> (mobile promotes playing video to its own layer otherwise).
+      // overflow-hidden+rounded is the ONLY round-clip; media stays square (a rounded video layer paints a white corner AA).
       className="relative isolate h-[340px] md:h-[500px] aspect-[9/16] shrink-0 overflow-hidden rounded-[1.25rem] shadow-[0_4px_20px_rgba(0,0,0,0.22)] select-none bg-black"
     >
       {/* Poster stays mounted: instant paint + stable width before the video buffers. Eager +
           shrunk (POSTER_WIDTH): the 12 unique posters load up front so none pop in as the row
           drifts, yet they're small enough not to starve the cold first-clip load. */}
       {clip.thumbnail_url && (
-        <img src={poster_url(clip.thumbnail_url)} alt="" draggable={false} decoding="async" className="absolute inset-0 z-0 h-full w-full rounded-[1.25rem] object-cover" />
+        <img src={poster_url(clip.thumbnail_url)} alt="" draggable={false} decoding="async" className="absolute inset-0 z-0 h-full w-full object-cover" />
       )}
       <video
         ref={videoRef}
         muted
         playsInline
         preload="auto"
-        className={`absolute inset-0 z-0 h-full w-full rounded-[1.25rem] object-cover transition-opacity duration-300 ${ready ? "opacity-100" : "opacity-0"}`}
+        className={`absolute inset-0 z-0 h-full w-full object-cover transition-opacity duration-300 ${ready ? "opacity-100" : "opacity-0"}`}
       />
 
       {/* Top chrome — title + toggle icon, with the stories-style progress bars below it. */}
