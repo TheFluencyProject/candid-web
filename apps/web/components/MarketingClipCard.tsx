@@ -301,7 +301,7 @@ function MarketingClipCard({ clip, dataKey, isActive, shouldLoad, onSegmentEnd, 
       {karaoke && (
         <div className={`pointer-events-none absolute inset-x-0 top-[56%] z-20 flex justify-center -translate-y-[calc(100%+8px)] md:-translate-y-[calc(100%+12px)] transition-opacity duration-300 ease-out ${isActive && ready ? "opacity-100" : "opacity-0"}`}>
           {/* size tracks the card: smaller on the 340px mobile card, larger on the 500px desktop one */}
-          <span className="inline-block rounded px-2 py-0.5 md:px-2.5 md:py-1 text-xs md:text-base font-semibold leading-tight text-black shadow" style={{ backgroundColor: KARAOKE_ACCENT }}>
+          <span className="inline-block rounded-md px-2 py-1 md:px-2.5 text-xs md:text-base font-semibold leading-tight text-black shadow" style={{ backgroundColor: KARAOKE_ACCENT }}>
             Speak now
           </span>
         </div>
