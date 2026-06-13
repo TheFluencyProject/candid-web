@@ -7,7 +7,6 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import MobileCTABar from "@/components/MobileCTABar";
 import TutorNavbar from "@/components/TutorNavbar";
 import QRCode from "@/components/QRCode";
-import DownloadCTA from "@/components/DownloadCTA";
 import { getTutorPageConfig } from "@/config/tutors";
 import StickyHeader from "@/components/StickyHeader";
 import ScrollFadeIn from "@/components/ScrollFadeIn";
@@ -15,8 +14,9 @@ import BlurImage from "@/components/BlurImage";
 import SiteFooter from "@/components/SiteFooter";
 import JoinForFreePill from "@/components/JoinForFree/JoinForFreePill";
 import JoinForFreeSheet from "@/components/JoinForFree/JoinForFreeSheet";
+import MarketingClipMarquee from "@/components/MarketingClipMarquee";
 import { localizeLanguageName, localizeMapCountry, capitalize, withKoreanParticle, formatHeroTitle, stripEmojis } from "@/lib/i18n-helpers";
-import { type Tutor, type TutorLanguageProficiency, fetchTutor } from "@/lib/api";
+import { type Tutor, type TutorLanguageProficiency, type MarketingClip, fetchTutor, fetchMarketingClips } from "@/lib/api";
 import { isJoinForFreeContext, isCandidtutorsHost } from "@/lib/canonical-hosts";
 
 function formatLanguages(languages: TutorLanguageProficiency[]): string {
@@ -146,6 +146,9 @@ export default async function TutorPage({ params, searchParams }: Props) {
   // the existing full-bleed hero (see the main return below).
   if (candidtutors_brand) {
     const heroImage = tutor.web_bg_picture_url || tutor.large_profile_picture_url;
+    // The tutor's own clips for the marquee below the card. Additive chrome — a fetch
+    // failure (incl. the pre-deploy 404) falls back to [] so it never breaks the card.
+    const clips = await fetchMarketingClips(locale, slug).catch(() => [] as MarketingClip[]);
     return (
       <main
         className="min-h-screen flex flex-col"
@@ -201,6 +204,12 @@ export default async function TutorPage({ params, searchParams }: Props) {
             </div>
           </div>
         </div>
+        {/* Tutor's own clips — full-width row below the card (breaks out of max-w-2xl). */}
+        {clips.length > 0 && (
+          <div className="w-full">
+            <MarketingClipMarquee clips={clips} />
+          </div>
+        )}
         <footer className="px-6 py-6 flex items-center justify-between flex-wrap gap-4 text-sm" style={{ color: "rgba(255,255,255,0.5)" }}>
           <p>&copy; {new Date().getFullYear()} The Fluency Project Inc.</p>
           <div className="flex gap-6">
@@ -245,16 +254,16 @@ export default async function TutorPage({ params, searchParams }: Props) {
           ) : (
             <>
               {/* Desktop: Get the app pill (App Store badge moves inline under hero) */}
-              <DownloadCTA
-                slug={slug}
-                tutorName={localizedFirstName}
+              <a
+                href={`/download/${slug}`}
+                data-tutor-name={localizedFirstName}
                 className="hidden lg:block px-5 py-2 rounded-full text-sm font-semibold"
                 style={{ backgroundColor: "#FFFFFF", color: "#18181C" }}
               >
                 Get the app
-              </DownloadCTA>
+              </a>
               {/* Mobile: App Store badge */}
-              <DownloadCTA slug={slug} tutorName={localizedFirstName} className="lg:hidden">
+              <a href={`/download/${slug}`} className="lg:hidden">
                 <Image
                   src="/download.svg"
                   alt="Download on the App Store"
@@ -262,7 +271,7 @@ export default async function TutorPage({ params, searchParams }: Props) {
                   height={40}
                   priority
                 />
-              </DownloadCTA>
+              </a>
             </>
           )
         }
@@ -354,9 +363,9 @@ export default async function TutorPage({ params, searchParams }: Props) {
               variant="hero-pill"
             />
           ) : (
-            <DownloadCTA
-              slug={slug}
-              tutorName={localizedFirstName}
+            <a
+              href={`/download/${slug}`}
+              data-tutor-name={localizedFirstName}
               className="animate-fade-in-up-delay-2 self-start"
             >
               <Image
@@ -366,7 +375,7 @@ export default async function TutorPage({ params, searchParams }: Props) {
                 height={46}
                 priority
               />
-            </DownloadCTA>
+            </a>
           )}
           {/* Hidden until further notice; superseded by inline App Store badge above. */}
           <div className="hidden">
