@@ -17,12 +17,11 @@ function seeded_unit(s: string): number {
   return ((h >>> 0) % 1000) / 1000;
 }
 
-// Pull emoji out of a title so the text line stays clean (and survives truncation).
-function split_title(title: string): { emoji: string; text: string } {
-  const re = /\p{Extended_Pictographic}️?/gu;
-  const emoji = (title.match(re) || []).join("");
-  const text = title.replace(re, "").replace(/\s+/g, " ").trim();
-  return { emoji, text };
+// Strip emoji (plus skin-tone modifiers, regional indicators, ZWJ, variation
+// selectors, keycap) from a title so the chrome stays clean — no emoji shown.
+function strip_emoji(title: string): string {
+  const re = /[\p{Extended_Pictographic}\u{1F3FB}-\u{1F3FF}\u{1F1E6}-\u{1F1FF}\u200D\uFE0F\u20E3]/gu;
+  return title.replace(re, "").replace(/\s+/g, " ").trim();
 }
 
 type Props = {
@@ -144,7 +143,7 @@ export default function MarketingClipCard({ clip, dataKey, isActive, loop, shoul
   }, [isActive, clip]);
 
   const words = clip.word_level_captions;
-  const { emoji, text: title_text } = split_title(clip.title);
+  const title_text = strip_emoji(clip.title);
 
   // Decorative 3-bar story header — a random "mid-story" fill per card.
   const seed = seeded_unit(clip.caption_segment_id);
@@ -186,21 +185,15 @@ export default function MarketingClipCard({ clip, dataKey, isActive, loop, shoul
           ))}
         </div>
         <div className="flex items-center justify-between gap-2">
-          <div className="flex min-w-0 flex-1 items-center gap-1.5">
-            {emoji && <span className="shrink-0 text-sm md:text-base drop-shadow">{emoji}</span>}
-            <span className="min-w-0 truncate text-white text-xs md:text-sm font-semibold drop-shadow">{title_text}</span>
-          </div>
-          {/* SF Symbols switch.2 (iOS immersion toggle): top outlined capsule + knob left,
-              bottom filled capsule with a knocked-out knob right (evenodd hole, no mask). */}
-          <svg width="23" height="16.5" viewBox="0 0 25 18" fill="none" preserveAspectRatio="xMidYMid meet" className="shrink-0 text-white" aria-hidden>
-            <rect x="0.9" y="1" width="20.2" height="7" rx="3.5" stroke="currentColor" strokeWidth="1.5" />
-            <rect x="2.6" y="2.7" width="7.2" height="3.6" rx="1.8" fill="currentColor" />
-            <path
-              fillRule="evenodd"
-              fill="currentColor"
-              d="M7.4 10 H20.6 A3.5 3.5 0 0 1 20.6 17 H7.4 A3.5 3.5 0 0 1 7.4 10 Z
-                 M17.1 11.7 H20.7 A1.8 1.8 0 0 1 20.7 15.3 H17.1 A1.8 1.8 0 0 1 17.1 11.7 Z"
-            />
+          <span className="min-w-0 flex-1 truncate text-white text-xs md:text-sm font-semibold drop-shadow">{title_text}</span>
+          {/* SF Symbols switch.2 (iOS immersion toggle): two identical, vertically-stacked
+              capsule tracks (same x extent — aligned, not offset) with filled knobs on
+              opposite sides — top-left, bottom-right. */}
+          <svg width="22" height="15.6" viewBox="0 0 24 17" fill="none" preserveAspectRatio="xMidYMid meet" className="shrink-0 text-white" aria-hidden>
+            <rect x="1" y="1.2" width="22" height="6.8" rx="3.4" stroke="currentColor" strokeWidth="1.6" />
+            <rect x="3" y="2.9" width="6" height="3.4" rx="1.7" fill="currentColor" />
+            <rect x="1" y="9" width="22" height="6.8" rx="3.4" stroke="currentColor" strokeWidth="1.6" />
+            <rect x="15" y="10.7" width="6" height="3.4" rx="1.7" fill="currentColor" />
           </svg>
         </div>
       </div>
