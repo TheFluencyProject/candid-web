@@ -299,8 +299,9 @@ function MarketingClipCard({ clip, dataKey, isActive, shouldLoad, onSegmentEnd, 
       <div className={`pointer-events-none absolute inset-x-0 bottom-0 z-10 h-[62%] bg-gradient-to-t to-transparent ${karaoke ? "from-black/85 via-black/70" : "from-black/60 via-black/45"}`} />
       {/* always-mounted + opacity so it fades OUT too; gated on isActive → one playing card at a time */}
       {karaoke && (
-        <div className={`pointer-events-none absolute inset-x-0 top-[56%] z-20 flex justify-center -translate-y-[calc(100%+5px)] transition-opacity duration-300 ease-out ${isActive && ready ? "opacity-100" : "opacity-0"}`}>
-          <span className="inline-block rounded px-2.5 py-1 text-sm font-semibold leading-tight text-black shadow" style={{ backgroundColor: KARAOKE_ACCENT }}>
+        <div className={`pointer-events-none absolute inset-x-0 top-[56%] z-20 flex justify-center -translate-y-[calc(100%+8px)] md:-translate-y-[calc(100%+12px)] transition-opacity duration-300 ease-out ${isActive && ready ? "opacity-100" : "opacity-0"}`}>
+          {/* size tracks the card: smaller on the 340px mobile card, larger on the 500px desktop one */}
+          <span className="inline-block rounded px-2 py-0.5 md:px-2.5 md:py-1 text-xs md:text-base font-semibold leading-tight text-black shadow" style={{ backgroundColor: KARAOKE_ACCENT }}>
             Speak now
           </span>
         </div>

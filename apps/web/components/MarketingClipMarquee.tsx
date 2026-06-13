@@ -170,8 +170,10 @@ export default function MarketingClipMarquee({ clips, karaoke = true }: { clips:
     let raf = 0;
     let last = 0;
     let sinceInview = 0;
-    // 1.5× the old desktop pace, on mobile AND desktop.
-    const speed = SCROLL_SPEED_PX_PER_SEC * 1.5;
+    // Mobile drifts at 1.5× the base pace; desktop is 1.5× faster still — the wider viewport makes
+    // the same px/s read as slower. Computed once here (resize across the 768 bp mid-session is rare).
+    const desktop = typeof window !== "undefined" && window.innerWidth >= 768;
+    const speed = SCROLL_SPEED_PX_PER_SEC * 1.5 * (desktop ? 1.5 : 1);
     const step = (ts: number) => {
       const dt = last ? ts - last : 0;
       last = ts;
