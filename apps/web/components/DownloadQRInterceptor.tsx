@@ -36,11 +36,17 @@ export default function DownloadQRInterceptor() {
   }, [handleClick]);
 
   return (
-    <ResponsiveOverlay open={target !== null} onClose={() => setTarget(null)} blurBackdrop panelBackground="#FFFFFF">
+    <ResponsiveOverlay
+      open={target !== null}
+      onClose={() => setTarget(null)}
+      blurBackdrop
+      panelBackground="#FFFFFF"
+      desktopMaxWidthClass="max-w-[340px]"
+    >
       {target && (
-        <div className="px-8 py-10 flex flex-col items-center text-center gap-5">
-          <h2 className="text-2xl font-semibold" style={{ color: "#18181C" }}>
-            {t("get_started_free")}
+        <div className="px-8 py-8 flex flex-col items-center text-center gap-4">
+          <h2 className="text-xl font-semibold" style={{ color: "#18181C" }}>
+            {t("download_for_ios")}
           </h2>
           <div className="rounded-2xl bg-white p-4">
             <QRCodeSVG value={target.url} size={196} />

@@ -87,10 +87,10 @@ export default function ResponsiveOverlay({
       {/* Desktop centered modal.
           - Tap outside the panel dismisses. Clicks on the panel stopPropagation
             so they don't bubble to the backdrop.
-          - Darker backdrop (bg-black/75) so the underlying page is visibly
-            de-emphasized. */}
+          - Backdrop dims the page: a lighter bg-black/40 paired with the frosted
+            blur (the download QR overlay), else the stronger bg-black/75. */}
       <div
-        className={`hidden lg:flex fixed inset-0 z-[70] items-center justify-center p-6 bg-black/75${blurClass}`}
+        className={`hidden lg:flex fixed inset-0 z-[70] items-center justify-center p-6 ${blurBackdrop ? "bg-black/40" : "bg-black/75"}${blurClass}`}
         onClick={onClose}
       >
         <div
