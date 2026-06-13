@@ -333,7 +333,7 @@ export default function MarketingClipMarquee({ clips }: { clips: MarketingClip[]
   const prebuffer_neighbors = !isMobile || coldStartDone;
 
   const render_group = (group_idx: number, duplicate: boolean) => (
-    <div className="flex shrink-0 gap-4 md:gap-6 pr-4 md:pr-6" aria-hidden={duplicate || undefined}>
+    <div className="flex shrink-0 gap-3 md:gap-6 pr-3 md:pr-6" aria-hidden={duplicate || undefined}>
       {clips.map((clip) => {
         const key = `${group_idx}::${clip.caption_segment_id}`;
         return (
