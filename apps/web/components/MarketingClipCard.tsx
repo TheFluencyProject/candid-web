@@ -238,14 +238,14 @@ function MarketingClipCard({ clip, dataKey, isActive, shouldLoad, onSegmentEnd, 
           shrunk (POSTER_WIDTH): the 12 unique posters load up front so none pop in as the row
           drifts, yet they're small enough not to starve the cold first-clip load. */}
       {clip.thumbnail_url && (
-        <img src={poster_url(clip.thumbnail_url)} alt="" draggable={false} decoding="async" className="absolute inset-0 z-0 h-full w-full object-cover" />
+        <img src={poster_url(clip.thumbnail_url)} alt="" draggable={false} decoding="async" className="absolute inset-0 z-0 h-full w-full rounded-[1.25rem] object-cover" />
       )}
       <video
         ref={videoRef}
         muted
         playsInline
         preload="auto"
-        className={`absolute inset-0 z-0 h-full w-full object-cover transition-opacity duration-300 ${ready ? "opacity-100" : "opacity-0"}`}
+        className={`absolute inset-0 z-0 h-full w-full rounded-[1.25rem] object-cover transition-opacity duration-300 ${ready ? "opacity-100" : "opacity-0"}`}
       />
 
       {/* Top chrome — title + toggle icon, with the stories-style progress bars below it. */}
@@ -275,7 +275,7 @@ function MarketingClipCard({ clip, dataKey, isActive, shouldLoad, onSegmentEnd, 
       {/* always-mounted + opacity so it fades OUT too; gated on isActive → one playing card at a time */}
       {karaoke && (
         <div className={`pointer-events-none absolute inset-x-0 top-[56%] z-20 flex justify-center -translate-y-[calc(100%+8px)] transition-opacity duration-300 ease-out ${isActive && ready ? "opacity-100" : "opacity-0"}`}>
-          <span className="inline-block rounded-sm px-2.5 py-0.5 text-xs font-semibold text-black shadow" style={{ backgroundColor: KARAOKE_ACCENT }}>
+          <span className="inline-block rounded px-2 py-1 text-xs font-semibold text-black shadow" style={{ backgroundColor: KARAOKE_ACCENT }}>
             Speak now
           </span>
         </div>
