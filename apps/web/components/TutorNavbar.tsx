@@ -9,6 +9,7 @@ export default function TutorNavbar({
   alwaysWhite,
   mobileDark,
   rightElement,
+  revealRightOnScroll,
 }: {
   sentinelId: string;
   downloadUrl: string;
@@ -16,6 +17,8 @@ export default function TutorNavbar({
   /** Force dark wordmark on mobile even when alwaysWhite is true. */
   mobileDark?: boolean;
   rightElement?: React.ReactNode;
+  /** Hide rightElement until the hero sentinel scrolls out of view, then fade it in. */
+  revealRightOnScroll?: boolean;
 }) {
   const [pastHero, setPastHero] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -79,16 +82,26 @@ export default function TutorNavbar({
             priority
           />
         </a>
-        {rightElement ?? (
-          <a href={downloadUrl}>
-            <Image
-              src="/download.svg"
-              alt="Download on the App Store"
-              width={120}
-              height={40}
-              priority
-            />
-          </a>
+        {revealRightOnScroll ? (
+          // Revealed top-right only after the hero CTA scrolls out of view.
+          <div
+            className="transition-opacity duration-300"
+            style={{ opacity: pastHero ? 1 : 0, pointerEvents: pastHero ? "auto" : "none" }}
+          >
+            {rightElement}
+          </div>
+        ) : (
+          rightElement ?? (
+            <a href={downloadUrl}>
+              <Image
+                src="/download.svg"
+                alt="Download on the App Store"
+                width={120}
+                height={40}
+                priority
+              />
+            </a>
+          )
         )}
       </div>
     </nav>

@@ -7,7 +7,6 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import MobileCTABar from "@/components/MobileCTABar";
 import TutorNavbar from "@/components/TutorNavbar";
 import QRCode from "@/components/QRCode";
-import { getTutorPageConfig } from "@/config/tutors";
 import StickyHeader from "@/components/StickyHeader";
 import ScrollFadeIn from "@/components/ScrollFadeIn";
 import BlurImage from "@/components/BlurImage";
@@ -15,7 +14,7 @@ import SiteFooter from "@/components/SiteFooter";
 import JoinForFreePill from "@/components/JoinForFree/JoinForFreePill";
 import JoinForFreeSheet from "@/components/JoinForFree/JoinForFreeSheet";
 import MarketingClipMarquee from "@/components/MarketingClipMarquee";
-import { localizeLanguageName, localizeMapCountry, capitalize, withKoreanParticle, formatHeroTitle, stripEmojis } from "@/lib/i18n-helpers";
+import { localizeLanguageName, localizeMapCountry, capitalize, withKoreanParticle, formatHeroTitle } from "@/lib/i18n-helpers";
 import { type Tutor, type TutorLanguageProficiency, type MarketingClip, fetchTutor, fetchMarketingClips } from "@/lib/api";
 import { isJoinForFreeContext, isCandidtutorsHost } from "@/lib/canonical-hosts";
 
@@ -43,18 +42,14 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     return { title: "Guide Not Found — Candid" };
   }
 
-  // Format: "<TITLE> - <Language> with <Name>" so each tutor's tab reads like
-  // their program ("AMERICAN DREAM - English with Adam"). Falls back to the
-  // legacy "Candid | …" form when title is empty.
+  // Tab title: "<Language> with <Name> | Candid" (e.g. "Korean with Mia | Candid").
   let title: string;
   if (locale === "ko") {
     const koreanLang = localizeLanguageName(tutor.teaching_language, "ko");
     const koreanName = (tutor.metadata?.name_kr as string) ?? tutor.name;
-    const suffix = `${koreanLang}, ${withKoreanParticle(koreanName)} 함께`;
-    title = tutor.title ? `${tutor.title} - ${suffix}` : `Candid | ${suffix}`;
+    title = `${withKoreanParticle(koreanName)} 함께하는 ${koreanLang} | Candid`;
   } else {
-    const suffix = `${capitalize(tutor.teaching_language)} with ${tutor.name}`;
-    title = tutor.title ? `${tutor.title} - ${suffix}` : `Candid | ${suffix}`;
+    title = `${capitalize(tutor.teaching_language)} with ${tutor.name} | Candid`;
   }
   // Flatten the \n in cool_title for HTML meta description (single-line expected).
   const description = (tutor.cool_title ?? tutor.short_description ?? "").replace(/\n/g, " ");
@@ -80,16 +75,20 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
+// App-screenshot sections are hidden for now — kept in code for a later day.
+const SHOW_APP_SCREENSHOTS: boolean = false;
+
 export default async function TutorPage({ params, searchParams }: Props) {
   const { locale, slug } = await params;
   setRequestLocale(locale);
 
-  const [tutor, t, t_footer, host_header, sp] = await Promise.all([
+  const [tutor, t, t_footer, host_header, sp, clips] = await Promise.all([
     fetchTutor(slug, locale),
     getTranslations("tutor"),
     getTranslations("footer"),
     headers().then(h => h.get("host") ?? ""),
     searchParams,
+    fetchMarketingClips(locale, slug).catch(() => [] as MarketingClip[]),
   ]);
   if (!tutor) {
     notFound();
@@ -111,11 +110,6 @@ export default async function TutorPage({ params, searchParams }: Props) {
   // and ?v=meta). joincandid.co/tutor stays on the App Store path.
   const uses_join_sheet = join_for_free || candidtutors_brand;
 
-  // joincandid.co (+ preview/local) now renders the same compact card as
-  // candidtutors.co, but its CTA routes to the App Clip funnel (/download/[slug])
-  // — not the web-signup sheet. custom_domain pages keep the full-bleed hero.
-  const app_clip_card = !candidtutors_brand && !join_for_free;
-
   // "Join {name}'s study club for conversational {lang}" framing — default on
   // candidtutors.co AND on the ?v=meta ad variant; original subtitle otherwise.
   const use_study_club_framing = is_meta_variant || candidtutors_brand;
@@ -126,48 +120,29 @@ export default async function TutorPage({ params, searchParams }: Props) {
       ? (tutor.metadata.name_kr as string)
       : firstName;
   const langLabel = localizeLanguageName(tutor.teaching_language, locale);
-  const config = getTutorPageConfig(slug);
   // Web-only override; falls back to cool_title (and short_description for legacy API responses) when null.
   const coolTitle = formatHeroTitle(tutor.web_title_override ?? tutor.cool_title ?? tutor.short_description);
-  // Per-tutor English subtitle override (HTML allowed). Korean keeps the i18n default.
-  const defaultSubtitleHtml = locale === "en" && config.subtitle?.en
-    ? config.subtitle.en
-    : stripEmojis(t("subtitle", { name: locale === "ko" ? withKoreanParticle(localizedFirstName) : localizedFirstName, language: langLabel }));
-  // Meta variant subtitle uses the same i18n key on both desktop + mobile (no per-tutor override).
-  const metaSubtitleHtml = stripEmojis(t("meta_subtitle", {
-    name: locale === "ko" ? withKoreanParticle(localizedFirstName) : localizedFirstName,
-    language: langLabel,
-  }));
-  const subtitleHtml = use_study_club_framing ? metaSubtitleHtml : defaultSubtitleHtml;
-  const subtitleMobileHtml = use_study_club_framing
-    ? metaSubtitleHtml.replace(/<br\s*\/?>/gi, " ").replace(/\s+/g, " ").trim()
-    : (locale === "en" && config.subtitle?.enMobile
-        ? config.subtitle.enMobile
-        : subtitleHtml.replace(/<br\s*\/?>/gi, " ").replace(/\s+/g, " ").trim());
+  // Speaking-screenshot hero copy: one tagline for every tutor; subtitle stays personalized.
+  const heroName = locale === "ko" ? withKoreanParticle(localizedFirstName) : localizedFirstName;
+  const heroTitle = t("hero_tagline_vertical"); // "Less scrolling.\nMore speaking." (two forced lines)
+  const heroSubtitle = t("hero_subtitle_alt", { language: langLabel, name: heroName });
+  // The speaking/shadowing app screenshot shown in the hero phone frame.
+  const speakingShot = tutor.screenshot_shadow_url ?? tutor.screenshot_listen_url ?? tutor.web_bg_picture_url ?? tutor.large_profile_picture_url;
 
   // ─── simplified card layout (candidtutors.co + joincandid.co) ───────────
   // Single centered card on the dark page — no navbar, no app screenshots,
   // no App Store badge. candidtutors.co's CTA opens the web-signup sheet;
   // joincandid.co's CTA routes to the App Clip funnel. custom_domain pages
   // keep the full-bleed hero (see the main return below).
-  if (candidtutors_brand || app_clip_card) {
+  if (candidtutors_brand) {
     const heroImage = tutor.web_bg_picture_url || tutor.large_profile_picture_url;
-    // The tutor's own clips for the marquee below the card. Additive chrome — a fetch
-    // failure (incl. the pre-deploy 404) falls back to [] so it never breaks the card.
-    const clips = await fetchMarketingClips(locale, slug).catch(() => [] as MarketingClip[]);
     return (
       <main
-        className={`min-h-screen flex flex-col ${app_clip_card ? "pb-40 md:pb-0" : ""}`}
+        className="min-h-screen flex flex-col"
         style={{ backgroundColor: "#18181C", color: "#FFFFFF" }}
       >
         <header className="px-6 md:px-10 pt-8">
-          {/* joincandid: the wordmark shares the App Clip CTA behavior (desktop QR /
-              mobile App Clip) via the global DownloadQRInterceptor. candidtutors: home. */}
-          <a
-            href={candidtutors_brand ? "/" : `/download/${slug}`}
-            data-tutor-name={candidtutors_brand ? undefined : localizedFirstName}
-            className="inline-block"
-          >
+          <a href="/" className="inline-block">
             <Image
               src="/wordmark-white.svg"
               alt="Candid"
@@ -209,24 +184,10 @@ export default async function TutorPage({ params, searchParams }: Props) {
                   {tutor.web_letter}
                 </p>
               )}
-              {candidtutors_brand ? (
-                <JoinForFreePill
-                  label={t("study_with", { name: localizedFirstName })}
-                  variant="card"
-                />
-              ) : (
-                // joincandid.co: green card CTA → App Clip funnel (desktop QR via the
-                // global DownloadQRInterceptor). Desktop only — on mobile the CTA lives
-                // in the fixed MobileCTABar below, sticking out from the bottom.
-                <a
-                  href={`/download/${slug}`}
-                  data-tutor-name={localizedFirstName}
-                  className="hidden md:block w-full text-center px-7 py-4 rounded-full text-base font-bold tracking-wide"
-                  style={{ backgroundColor: "#89FFB4", color: "#000000" }}
-                >
-                  {t("start_with_name", { name: localizedFirstName })}
-                </a>
-              )}
+              <JoinForFreePill
+                label={t("study_with", { name: localizedFirstName })}
+                variant="card"
+              />
             </div>
           </div>
         </div>
@@ -247,25 +208,11 @@ export default async function TutorPage({ params, searchParams }: Props) {
             </Link>
           </div>
         </footer>
-        {candidtutors_brand && (
-          <JoinForFreeSheet
-            tutor_name={localizedFirstName}
-            tutor_slug={slug}
-            locale={join_for_free_locale}
-          />
-        )}
-        {/* Mobile only: CTA lives in a fixed bottom bar instead of inside the card.
-            mode="download" → /download/[slug] → App Clip on iOS (the QR interceptor is
-            desktop-only, so on mobile this navigates straight to the clip funnel). */}
-        {app_clip_card && (
-          <MobileCTABar
-            downloadUrl={`/download/${slug}`}
-            ctaLabel={t("start_with_name", { name: localizedFirstName })}
-            ctaSubtext={t("no_credit_card")}
-            mode="download"
-            alwaysVisible
-          />
-        )}
+        <JoinForFreeSheet
+          tutor_name={localizedFirstName}
+          tutor_slug={slug}
+          locale={join_for_free_locale}
+        />
       </main>
     );
   }
@@ -279,8 +226,8 @@ export default async function TutorPage({ params, searchParams }: Props) {
       <TutorNavbar
         sentinelId="hero-sentinel"
         downloadUrl={`/download/${slug}`}
-        alwaysWhite={Boolean(config.hero?.textColor)}
-        mobileDark={slug === "english-adam"}
+        alwaysWhite
+        revealRightOnScroll={!uses_join_sheet}
         rightElement={
           join_for_free ? (
             <>
@@ -292,213 +239,100 @@ export default async function TutorPage({ params, searchParams }: Props) {
             // hero badge, mobile has the bottom sticky CTA — top-right pill is redundant.
             <></>
           ) : (
-            <>
-              {/* Desktop: Get the app pill (App Store badge moves inline under hero) */}
-              <a
-                href={`/download/${slug}`}
-                data-tutor-name={localizedFirstName}
-                className="hidden lg:block px-5 py-2 rounded-full text-sm font-semibold"
-                style={{ backgroundColor: "#FFFFFF", color: "#18181C" }}
-              >
-                Get the app
-              </a>
-              {/* Mobile: App Store badge */}
-              <a href={`/download/${slug}`} className="lg:hidden">
-                <Image
-                  src="/download.svg"
-                  alt="Download on the App Store"
-                  width={120}
-                  height={40}
-                  priority
-                />
-              </a>
-            </>
+            // joincandid: green "TRY FOR FREE" pill, revealed top-right on scroll (revealRightOnScroll).
+            // Desktop only — mobile uses the bottom MobileCTABar.
+            <a
+              href={`/download/${slug}`}
+              data-tutor-name={localizedFirstName}
+              className="hidden lg:inline-block px-5 py-2 rounded-full text-sm font-bold"
+              style={{ backgroundColor: "#89FFB4", color: "#000000" }}
+            >
+              {t("get_started")}
+            </a>
           )
         }
       />
 
-      {/* ─── Full-Viewport Hero ─── */}
-      <section className="relative min-h-[80vh] lg:min-h-screen overflow-hidden">
-        {/* Photo background */}
-        {(tutor.web_bg_picture_url || tutor.large_profile_picture_url) ? (
-          <>
-            {/* Desktop photo. Plain <img> direct from S3 — bypasses /_next/image transcode hop. */}
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={tutor.web_bg_picture_url || tutor.large_profile_picture_url!}
-              alt={tutor.name}
-              className="absolute inset-0 w-full h-full object-cover hidden lg:block"
-              style={{ objectPosition: config.photo.desktop }}
-            />
-            {/* Mobile photo */}
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={tutor.web_bg_picture_url || tutor.large_profile_picture_url!}
-              alt={tutor.name}
-              className="absolute inset-0 w-full h-full object-cover lg:hidden origin-bottom"
-              style={{
-                objectPosition: config.photo.mobile,
-                transform: `scale(${config.photo.mobileScale ?? 1.15}) translate(${config.photo.mobileTranslateX ?? '0'}, ${config.photo.mobileTranslateY ?? '0'})`,
-              }}
-            />
-          </>
-        ) : (
-          <div
-            className="absolute inset-0"
-            style={{
-              background:
-                "linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%)",
-            }}
-          />
-        )}
-
-        {/* Optional per-tutor overlay (e.g. dark radial behind the headline).
-            Only rendered when the hero text is white — the overlay's whole
-            purpose is to keep white text legible on a busy/light photo. */}
-        {config.hero?.textColor && config.hero?.overlay && (
-          <div
-            className="hidden lg:block absolute inset-0 pointer-events-none"
-            style={{ background: config.hero.overlay }}
-          />
-        )}
-
-        {/* Bottom fade into background color — desktop */}
-        <div
-          className="absolute inset-0 pointer-events-none hidden lg:block"
-          style={{
-            background:
-              "linear-gradient(to bottom, transparent 70%, #18181C 100%)",
-          }}
-        />
-        {/* Bottom fade into background color — mobile */}
-        <div
-          className="absolute inset-0 pointer-events-none lg:hidden"
-          style={{
-            background: config.photo.mobileFade
-              ?? "linear-gradient(to bottom, transparent 45%, rgba(24,24,28,0.52) 60%, rgba(24,24,28,0.91) 75%, rgba(24,24,28,1) 90%, #18181C 100%)",
-          }}
-        />
-
-        {/* Desktop text content — left side. Bumped weight on desktop when the
-            hero text override is white so it stays readable on busy backgrounds. */}
-        <div className="relative z-10 hidden lg:flex flex-col justify-start min-h-screen px-12 pt-[100px] pb-24">
-          <h1
-            className={`hero-heading ${config.hero?.textShadow ? "hero-heading--shadowed" : ""} text-[2.7rem] xl:text-[3.375rem] font-light lg:font-medium leading-[1.15] mb-[1.125rem] animate-fade-in-up`}
-            style={{ color: config.hero?.textColor ?? "#18181C", textShadow: config.hero?.textShadow }}
-            dangerouslySetInnerHTML={{ __html: coolTitle }}
-          />
-          <p
-            className={`text-[1.2375rem] xl:text-[1.39rem] font-light leading-snug mb-5 animate-fade-in-up-delay-1`}
-            style={{ color: config.hero?.textColor ?? "#18181C", textShadow: config.hero?.textShadow }}
-            dangerouslySetInnerHTML={{ __html: subtitleHtml }}
-          />
-          {uses_join_sheet ? (
-            // candidtutors.co + custom_domain → opens the Join-for-free sheet, not the App Store.
-            <JoinForFreePill
-              label={
-                candidtutors_brand
-                  ? t("study_with", { name: localizedFirstName })
-                  : t("join_for_free")
-              }
-              variant="hero-pill"
-            />
-          ) : (
-            <a
-              href={`/download/${slug}`}
-              data-tutor-name={localizedFirstName}
-              className="animate-fade-in-up-delay-2 self-start"
+      {/* ─── Speaking-screenshot hero ─── */}
+      <section className="relative px-6 md:px-12 pt-[110px] md:pt-[128px] pb-12 md:pb-16">
+        <div className="mx-auto w-full max-w-6xl flex flex-col lg:flex-row lg:items-center lg:gap-12">
+          {/* Text column */}
+          <div className="lg:flex-1">
+            <h1
+              className="hero-heading font-medium leading-[1.05] whitespace-pre-line text-[clamp(2.4rem,11vw,3.4rem)] lg:text-[3.5rem] mb-4 md:mb-5 animate-fade-in-up"
+              style={{ color: "#FFFFFF" }}
             >
-              <Image
-                src="/download.svg"
-                alt="Download on the App Store"
-                width={140}
-                height={46}
-                priority
-              />
-            </a>
-          )}
-          {/* Hidden until further notice; superseded by inline App Store badge above. */}
-          <div className="hidden">
-            <QRCode slug={slug} label={t("download_qr")} />
+              {heroTitle}
+            </h1>
+            <p
+              className="text-lg md:text-xl font-light leading-snug max-w-md animate-fade-in-up-delay-1"
+              style={{ color: "rgba(255,255,255,0.8)" }}
+            >
+              {heroSubtitle}
+            </p>
+            {/* Desktop CTA — joincandid: scan-to-install QR; custom_domain: join pill.
+                Mobile uses the bottom MobileCTABar either way. */}
+            {uses_join_sheet ? (
+              <div className="hidden lg:block mt-8 animate-fade-in-up-delay-2">
+                <JoinForFreePill label={t("join_for_free")} variant="hero-pill" />
+              </div>
+            ) : (
+              <div className="hidden lg:block mt-8 animate-fade-in-up-delay-2">
+                <QRCode slug={slug} />
+              </div>
+            )}
           </div>
+
+          {/* Phone-framed speaking (shadowing) screenshot */}
+          {speakingShot && (
+            <div className="lg:flex-1 flex justify-center lg:justify-end mt-10 lg:mt-0 animate-fade-in-up-delay-1">
+              <div className="relative w-full max-w-[300px] rounded-[2.75rem] bg-black p-2.5 shadow-2xl">
+                {/* Plain <img> direct from S3 — bypasses the /_next/image transcode hop. */}
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={speakingShot}
+                  alt={t("shadow", { firstName: localizedFirstName, language: langLabel })}
+                  className="block w-full rounded-[2.1rem]"
+                />
+              </div>
+            </div>
+          )}
         </div>
 
-        {/* Mobile text content — bottom, centered. Slim bottom padding so the
-            headline sits ~10% lower in the hero. */}
-        <div className="relative z-10 lg:hidden flex flex-col items-center justify-end min-h-[80vh] px-6 pb-[3svh] text-center">
-          <h1
-            className="hero-heading font-medium leading-tight mb-4 animate-fade-in-up"
-            style={{ color: "#FFFFFF", fontSize: "clamp(1.6rem, 7.5vw, 2.85rem)", textShadow: config.hero?.textShadow }}
-            dangerouslySetInnerHTML={{ __html: coolTitle }}
-          />
-          <p
-            className="text-base font-light leading-relaxed max-w-sm animate-fade-in-up-delay-1"
-            style={{ color: "#FFFFFF", textShadow: config.hero?.textShadow }}
-            dangerouslySetInnerHTML={{ __html: subtitleMobileHtml }}
-          />
-        </div>
-
-        {/* "Tutor [Name]" label + arrow — desktop */}
-        <div
-          className="absolute z-10 hidden lg:flex flex-col items-center animate-fade-in-up-delay-3"
-          style={{
-            visibility: "hidden",
-            top: config.arrow.desktop.top,
-            left: config.arrow.desktop.left,
-            transform: config.arrow.desktop.rotation
-              ? `rotate(${config.arrow.desktop.rotation})`
-              : undefined,
-          }}
-        >
-          <Image
-            src="/curved-arrow.png"
-            alt=""
-            width={48}
-            height={48}
-            className="w-12 h-12 -mb-2"
-          />
-          <span
-            className="text-2xl text-white"
-            style={{ fontFamily: "'Sriracha', cursive" }}
-          >
-            {t("tutor_label", { firstName: localizedFirstName })}
-          </span>
-        </div>
-
-        {/* "Tutor [Name]" label + arrow — mobile */}
-        <div
-          className="absolute z-10 lg:hidden flex flex-col items-center animate-fade-in-up-delay-3"
-          style={{
-            visibility: "hidden",
-            top: config.arrow.mobile.top,
-            right: config.arrow.mobile.right,
-            transform: config.arrow.mobile.rotation
-              ? `rotate(${config.arrow.mobile.rotation})`
-              : undefined,
-          }}
-        >
-          <Image
-            src="/curved-arrow.png"
-            alt=""
-            width={36}
-            height={36}
-            className="w-9 h-9 -mb-1"
-          />
-          <span
-            className="text-lg text-white"
-            style={{ fontFamily: "'Sriracha', cursive" }}
-          >
-            {t("tutor_label", { firstName: localizedFirstName })}
-          </span>
-        </div>
-
-        {/* Sentinel for navbar wordmark swap — at ~80% height */}
-        <div id="hero-sentinel" className="absolute w-full h-1" style={{ top: slug === "english-adam" ? "30%" : "60%" }} />
+        {/* Sentinel — drives the navbar CTA reveal on scroll. */}
+        <div id="hero-sentinel" className="absolute w-full h-1" style={{ top: "70%" }} />
       </section>
 
+      {/* ─── Centered profile photo + the tutor's written letter ─── */}
+      {tutor.web_letter && (
+        <section className="flex flex-col items-center text-center px-6 pt-14 md:pt-20 pb-10 md:pb-14">
+          {(tutor.large_profile_picture_url || tutor.profile_picture_url) && (
+            // Plain <img> direct from S3 — bypasses the /_next/image transcode hop.
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={(tutor.large_profile_picture_url || tutor.profile_picture_url)!}
+              alt={tutor.name}
+              className="w-28 h-28 md:w-32 md:h-32 rounded-full object-cover shadow-2xl mb-6"
+            />
+          )}
+          <p
+            className="max-w-xl text-base md:text-lg leading-relaxed whitespace-pre-line"
+            style={{ color: "rgba(255,255,255,0.9)" }}
+          >
+            {tutor.web_letter}
+          </p>
+        </section>
+      )}
 
-      {/* ─── App Screenshots with Sticky Headers ─── */}
-      {(() => {
+      {/* ─── Horizontal scrolling clips — only when the tutor has at least 3 ─── */}
+      {clips.length >= 3 && (
+        <div className="w-full pb-4 md:pb-8">
+          <MarketingClipMarquee clips={clips} />
+        </div>
+      )}
+
+      {/* ─── App Screenshots with Sticky Headers — hidden for now, kept for a later day ─── */}
+      {SHOW_APP_SCREENSHOTS && (() => {
         const tVars = { firstName: localizedFirstName, language: langLabel };
         const country = localizeMapCountry(tutor.teaching_language, locale);
         const screenshots = [

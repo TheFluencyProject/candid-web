@@ -94,12 +94,12 @@ export default async function SimpleLanding({ locale }: Props) {
         <div className="flex flex-1 flex-col md:justify-center">
           <div className="px-6 text-center pt-12 md:pt-0">
             <h1 className="text-4xl md:text-6xl font-normal tracking-tight leading-[1.1] mb-5">
-              Your guide to <br className="md:hidden" />real-life fluency
+              Less scrolling.<br />More speaking.
             </h1>
             <p className="max-w-2xl mx-auto text-lg md:text-xl leading-relaxed text-gray-300">
-              Learn real-life Korean with daily listening &amp; speaking practice{" "}
+              Learn the language people actually use, with daily listening &amp; speaking practice{" "}
               <br className="hidden md:inline" />
-              from your favorite tutors
+              from your favorite creators
             </p>
             <div className="mt-6 md:mt-8 flex flex-col sm:flex-row items-center justify-center gap-2.5 sm:gap-3">
               {/* Primary — learn (→ /download, UA-aware App Store redirect). */}
