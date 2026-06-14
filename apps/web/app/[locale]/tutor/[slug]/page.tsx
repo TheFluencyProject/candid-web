@@ -345,24 +345,38 @@ export default async function TutorPage({ params, searchParams }: Props) {
         <div id="hero-sentinel" className="absolute inset-x-0 h-1" style={{ top: "70%" }} />
       </section>
 
-      {/* ─── Centered profile photo + the tutor's written letter ─── */}
+      {/* ─── Centered profile photo + the tutor's written letter, signed off
+             with their first name and (optional) handwritten signature image ─── */}
       {tutor.web_letter && (
-        <section className="flex flex-col items-center text-center px-6 pt-14 md:pt-20 pb-10 md:pb-14">
-          {(tutor.large_profile_picture_url || tutor.profile_picture_url) && (
-            // Plain <img> direct from S3 — bypasses the /_next/image transcode hop.
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={(tutor.large_profile_picture_url || tutor.profile_picture_url)!}
-              alt={tutor.name}
-              className="w-28 h-28 md:w-32 md:h-32 rounded-full object-cover shadow-2xl mb-6"
-            />
-          )}
-          <p
-            className="max-w-xl text-base md:text-lg leading-relaxed whitespace-pre-line"
-            style={{ color: "rgba(255,255,255,0.9)" }}
-          >
-            {tutor.web_letter}
-          </p>
+        <section className="px-6 pt-14 md:pt-20 pb-10 md:pb-14">
+          <div className="mx-auto max-w-xl">
+            {(tutor.large_profile_picture_url || tutor.profile_picture_url) && (
+              // Plain <img> direct from S3 — bypasses the /_next/image transcode hop.
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={(tutor.large_profile_picture_url || tutor.profile_picture_url)!}
+                alt={tutor.name}
+                className="mx-auto block w-36 h-36 md:w-44 md:h-44 rounded-full object-cover shadow-2xl mb-8"
+              />
+            )}
+            <p
+              className="text-lg md:text-xl leading-relaxed whitespace-pre-line"
+              style={{ color: "rgba(255,255,255,0.9)" }}
+            >
+              {tutor.web_letter}
+            </p>
+            <p className="mt-8 text-xl font-bold" style={{ color: "#FFFFFF" }}>
+              {localizedFirstName}
+            </p>
+            {tutor.web_signature_url && (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={tutor.web_signature_url}
+                alt={`${tutor.name} signature`}
+                className="mt-3 h-16 w-auto max-w-[240px] object-contain"
+              />
+            )}
+          </div>
         </section>
       )}
 
