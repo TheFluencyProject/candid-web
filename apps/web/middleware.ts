@@ -2,7 +2,7 @@ import createMiddleware from "next-intl/middleware";
 import { NextResponse, type NextRequest } from "next/server";
 import { routing } from "./i18n/routing";
 import { APP_STORE_URL, getRedirectUrl } from "./lib/platform";
-import { resolve_tutor_by_host } from "./lib/resolve-domain";
+import { resolve_tutor_by_host, resolve_tutor_by_username } from "./lib/resolve-domain";
 import { isCanonicalHost } from "./lib/canonical-hosts";
 
 const intlMiddleware = createMiddleware(routing);
@@ -70,6 +70,14 @@ function prefersKorean(request: NextRequest): boolean {
   return primary.startsWith("ko");
 }
 
+// Single-segment paths that are real routes (or locale prefixes) — never treat these as a
+// username, so a username lookup can't shadow a page. App Store vanity words are handled
+// above; api/_next/videos/lesson/g are excluded by the matcher.
+const RESERVED_USERNAME_PATHS = new Set([
+  "classic", "company-info", "privacy", "terms", "tutor", "youtube-videos",
+  "download", "g", "lesson", "videos", "en", "ko",
+]);
+
 
 export default async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
@@ -97,6 +105,22 @@ export default async function middleware(request: NextRequest) {
     // ever runs — this redirect is just the fallback for everything else.
     const dest = getRedirectUrl(ua, redirect.dest);
     return NextResponse.redirect(dest, { status: redirect.status });
+  }
+
+  // ── Username vanity redirect: joincandid.co/{username} → /tutor/{slug} ──
+  // Runtime DB lookup (replaces the old hardcoded next.config redirects). Single-segment
+  // paths only; reserved words are skipped so a username can't shadow a real route.
+  const locale_stripped = pathname.replace(/^\/(?:en|ko)(?=\/|$)/, "");
+  const segments = locale_stripped.split("/").filter(Boolean);
+  if (segments.length === 1 && !RESERVED_USERNAME_PATHS.has(segments[0])) {
+    const slug = await resolve_tutor_by_username(segments[0]);
+    if (slug) {
+      // 307 (temporary): usernames can change, so browsers must not cache the mapping.
+      const wants_ko = pathname.startsWith("/ko/") || prefersKorean(request);
+      const url = request.nextUrl.clone();
+      url.pathname = wants_ko ? `/ko/tutor/${slug}` : `/tutor/${slug}`;
+      return NextResponse.redirect(url, 307);
+    }
   }
 
   // ── Locale detection ──

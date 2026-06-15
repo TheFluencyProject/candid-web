@@ -28,26 +28,8 @@ const nextConfig = {
       },
       // App Store redirects (/download, /join, /app, etc.) are handled in
       // middleware.ts so we can branch on User-Agent for non-iOS waitlist.
-      {
-        source: "/adam",
-        destination: "/tutor/english-adam",
-        permanent: true,
-      },
-      {
-        source: "/mia",
-        destination: "/tutor/korean-mia",
-        permanent: true,
-      },
-      {
-        source: "/misshoney",
-        destination: "/tutor/misshoney",
-        permanent: true,
-      },
-      {
-        source: "/chan",
-        destination: "/tutor/korean-chan",
-        permanent: true,
-      },
+      // Tutor vanity redirects (/adam, /mia, /misshoney, /chan) are now DB-driven
+      // usernames resolved at runtime in middleware.ts (joincandid.co/{username}).
       // /guide/:slug was renamed to /tutor/:slug (commit c4ce9b5). The short
       // links above used to 308 → /guide/:slug, and browsers cache permanent
       // redirects — so already-visited /adam etc. still point at /guide. Keep
