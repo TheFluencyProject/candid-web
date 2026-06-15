@@ -31,10 +31,10 @@ function shuffle<T>(arr: T[]): T[] {
   return a;
 }
 
-// Round-robin across tutors so adjacent screenshots are different tutors
+// Round-robin across tutors so adjacent items are different tutors
 // ("alternating randomly" — same alternation idea as the old home's i % len).
-function interleave(lists: string[][]): string[] {
-  const out: string[] = [];
+function interleave<T>(lists: T[][]): T[] {
+  const out: T[] = [];
   const max = Math.max(0, ...lists.map((l) => l.length));
   for (let i = 0; i < max; i++) {
     for (const list of lists) {
@@ -64,7 +64,16 @@ export default async function SimpleLanding({ locale, karaoke = true }: Props) {
   let clips: MarketingClip[] = [];
   try {
     // Home markets Korean — show only Korean creators' clips, not English tutors'.
-    clips = shuffle(await fetchMarketingClips(locale, { language: "korean" }));
+    // The backend returns clips grouped by tutor; group + round-robin (same as the
+    // screenshots above) so the row alternates creators instead of running several
+    // clips from one tutor together. Shuffle within/across tutors for per-load variety.
+    const by_tutor = new Map<string, MarketingClip[]>();
+    for (const clip of await fetchMarketingClips(locale, { language: "korean" })) {
+      const list = by_tutor.get(clip.tutor_name) ?? [];
+      list.push(clip);
+      by_tutor.set(clip.tutor_name, list);
+    }
+    clips = interleave(shuffle([...by_tutor.values()]).map((l) => shuffle(l)));
   } catch {
     clips = [];
   }
