@@ -112,10 +112,10 @@ export default async function SimpleLanding({ locale, karaoke = true }: Props) {
               from your favorite creators.
             </p>
             <div className="mt-6 md:mt-8 flex flex-col sm:flex-row items-center justify-center gap-2.5 sm:gap-3">
-              {/* TEMP — App Clip verification: points at Adobe Aero's known-working App Clip link to
-                  confirm the card surfaces on-device. Revert to href="/download" after testing. */}
+              {/* TEMP — App Clip verification: points at Candid's own Apple-provided App Clip link
+                  to test whether our clip is live in the App Store. Revert to href="/download" after. */}
               <a
-                href="https://appclip.apple.com/id?p=com.adobe.aero.clip"
+                href="https://appclip.apple.com/id?p=co.thefluencyproject.bloom-ios.Clip"
                 className="inline-block rounded-full bg-[#89FFB4] px-8 py-2.5 md:py-3 text-base font-semibold tracking-wide text-[#18181C] hover:opacity-90 transition-opacity"
               >
                 LEARN WITH CANDID
