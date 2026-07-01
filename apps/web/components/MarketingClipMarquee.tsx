@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import type { MarketingClip } from "@/lib/api";
 import MarketingClipCard from "./MarketingClipCard";
+import { isRestrictedInAppBrowser } from "@/lib/platform";
 
 // Continuous drift speed; roughly matches the old CSS marquee's slow pace.
 const SCROLL_SPEED_PX_PER_SEC = 38;
@@ -79,6 +80,15 @@ export default function MarketingClipMarquee({ clips, karaoke = true }: { clips:
     window.addEventListener("candid:inapp-blocker", on_blocker);
     return () => window.removeEventListener("candid:inapp-blocker", on_blocker);
   }, []);
+
+  // Poster-only mode for restricted in-app browsers (TikTok etc.). Their WKWebView leaves
+  // allowsInlineMediaPlayback = false, so it IGNORES the video's playsInline and force-fullscreens
+  // any clip the moment it plays — nothing the page does can veto that. So here we never load or
+  // play the videos at all; the always-mounted posters still drift, so the row looks alive without
+  // ever handing the webview a playing <video> to hijack. Detected client-side (navigator UA), so
+  // it starts false to match SSR and flips after mount — no hydration mismatch.
+  const [posterOnly, setPosterOnly] = useState(false);
+  useEffect(() => setPosterOnly(isRestrictedInAppBrowser()), []);
 
   // Few clips (e.g. one tutor's 3) make a single group narrower than the viewport, so the
   // modulo wrap exposes a gap before the row loops. Repeat the clips per group until one
@@ -400,12 +410,15 @@ export default function MarketingClipMarquee({ clips, karaoke = true }: { clips:
               // Always load the active card (so a long clip never blanks mid-play before it hands
               // off); load in-view neighbors only once prebuffering is allowed (always on desktop;
               // on mobile, after the first clip is playing — avoids the cold-start pipeline pileup).
-              shouldLoad={autoKey === key || (prebuffer_neighbors && inView.has(key))}
+              // Poster-only mode loads nothing — no <video> src ever attaches, so none can play.
+              shouldLoad={!posterOnly && (autoKey === key || (prebuffer_neighbors && inView.has(key)))}
               onSegmentEnd={handle_segment_end}
               onReady={handle_ready}
               karaoke={karaoke}
               muted={muted}
-              frozen={frozen}
+              // Card-level freeze: while the blocker modal is up, or always in poster-only mode.
+              // (The marquee's own drift keeps running in poster-only mode so the posters still scroll.)
+              frozen={frozen || posterOnly}
             />
           );
         })
