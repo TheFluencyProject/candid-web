@@ -42,7 +42,7 @@ export default function InAppBrowserBlocker() {
           onClick={() => setOpen(false)}
         >
           <h2 className="text-2xl font-bold text-white text-center mb-1">
-            Search &ldquo;Candid fluency&rdquo;
+            Search &ldquo;Candid Korean&rdquo;
           </h2>
           <p className="text-2xl font-bold text-white text-center mb-2">
             in the App Store :)
@@ -51,7 +51,7 @@ export default function InAppBrowserBlocker() {
           <div className="mb-8" />
           <Image
             src="/appstore-search.png"
-            alt="Search Candid Fluency on the App Store"
+            alt="Search Candid Korean on the App Store"
             width={500}
             height={600}
             className="w-full max-w-md rounded-2xl"
