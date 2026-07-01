@@ -68,6 +68,18 @@ export default function MarketingClipMarquee({ clips, karaoke = true }: { clips:
   // affordance below the row to unmute. Only the active card actually emits audio (see the card).
   const [muted, setMuted] = useState(true);
 
+  // Frozen while the in-app-browser blocker modal is open (TikTok etc.): its inline videos ignore
+  // playsInline and auto-fullscreen, so a drifting marquee behind the modal keeps re-fullscreening
+  // and pokes out at the bottom of the screen. Freeze stops drift AND video playback until it closes.
+  const [frozen, setFrozen] = useState(false);
+  const frozenRef = useRef(false);
+  frozenRef.current = frozen; // mirror for the rAF drift loop (no stale closure)
+  useEffect(() => {
+    const on_blocker = (e: Event) => setFrozen(!!(e as CustomEvent).detail);
+    window.addEventListener("candid:inapp-blocker", on_blocker);
+    return () => window.removeEventListener("candid:inapp-blocker", on_blocker);
+  }, []);
+
   // Few clips (e.g. one tutor's 3) make a single group narrower than the viewport, so the
   // modulo wrap exposes a gap before the row loops. Repeat the clips per group until one
   // group is at least as wide as the container — measured, grow-only, converges immediately.
@@ -177,7 +189,7 @@ export default function MarketingClipMarquee({ clips, karaoke = true }: { clips:
     const step = (ts: number) => {
       const dt = last ? ts - last : 0;
       last = ts;
-      if (!pausedRef.current && dt > 0) {
+      if (!pausedRef.current && !frozenRef.current && dt > 0) {
         // measure here too, so the drift starts on the first frame even if the measure effect
         // hasn't run yet (mobile first paint can lag) — was "doesn't move immediately on mobile"
         if (groupWidthRef.current <= 0) groupWidthRef.current = group_width();
@@ -393,6 +405,7 @@ export default function MarketingClipMarquee({ clips, karaoke = true }: { clips:
               onReady={handle_ready}
               karaoke={karaoke}
               muted={muted}
+              frozen={frozen}
             />
           );
         })

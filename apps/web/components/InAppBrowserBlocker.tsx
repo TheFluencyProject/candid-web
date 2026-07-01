@@ -30,6 +30,14 @@ export default function InAppBrowserBlocker() {
     return () => { document.body.style.overflow = ""; };
   }, [open]);
 
+  // Broadcast open/close so the hero marquee freezes its videos while this modal is up.
+  // In restricted in-app browsers (TikTok) the marquee's inline videos ignore playsInline and
+  // auto-fullscreen; left drifting behind the modal they keep re-fullscreening and poke out at
+  // the bottom of the screen. The marquee listens for this and pauses playback + drift.
+  useEffect(() => {
+    window.dispatchEvent(new CustomEvent("candid:inapp-blocker", { detail: open }));
+  }, [open]);
+
   return (
     <>
       {/* Preload image so it renders instantly when modal opens */}

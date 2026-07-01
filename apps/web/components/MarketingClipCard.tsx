@@ -68,9 +68,12 @@ type Props = {
   karaoke?: boolean;
   /** Global volume toggle (marquee-owned). Default true (muted); only the active card emits audio. */
   muted?: boolean;
+  /** Freeze playback while the in-app-browser blocker modal is open — keeps TikTok's webview from
+   *  auto-fullscreening the inline video behind the modal. */
+  frozen?: boolean;
 };
 
-function MarketingClipCard({ clip, dataKey, isActive, shouldLoad, onSegmentEnd, onReady, karaoke = true, muted = true }: Props) {
+function MarketingClipCard({ clip, dataKey, isActive, shouldLoad, onSegmentEnd, onReady, karaoke = true, muted = true, frozen = false }: Props) {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const [activeWordIdx, setActiveWordIdx] = useState(-1);
   const [ready, setReady] = useState(false); // first frame buffered → fade video over poster
@@ -90,8 +93,11 @@ function MarketingClipCard({ clip, dataKey, isActive, shouldLoad, onSegmentEnd, 
   isActiveRef.current = isActive;
   const mutedRef = useRef(muted); // read in play_from_start so a toggle doesn't restart playback
   mutedRef.current = muted;
+  const frozenRef = useRef(frozen); // read in play_from_start / on_ready so a frozen card never plays
+  frozenRef.current = frozen;
 
   const play_from_start = (video: HTMLVideoElement) => {
+    if (frozenRef.current) return; // blocker modal is up — don't start (would fullscreen in TikTok)
     // iOS: React's `muted`/`playsInline` props don't reliably set the real state — force them
     // imperatively before play(). Defaults muted (autoplay allowed); the user's unmute tap is the
     // gesture that lets later clips start with sound.
@@ -183,8 +189,17 @@ function MarketingClipCard({ clip, dataKey, isActive, shouldLoad, onSegmentEnd, 
     const video = videoRef.current;
     if (!video) return;
 
-    if (!isActive) {
+    if (!isActive || frozen) {
       video.pause(); // freeze on the current frame — do NOT rewind to start
+      if (frozen) {
+        // TikTok's webview may have already forced this video into native fullscreen; kick it back
+        // out so it stops covering the blocker modal.
+        const v = video as HTMLVideoElement & {
+          webkitDisplayingFullscreen?: boolean;
+          webkitExitFullscreen?: () => void;
+        };
+        if (v.webkitDisplayingFullscreen) v.webkitExitFullscreen?.();
+      }
       return;
     }
 
@@ -227,7 +242,7 @@ function MarketingClipCard({ clip, dataKey, isActive, shouldLoad, onSegmentEnd, 
       video.pause();
       // leave progress where it stopped — the bar matches the frozen frame
     };
-  }, [isActive, clip]);
+  }, [isActive, clip, frozen]);
 
   // On first load, show cards left of the viewport centre as already-played (captions fully lit)
   // so the row looks mid-stream, not all-dim. Runs once; play/recycle logic takes over after.
