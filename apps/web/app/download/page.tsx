@@ -3,13 +3,12 @@ import Image from "next/image";
 import { headers } from "next/headers";
 import { APP_STORE_URL } from "@/lib/platform";
 
-// Slug-less App Clip landing for /download. On a clip-capable iPhone (iOS 18+) the middleware
-// renders this page instead of redirecting, so Safari surfaces the App Clip card from the
-// apple-itunes-app meta tag; the body is the App Store fallback for clip-incapable clients. Mirrors
-// /download/[slug] minus the tutor-specific hero. app-id is the App Store fallback for iOS versions
-// below the clip's iOS 18 minimum.
-const APP_CLIP_META =
-  "app-id=6754859158, app-clip-bundle-id=co.thefluencyproject.bloom-ios.Clip, app-clip-display=card";
+// Slug-less App Store landing for /download. App Clip funnel is disabled for now — the middleware
+// always redirects /download to the App Store, so this body only renders for clip-incapable clients
+// reached some other way. The apple-itunes-app App Clip meta is commented out below; uncomment it
+// (and re-enable the middleware appClip branch) to bring the App Clip card back.
+// const APP_CLIP_META =
+//   "app-id=6754859158, app-clip-bundle-id=co.thefluencyproject.bloom-ios.Clip, app-clip-display=card";
 
 // This route lives outside /[locale], so detect ko/en from the header directly (mirrors middleware).
 async function resolveLocale(): Promise<"en" | "ko"> {
@@ -26,7 +25,8 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     metadataBase: new URL("https://joincandid.co"),
     title: "Candid",
-    other: { "apple-itunes-app": APP_CLIP_META },
+    // App Clip funnel disabled — uncomment to surface the App Clip card again.
+    // other: { "apple-itunes-app": APP_CLIP_META },
   };
 }
 

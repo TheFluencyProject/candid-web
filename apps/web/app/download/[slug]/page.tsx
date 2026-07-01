@@ -5,11 +5,12 @@ import { headers } from "next/headers";
 import { fetchTutor } from "@/lib/api";
 import { APP_STORE_URL } from "@/lib/platform";
 
-// The App Clip is invoked from this URL. The apple-itunes-app meta tag makes iOS Safari surface
-// the App Clip card; the page body is the fallback for clip-incapable iOS, in-app browsers, etc.
-// app-id is the App Store fallback for iOS versions below the clip's iOS 18 minimum.
-const APP_CLIP_META =
-  "app-id=6754859158, app-clip-bundle-id=co.thefluencyproject.bloom-ios.Clip, app-clip-display=card";
+// App Clip funnel disabled for now — the middleware always redirects /download/<slug> to the App
+// Store, so this body only renders the App Store fallback. The apple-itunes-app App Clip meta is
+// commented out below; uncomment it (and re-enable the middleware appClip branch) to restore the
+// App Clip card. app-id is the App Store fallback for iOS versions below the clip's iOS 18 minimum.
+// const APP_CLIP_META =
+//   "app-id=6754859158, app-clip-bundle-id=co.thefluencyproject.bloom-ios.Clip, app-clip-display=card";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -30,7 +31,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     metadataBase: new URL("https://joincandid.co"),
     title: tutor ? `Candid — ${tutor.name}` : "Candid",
-    other: { "apple-itunes-app": APP_CLIP_META },
+    // App Clip funnel disabled — uncomment to surface the App Clip card again.
+    // other: { "apple-itunes-app": APP_CLIP_META },
   };
 }
 
