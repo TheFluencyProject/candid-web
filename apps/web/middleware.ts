@@ -57,21 +57,20 @@ function resolveAppStoreRedirect(
     const appUrl = exact.ppid ? `${APP_STORE_URL}?ppid=${exact.ppid}` : APP_STORE_URL;
     return { dest: appUrl, status: exact.permanent ? 308 : 307 };
   }
-  // Catch-all: /download or /download/:slug (any slug not matched above) → App Store.
-  // App Clip funnel disabled for now — the `appClip` flag below is commented out so these
-  // always redirect to the App Store instead of rendering the App Clip landing page.
+  // Catch-all: /download or /download/:slug (any slug not matched above). Marked appClip so a
+  // clip-capable iPhone renders the landing page (App Clip card) instead of redirecting — the
+  // App Store redirect is the fallback for everything else. See the middleware body below.
   if (pathname === "/download" || pathname.startsWith("/download/")) {
-    return { dest: APP_STORE_URL, status: 307 /* , appClip: true */ };
+    return { dest: APP_STORE_URL, status: 307, appClip: true };
   }
   return null;
 }
 
 // iPhone iOS major from the UA ("iPhone OS 18_5" → 18), or 0 when not an iPhone.
-// Only used by the App Clip funnel, which is disabled for now — uncomment with it.
-// function iphoneIOSMajor(ua: string): number {
-//   const m = ua.match(/iPhone OS (\d+)_/);
-//   return m ? parseInt(m[1], 10) : 0;
-// }
+function iphoneIOSMajor(ua: string): number {
+  const m = ua.match(/iPhone OS (\d+)_/);
+  return m ? parseInt(m[1], 10) : 0;
+}
 
 // Detect Korean from Accept-Language. Anything else → leave on default (`en`).
 function prefersKorean(request: NextRequest): boolean {
@@ -110,15 +109,15 @@ export default async function middleware(request: NextRequest) {
   const redirect = resolveAppStoreRedirect(pathname);
   if (redirect) {
     const ua = request.headers.get("user-agent") ?? "";
-    // App Clip funnel — DISABLED for now. When enabled, a /download or /download/<slug> visit on a
-    // clip-capable iPhone (iOS 18+, the clip's min target) renders the landing page so Safari
-    // surfaces the App Clip card from its apple-itunes-app meta tag — tapping the card opens the
-    // clip. Everything else (older iOS, Android, desktop, and the ppid product-page vanity links)
-    // falls through to the App Store redirect below. iOS may also auto-present the clip from a
-    // registered Experience or QR/camera before this ever runs. Uncomment to re-enable.
-    // if (redirect.appClip && iphoneIOSMajor(ua) >= 18) {
-    //   return NextResponse.next();
-    // }
+    // App Clip funnel: a /download or /download/<slug> visit on a clip-capable iPhone (iOS 18+, the
+    // clip's min target) renders the landing page so Safari surfaces the App Clip card from its
+    // apple-itunes-app meta tag — tapping the card opens the clip. Everything else (older iOS,
+    // Android, desktop, and the ppid product-page vanity links) falls through to the App Store
+    // redirect below. iOS may also auto-present the clip from a registered Experience or QR/camera
+    // before this ever runs.
+    if (redirect.appClip && iphoneIOSMajor(ua) >= 18) {
+      return NextResponse.next();
+    }
     const dest = getRedirectUrl(ua, redirect.dest);
     return NextResponse.redirect(dest, { status: redirect.status });
   }
