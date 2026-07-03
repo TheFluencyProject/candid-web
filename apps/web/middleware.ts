@@ -2,7 +2,7 @@ import createMiddleware from "next-intl/middleware";
 import { NextResponse, type NextRequest } from "next/server";
 import { routing } from "./i18n/routing";
 import { APP_STORE_URL, getRedirectUrl } from "./lib/platform";
-import { resolve_tutor_by_host, resolve_tutor_by_username } from "./lib/resolve-domain";
+import { resolve_tutor_by_host, resolve_tutor_by_username, resolve_lesson_by_handle_and_code } from "./lib/resolve-domain";
 import { isCanonicalHost } from "./lib/canonical-hosts";
 
 const intlMiddleware = createMiddleware(routing);
@@ -135,6 +135,24 @@ export default async function middleware(request: NextRequest) {
       const wants_ko = pathname.startsWith("/ko/") || prefersKorean(request);
       const url = request.nextUrl.clone();
       url.pathname = wants_ko ? `/ko/tutor/${slug}` : `/tutor/${slug}`;
+      return NextResponse.redirect(url, 307);
+    }
+  }
+
+  // ── Lesson short-URL redirect: joincandid.co/{handle}/{code} → /lesson/{lesson_id} ──
+  // Two-segment paths whose 2nd segment matches the 6-char share_code shape. The regex
+  // gate avoids a backend call on every random two-segment path (crawlers, typos). The
+  // /lesson route is locale-agnostic (excluded from the matcher), so no locale prefix.
+  if (
+    segments.length === 2 &&
+    !RESERVED_USERNAME_PATHS.has(segments[0]) &&
+    /^[a-z0-9]{6}$/.test(segments[1])
+  ) {
+    const lesson_id = await resolve_lesson_by_handle_and_code(segments[0], segments[1]);
+    if (lesson_id) {
+      // 307 (temporary): share codes / usernames can change, so don't cache the mapping.
+      const url = request.nextUrl.clone();
+      url.pathname = `/lesson/${lesson_id}`;
       return NextResponse.redirect(url, 307);
     }
   }

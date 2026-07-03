@@ -56,3 +56,32 @@ export async function resolve_tutor_by_username(username: string): Promise<strin
   const body = (await res.json()) as { slug?: string };
   return body.slug ?? null;
 }
+
+/**
+ * Resolves a tutor handle (username or slug) + share code to a lesson id, for the
+ * joincandid.co/{handle}/{code} → /lesson/{id} redirect. Returns null when unknown.
+ *
+ * Called from middleware for two-segment paths whose second segment looks like a
+ * share code. Same swallow-errors + 5s cap + 5min revalidate contract as the others.
+ */
+export async function resolve_lesson_by_handle_and_code(
+  handle: string,
+  code: string,
+): Promise<string | null> {
+  if (!handle || !code) return null;
+
+  let res: Response;
+  try {
+    res = await fetch(
+      `${API_BASE_URL}/public/lessons/resolve/${encodeURIComponent(handle.toLowerCase())}/${encodeURIComponent(code)}`,
+      { next: { revalidate: 300 }, signal: AbortSignal.timeout(5000) },
+    );
+  } catch {
+    return null;
+  }
+
+  if (res.status === 404) return null;
+  if (!res.ok) return null;
+  const body = (await res.json()) as { lesson_id?: string };
+  return body.lesson_id ?? null;
+}
