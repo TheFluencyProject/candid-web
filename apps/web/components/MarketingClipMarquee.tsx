@@ -92,18 +92,25 @@ export default function MarketingClipMarquee({ clips, karaoke = true }: { clips:
   const [posterOnly, setPosterOnly] = useState(false);
   useEffect(() => setPosterOnly(isRestrictedInAppBrowser()), []);
 
-  // A forced fullscreen (candid:fullscreen-hijack, from a card's guard) means this webview doesn't
-  // honor inline playback. Freeze immediately — but KEEP srcs attached: unloading a video that's
-  // mid-fullscreen-transition strands an empty black native player the user can't dismiss. Only
-  // once the webview reports the fullscreen ended is it safe to drop to poster-only (the TikTok
-  // end state) and unload the videos for good.
+  // Runtime restricted-webview signals from the cards, layered by how early they fire:
+  // 1. candid:autoplay-blocked — a MUTED inline play() was denied (the restricted-webview
+  //    signature; fires ~on load, before any tap). Drop straight to poster-only: no gesture can
+  //    ever hand this webview a video to fullscreen, so the user never sees a flash.
+  // 2. candid:fullscreen-hijack — a fullscreen still began. Freeze immediately but KEEP srcs
+  //    attached: unloading a video mid-fullscreen-transition strands an empty black native player
+  //    the user can't dismiss.
+  // 3. candid:fullscreen-ended — the webview confirmed the fullscreen ended; now it's safe to
+  //    drop to poster-only (the TikTok end state) and unload the videos for good.
   const [hijacked, setHijacked] = useState(false);
   useEffect(() => {
+    const on_blocked = () => setPosterOnly(true);
     const on_hijack = () => setHijacked(true);
     const on_ended = () => setPosterOnly(true);
+    window.addEventListener("candid:autoplay-blocked", on_blocked);
     window.addEventListener("candid:fullscreen-hijack", on_hijack);
     window.addEventListener("candid:fullscreen-ended", on_ended);
     return () => {
+      window.removeEventListener("candid:autoplay-blocked", on_blocked);
       window.removeEventListener("candid:fullscreen-hijack", on_hijack);
       window.removeEventListener("candid:fullscreen-ended", on_ended);
     };

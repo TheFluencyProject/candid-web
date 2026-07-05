@@ -114,7 +114,17 @@ function MarketingClipCard({ clip, dataKey, isActive, shouldLoad, onSegmentEnd, 
       video.playbackRate = PLAYBACK_RATE; // re-assert: starting playback can reset it to 1
       setReady(true);
       onReadyRef.current(); // active clip is established → marquee may now prebuffer neighbors
-    }).catch(() => {});
+    }).catch((err: DOMException) => {
+      // A MUTED inline autoplay denial is the restricted-webview signature (TikTok-style: inline
+      // playback disallowed, so the clip sits on its first frame and a later gesture-adjacent
+      // play() would open the native fullscreen player) — or an autoplay-off policy (Low Power
+      // Mode, user setting), where posters are the right fallback anyway. Tell the marquee to
+      // drop to poster-only BEFORE any tap can hand the webview a video to fullscreen. Unmuted
+      // denials are ordinary audio policy — leave those alone.
+      if (video.muted && video.currentSrc && err?.name === "NotAllowedError") {
+        window.dispatchEvent(new CustomEvent("candid:autoplay-blocked"));
+      }
+    });
   };
 
   // Load (prebuffer) the video only while near the viewport; attach once, tear down when
@@ -214,7 +224,17 @@ function MarketingClipCard({ clip, dataKey, isActive, shouldLoad, onSegmentEnd, 
     const tick = () => {
       if (cancelled) return;
       if (video.playbackRate !== PLAYBACK_RATE) video.playbackRate = PLAYBACK_RATE; // hls/seek can reset it
-      if (video.paused && video.readyState >= 2) video.play().catch(() => {}); // re-assert if play stalled/was blocked
+      if (video.paused && video.readyState >= 2) {
+        // Re-assert if play stalled/was blocked. NOTE: in a restricted webview this retry is the
+        // fullscreen vector — the call landing inside a tap gesture inherits its activation and
+        // "succeeds" straight into the native player. The muted-denial dispatch (see
+        // play_from_start) flips the marquee to poster-only before that can happen.
+        video.play().catch((err: DOMException) => {
+          if (video.muted && video.currentSrc && err?.name === "NotAllowedError") {
+            window.dispatchEvent(new CustomEvent("candid:autoplay-blocked"));
+          }
+        });
+      }
       const t = video.currentTime;
       setPlayhead(t);
       const dur = clip.end_time - clip.start_time;
