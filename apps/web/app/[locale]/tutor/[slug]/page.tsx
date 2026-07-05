@@ -16,6 +16,7 @@ import MarketingClipMarquee from "@/components/MarketingClipMarquee";
 import { localizeLanguageName, localizeMapCountry, capitalize, withKoreanParticle, formatHeroTitle } from "@/lib/i18n-helpers";
 import { type Tutor, type TutorLanguageProficiency, type MarketingClip, fetchTutor, fetchMarketingClips } from "@/lib/api";
 import { isJoinForFreeContext, isCandidtutorsHost } from "@/lib/canonical-hosts";
+import { APP_CLIP_URL } from "@/lib/platform";
 
 function formatLanguages(languages: TutorLanguageProficiency[]): string {
   return languages
@@ -141,6 +142,10 @@ export default async function TutorPage({ params, searchParams }: Props) {
   // "Join {name}'s study club for conversational {lang}" framing — default on
   // candidtutors.co AND on the ?v=meta ad variant; original subtitle otherwise.
   const use_study_club_framing = is_meta_variant || candidtutors_brand;
+
+  // Adam's page sends its "Start free" CTA to Candid's App Clip link (clip card on iOS),
+  // not the /download App-Store funnel every other tutor uses.
+  const cta_href = slug === "english-adam" ? APP_CLIP_URL : `/download/${slug}`;
 
   const firstName = tutor.name.split(" ")[0];
   const localizedFirstName =
@@ -279,7 +284,7 @@ export default async function TutorPage({ params, searchParams }: Props) {
             // joincandid: green "TRY FOR FREE" pill, revealed top-right on scroll (revealRightOnScroll).
             // Desktop only — mobile uses the bottom MobileCTABar.
             <a
-              href={`/download/${slug}`}
+              href={cta_href}
               data-tutor-name={localizedFirstName}
               className="hidden lg:inline-block px-5 py-2 rounded-full text-sm font-bold"
               style={{ backgroundColor: "#89FFB4", color: "#000000" }}
@@ -316,7 +321,7 @@ export default async function TutorPage({ params, searchParams }: Props) {
             ) : (
               <div className="hidden lg:block mt-8 animate-fade-in-up-delay-2">
                 <a
-                  href={`/download/${slug}`}
+                  href={cta_href}
                   data-tutor-name={localizedFirstName}
                   className="inline-block px-12 py-3.5 rounded-full text-base font-bold"
                   style={{ backgroundColor: "#89FFB4", color: "#000000" }}
@@ -454,7 +459,7 @@ export default async function TutorPage({ params, searchParams }: Props) {
           App Store + Programs, swaps IG to @candidtutors. */}
       <SiteFooter variant={uses_join_sheet ? "tutor" : "joincandid"} />
       <MobileCTABar
-        downloadUrl={`/download/${slug}`}
+        downloadUrl={cta_href}
         ctaLabel={
           use_study_club_framing
             ? t("study_with", { name: localizedFirstName })
