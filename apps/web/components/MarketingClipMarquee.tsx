@@ -92,12 +92,21 @@ export default function MarketingClipMarquee({ clips, karaoke = true }: { clips:
   const [posterOnly, setPosterOnly] = useState(false);
   useEffect(() => setPosterOnly(isRestrictedInAppBrowser()), []);
 
-  // A forced fullscreen from any card means this environment doesn't honor inline playback —
-  // drop to poster-only (same as TikTok), so no <video> is ever handed to it again.
+  // A forced fullscreen (candid:fullscreen-hijack, from a card's guard) means this webview doesn't
+  // honor inline playback. Freeze immediately — but KEEP srcs attached: unloading a video that's
+  // mid-fullscreen-transition strands an empty black native player the user can't dismiss. Only
+  // once the webview reports the fullscreen ended is it safe to drop to poster-only (the TikTok
+  // end state) and unload the videos for good.
+  const [hijacked, setHijacked] = useState(false);
   useEffect(() => {
-    const on_forced = () => setPosterOnly(true);
-    window.addEventListener("candid:force-fullscreen", on_forced);
-    return () => window.removeEventListener("candid:force-fullscreen", on_forced);
+    const on_hijack = () => setHijacked(true);
+    const on_ended = () => setPosterOnly(true);
+    window.addEventListener("candid:fullscreen-hijack", on_hijack);
+    window.addEventListener("candid:fullscreen-ended", on_ended);
+    return () => {
+      window.removeEventListener("candid:fullscreen-hijack", on_hijack);
+      window.removeEventListener("candid:fullscreen-ended", on_ended);
+    };
   }, []);
 
   // Few clips (e.g. one tutor's 3) make a single group narrower than the viewport, so the
@@ -426,9 +435,11 @@ export default function MarketingClipMarquee({ clips, karaoke = true }: { clips:
               onReady={handle_ready}
               karaoke={karaoke}
               muted={muted}
-              // Card-level freeze: while the blocker modal is up, or always in poster-only mode.
-              // (The marquee's own drift keeps running in poster-only mode so the posters still scroll.)
-              frozen={frozen || posterOnly}
+              // Card-level freeze: while the blocker modal is up, after a fullscreen hijack, or
+              // always in poster-only mode. (The marquee's own drift keeps running in poster-only
+              // mode so the posters still scroll.)
+              frozen={frozen || hijacked || posterOnly}
+              posterOnly={posterOnly}
             />
           );
         })

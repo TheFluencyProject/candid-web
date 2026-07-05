@@ -71,9 +71,13 @@ type Props = {
   /** Freeze playback while the in-app-browser blocker modal is open — keeps TikTok's webview from
    *  auto-fullscreening the inline video behind the modal. */
   frozen?: boolean;
+  /** Restricted webview: don't render the <video> element at all. An empty media element is still
+   *  tappable and summons the native (black) fullscreen player in webviews that don't allow inline
+   *  playback — only the drifting poster is safe to show there. */
+  posterOnly?: boolean;
 };
 
-function MarketingClipCard({ clip, dataKey, isActive, shouldLoad, onSegmentEnd, onReady, karaoke = true, muted = true, frozen = false }: Props) {
+function MarketingClipCard({ clip, dataKey, isActive, shouldLoad, onSegmentEnd, onReady, karaoke = true, muted = true, frozen = false, posterOnly = false }: Props) {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const [activeWordIdx, setActiveWordIdx] = useState(-1);
   const [ready, setReady] = useState(false); // first frame buffered → fade video over poster
@@ -262,26 +266,49 @@ function MarketingClipCard({ clip, dataKey, isActive, shouldLoad, onSegmentEnd, 
     if (v) v.muted = muted || !isActive;
   }, [muted, isActive]);
 
-  // Marquee videos must NEVER stay fullscreen, wherever this card is embedded. Some in-app
-  // webviews (allowsInlineMediaPlayback = false) ignore playsInline and force-fullscreen a clip
-  // the moment it plays. Kick it back out the instant it begins, and tell the marquee so it can
-  // drop to poster-only (stop handing this webview a playing <video> to hijack).
+  // Marquee videos must NEVER stay fullscreen, wherever this card is embedded. Some webviews
+  // (allowsInlineMediaPlayback = false) ignore playsInline and force-fullscreen a clip the moment
+  // it plays. On begin: freeze every card via the marquee (src STAYS attached — unloading a video
+  // mid-transition strands an empty black native player) and repeatedly kick the video back
+  // inline (an exit call during the begin transition is ignored by WebKit, so retry until it
+  // sticks). Only once the webview reports the fullscreen ended does the marquee drop to
+  // poster-only and unload the videos for good.
   useEffect(() => {
     const video = videoRef.current as (HTMLVideoElement & {
       webkitDisplayingFullscreen?: boolean;
       webkitExitFullscreen?: () => void;
+      webkitSetPresentationMode?: (mode: string) => void;
     }) | null;
     if (!video) return;
     // React's `playsInline` prop only emits `playsinline`; some webviews honor only `webkit-playsinline`.
     video.setAttribute("playsinline", "");
     video.setAttribute("webkit-playsinline", "");
-    const kick_out = () => {
-      if (video.webkitDisplayingFullscreen) video.webkitExitFullscreen?.();
-      window.dispatchEvent(new CustomEvent("candid:force-fullscreen"));
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    const on_begin = () => {
+      video.pause();
+      window.dispatchEvent(new CustomEvent("candid:fullscreen-hijack"));
+      let tries = 0;
+      const kick = () => {
+        if (video.webkitDisplayingFullscreen) {
+          try { video.webkitSetPresentationMode?.("inline"); } catch { /* mode unsupported */ }
+          video.webkitExitFullscreen?.();
+        }
+        if (++tries < 20) timer = setTimeout(kick, 120);
+      };
+      kick();
     };
-    video.addEventListener("webkitbeginfullscreen", kick_out);
-    return () => video.removeEventListener("webkitbeginfullscreen", kick_out);
-  }, []);
+    const on_end = () => {
+      if (timer) clearTimeout(timer);
+      window.dispatchEvent(new CustomEvent("candid:fullscreen-ended"));
+    };
+    video.addEventListener("webkitbeginfullscreen", on_begin);
+    video.addEventListener("webkitendfullscreen", on_end);
+    return () => {
+      if (timer) clearTimeout(timer);
+      video.removeEventListener("webkitbeginfullscreen", on_begin);
+      video.removeEventListener("webkitendfullscreen", on_end);
+    };
+  }, [posterOnly]); // re-attach when the <video> mounts/unmounts with poster-only mode
 
   const words = clip.word_level_captions;
   const title_text = strip_emoji(clip.title);
@@ -301,13 +328,18 @@ function MarketingClipCard({ clip, dataKey, isActive, shouldLoad, onSegmentEnd, 
       {clip.thumbnail_url && (
         <img src={poster_url(clip.thumbnail_url)} alt="" draggable={false} decoding="async" className="absolute inset-0 z-0 h-full w-full object-cover" />
       )}
-      <video
-        ref={videoRef}
-        muted={muted || !isActive}
-        playsInline
-        preload="auto"
-        className={`absolute inset-0 z-0 h-full w-full object-cover transition-opacity duration-300 ${ready ? "opacity-100" : "opacity-0"}`}
-      />
+      {/* pointer-events-none: the video is purely presentational (no controls; the marquee owns
+          dragging) — a tap that reaches a media element makes restricted webviews open the native
+          fullscreen player, even for an empty video. Not rendered at all in poster-only mode. */}
+      {!posterOnly && (
+        <video
+          ref={videoRef}
+          muted={muted || !isActive}
+          playsInline
+          preload="auto"
+          className={`pointer-events-none absolute inset-0 z-0 h-full w-full object-cover transition-opacity duration-300 ${ready ? "opacity-100" : "opacity-0"}`}
+        />
+      )}
 
       {/* Top chrome — title + toggle icon, with the stories-style progress bars below it. */}
       <div className="absolute inset-x-0 top-0 z-10 px-4 pt-3 pb-6 bg-gradient-to-b from-black/45 to-transparent">
