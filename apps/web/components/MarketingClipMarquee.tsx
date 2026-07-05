@@ -86,9 +86,19 @@ export default function MarketingClipMarquee({ clips, karaoke = true }: { clips:
   // any clip the moment it plays — nothing the page does can veto that. So here we never load or
   // play the videos at all; the always-mounted posters still drift, so the row looks alive without
   // ever handing the webview a playing <video> to hijack. Detected client-side (navigator UA), so
-  // it starts false to match SSR and flips after mount — no hydration mismatch.
+  // it starts false to match SSR and flips after mount — no hydration mismatch. Also flipped at
+  // runtime when a card reports a forced fullscreen (see below), which catches hostile webviews
+  // the UA sniff misses.
   const [posterOnly, setPosterOnly] = useState(false);
   useEffect(() => setPosterOnly(isRestrictedInAppBrowser()), []);
+
+  // A forced fullscreen from any card means this environment doesn't honor inline playback —
+  // drop to poster-only (same as TikTok), so no <video> is ever handed to it again.
+  useEffect(() => {
+    const on_forced = () => setPosterOnly(true);
+    window.addEventListener("candid:force-fullscreen", on_forced);
+    return () => window.removeEventListener("candid:force-fullscreen", on_forced);
+  }, []);
 
   // Few clips (e.g. one tutor's 3) make a single group narrower than the viewport, so the
   // modulo wrap exposes a gap before the row loops. Repeat the clips per group until one

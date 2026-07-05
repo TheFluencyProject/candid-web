@@ -262,6 +262,27 @@ function MarketingClipCard({ clip, dataKey, isActive, shouldLoad, onSegmentEnd, 
     if (v) v.muted = muted || !isActive;
   }, [muted, isActive]);
 
+  // Marquee videos must NEVER stay fullscreen, wherever this card is embedded. Some in-app
+  // webviews (allowsInlineMediaPlayback = false) ignore playsInline and force-fullscreen a clip
+  // the moment it plays. Kick it back out the instant it begins, and tell the marquee so it can
+  // drop to poster-only (stop handing this webview a playing <video> to hijack).
+  useEffect(() => {
+    const video = videoRef.current as (HTMLVideoElement & {
+      webkitDisplayingFullscreen?: boolean;
+      webkitExitFullscreen?: () => void;
+    }) | null;
+    if (!video) return;
+    // React's `playsInline` prop only emits `playsinline`; some webviews honor only `webkit-playsinline`.
+    video.setAttribute("playsinline", "");
+    video.setAttribute("webkit-playsinline", "");
+    const kick_out = () => {
+      if (video.webkitDisplayingFullscreen) video.webkitExitFullscreen?.();
+      window.dispatchEvent(new CustomEvent("candid:force-fullscreen"));
+    };
+    video.addEventListener("webkitbeginfullscreen", kick_out);
+    return () => video.removeEventListener("webkitbeginfullscreen", kick_out);
+  }, []);
+
   const words = clip.word_level_captions;
   const title_text = strip_emoji(clip.title);
 
