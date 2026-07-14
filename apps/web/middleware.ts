@@ -1,7 +1,7 @@
 import createMiddleware from "next-intl/middleware";
 import { NextResponse, type NextRequest } from "next/server";
 import { routing } from "./i18n/routing";
-import { APP_STORE_URL, getRedirectUrl } from "./lib/platform";
+import { APP_STORE_URL, MAC_DOWNLOAD_URL, getRedirectUrl } from "./lib/platform";
 import { resolve_tutor_by_host, resolve_tutor_by_username, resolve_lesson_by_handle_and_code } from "./lib/resolve-domain";
 import { isCanonicalHost } from "./lib/canonical-hosts";
 
@@ -52,6 +52,10 @@ const EXACT_REDIRECTS: Record<string, RedirectEntry> = {
 function resolveAppStoreRedirect(
   pathname: string,
 ): { dest: string; status: number; appClip?: boolean } | null {
+  // Mac desktop DMG — must precede the /download/* → App Store catch-all below.
+  if (pathname === "/download/mac") {
+    return { dest: MAC_DOWNLOAD_URL, status: 307 };
+  }
   const exact = EXACT_REDIRECTS[pathname];
   if (exact) {
     const appUrl = exact.ppid ? `${APP_STORE_URL}?ppid=${exact.ppid}` : APP_STORE_URL;
