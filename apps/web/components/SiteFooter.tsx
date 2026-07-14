@@ -136,7 +136,7 @@ export default async function SiteFooter({ variant = "joincandid", appStoreBadge
           </a>
           {/* Mac app is login-only — companion download for existing users. */}
           <div className="mt-3">
-            <a href="/download/mac" className="text-sm font-normal text-white/70 hover:text-white transition-colors">
+            <a href="/desktop" className="text-sm font-normal text-white/70 hover:text-white transition-colors">
               Download for Mac
             </a>
             <span className="ml-2 text-xs text-white/40">Requires macOS 26+</span>

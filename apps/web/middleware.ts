@@ -196,6 +196,7 @@ export const config = {
   // - _next (Next.js internals)
   // - /videos (video share pages, no i18n needed)
   // - /lesson (lesson share pages, no i18n needed)
+  // - /desktop (Mac download page — detects locale itself, like /download)
   // - Static files (images, fonts, etc.)
-  matcher: ["/((?!api|_next|videos|lesson|g/|.*\\..*).*)"],
+  matcher: ["/((?!api|_next|videos|lesson|desktop|g/|.*\\..*).*)"],
 };
