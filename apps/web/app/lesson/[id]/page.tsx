@@ -5,7 +5,9 @@ import { headers } from "next/headers";
 import { notFound } from "next/navigation";
 
 import BlurImage from "@/components/BlurImage";
+import DownloadQRInterceptor from "@/components/DownloadQRInterceptor";
 import { API_BASE_URL, fetchTutor } from "@/lib/api";
+import { localizeLanguageName } from "@/lib/i18n-helpers";
 
 const SHARE_DESCRIPTIONS: Record<"en" | "ko", string> = {
   en: "Candid is your guide to real, spoken language through a tutor's real life in the country.",
@@ -14,9 +16,15 @@ const SHARE_DESCRIPTIONS: Record<"en" | "ko", string> = {
 
 // This route lives OUTSIDE the [locale] group (excluded from the next-intl matcher),
 // so there's no translation context here — keep the little UI copy in a local map.
-const COPY: Record<"en" | "ko", { cta: string; privacy: string; terms: string }> = {
-  en: { cta: "Open in Candid", privacy: "Privacy", terms: "Terms" },
-  ko: { cta: "Candid에서 보기", privacy: "개인정보", terms: "이용약관" },
+const COPY: Record<"en" | "ko", { cta: string; qrTitle: string; privacy: string; terms: string }> = {
+  en: { cta: "Study in Candid", qrTitle: "Download Candid for iOS", privacy: "Privacy", terms: "Terms" },
+  ko: { cta: "Candid에서 학습하기", qrTitle: "iOS용 Candid 다운로드", privacy: "개인정보", terms: "이용약관" },
+};
+
+// Band labels match the app's feed filter + dashboard wording.
+const BAND_LABELS: Record<"en" | "ko", Record<string, string>> = {
+  en: { upper_beginner: "Upper Beginner", lower_intermediate: "Lower Intermediate", intermediate: "Intermediate" },
+  ko: { upper_beginner: "초중급", lower_intermediate: "중하급", intermediate: "중급" },
 };
 
 interface LessonMeta {
@@ -29,7 +37,8 @@ interface LessonMeta {
   localized_title: string;
   tutor_name: string;
   tutor_slug: string;
-  category: string | null;
+  teaching_language: string;
+  difficulty_band: string | null;
 }
 
 // Returns null only for genuine 404 ("no such lesson"). Transient failures
@@ -115,6 +124,12 @@ export default async function LessonPage({
   const aspect = isVertical ? "aspect-[9/16]" : "aspect-video";
   const tutorPhoto = tutor?.large_profile_picture_url ?? tutor?.profile_picture_url ?? null;
 
+  // Subtitle = the lesson's level, e.g. "Upper Beginner Korean". Ungraded content has no band,
+  // so it falls back to the language alone rather than showing nothing.
+  const languageLabel = localizeLanguageName(lesson.teaching_language, locale);
+  const bandLabel = lesson.difficulty_band ? BAND_LABELS[locale][lesson.difficulty_band] : null;
+  const levelSubtitle = bandLabel ? `${bandLabel} ${languageLabel}` : languageLabel;
+
   return (
     <main
       className="min-h-screen flex flex-col"
@@ -152,24 +167,21 @@ export default async function LessonPage({
         <h1 className="mt-8 text-2xl md:text-3xl font-semibold max-w-xl leading-snug">
           {lesson.localized_title}
         </h1>
-        {lesson.category && (
-          <p className="mt-2 text-base md:text-lg font-light" style={{ color: "rgba(255,255,255,0.6)" }}>
-            {lesson.category}
-          </p>
-        )}
+        <p className="mt-2 text-base md:text-lg font-light" style={{ color: "rgba(255,255,255,0.6)" }}>
+          {levelSubtitle}
+        </p>
 
-        <Link
-          href={`/tutor/${lesson.tutor_slug}`}
-          className="mt-6 inline-flex items-center gap-3 hover:opacity-80 transition-opacity"
-        >
+        <div className="mt-6 inline-flex items-center gap-3">
           {tutorPhoto && (
             // Plain <img> direct from S3 — bypasses the /_next/image transcode hop.
             // eslint-disable-next-line @next/next/no-img-element
             <img src={tutorPhoto} alt={lesson.tutor_name} className="w-9 h-9 rounded-full object-cover" />
           )}
           <span className="text-base font-medium">{lesson.tutor_name}</span>
-        </Link>
+        </div>
 
+        {/* /download/{slug} = this tutor's App Store link. On desktop the interceptor below
+            swallows the click and pops a QR of it instead; mobile navigates normally. */}
         <a
           href={`/download/${lesson.tutor_slug}`}
           className="mt-8 inline-block px-12 py-3.5 rounded-full text-base font-bold"
@@ -177,6 +189,7 @@ export default async function LessonPage({
         >
           {copy.cta}
         </a>
+        <DownloadQRInterceptor label={copy.qrTitle} />
       </section>
 
       <footer
