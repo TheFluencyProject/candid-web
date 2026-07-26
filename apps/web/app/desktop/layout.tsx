@@ -1,3 +1,5 @@
+import AnonAnalytics from "@/components/AnonAnalytics";
+
 // Top-level routes live outside /[locale], whose layout supplies <html>/<body>, so this route
 // provides its own (mirrors app/lesson/layout.tsx). Dark color-scheme matches the page.
 export default function DesktopLayout({
@@ -10,7 +12,9 @@ export default function DesktopLayout({
       <head>
         <meta name="color-scheme" content="dark" />
       </head>
-      <body>{children}</body>
+      <body>
+        <AnonAnalytics>{children}</AnonAnalytics>
+      </body>
     </html>
   );
 }

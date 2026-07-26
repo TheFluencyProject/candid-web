@@ -1,3 +1,5 @@
+import AnonAnalytics from "@/components/AnonAnalytics";
+
 export default function GroupLayout({
   children,
 }: {
@@ -8,7 +10,9 @@ export default function GroupLayout({
       <head>
         <meta name="color-scheme" content="dark" />
       </head>
-      <body>{children}</body>
+      <body>
+        <AnonAnalytics>{children}</AnonAnalytics>
+      </body>
     </html>
   );
 }
