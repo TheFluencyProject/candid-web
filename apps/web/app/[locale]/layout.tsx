@@ -106,7 +106,9 @@ export default async function LocaleLayout({ children, params }: Props) {
           <PostHogProvider distinctId={distinctId} bootstrapFlags={bootstrapFlags}>
             {children}
             <InAppBrowserBlocker />
-            <DownloadQRInterceptor />
+            <DownloadQRInterceptor
+              label={(messages.tutor as { download_for_ios: string }).download_for_ios}
+            />
           </PostHogProvider>
         </NextIntlClientProvider>
       </body>
