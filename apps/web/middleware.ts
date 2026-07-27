@@ -4,6 +4,7 @@ import { routing } from "./i18n/routing";
 import { APP_STORE_URL, MAC_DOWNLOAD_URL, getRedirectUrl } from "./lib/platform";
 import { resolve_tutor_by_host, resolve_tutor_by_username, resolve_lesson_by_handle_and_code } from "./lib/resolve-domain";
 import { isCanonicalHost } from "./lib/canonical-hosts";
+import { POSTHOG_ASSETS_HOST, POSTHOG_HOST, POSTHOG_PROXY_PATH } from "./lib/posthog-config";
 
 const intlMiddleware = createMiddleware(routing);
 
@@ -95,6 +96,19 @@ const RESERVED_USERNAME_PATHS = new Set([
 
 export default async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
+
+  // ── PostHog first-party proxy: /lx/* → PostHog ──
+  // Ad blockers block *.posthog.com by domain, so the browser SDK only ever names our origin.
+  // Must stay ABOVE the custom-domain branch, which 404s non-canonical hosts — tutor domains
+  // serve the same pages and need analytics too.
+  if (pathname.startsWith(`${POSTHOG_PROXY_PATH}/`)) {
+    const upstream_path = pathname.slice(POSTHOG_PROXY_PATH.length);
+    // /static/ + /array/ are CDN bundles; everything else is ingestion/flags.
+    const upstream = upstream_path.startsWith("/static/") || upstream_path.startsWith("/array/")
+      ? POSTHOG_ASSETS_HOST
+      : POSTHOG_HOST;
+    return NextResponse.rewrite(new URL(upstream_path + request.nextUrl.search, upstream));
+  }
 
   // ── Custom-domain rewrite ──
   // Strip port + lowercase: host headers vary by proxy.
@@ -198,5 +212,8 @@ export const config = {
   // - /lesson (lesson share pages, no i18n needed)
   // - /desktop (Mac download page — detects locale itself, like /download)
   // - Static files (images, fonts, etc.)
-  matcher: ["/((?!api|_next|videos|lesson|desktop|g/|.*\\..*).*)"],
+  //
+  // /lx/* needs its own entry: the dotted-file exclusion above would drop the PostHog CDN
+  // bundles (/lx/static/recorder.js) before the proxy branch could ever run.
+  matcher: ["/((?!api|_next|videos|lesson|desktop|g/|.*\\..*).*)", "/lx/:path*"],
 };

@@ -2,7 +2,7 @@
 
 import posthog from "posthog-js";
 import { useEffect } from "react";
-import { POSTHOG_HOST, POSTHOG_KEY } from "@/lib/posthog-config";
+import { POSTHOG_KEY, POSTHOG_PROXY_PATH, POSTHOG_UI_HOST } from "@/lib/posthog-config";
 
 // Survives React Fast Refresh + StrictMode double-mounts; posthog.init must only run once per browser load.
 let initialized = false;
@@ -20,7 +20,10 @@ export function PostHogProvider({ children, distinctId, bootstrapFlags }: Props)
     if (initialized) return;
     initialized = true;
     posthog.init(POSTHOG_KEY, {
-      api_host: POSTHOG_HOST,
+      // Relative on purpose — same-origin proxy (middleware) on localhost, previews and prod alike.
+      api_host: POSTHOG_PROXY_PATH,
+      // Toolbar/app links can't be inferred from a relative api_host.
+      ui_host: POSTHOG_UI_HOST,
       // SDK-native SPA tracking: one $pageview per pushState/replaceState/popstate, with the URL
       // already updated. Replaces the old manual tracker component, which sat as a CHILD of this
       // provider — React runs child effects before parent effects, so it ran before init() and its
