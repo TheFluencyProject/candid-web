@@ -7,7 +7,7 @@ import { notFound } from "next/navigation";
 import BlurImage from "@/components/BlurImage";
 import DownloadQRInterceptor from "@/components/DownloadQRInterceptor";
 import { API_BASE_URL, fetchTutor } from "@/lib/api";
-import { localizeLanguageName } from "@/lib/i18n-helpers";
+// import { localizeLanguageName } from "@/lib/i18n-helpers";
 
 const SHARE_DESCRIPTIONS: Record<"en" | "ko", string> = {
   en: "Candid is your guide to real, spoken language through a tutor's real life in the country.",
@@ -22,10 +22,10 @@ const COPY: Record<"en" | "ko", { cta: string; qrTitle: string; privacy: string;
 };
 
 // Band labels match the app's feed filter + dashboard wording.
-const BAND_LABELS: Record<"en" | "ko", Record<string, string>> = {
-  en: { upper_beginner: "Upper Beginner", lower_intermediate: "Lower Intermediate", intermediate: "Intermediate" },
-  ko: { upper_beginner: "초중급", lower_intermediate: "중하급", intermediate: "중급" },
-};
+// const BAND_LABELS: Record<"en" | "ko", Record<string, string>> = {
+//   en: { upper_beginner: "Upper Beginner", lower_intermediate: "Lower Intermediate", intermediate: "Intermediate" },
+//   ko: { upper_beginner: "초중급", lower_intermediate: "중하급", intermediate: "중급" },
+// };
 
 interface LessonMeta {
   lesson_id: string;
@@ -124,11 +124,10 @@ export default async function LessonPage({
   const aspect = isVertical ? "aspect-[9/16]" : "aspect-video";
   const tutorPhoto = tutor?.large_profile_picture_url ?? tutor?.profile_picture_url ?? null;
 
-  // Subtitle = the lesson's level, e.g. "Upper Beginner Korean". Ungraded content has no band,
-  // so it falls back to the language alone rather than showing nothing.
-  const languageLabel = localizeLanguageName(lesson.teaching_language, locale);
-  const bandLabel = lesson.difficulty_band ? BAND_LABELS[locale][lesson.difficulty_band] : null;
-  const levelSubtitle = bandLabel ? `${bandLabel} ${languageLabel}` : languageLabel;
+  // Level subtitle ("Upper Beginner Korean") hidden for now — see the JSX below.
+  // const languageLabel = localizeLanguageName(lesson.teaching_language, locale);
+  // const bandLabel = lesson.difficulty_band ? BAND_LABELS[locale][lesson.difficulty_band] : null;
+  // const levelSubtitle = bandLabel ? `${bandLabel} ${languageLabel}` : languageLabel;
 
   return (
     <main
@@ -167,9 +166,11 @@ export default async function LessonPage({
         <h1 className="mt-8 text-2xl md:text-3xl font-semibold max-w-xl leading-snug">
           {lesson.localized_title}
         </h1>
-        <p className="mt-2 text-base md:text-lg font-light" style={{ color: "rgba(255,255,255,0.6)" }}>
+        {/* Hidden for now. Title → tutor row falls back to mt-6, the same layout this had
+            whenever the old category subtitle was null. */}
+        {/* <p className="mt-2 text-base md:text-lg font-light" style={{ color: "rgba(255,255,255,0.6)" }}>
           {levelSubtitle}
-        </p>
+        </p> */}
 
         <div className="mt-6 inline-flex items-center gap-3">
           {tutorPhoto && (
