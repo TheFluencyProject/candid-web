@@ -1,3 +1,28 @@
+# candid-web
+
+Marketing site for Candid — joincandid.co and candidtutors.co.
+
+## Why this repo is public
+
+Vercel's Hobby plan refuses to deploy a private repo owned by a GitHub **organization**
+("Cannot deploy from a private GitHub organization repository on the Hobby plan"). That
+silently stopped every deploy on 2026-07-31 — the site stayed up serving a stale build while
+`main` drifted ahead. Going public was the free fix; the alternatives were upgrading to Vercel
+Pro or moving the repo to a personal GitHub account.
+
+This is safe **because this is a marketing site** — nearly everything here already ships to the
+browser. Before opening it up we confirmed no secret has ever been committed anywhere in the
+repo's history, and that the only credentials in the tree are publishable by design:
+
+- `NEXT_PUBLIC_FIREBASE_*` — Firebase web config, public by design
+- `POSTHOG_KEY` (`phc_…`) — PostHog project key, write-only and public by design
+
+**So: never commit a real secret here.** Anything genuinely sensitive belongs in Vercel
+environment variables, not in the tree. `candid-backend`, `candid-ios`, and
+`candid-tutor-dashboard-web` are separate repos and stay private.
+
+---
+
 # Turborepo starter
 
 This Turborepo starter is maintained by the Turborepo core team.

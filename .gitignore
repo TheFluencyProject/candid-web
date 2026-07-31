@@ -21,6 +21,10 @@ coverage
 # Vercel
 .vercel
 
+# Local codebase knowledge graph — was only in .git/info/exclude, which isn't committed,
+# so a fresh clone would have swept 1.5M of it into this now-public repo.
+graphify-out/
+
 # Build Outputs
 .next/
 out/

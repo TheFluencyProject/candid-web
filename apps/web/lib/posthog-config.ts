@@ -2,6 +2,9 @@
 // and the Node SDK (lib/posthog-server). Kept in one place so server-decide
 // and client-bootstrap can't drift.
 
+// Safe to hardcode: phc_ is PostHog's write-only project key, public by design, and it
+// already ships in the browser bundle. This repo is PUBLIC (see README) — a key that isn't
+// publishable must go in a Vercel env var instead.
 export const POSTHOG_KEY = "phc_z63G96rjoQ69KcCvirgWCd65MTRWu8ihGEs24ugqmiAF";
 // Ingestion + flags. Used directly by the Node SDK, and as the middleware proxy's upstream.
 export const POSTHOG_HOST = "https://us.i.posthog.com";
