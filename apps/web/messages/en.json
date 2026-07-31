@@ -10,7 +10,9 @@
     "cta_learn": "LEARN WITH CANDID",
     "cta_teach": "TEACH ON CANDID",
     "mac_download": "Download for Mac",
-    "mac_requires": "Requires macOS 26+"
+    "mac_requires": "Requires macOS 26+",
+    "tap_to_unmute": "Tap to unmute",
+    "tap_to_mute": "Tap to mute"
   },
   "teach": {
     "title": "Become a Candid Creator",

@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useTranslations } from "next-intl";
 import type { MarketingClip } from "@/lib/api";
 import MarketingClipCard from "./MarketingClipCard";
 import { isRestrictedInAppBrowser } from "@/lib/platform";
@@ -40,6 +41,7 @@ function SpeakerIcon({ muted }: { muted: boolean }) {
 // pointer events with a touch axis-lock so a vertical swipe still scrolls the page. Exactly
 // one card plays at a time and follows the viewport center as you drag.
 export default function MarketingClipMarquee({ clips, karaoke = true }: { clips: MarketingClip[]; karaoke?: boolean }) {
+  const t = useTranslations("home");
   const containerRef = useRef<HTMLDivElement | null>(null); // viewport (clips the track)
   const trackRef = useRef<HTMLDivElement | null>(null); // the translated 2-group track
   const offsetRef = useRef(0); // current translateX, kept wrapped to [0, groupWidth)
@@ -65,9 +67,17 @@ export default function MarketingClipMarquee({ clips, karaoke = true }: { clips:
   const [coldStartDone, setColdStartDone] = useState(false);
   const handle_ready = useCallback(() => setColdStartDone(true), []);
 
-  // Volume off by default (muted autoplay is the only kind browsers allow); the user taps the
-  // affordance below the row to unmute. Only the active card actually emits audio (see the card).
-  const [muted, setMuted] = useState(true);
+  // Sound ON by default. Browsers only permit unmuted autoplay once the visitor has media
+  // engagement on this origin, so the card attempts it, and on denial falls back to muted and
+  // fires candid:audio-blocked (below) — the clip always plays either way. The toggle's label
+  // reads off this state, so it only says "tap to mute" when sound is genuinely on.
+  // Only the active card emits audio; the rest are paused (see the card).
+  const [muted, setMuted] = useState(false);
+  useEffect(() => {
+    const on_audio_blocked = () => setMuted(true);
+    window.addEventListener("candid:audio-blocked", on_audio_blocked);
+    return () => window.removeEventListener("candid:audio-blocked", on_audio_blocked);
+  }, []);
 
   // Frozen while the in-app-browser blocker modal is open (TikTok etc.): its inline videos ignore
   // playsInline and auto-fullscreen, so a drifting marquee behind the modal keeps re-fullscreening
@@ -480,7 +490,7 @@ export default function MarketingClipMarquee({ clips, karaoke = true }: { clips:
           className="inline-flex items-center gap-1.5 text-white/50 transition-colors [@media(hover:hover)]:hover:text-white/80"
         >
           <SpeakerIcon muted={muted} />
-          <span className="text-sm font-medium">{muted ? "Tap to unmute" : "Tap to mute"}</span>
+          <span className="text-sm font-medium">{muted ? t("tap_to_unmute") : t("tap_to_mute")}</span>
         </button>
       </div>
     </div>

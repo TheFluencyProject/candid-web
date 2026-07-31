@@ -10,7 +10,9 @@
     "cta_learn": "Candid로 배우기",
     "cta_teach": "Candid 크리에이터 되기",
     "mac_download": "Mac용 다운로드",
-    "mac_requires": "macOS 26 이상 필요"
+    "mac_requires": "macOS 26 이상 필요",
+    "tap_to_unmute": "소리 켜기",
+    "tap_to_mute": "소리 끄기"
   },
   "teach": {
     "title": "Candid 크리에이터 되기",
