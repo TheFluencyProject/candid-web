@@ -1,7 +1,7 @@
 import createMiddleware from "next-intl/middleware";
 import { NextResponse, type NextFetchEvent, type NextRequest } from "next/server";
 import { routing } from "./i18n/routing";
-import { APP_STORE_URL, MAC_DOWNLOAD_URL, appStoreUrlForTutorSlug, getRedirectUrl } from "./lib/platform";
+import { APP_STORE_URL, MAC_DOWNLOAD_URL, appStoreUrlForTutor, getRedirectUrl } from "./lib/platform";
 import { captureServerEvent } from "./lib/posthog-capture";
 import { resolve_tutor_by_host, resolve_tutor_by_username, resolve_lesson_by_handle_and_code } from "./lib/resolve-domain";
 import { isCanonicalHost } from "./lib/canonical-hosts";
@@ -48,14 +48,6 @@ const EXACT_REDIRECTS: Record<string, RedirectEntry> = {
   "/news": { permanent: true, ppid: "86959fbf-bcba-4bea-829f-5b7d73270854" },
 };
 
-// App Store Custom Product Page ids for the /redirects/<handle> deep links. Only the few tutors
-// with a real CPP need an entry; every other handle still redirects to the store (no ?ppid=).
-// Attribution is captured in-app from the handle — this map is purely which marketing page shows.
-const REDIRECT_PPID: Record<string, string> = {
-  adam: "a5bb8fc4-a398-442f-b401-92c2cc1e050a",
-  mia: "86959fbf-bcba-4bea-829f-5b7d73270854",
-};
-
 function resolveAppStoreRedirect(
   pathname: string,
 ): { dest: string; status: number; appClip?: boolean } | null {
@@ -74,7 +66,7 @@ function resolveAppStoreRedirect(
   // always redirect to the App Store instead of rendering the App Clip landing page.
   if (pathname === "/download" || pathname.startsWith("/download/")) {
     const slug = pathname.slice("/download/".length); // "" for bare /download
-    return { dest: appStoreUrlForTutorSlug(slug), status: 307 /* , appClip: true */ };
+    return { dest: appStoreUrlForTutor(slug), status: 307 /* , appClip: true */ };
   }
   return null;
 }
@@ -172,7 +164,7 @@ export default async function middleware(request: NextRequest, event: NextFetchE
       }),
     );
     const ua = request.headers.get("user-agent") ?? "";
-    return NextResponse.redirect(getRedirectUrl(ua, appStoreUrlForTutorSlug(slug)), { status: 307 });
+    return NextResponse.redirect(getRedirectUrl(ua, appStoreUrlForTutor(slug)), { status: 307 });
   }
 
   // ── App Store / waitlist redirects (UA-aware) ──
@@ -199,15 +191,15 @@ export default async function middleware(request: NextRequest, event: NextFetchE
   const segments = locale_stripped.split("/").filter(Boolean);
 
   // ── Tutor referral deep link: joincandid.co/redirects/<handle> → App Store ──
-  // Generic (replaces the old hardcoded /redirects/adam,/redirects/mia map): any handle works with
-  // no code change. Append ?ppid=<x> only when that tutor has a Custom Product Page. Must precede
-  // the lesson-share branch below — a 6-char handle (e.g. "hayden") would otherwise match its
-  // share-code regex. 307 (temporary): handles/ppids can change.
+  // Any handle works with no code change; appStoreUrlForTutor appends ?ppid=<x> only when that
+  // tutor has a Custom Product Page. Must precede the lesson-share branch below — a 6-char handle
+  // (e.g. "hayden") would otherwise match its share-code regex. 307: handles/ppids can change.
   if (segments.length === 2 && segments[0] === "redirects") {
-    const ppid = REDIRECT_PPID[segments[1].toLowerCase()];
-    const dest = ppid ? `${APP_STORE_URL}?ppid=${ppid}` : APP_STORE_URL;
     const ua = request.headers.get("user-agent") ?? "";
-    return NextResponse.redirect(getRedirectUrl(ua, dest), { status: 307 });
+    return NextResponse.redirect(
+      getRedirectUrl(ua, appStoreUrlForTutor(segments[1])),
+      { status: 307 },
+    );
   }
 
   if (segments.length === 1 && !RESERVED_USERNAME_PATHS.has(segments[0])) {

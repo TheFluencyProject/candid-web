@@ -20,17 +20,31 @@ export function isRestrictedInAppBrowser(): boolean {
   return /TikTok|BytedanceWebview|musical_ly/i.test(navigator.userAgent);
 }
 
-// App Store Custom Product Page ids keyed by tutor slug. Only tutors with a real CPP need an
-// entry; everyone else gets the default store URL. Keep in sync with REDIRECT_PPID in
-// middleware.ts (keyed by username) and CustomProductPageAttribution.slugToPpid in iOS.
+// App Store Custom Product Page ids. Keyed by BOTH the tutor's slug (/download/<slug>, /qr/<slug>)
+// and their username (/redirects/<handle>) — the same tutor is reached either way, and keeping two
+// separate maps is what let a tutor resolve on one path but not the other.
+//
+// Only tutors with a real CPP need entries; everyone else gets the default store URL. A CPP that
+// exists in App Store Connect but is missing here silently falls back to the generic page, so add
+// the tutor as soon as their page is live. Keep in sync with
+// CustomProductPageAttribution.slugToPpid in iOS, which records the referral in-app.
+const ADAM_PPID = "a5bb8fc4-a398-442f-b401-92c2cc1e050a";
+const MIA_PPID = "86959fbf-bcba-4bea-829f-5b7d73270854";
+const HAYDEN_PPID = "42f15230-8e6c-434c-b41f-ff76e5db06d5";
+
 const TUTOR_PPID: Record<string, string> = {
-  "english-adam": "a5bb8fc4-a398-442f-b401-92c2cc1e050a",
-  "korean-mia": "86959fbf-bcba-4bea-829f-5b7d73270854",
+  "english-adam": ADAM_PPID,
+  adam: ADAM_PPID,
+  "korean-mia": MIA_PPID,
+  mia: MIA_PPID,
+  "korean-hayden": HAYDEN_PPID,
+  hayden: HAYDEN_PPID,
 };
 
 // This tutor's own App Store page when they have a CPP, else the default store URL.
-export function appStoreUrlForTutorSlug(slug: string | null | undefined): string {
-  const ppid = slug ? TUTOR_PPID[slug.toLowerCase()] : undefined;
+// Accepts either a tutor slug ("korean-hayden") or a username ("hayden").
+export function appStoreUrlForTutor(handle: string | null | undefined): string {
+  const ppid = handle ? TUTOR_PPID[handle.toLowerCase()] : undefined;
   return ppid ? `${APP_STORE_URL}?ppid=${ppid}` : APP_STORE_URL;
 }
 
