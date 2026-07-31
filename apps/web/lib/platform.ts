@@ -20,6 +20,20 @@ export function isRestrictedInAppBrowser(): boolean {
   return /TikTok|BytedanceWebview|musical_ly/i.test(navigator.userAgent);
 }
 
+// App Store Custom Product Page ids keyed by tutor slug. Only tutors with a real CPP need an
+// entry; everyone else gets the default store URL. Keep in sync with REDIRECT_PPID in
+// middleware.ts (keyed by username) and CustomProductPageAttribution.slugToPpid in iOS.
+const TUTOR_PPID: Record<string, string> = {
+  "english-adam": "a5bb8fc4-a398-442f-b401-92c2cc1e050a",
+  "korean-mia": "86959fbf-bcba-4bea-829f-5b7d73270854",
+};
+
+// This tutor's own App Store page when they have a CPP, else the default store URL.
+export function appStoreUrlForTutorSlug(slug: string | null | undefined): string {
+  const ppid = slug ? TUTOR_PPID[slug.toLowerCase()] : undefined;
+  return ppid ? `${APP_STORE_URL}?ppid=${ppid}` : APP_STORE_URL;
+}
+
 export function getRedirectUrl(
   ua: string,
   appStoreUrl = APP_STORE_URL,

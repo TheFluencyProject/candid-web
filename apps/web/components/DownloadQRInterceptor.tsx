@@ -1,18 +1,35 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import posthog from "posthog-js";
 import { QRCodeSVG } from "qrcode.react";
 import ResponsiveOverlay from "@/components/ResponsiveOverlay";
+import { APP_CLIP_URL } from "@/lib/platform";
 
 const BASE_URL = "https://joincandid.co";
 
+// Which page the click happened on, for the funnel. Custom-domain tutor pages rewrite server-side
+// so their pathname is "/" — they render join-sheet buttons, not /download anchors, so they never
+// reach this in practice.
+function describePage(pathname: string): { surface: string; lesson_id: string | null } {
+  const lesson = pathname.match(/^\/lesson\/([^/]+)/);
+  if (lesson) return { surface: "lesson", lesson_id: lesson[1] };
+  if (/^(?:\/(?:en|ko))?\/tutor\//.test(pathname)) return { surface: "tutor", lesson_id: null };
+  return { surface: "site", lesson_id: null };
+}
+
 // Universal desktop behavior for every "/download…" link on the marketing site: a desktop user can't
-// install an iOS app, so instead of navigating we pop a QR of that exact link (any tutor slug + lesson
-// params ride along in the href) to scan with an iPhone → App Clip card. Mobile/tablet clicks fall
-// through and navigate normally (→ App Clip on iOS 18+, App Store otherwise).
+// install an iOS app, so instead of navigating we pop a QR to scan with an iPhone. Mobile/tablet
+// clicks fall through and navigate normally.
+//
+// The QR encodes /qr/<slug>, NOT the /download link itself — /download is a registered App Clip
+// Experience, so scanning it pops the clip card before the redirect can run. /qr is unregistered
+// (goes straight to the tutor's App Store page) and lets middleware record the scan.
+// The App Clip funnel used `${BASE_URL}${href}` here; restore that if it's ever re-enabled.
 //
 // Capture-phase document listener mirrors InAppBrowserBlocker; the two never overlap — that one only
-// runs in restricted in-app browsers, this one only on desktop (≥1024px).
+// runs in restricted in-app browsers, this one only on desktop (≥1024px). Click tracking happens
+// before the desktop gate, so mobile taps are tracked too and then navigate.
 //
 // `label` is passed in rather than read from next-intl: /lesson/[id] lives outside the [locale] group
 // (no translation context there) and mounts this with its own local copy map.
@@ -22,13 +39,37 @@ export default function DownloadQRInterceptor({ label }: { label: string }) {
   const handleClick = useCallback((e: MouseEvent) => {
     // Leave new-tab / modified / non-primary clicks alone.
     if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
-    if (!window.matchMedia("(min-width: 1024px)").matches) return;
     const anchor = (e.target as HTMLElement).closest("a");
     const href = anchor?.getAttribute("href") ?? "";
-    if (!href.startsWith("/download")) return;
+    const isDownload = href.startsWith("/download");
+    // Adam's tutor page sends its CTA to the App Clip link instead — track it, but never intercept.
+    if (!isDownload && href !== APP_CLIP_URL) return;
+
+    const { surface, lesson_id } = describePage(window.location.pathname);
+    const tutor_slug = isDownload ? href.slice("/download/".length) : "";
+    const isDesktop = window.matchMedia("(min-width: 1024px)").matches;
+    const showQR = isDownload && isDesktop;
+
+    posthog.capture("study_cta_clicked", {
+      surface,
+      tutor_slug,
+      lesson_id,
+      href,
+      mode: showQR ? "qr" : "navigate",
+    });
+
+    if (!showQR) return;
     e.preventDefault();
     e.stopPropagation();
-    setTarget({ url: `${BASE_URL}${href}` });
+
+    // Undefined before posthog.init resolves — omit rather than bake "undefined" into the QR.
+    const sid = posthog.get_distinct_id();
+    const params = new URLSearchParams({ s: surface });
+    if (sid) params.set("sid", sid);
+    if (lesson_id) params.set("l", lesson_id);
+    // No trailing slash on the bare form — Next 308s "/qr/" to "/qr" before middleware runs.
+    const path = tutor_slug ? `/qr/${tutor_slug}` : "/qr";
+    setTarget({ url: `${BASE_URL}${path}?${params}` });
   }, []);
 
   useEffect(() => {

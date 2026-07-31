@@ -7,8 +7,10 @@ import { PostHogProvider } from "@/components/PostHogProvider";
 //
 // Bare wiring on purpose — no bootstrapped flags, since the one experiment we bootstrap
 // (mobile-cta-copy) is a marketing-homepage concern. distinct_id is the same candid_did the
-// middleware sets on every request, so a visitor who lands on a share link and then walks into
-// the marketing site stays one person.
+// middleware stamps for these routes (ANON_ANALYTICS_ROUTES — they need their own matcher entries
+// to get it), so a visitor who lands on a share link and then walks into the marketing site stays
+// one person. The fallback below is a safety net: posthog register()s whatever it gets, so a fresh
+// UUID per render would mint a new person on every load.
 export default async function AnonAnalytics({ children }: { children: React.ReactNode }) {
   const cookieStore = await cookies();
   const distinctId = cookieStore.get("candid_did")?.value ?? crypto.randomUUID();

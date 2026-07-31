@@ -18,8 +18,8 @@ const SHARE_DESCRIPTIONS: Record<"en" | "ko", string> = {
 // This route lives OUTSIDE the [locale] group (excluded from the next-intl matcher),
 // so there's no translation context here — keep the little UI copy in a local map.
 const COPY: Record<"en" | "ko", { cta: string; qrTitle: string; privacy: string; terms: string }> = {
-  en: { cta: "Study in Candid", qrTitle: "Download Candid for iOS", privacy: "Privacy", terms: "Terms" },
-  ko: { cta: "Candid에서 학습하기", qrTitle: "iOS용 Candid 다운로드", privacy: "개인정보", terms: "이용약관" },
+  en: { cta: "Study with Candid", qrTitle: "Download Candid for iOS", privacy: "Privacy", terms: "Terms" },
+  ko: { cta: "Candid에서 공부하기", qrTitle: "iOS용 Candid 다운로드", privacy: "개인정보", terms: "이용약관" },
 };
 
 // Band labels match the app's feed filter + dashboard wording.
@@ -176,7 +176,9 @@ export default async function LessonPage({
         </div>
 
         {/* /download/{slug} = this tutor's App Store link. On desktop the interceptor below
-            swallows the click and pops a QR of it instead; mobile navigates normally. */}
+            swallows the click and pops a QR of the equivalent /qr/{slug} link (same
+            destination, but scannable without tripping the App Clip card); mobile navigates
+            normally. Either way the click is tracked as study_cta_clicked. */}
         <a
           href={`/download/${lesson.tutor_slug}`}
           className="mt-8 inline-block px-12 py-3.5 rounded-full text-base font-bold"

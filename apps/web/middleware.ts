@@ -1,7 +1,8 @@
 import createMiddleware from "next-intl/middleware";
-import { NextResponse, type NextRequest } from "next/server";
+import { NextResponse, type NextFetchEvent, type NextRequest } from "next/server";
 import { routing } from "./i18n/routing";
-import { APP_STORE_URL, MAC_DOWNLOAD_URL, getRedirectUrl } from "./lib/platform";
+import { APP_STORE_URL, MAC_DOWNLOAD_URL, appStoreUrlForTutorSlug, getRedirectUrl } from "./lib/platform";
+import { captureServerEvent } from "./lib/posthog-capture";
 import { resolve_tutor_by_host, resolve_tutor_by_username, resolve_lesson_by_handle_and_code } from "./lib/resolve-domain";
 import { isCanonicalHost } from "./lib/canonical-hosts";
 import { pickLocale } from "./lib/i18n-helpers";
@@ -45,8 +46,6 @@ const EXACT_REDIRECTS: Record<string, RedirectEntry> = {
   "/englishmode": { permanent: true, ppid: "a34b9b94-7d2a-4fac-b792-6e59fb0e5e59" },
   "/business": { permanent: true, ppid: "a5bb8fc4-a398-442f-b401-92c2cc1e050a" },
   "/news": { permanent: true, ppid: "86959fbf-bcba-4bea-829f-5b7d73270854" },
-  "/download/english-adam": { permanent: false, ppid: "a5bb8fc4-a398-442f-b401-92c2cc1e050a" },
-  "/download/korean-mia": { permanent: false, ppid: "86959fbf-bcba-4bea-829f-5b7d73270854" },
 };
 
 // App Store Custom Product Page ids for the /redirects/<handle> deep links. Only the few tutors
@@ -69,11 +68,13 @@ function resolveAppStoreRedirect(
     const appUrl = exact.ppid ? `${APP_STORE_URL}?ppid=${exact.ppid}` : APP_STORE_URL;
     return { dest: appUrl, status: exact.permanent ? 308 : 307 };
   }
-  // Catch-all: /download or /download/:slug (any slug not matched above) → App Store.
+  // Catch-all: /download or /download/:slug → that tutor's Custom Product Page when they have
+  // one, else the plain App Store URL.
   // App Clip funnel disabled for now — the `appClip` flag below is commented out so these
   // always redirect to the App Store instead of rendering the App Clip landing page.
   if (pathname === "/download" || pathname.startsWith("/download/")) {
-    return { dest: APP_STORE_URL, status: 307 /* , appClip: true */ };
+    const slug = pathname.slice("/download/".length); // "" for bare /download
+    return { dest: appStoreUrlForTutorSlug(slug), status: 307 /* , appClip: true */ };
   }
   return null;
 }
@@ -97,11 +98,15 @@ function prefersKorean(request: NextRequest): boolean {
 // above; api/_next/videos/lesson/g are excluded by the matcher.
 const RESERVED_USERNAME_PATHS = new Set([
   "classic", "company-info", "privacy", "terms", "tutor", "youtube-videos",
-  "download", "g", "lesson", "teach", "videos", "en", "ko",
+  "download", "g", "lesson", "qr", "teach", "videos", "en", "ko",
 ]);
 
+// Routes that render their own <html> and are excluded from the intl matcher below, but still
+// need candid_did stamped — AnonAnalytics reads that cookie to keep a visitor one PostHog person.
+const ANON_ANALYTICS_ROUTES = ["/lesson", "/videos", "/desktop", "/g"];
 
-export default async function middleware(request: NextRequest) {
+
+export default async function middleware(request: NextRequest, event: NextFetchEvent) {
   const { pathname } = request.nextUrl;
 
   // ── PostHog first-party proxy: /lx/* → PostHog ──
@@ -117,6 +122,25 @@ export default async function middleware(request: NextRequest) {
     return NextResponse.rewrite(new URL(upstream_path + request.nextUrl.search, upstream));
   }
 
+  // ── candid_did for the non-intl routes (/lesson, /videos, /desktop, /g) ──
+  // These own their <html> and are excluded from the intl matcher, so they get their own matcher
+  // entries and return here: they must never reach intlMiddleware (it would add a locale prefix).
+  // Must stay ABOVE the custom-domain branch, which rewrites ANY path on a tutor domain to that
+  // tutor's page. Without the cookie, AnonAnalytics falls back to a fresh UUID per render and
+  // posthog register()s it — minting a new person on every single load.
+  if (ANON_ANALYTICS_ROUTES.some((p) => pathname === p || pathname.startsWith(`${p}/`))) {
+    const did = request.cookies.get(DISTINCT_ID_COOKIE)?.value ?? crypto.randomUUID();
+    // Mirror onto the request so this render reads the same id it's about to be issued.
+    request.cookies.set(DISTINCT_ID_COOKIE, did);
+    const response = NextResponse.next({ request });
+    response.cookies.set(DISTINCT_ID_COOKIE, did, {
+      path: "/",
+      maxAge: ONE_YEAR_SECONDS,
+      sameSite: "lax",
+    });
+    return response;
+  }
+
   // ── Custom-domain rewrite ──
   // Strip port + lowercase: host headers vary by proxy.
   const host = (request.headers.get("host") ?? "").toLowerCase().split(":")[0];
@@ -129,6 +153,26 @@ export default async function middleware(request: NextRequest) {
     const url = request.nextUrl.clone();
     url.pathname = `/${locale}/tutor/${slug}`;
     return NextResponse.rewrite(url);
+  }
+
+  // ── Scanned QR → App Store (tracked) ──
+  // Deliberately NOT /download/*: that prefix is a registered App Clip Experience, so scanning it
+  // pops the clip card before any redirect can run. /qr is unregistered, so it goes straight to
+  // the store. `sid` is the distinct_id of the desktop session that rendered the QR, so the scan
+  // joins that visitor's funnel even though it arrives from a different device.
+  if (pathname === "/qr" || pathname.startsWith("/qr/")) {
+    const slug = pathname.slice("/qr/".length); // "" for bare /qr
+    const params = request.nextUrl.searchParams;
+    event.waitUntil(
+      captureServerEvent("qr_scanned", params.get("sid") ?? crypto.randomUUID(), {
+        surface: params.get("s") ?? "unknown",
+        tutor_slug: slug,
+        lesson_id: params.get("l"),
+        $current_url: request.url,
+      }),
+    );
+    const ua = request.headers.get("user-agent") ?? "";
+    return NextResponse.redirect(getRedirectUrl(ua, appStoreUrlForTutorSlug(slug)), { status: 307 });
   }
 
   // ── App Store / waitlist redirects (UA-aware) ──
@@ -245,5 +289,16 @@ export const config = {
   //
   // /lx/* needs its own entry: the dotted-file exclusion above would drop the PostHog CDN
   // bundles (/lx/static/recorder.js) before the proxy branch could ever run.
-  matcher: ["/((?!api|_next|videos|lesson|desktop|g/|.*\\..*).*)", "/lx/:path*"],
+  //
+  // The excluded routes then get their own entries so middleware still runs on them and can stamp
+  // candid_did — they stay out of the lookahead above so they never reach intlMiddleware, and the
+  // ANON_ANALYTICS_ROUTES branch returns before anything else can touch them.
+  matcher: [
+    "/((?!api|_next|videos|lesson|desktop|g/|.*\\..*).*)",
+    "/lx/:path*",
+    "/lesson/:path*",
+    "/videos/:path*",
+    "/desktop/:path*",
+    "/g/:path*",
+  ],
 };

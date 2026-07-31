@@ -1,5 +1,6 @@
 "use client";
 
+import posthog from "posthog-js";
 import { openJoinForFree } from "@/lib/join-for-free-store";
 
 interface Props {
@@ -8,7 +9,11 @@ interface Props {
 }
 
 export default function JoinForFreePill({ label, variant = "navbar-pill" }: Props) {
-  const onClick = () => openJoinForFree();
+  // These are <button>s, so DownloadQRInterceptor's anchor listener never sees them.
+  const onClick = () => {
+    posthog.capture("join_for_free_clicked", { variant, label });
+    openJoinForFree();
+  };
 
   if (variant === "mobile-navbar-pill") {
     return (
