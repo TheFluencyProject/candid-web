@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { headers } from "next/headers";
 import { fetchTutor } from "@/lib/api";
 import { APP_STORE_URL } from "@/lib/platform";
+import { pickLocale } from "@/lib/i18n-helpers";
 
 // App Clip funnel disabled for now — the middleware always redirects /download/<slug> to the App
 // Store, so this body only renders the App Store fallback. The apple-itunes-app App Clip meta is
@@ -14,10 +15,9 @@ import { APP_STORE_URL } from "@/lib/platform";
 
 type Props = { params: Promise<{ slug: string }> };
 
-// This route lives outside /[locale], so detect ko/en from the header directly (mirrors middleware).
+// Outside /[locale], so the header is read here instead of by the middleware.
 async function resolveLocale(): Promise<"en" | "ko"> {
-  const al = (await headers()).get("accept-language") ?? "";
-  return al.split(",")[0]?.trim().toLowerCase().startsWith("ko") ? "ko" : "en";
+  return pickLocale((await headers()).get("accept-language"));
 }
 
 const COPY = {

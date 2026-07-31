@@ -14,7 +14,6 @@ import { localizeLanguageName, withKoreanParticle, formatHeroTitle, stripEmojis 
 import { type Tutor, fetchTutor } from "@/lib/api";
 import { getMobileCtaVariant } from "@/lib/posthog-server";
 import { isCandidtutorsHost } from "@/lib/canonical-hosts";
-import { BECOME_A_TUTOR_URL } from "@/lib/platform";
 import CandidtutorsLanding from "@/components/CandidtutorsLanding";
 
 type Props = {
@@ -181,8 +180,8 @@ export default async function Home({ params }: Props) {
           candidtutors_brand ? (
             <div className="flex items-center gap-2">
               {/* Secondary CTA — less prominent (white text on translucent white). */}
-              <BecomeATutorPill label={t_tutor("become_a_tutor")} href={BECOME_A_TUTOR_URL} variant="navbar-pill" />
-              <BecomeATutorPill label={t_tutor("become_a_tutor_short")} href={BECOME_A_TUTOR_URL} variant="mobile-navbar-pill" />
+              <BecomeATutorPill label={t_tutor("become_a_tutor")} variant="navbar-pill" />
+              <BecomeATutorPill label={t_tutor("become_a_tutor_short")} variant="mobile-navbar-pill" />
               {/* Primary CTA — same App Store behavior as Get the app. */}
               <a
                 href="/download"

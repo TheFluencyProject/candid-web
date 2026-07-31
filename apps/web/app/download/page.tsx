@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import { headers } from "next/headers";
 import { APP_STORE_URL } from "@/lib/platform";
+import { pickLocale } from "@/lib/i18n-helpers";
 
 // Slug-less App Store landing for /download. App Clip funnel is disabled for now — the middleware
 // always redirects /download to the App Store, so this body only renders for clip-incapable clients
@@ -9,12 +10,6 @@ import { APP_STORE_URL } from "@/lib/platform";
 // (and re-enable the middleware appClip branch) to bring the App Clip card back.
 // const APP_CLIP_META =
 //   "app-id=6754859158, app-clip-bundle-id=co.thefluencyproject.bloom-ios.Clip, app-clip-display=card";
-
-// This route lives outside /[locale], so detect ko/en from the header directly (mirrors middleware).
-async function resolveLocale(): Promise<"en" | "ko"> {
-  const al = (await headers()).get("accept-language") ?? "";
-  return al.split(",")[0]?.trim().toLowerCase().startsWith("ko") ? "ko" : "en";
-}
 
 const COPY = {
   en: { hint: "Tap the banner above to start instantly — or download the full app.", alt: "Download on the App Store" },
@@ -31,7 +26,8 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function DownloadLanding() {
-  const copy = COPY[await resolveLocale()];
+  // Outside /[locale], so the header is read here instead of by the middleware.
+  const copy = COPY[pickLocale((await headers()).get("accept-language"))];
 
   return (
     <main
