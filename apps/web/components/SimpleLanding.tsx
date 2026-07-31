@@ -1,9 +1,10 @@
 import Image from "next/image";
+import { getTranslations } from "next-intl/server";
+import { Link } from "@/i18n/routing";
 import SiteFooter from "@/components/SiteFooter";
 import ScreenshotMarquee from "@/components/ScreenshotMarquee";
 import MarketingClipMarquee from "@/components/MarketingClipMarquee";
 import { type Tutor, type MarketingClip, fetchTutor, fetchMarketingClips } from "@/lib/api";
-import { BECOME_A_TUTOR_URL } from "@/lib/platform";
 
 // Active/featured tutors. The public tutor API exposes no active flag, so the
 // set is listed here (matches the old home); korean-chan has a profile page but
@@ -47,6 +48,10 @@ function interleave<T>(lists: T[][]): T[] {
 type Props = { locale: string; karaoke?: boolean };
 
 export default async function SimpleLanding({ locale, karaoke = true }: Props) {
+  const t = await getTranslations("home");
+  // tracking-wide was tuned for the uppercase Latin labels; it just looks loose on Hangul.
+  const tracking = locale === "ko" ? "" : "tracking-wide";
+
   // Promise.all + filter(null): a 404 drops out; a transient throw → Next serves
   // the last cached render (see fetchTutor) instead of a blank row.
   const tutors = (
@@ -103,32 +108,31 @@ export default async function SimpleLanding({ locale, karaoke = true }: Props) {
             from the top (md:justify-center only) with real breathing room above the title. */}
         <div className="flex flex-1 flex-col md:justify-center">
           <div className="px-6 text-center pt-12 md:pt-0">
-            <h1 className="text-4xl md:text-6xl font-normal tracking-tight leading-[1.1] mb-5">
-              Less scrolling.<br />More speaking.
+            {/* whitespace-pre-line: both strings carry a \n to control their line break. */}
+            <h1 className="text-4xl md:text-6xl font-normal tracking-tight leading-[1.1] mb-5 whitespace-pre-line">
+              {t("hero_title")}
             </h1>
-            <p className="max-w-2xl mx-auto text-base md:text-xl leading-relaxed text-gray-300">
-              Learn real-life Korean with daily listening &amp; speaking practice{" "}
-              <br className="hidden md:inline" />
-              from your favorite creators.
+            <p className="max-w-2xl mx-auto text-base md:text-xl leading-relaxed text-gray-300 md:whitespace-pre-line">
+              {t("hero_subtitle")}
             </p>
             <div className="mt-6 md:mt-8 flex flex-col sm:flex-row items-center justify-center gap-2.5 sm:gap-3">
               {/* App Store download. App Clip funnel is disabled for now — this points at the
-                  /download App Store redirect, not the App Clip link. */}
+                  /download App Store redirect, not the App Clip link.
+                  Plain <a>, not next-intl Link: /download is a middleware redirect that only
+                  matches unprefixed, so a /ko/download href would 404. */}
               <a
                 href="/download"
-                className="inline-block rounded-full bg-[#89FFB4] px-8 py-2.5 md:py-3 text-base font-semibold tracking-wide text-[#18181C] hover:opacity-90 transition-opacity"
+                className={`inline-block rounded-full bg-[#89FFB4] px-8 py-2.5 md:py-3 text-base font-semibold ${tracking} text-[#18181C] hover:opacity-90 transition-opacity`}
               >
-                LEARN WITH CANDID
+                {t("cta_learn")}
               </a>
-              {/* Secondary — teach (become a tutor). Translucent = less prominent. */}
-              <a
-                href={BECOME_A_TUTOR_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-block rounded-full bg-white/10 px-8 py-2.5 md:py-3 text-base font-semibold tracking-wide text-white hover:bg-white/20 transition-colors"
+              {/* Secondary — teach (become a creator). Translucent = less prominent. */}
+              <Link
+                href="/teach"
+                className={`inline-block rounded-full bg-white/10 px-8 py-2.5 md:py-3 text-base font-semibold ${tracking} text-white hover:bg-white/20 transition-colors`}
               >
-                TEACH ON CANDID
-              </a>
+                {t("cta_teach")}
+              </Link>
             </div>
           </div>
 

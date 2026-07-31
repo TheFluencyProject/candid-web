@@ -1,10 +1,21 @@
 {
   "metadata": {
-    "title": "Candid: Real-Life Fluency",
-    "description": "Daily video lessons through the eyes of a native tutor, new every week."
+    "title": "Candid: 진짜 실생활 회화",
+    "description": "네이티브 튜터의 시선으로 담은 매일의 영상 레슨, 매주 새롭게."
   },
   "home": {
-    "download_alt": "App Store에서 다운로드"
+    "download_alt": "App Store에서 다운로드",
+    "hero_title": "스크롤은 적게,\n말하기는 많이.",
+    "hero_subtitle": "좋아하는 크리에이터와 매일 듣고 말하며\n진짜 실생활 언어를 배워요.",
+    "cta_learn": "Candid로 배우기",
+    "cta_teach": "Candid 크리에이터 되기",
+    "mac_download": "Mac용 다운로드",
+    "mac_requires": "macOS 26 이상 필요"
+  },
+  "teach": {
+    "title": "Candid 크리에이터 되기",
+    "subtitle": "모국어로 콘텐츠를 만들고 수익을 얻어요.\n내 팔로워가 그 언어를 배우도록 도우면서요.",
+    "invite_only": "참고: Candid 크리에이터는 현재 초대제로 운영되고 있어요."
   },
   "footer": {
     "privacy": "개인정보 처리방침",

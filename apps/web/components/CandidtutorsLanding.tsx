@@ -3,7 +3,6 @@ import SiteFooter from "@/components/SiteFooter";
 import BecomeATutorPill from "@/components/BecomeATutorPill";
 import MatchIntakeOverlay from "@/components/MatchIntakeOverlay";
 import GetMatchedButton from "@/components/GetMatchedButton";
-import { BECOME_A_TUTOR_URL } from "@/lib/platform";
 
 /**
  * Stripped landing rendered for candidtutors.co/ only (host-conditional;
@@ -45,7 +44,7 @@ export default function CandidtutorsLanding() {
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
               {/* Primary CTA — recruit tutors. External Notion form. */}
-              <BecomeATutorPill label="BECOME A CANDID TUTOR" href={BECOME_A_TUTOR_URL} variant="landing-pill" />
+              <BecomeATutorPill label="BECOME A CANDID TUTOR" variant="landing-pill" />
               {/* Secondary CTA — opens the match-intake overlay. */}
               <GetMatchedButton label="GET MATCHED WITH A TUTOR" />
             </div>

@@ -4,6 +4,7 @@ import { routing } from "./i18n/routing";
 import { APP_STORE_URL, MAC_DOWNLOAD_URL, getRedirectUrl } from "./lib/platform";
 import { resolve_tutor_by_host, resolve_tutor_by_username, resolve_lesson_by_handle_and_code } from "./lib/resolve-domain";
 import { isCanonicalHost } from "./lib/canonical-hosts";
+import { pickLocale } from "./lib/i18n-helpers";
 import { POSTHOG_ASSETS_HOST, POSTHOG_HOST, POSTHOG_PROXY_PATH } from "./lib/posthog-config";
 
 const intlMiddleware = createMiddleware(routing);
@@ -84,11 +85,11 @@ function resolveAppStoreRedirect(
 //   return m ? parseInt(m[1], 10) : 0;
 // }
 
-// Detect Korean from Accept-Language. Anything else → leave on default (`en`).
+// Accept-Language only — no country. The two callers below are a rewrite (locale never
+// appears in the URL) and a vanity redirect, neither of which leaves a way back to English,
+// so geo must not widen who they catch. Only the landing check does, and it's cookie-gated.
 function prefersKorean(request: NextRequest): boolean {
-  const header = request.headers.get("accept-language") ?? "";
-  const primary = header.split(",")[0]?.trim().toLowerCase() ?? "";
-  return primary.startsWith("ko");
+  return pickLocale(request.headers.get("accept-language")) === "ko";
 }
 
 // Single-segment paths that are real routes (or locale prefixes) — never treat these as a
@@ -96,7 +97,7 @@ function prefersKorean(request: NextRequest): boolean {
 // above; api/_next/videos/lesson/g are excluded by the matcher.
 const RESERVED_USERNAME_PATHS = new Set([
   "classic", "company-info", "privacy", "terms", "tutor", "youtube-videos",
-  "download", "g", "lesson", "videos", "en", "ko",
+  "download", "g", "lesson", "teach", "videos", "en", "ko",
 ]);
 
 
@@ -198,7 +199,17 @@ export default async function middleware(request: NextRequest) {
   const hasSeenCookie = request.cookies.has(FIRST_VISIT_COOKIE);
   const isRoot = pathname === "/";
 
-  if (isRoot && !hasSeenCookie && prefersKorean(request)) {
+  // The only place the country is consulted — a redirect that leaves /ko in the URL and
+  // sets the cookie, so a mis-detected visitor can get back to English and stay there.
+  const wants_korean =
+    isRoot &&
+    !hasSeenCookie &&
+    pickLocale(
+      request.headers.get("accept-language"),
+      request.headers.get("x-vercel-ip-country"),
+    ) === "ko";
+
+  if (wants_korean) {
     const url = request.nextUrl.clone();
     url.pathname = "/ko";
     const response = NextResponse.redirect(url);

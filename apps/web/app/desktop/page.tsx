@@ -1,13 +1,7 @@
 import type { Metadata } from "next";
 import { headers } from "next/headers";
 import { MAC_DOWNLOAD_URL } from "@/lib/platform";
-
-// Top-level route (outside /[locale]) — detect ko/en from the header directly, mirroring the
-// middleware and the sibling /download page.
-async function resolveLocale(): Promise<"en" | "ko"> {
-  const al = (await headers()).get("accept-language") ?? "";
-  return al.split(",")[0]?.trim().toLowerCase().startsWith("ko") ? "ko" : "en";
-}
+import { pickLocale } from "@/lib/i18n-helpers";
 
 const COPY = {
   en: {
@@ -34,7 +28,8 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function DesktopLanding() {
-  const copy = COPY[await resolveLocale()];
+  // Outside /[locale], so the header is read here instead of by the middleware.
+  const copy = COPY[pickLocale((await headers()).get("accept-language"))];
 
   return (
     <main

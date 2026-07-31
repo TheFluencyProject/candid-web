@@ -1,3 +1,25 @@
+/**
+ * Resolve the UI locale from request headers.
+ *
+ * Browser language decides; `country` (Vercel's x-vercel-ip-country) only breaks a
+ * tie. An English speaker in Korea is usually there to *learn* Korean, so they keep
+ * the English pitch — geo alone never flips the locale.
+ *
+ * Takes plain strings rather than a NextRequest or headers(): middleware runs on
+ * Edge and the top-level routes run in RSC, and only a runtime-agnostic signature
+ * can be imported by both.
+ */
+export function pickLocale(acceptLanguage: string | null, country?: string | null): "en" | "ko" {
+  const header = (acceptLanguage ?? "").toLowerCase();
+  const primary = header.split(",")[0]?.split(";")[0]?.trim() ?? "";
+  if (primary.startsWith("ko")) return "ko";
+  // Korean isn't the primary tag, but it's accepted (or nothing is) and the request
+  // is from Korea — e.g. a local whose phone UI is set to English. \b keeps "kok"
+  // (Konkani) from matching.
+  if (country?.toUpperCase() === "KR" && (!primary || /(^|,)\s*ko\b/.test(header))) return "ko";
+  return "en";
+}
+
 const KO_LANG_NAMES: Record<string, string> = { english: "영어", korean: "한국어" };
 
 export function localizeLanguageName(lang: string, locale: string): string {

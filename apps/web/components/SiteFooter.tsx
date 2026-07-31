@@ -3,6 +3,7 @@ import { getTranslations, getLocale } from "next-intl/server";
 import { Link } from "@/i18n/routing";
 import { localizeLanguageName, titleCase } from "@/lib/i18n-helpers";
 import { fetchTutor } from "@/lib/api";
+import LocaleSwitcher from "@/components/LocaleSwitcher";
 
 interface SiteFooterProps {
   // "tutor" → candidtutors.co + per-tutor custom_domain pages: drops the
@@ -14,6 +15,7 @@ interface SiteFooterProps {
 
 export default async function SiteFooter({ variant = "joincandid", appStoreBadge = false }: SiteFooterProps = {}) {
   const t = await getTranslations("footer");
+  const t_home = await getTranslations("home");
   const locale = await getLocale();
   const is_tutor = variant === "tutor";
 
@@ -132,14 +134,14 @@ export default async function SiteFooter({ variant = "joincandid", appStoreBadge
       {appStoreBadge && (
         <div className="px-6 pt-10 md:px-12">
           <a href="/download" className="inline-block">
-            <img src="/download.svg" alt="Download on the App Store" width={140} className="h-auto" />
+            <img src="/download.svg" alt={t_home("download_alt")} width={140} className="h-auto" />
           </a>
           {/* Mac app is login-only — companion download for existing users. */}
           <div className="mt-3">
             <a href="/desktop" className="text-sm font-normal text-white/70 hover:text-white transition-colors">
-              Download for Mac
+              {t_home("mac_download")}
             </a>
-            <span className="ml-2 text-xs text-white/40">Requires macOS 26+</span>
+            <span className="ml-2 text-xs text-white/40">{t_home("mac_requires")}</span>
           </div>
         </div>
       )}
@@ -162,6 +164,7 @@ export default async function SiteFooter({ variant = "joincandid", appStoreBadge
           <span className="text-sm font-normal text-white/70">
             {t("elevenlabs_partner")}
           </span>
+          <LocaleSwitcher />
         </div>
         <p className="text-sm font-normal text-white/70">
           &copy; {new Date().getFullYear()} The Fluency Project Inc.

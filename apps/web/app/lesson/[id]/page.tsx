@@ -7,6 +7,7 @@ import { notFound } from "next/navigation";
 import BlurImage from "@/components/BlurImage";
 import DownloadQRInterceptor from "@/components/DownloadQRInterceptor";
 import { API_BASE_URL, fetchTutor } from "@/lib/api";
+import { pickLocale } from "@/lib/i18n-helpers";
 // import { localizeLanguageName } from "@/lib/i18n-helpers";
 
 const SHARE_DESCRIPTIONS: Record<"en" | "ko", string> = {
@@ -55,13 +56,6 @@ async function fetchLessonMeta(id: string, locale: string): Promise<LessonMeta |
   return res.json();
 }
 
-function parseLocale(acceptLanguage: string | null): "en" | "ko" {
-  if (!acceptLanguage) return "en";
-  const primary = acceptLanguage.split(",")[0]?.split(";")[0]?.trim().toLowerCase() ?? "";
-  if (primary.startsWith("ko")) return "ko";
-  return "en";
-}
-
 function buildTitle(lesson: LessonMeta | null): string {
   const title = lesson?.localized_title;
   if (!title) return "Candid";
@@ -76,7 +70,7 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { id } = await params;
   const headersList = await headers();
-  const locale = parseLocale(headersList.get("accept-language"));
+  const locale = pickLocale(headersList.get("accept-language"));
   const lesson = await fetchLessonMeta(id, locale);
 
   const title = buildTitle(lesson);
@@ -107,7 +101,7 @@ export default async function LessonPage({
 }) {
   const { id } = await params;
   const headersList = await headers();
-  const locale = parseLocale(headersList.get("accept-language"));
+  const locale = pickLocale(headersList.get("accept-language"));
 
   const lesson = await fetchLessonMeta(id, locale);
   if (!lesson) notFound();

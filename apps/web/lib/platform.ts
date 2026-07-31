@@ -6,7 +6,6 @@ export const MAC_DOWNLOAD_URL =
 export const APP_CLIP_URL = "https://appclip.apple.com/id?p=co.thefluencyproject.bloom-ios.Clip";
 export const WAITLIST_URL =
   "https://thefluencyproject.notion.site/359bc1de5e3480bdbecddd96d7f73a3e?pvs=105";
-export const BECOME_A_TUTOR_URL = "https://thefluencyproject.notion.site/candid-tutor";
 
 // Flip to true to send non-iOS users to the waitlist instead of the App Store.
 export const WAITLIST_ENABLED = false;
