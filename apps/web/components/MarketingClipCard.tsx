@@ -110,31 +110,18 @@ function MarketingClipCard({ clip, dataKey, isActive, shouldLoad, onSegmentEnd, 
     try { video.currentTime = clip.start_time; } catch { /* not seekable yet */ }
     video.defaultPlaybackRate = PLAYBACK_RATE;
     video.playbackRate = PLAYBACK_RATE;
-    const on_playing = () => {
+    video.play().then(() => {
       video.playbackRate = PLAYBACK_RATE; // re-assert: starting playback can reset it to 1
       setReady(true);
       onReadyRef.current(); // active clip is established → marquee may now prebuffer neighbors
-    };
-
-    video.play().then(on_playing).catch((err: DOMException) => {
-      if (err?.name !== "NotAllowedError") return;
-      // An UNMUTED denial is ordinary audio policy: browsers only allow sound-on autoplay once
-      // the visitor has media engagement on this origin, so it's the norm for first-timers.
-      // Retry muted — without this the clip sits dead on its poster and onReady never fires,
-      // which also stalls mobile neighbor prebuffering. Tell the marquee so its toggle stops
-      // claiming sound is on.
-      if (!video.muted) {
-        video.muted = true;
-        window.dispatchEvent(new CustomEvent("candid:audio-blocked"));
-        video.play().then(on_playing).catch(() => { /* muted retry denied → handled below on the next attempt */ });
-        return;
-      }
+    }).catch((err: DOMException) => {
       // A MUTED inline autoplay denial is the restricted-webview signature (TikTok-style: inline
       // playback disallowed, so the clip sits on its first frame and a later gesture-adjacent
       // play() would open the native fullscreen player) — or an autoplay-off policy (Low Power
       // Mode, user setting), where posters are the right fallback anyway. Tell the marquee to
-      // drop to poster-only BEFORE any tap can hand the webview a video to fullscreen.
-      if (video.currentSrc) {
+      // drop to poster-only BEFORE any tap can hand the webview a video to fullscreen. Unmuted
+      // denials are ordinary audio policy — leave those alone.
+      if (video.muted && video.currentSrc && err?.name === "NotAllowedError") {
         window.dispatchEvent(new CustomEvent("candid:autoplay-blocked"));
       }
     });

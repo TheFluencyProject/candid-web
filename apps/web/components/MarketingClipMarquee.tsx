@@ -67,17 +67,11 @@ export default function MarketingClipMarquee({ clips, karaoke = true }: { clips:
   const [coldStartDone, setColdStartDone] = useState(false);
   const handle_ready = useCallback(() => setColdStartDone(true), []);
 
-  // Sound ON by default. Browsers only permit unmuted autoplay once the visitor has media
-  // engagement on this origin, so the card attempts it, and on denial falls back to muted and
-  // fires candid:audio-blocked (below) — the clip always plays either way. The toggle's label
-  // reads off this state, so it only says "tap to mute" when sound is genuinely on.
-  // Only the active card emits audio; the rest are paused (see the card).
-  const [muted, setMuted] = useState(false);
-  useEffect(() => {
-    const on_audio_blocked = () => setMuted(true);
-    window.addEventListener("candid:audio-blocked", on_audio_blocked);
-    return () => window.removeEventListener("candid:audio-blocked", on_audio_blocked);
-  }, []);
+  // Volume off by default. Tried sound-on once (2026-07-31) and reverted: iOS Safari forbids
+  // unmuted autoplay outright, so iPhone — most of this page's traffic — could never get it,
+  // and desktop only did where the browser had already granted the origin media engagement.
+  // The user taps the affordance below the row to unmute. Only the active card emits audio.
+  const [muted, setMuted] = useState(true);
 
   // Frozen while the in-app-browser blocker modal is open (TikTok etc.): its inline videos ignore
   // playsInline and auto-fullscreen, so a drifting marquee behind the modal keeps re-fullscreening
