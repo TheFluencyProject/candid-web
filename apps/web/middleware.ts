@@ -44,10 +44,16 @@ const EXACT_REDIRECTS: Record<string, RedirectEntry> = {
   "/englishmode": { permanent: true, ppid: "a34b9b94-7d2a-4fac-b792-6e59fb0e5e59" },
   "/business": { permanent: true, ppid: "a5bb8fc4-a398-442f-b401-92c2cc1e050a" },
   "/news": { permanent: true, ppid: "86959fbf-bcba-4bea-829f-5b7d73270854" },
-  "/redirects/adam": { permanent: false, ppid: "a5bb8fc4-a398-442f-b401-92c2cc1e050a" },
-  "/redirects/mia": { permanent: false, ppid: "86959fbf-bcba-4bea-829f-5b7d73270854" },
   "/download/english-adam": { permanent: false, ppid: "a5bb8fc4-a398-442f-b401-92c2cc1e050a" },
   "/download/korean-mia": { permanent: false, ppid: "86959fbf-bcba-4bea-829f-5b7d73270854" },
+};
+
+// App Store Custom Product Page ids for the /redirects/<handle> deep links. Only the few tutors
+// with a real CPP need an entry; every other handle still redirects to the store (no ?ppid=).
+// Attribution is captured in-app from the handle — this map is purely which marketing page shows.
+const REDIRECT_PPID: Record<string, string> = {
+  adam: "a5bb8fc4-a398-442f-b401-92c2cc1e050a",
+  mia: "86959fbf-bcba-4bea-829f-5b7d73270854",
 };
 
 function resolveAppStoreRedirect(
@@ -146,6 +152,19 @@ export default async function middleware(request: NextRequest) {
   // paths only; reserved words are skipped so a username can't shadow a real route.
   const locale_stripped = pathname.replace(/^\/(?:en|ko)(?=\/|$)/, "");
   const segments = locale_stripped.split("/").filter(Boolean);
+
+  // ── Tutor referral deep link: joincandid.co/redirects/<handle> → App Store ──
+  // Generic (replaces the old hardcoded /redirects/adam,/redirects/mia map): any handle works with
+  // no code change. Append ?ppid=<x> only when that tutor has a Custom Product Page. Must precede
+  // the lesson-share branch below — a 6-char handle (e.g. "hayden") would otherwise match its
+  // share-code regex. 307 (temporary): handles/ppids can change.
+  if (segments.length === 2 && segments[0] === "redirects") {
+    const ppid = REDIRECT_PPID[segments[1].toLowerCase()];
+    const dest = ppid ? `${APP_STORE_URL}?ppid=${ppid}` : APP_STORE_URL;
+    const ua = request.headers.get("user-agent") ?? "";
+    return NextResponse.redirect(getRedirectUrl(ua, dest), { status: 307 });
+  }
+
   if (segments.length === 1 && !RESERVED_USERNAME_PATHS.has(segments[0])) {
     const slug = await resolve_tutor_by_username(segments[0]);
     if (slug) {
