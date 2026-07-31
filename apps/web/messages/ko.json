@@ -5,7 +5,7 @@
   },
   "home": {
     "download_alt": "App Store에서 다운로드",
-    "hero_title": "스크롤은 적게,\n말하기는 많이.",
+    "hero_title": "스크롤링은 적게,\n스피킹은 많이.",
     "hero_subtitle": "좋아하는 크리에이터와 매일 듣고 말하며\n진짜 실생활 언어를 배워요.",
     "cta_learn": "Candid로 배우기",
     "cta_teach": "Candid 크리에이터 되기",
@@ -50,7 +50,7 @@
     "hero_title_alt": "{name} 함께 천천히 배우는 {language}",
     "hero_subtitle_alt": "실생활 {language} 회화를 위한 {name}의 매일 듣기·말하기 연습.",
     "hero_tagline_horizontal": "이제 말할 차례예요.",
-    "hero_tagline_vertical": "스크롤은 적게,\n말하기는 많이.",
+    "hero_tagline_vertical": "스크롤링은 적게,\n스피킹은 많이.",
     "download_for_ios": "iOS용 Candid 다운로드",
     "learn_with_creators": "{name}, 그리고 좋아하게 될 다른 크리에이터들과 함께 배워보세요",
     "daily_dose_with_tutor": "{name} 함께하는 매일의 {language}",
