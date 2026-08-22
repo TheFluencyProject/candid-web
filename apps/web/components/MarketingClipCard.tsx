@@ -382,9 +382,11 @@ function MarketingClipCard({ clip, dataKey, isActive, shouldLoad, onSegmentEnd, 
         </div>
       </div>
 
-      {/* Bottom — caption (word-level karaoke) + translation. Gradient is lighter at the
-          very bottom and sustains darkness higher up so the caption stays legible. */}
-      <div className={`pointer-events-none absolute inset-x-0 bottom-0 z-10 h-[62%] bg-gradient-to-t to-transparent ${karaoke ? "from-black/85 via-black/70" : "from-black/60 via-black/45"}`} />
+      {/* Bottom — caption (word-level karaoke) + translation. The fade runs all the way to solid
+          black and holds it for the last 6%, so no video colour survives at the card's bottom edge
+          (a partly-transparent bottom stop leaves a bright band there); it then sustains darkness
+          higher up so the caption stays legible. */}
+      <div className={`pointer-events-none absolute inset-x-0 bottom-0 z-10 h-[62%] bg-gradient-to-t to-transparent from-black from-[6%] ${karaoke ? "via-black/70" : "via-black/45"}`} />
       {/* always-mounted + opacity so it fades OUT too; gated on isActive → one playing card at a time */}
       {karaoke && (
         <div className={`pointer-events-none absolute inset-x-0 top-[56%] z-20 flex justify-center -translate-y-[calc(100%+8px)] md:-translate-y-[calc(100%+12px)] transition-opacity duration-300 ease-out ${isActive && ready ? "opacity-100" : "opacity-0"}`}>
