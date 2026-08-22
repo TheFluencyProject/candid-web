@@ -341,12 +341,17 @@ function MarketingClipCard({ clip, dataKey, isActive, shouldLoad, onSegmentEnd, 
       // <video> (mobile promotes playing video to its own layer otherwise).
       // overflow-hidden+rounded is the ONLY round-clip; media stays square (a rounded video layer paints a white corner AA).
       className="relative isolate h-[340px] md:h-[500px] aspect-[9/16] shrink-0 overflow-hidden rounded-[1.25rem] shadow-[0_4px_20px_rgba(0,0,0,0.22)] select-none bg-black"
+      // WebKit clips a composited <video> to the border-box RECT and applies the radius as a
+      // separate mask, so the two can disagree by a device pixel and leak a bright row of raw
+      // video at the card's edge. A (fully opaque, so visually inert) mask forces one mask over
+      // the whole subtree, which composited children can't escape.
+      style={{ WebkitMaskImage: "-webkit-radial-gradient(white, black)" }}
     >
       {/* Poster stays mounted: instant paint + stable width before the video buffers. Eager +
           shrunk (POSTER_WIDTH): the 12 unique posters load up front so none pop in as the row
           drifts, yet they're small enough not to starve the cold first-clip load. */}
       {clip.thumbnail_url && (
-        <img src={poster_url(clip.thumbnail_url)} alt="" draggable={false} decoding="async" className="absolute inset-0 z-0 h-full w-full object-cover" />
+        <img src={poster_url(clip.thumbnail_url)} alt="" draggable={false} decoding="async" className="absolute inset-0 z-0 h-[calc(100%-1px)] w-full object-cover" />
       )}
       {/* pointer-events-none: the video is purely presentational (no controls; the marquee owns
           dragging) — a tap that reaches a media element makes restricted webviews open the native
@@ -357,7 +362,7 @@ function MarketingClipCard({ clip, dataKey, isActive, shouldLoad, onSegmentEnd, 
           muted={muted || !isActive}
           playsInline
           preload="auto"
-          className={`pointer-events-none absolute inset-0 z-0 h-full w-full object-cover transition-opacity duration-300 ${ready ? "opacity-100" : "opacity-0"}`}
+          className={`pointer-events-none absolute inset-0 z-0 h-[calc(100%-1px)] w-full object-cover transition-opacity duration-300 ${ready ? "opacity-100" : "opacity-0"}`}
         />
       )}
 
