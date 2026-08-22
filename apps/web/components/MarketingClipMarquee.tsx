@@ -46,6 +46,7 @@ export default function MarketingClipMarquee({ clips, karaoke = true }: { clips:
   const trackRef = useRef<HTMLDivElement | null>(null); // the translated 2-group track
   const offsetRef = useRef(0); // current translateX, kept wrapped to [0, groupWidth)
   const groupWidthRef = useRef(0);
+  const snapYRef = useRef(0); // sub-pixel Y the track is shifted up by, so cards rasterize on whole pixels
   const pausedRef = useRef(false); // drift paused while the user drags
   const dragRef = useRef({ dragging: false, pending: false, startX: 0, startY: 0, startOffset: 0 });
   const centerRafRef = useRef(0); // coalesces the during-drag "which card is centered" recompute
@@ -148,6 +149,16 @@ export default function MarketingClipMarquee({ clips, karaoke = true }: { clips:
     return track ? track.scrollWidth / 2 : 0; // two identical groups
   };
 
+  // The hero above the row has fractional line heights, so the track lands on a sub-pixel Y.
+  // Measure that fraction (document-relative, so it's scroll-invariant; add back the shift we
+  // already applied) — set_offset then translates it away.
+  const measure_snap_y = () => {
+    const track = trackRef.current;
+    if (!track) return;
+    const doc_top = track.getBoundingClientRect().top + window.scrollY + snapYRef.current;
+    snapYRef.current = doc_top - Math.floor(doc_top);
+  };
+
   // Write the wrapped offset to the track. Modulo by one group width → seamless infinite loop
   // (group 2 is an identical copy, so a ±groupWidth jump is invisible).
   const set_offset = (v: number) => {
@@ -156,9 +167,10 @@ export default function MarketingClipMarquee({ clips, karaoke = true }: { clips:
     const off = gw > 0 ? ((v % gw) + gw) % gw : v;
     offsetRef.current = off;
     const track = trackRef.current;
-    // Render at a whole pixel (keep sub-pixel `off` for the math) — a fractional translate makes
-    // the rounded cards anti-alias a bright hairline against the page bg ("white line").
-    if (track) track.style.transform = `translate3d(${-Math.round(off)}px,0,0)`;
+    // Render at a whole pixel on both axes (keep sub-pixel `off` for the math) — a fractional
+    // position makes the rounded cards anti-alias a bright hairline against the page bg
+    // ("white line"). X is rounded here; Y cancels the fraction measured by measure_snap_y.
+    if (track) track.style.transform = `translate3d(${-Math.round(off)}px,${-snapYRef.current}px,0)`;
   };
 
   // Nearest card to the viewport center (rects reflect the live transform), optionally
@@ -261,13 +273,19 @@ export default function MarketingClipMarquee({ clips, karaoke = true }: { clips:
     const measure = () => {
       const t = trackRef.current;
       if (t) groupWidthRef.current = t.scrollWidth / 2;
+      measure_snap_y();
+      set_offset(offsetRef.current); // re-apply so a changed Y snap takes effect immediately
       recompute_inview();
     };
     measure();
+    let dead = false;
     const settleRaf = requestAnimationFrame(measure); // re-measure once layout settles
     const initRaf = requestAnimationFrame(() => setAutoKey((k) => k ?? pick_nearest_center(null)));
+    // The webfont swap reflows the hero above the row, which moves the track's sub-pixel Y.
+    document.fonts?.ready.then(() => { if (!dead) measure(); });
     window.addEventListener("resize", measure);
     return () => {
+      dead = true;
       cancelAnimationFrame(settleRaf);
       cancelAnimationFrame(initRaf);
       window.removeEventListener("resize", measure);

@@ -89,7 +89,7 @@ export default function YoutubeVideosList() {
   };
 
   return (
-    <main className="px-8 py-10 md:px-12 lg:px-16">
+    <main className="min-h-screen px-8 py-10 md:px-12 lg:px-16">
       {/* Header */}
       <header className="mb-10">
         <Link href="/" className="inline-block mb-8">

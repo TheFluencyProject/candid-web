@@ -16,7 +16,7 @@ export default async function TeachPage({ params }: Props) {
 
   return (
     <div className="min-h-screen flex flex-col" style={{ backgroundColor: "#18181C" }}>
-      <main className="flex-1 px-8 py-10 md:px-12 lg:px-16">
+      <main className="min-h-screen flex-1 px-8 py-10 md:px-12 lg:px-16">
         <header className="mb-10">
           <Link href="/" className="inline-block mb-8">
             <Image

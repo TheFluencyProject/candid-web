@@ -38,7 +38,7 @@ function CompanyInfoContent({ content }: { content: string }) {
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: "#18181C" }}>
-    <main className="px-8 py-10 md:px-12 lg:px-16">
+    <main className="min-h-screen px-8 py-10 md:px-12 lg:px-16">
       <header className="mb-10">
         <Link href="/" className="inline-block mb-8">
           <Image

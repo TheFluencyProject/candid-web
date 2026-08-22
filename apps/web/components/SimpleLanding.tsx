@@ -85,10 +85,10 @@ export default async function SimpleLanding({ locale, karaoke = true }: Props) {
 
   return (
     <main className="text-white" style={{ backgroundColor: "#18181C" }}>
-      {/* Desktop: min-h-screen + centered hero/row keeps the footer below the fold.
-          Mobile: natural top-down flow (no forced viewport height) so the spacing
-          isn't stretched to fill the screen. */}
-      <section className="flex flex-col md:min-h-screen">
+      {/* min-h-screen keeps the footer below the fold everywhere. Desktop also centers
+          the hero/row; mobile stays top-flowed (no justify-center) so the spacing isn't
+          stretched — any leftover height is just slack above the footer. */}
+      <section className="min-h-screen flex flex-col">
         {/* Wordmark only; the App Store badge now lives in the footer. Padding
             matches the original TutorNavbar (px-4 md:px-8) so it isn't too wide. */}
         <header className="flex items-center px-4 md:px-8 pt-5">
