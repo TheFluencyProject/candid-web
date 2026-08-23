@@ -1,6 +1,6 @@
 import Image from "next/image";
 import { getTranslations } from "next-intl/server";
-import { Link } from "@/i18n/routing";
+// import { Link } from "@/i18n/routing"; // only used by the hidden teach CTA below
 import SiteFooter from "@/components/SiteFooter";
 import ScreenshotMarquee from "@/components/ScreenshotMarquee";
 import MarketingClipMarquee from "@/components/MarketingClipMarquee";
@@ -126,13 +126,14 @@ export default async function SimpleLanding({ locale, karaoke = true }: Props) {
               >
                 {t("cta_learn")}
               </a>
-              {/* Secondary — teach (become a creator). Translucent = less prominent. */}
-              <Link
+              {/* Secondary — teach (become a creator). Hidden for now; /teach and the
+                  cta_teach strings still exist, so this is a one-line restore. */}
+              {/* <Link
                 href="/teach"
                 className={`inline-block rounded-full bg-white/10 px-8 py-2.5 md:py-3 text-base font-semibold ${tracking} text-white hover:bg-white/20 transition-colors`}
               >
                 {t("cta_teach")}
-              </Link>
+              </Link> */}
             </div>
           </div>
 
