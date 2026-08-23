@@ -35,6 +35,9 @@ interface LessonMeta {
   orientation: "vertical" | "horizontal" | null;
   title: string;
   thumbnail_url: string;
+  // Centre of the full-width square the tutor framed, 0-1 of image height. Optional so the page
+  // keeps working against an API that predates the field; null/absent = plain centring.
+  thumbnail_focus_y?: number | null;
   localized_title: string;
   tutor_name: string;
   tutor_slug: string;
@@ -115,7 +118,23 @@ export default async function LessonPage({
   const copy = COPY[locale];
   // orientation is nullable; default to vertical framing (matches shorts-style content).
   const isVertical = lesson.orientation !== "horizontal";
-  const aspect = isVertical ? "aspect-[9/16]" : "aspect-video";
+  // Crop height/width. Vertical gets a little more height than width; horizontal is square.
+  // Both sit well under the 1.472 the dashboard FramePicker clamps the saved focus against
+  // (HERO_CARD_ASPECT), so the crop can never pull blank space in above or below the square.
+  const frameRatio = isVertical ? 1.2 : 1;
+  // Height everything else in the viewport block takes — header, gaps, a two-line title, tutor
+  // row, CTA. Measured off the rendered page at the longest title we ship, not guessed. The frame
+  // gets what's left, so on a short screen it shrinks instead of pushing the CTA below the fold.
+  const RESERVED_PX = 300;
+  const frameStyle = {
+    aspectRatio: `1 / ${frameRatio}`,
+    width: `min(300px, calc((100svh - ${RESERVED_PX}px) / ${frameRatio}))`,
+  };
+  // Focus only ever describes a vertical source; clamp like FocusFilledWebImage does on iOS.
+  const focusY =
+    isVertical && typeof lesson.thumbnail_focus_y === "number"
+      ? Math.min(Math.max(lesson.thumbnail_focus_y, 0), 1)
+      : null;
   const tutorPhoto = tutor?.large_profile_picture_url ?? tutor?.profile_picture_url ?? null;
 
   // Level subtitle ("Upper Beginner Korean") hidden for now — see the JSX below.
@@ -124,73 +143,109 @@ export default async function LessonPage({
   // const levelSubtitle = bandLabel ? `${bandLabel} ${languageLabel}` : languageLabel;
 
   return (
-    <main
-      className="min-h-screen flex flex-col"
-      style={{ backgroundColor: "#18181C", color: "#FFFFFF" }}
-    >
-      <header className="px-6 md:px-10 pt-8">
-        <Link href="/" className="inline-block">
-          <Image
-            src="/wordmark-white.svg"
-            alt="Candid"
-            width={72}
-            height={36}
-            priority
-            className="hover:opacity-80 transition-opacity"
-          />
-        </Link>
-      </header>
-
-      <section className="flex-1 flex flex-col items-center justify-center px-6 py-10 md:py-16 text-center">
-        <div className={isVertical ? "w-full max-w-[300px]" : "w-full max-w-2xl"}>
-          {lesson.thumbnail_url ? (
-            <BlurImage
-              src={lesson.thumbnail_url}
-              alt={lesson.localized_title}
-              className={`w-full ${aspect} object-cover rounded-[2rem] shadow-2xl`}
+    <main className="flex flex-col" style={{ backgroundColor: "#18181C", color: "#FFFFFF" }}>
+      {/* One viewport tall, so the CTA is always reachable without scrolling and the footer
+          still starts below the fold. svh, not vh — vh on mobile Safari is the URL-bar-hidden
+          viewport, which is what pushed the CTA off screen. */}
+      <div className="min-h-[100svh] flex flex-col">
+        <header className="px-5 md:px-10 pt-5">
+          <Link href="/" className="inline-block">
+            <Image
+              src="/wordmark-white.svg"
+              alt="Candid"
+              width={72}
+              height={36}
+              priority
+              className="hover:opacity-80 transition-opacity"
             />
+          </Link>
+        </header>
+
+        <section className="flex-1 flex flex-col items-center justify-center px-5 py-4 text-center">
+          {lesson.thumbnail_url ? (
+            <div
+              className="relative max-w-full overflow-hidden rounded-[1.75rem] shadow-2xl"
+              style={
+                focusY != null
+                  ? {
+                      ...frameStyle,
+                      // Fallback layer for the one case the crop below can't cover: a barely-portrait
+                      // source (ratio under the frame's) leaves a strip once the fill binds on width.
+                      // iOS re-binds on height there; here the same image, centre-cropped, fills it.
+                      backgroundImage: `url(${lesson.thumbnail_url})`,
+                      backgroundSize: "cover",
+                      backgroundPosition: "center",
+                    }
+                  : frameStyle
+              }
+            >
+              {focusY != null ? (
+                // The tutor framed a full-width SQUARE centred at focusY. iOS pins that square's top
+                // to the frame top on taller-than-square cards (FocusFilledWebImage.focusYOffset), so
+                // the image top sits at frameW/2 − focusY·imgH. Percentage margins resolve against the
+                // containing block's WIDTH, so mt-[50%] is exactly frameW/2; translateY% resolves
+                // against this wrapper's own height, which is the image's rendered height.
+                // The offset lives on the wrapper because BlurImage owns the img's own transform.
+                <div className="absolute inset-x-0 top-0 mt-[50%]" style={{ transform: `translateY(${-focusY * 100}%)` }}>
+                  <BlurImage
+                    src={lesson.thumbnail_url}
+                    alt={lesson.localized_title}
+                    // `auto 9/16` = use the real ratio once decoded, else assume 9:16 (same cold-load
+                    // guess as iOS's cachedAspect) — without it the wrapper is the 150px default
+                    // height until decode and the crop visibly jumps.
+                    className="block w-full h-auto aspect-[auto_9/16]"
+                  />
+                </div>
+              ) : (
+                <BlurImage
+                  src={lesson.thumbnail_url}
+                  alt={lesson.localized_title}
+                  className="block w-full h-full object-cover"
+                />
+              )}
+            </div>
           ) : (
             <div
-              className={`w-full ${aspect} rounded-[2rem]`}
-              style={{ background: "linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%)" }}
+              className="max-w-full rounded-[1.75rem]"
+              style={{ ...frameStyle, background: "linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%)" }}
             />
           )}
-        </div>
 
-        <h1 className="mt-8 text-2xl md:text-3xl font-semibold max-w-xl leading-snug">
-          {lesson.localized_title}
-        </h1>
-        {/* Hidden for now. Title → tutor row falls back to mt-6, the same layout this had
-            whenever the old category subtitle was null. */}
-        {/* <p className="mt-2 text-base md:text-lg font-light" style={{ color: "rgba(255,255,255,0.6)" }}>
-          {levelSubtitle}
-        </p> */}
+          <h1 className="mt-5 text-2xl md:text-3xl font-semibold max-w-xl leading-snug">
+            {lesson.localized_title}
+          </h1>
+          {/* Hidden for now. Title → tutor row falls back to mt-6, the same layout this had
+              whenever the old category subtitle was null. */}
+          {/* <p className="mt-2 text-base md:text-lg font-light" style={{ color: "rgba(255,255,255,0.6)" }}>
+            {levelSubtitle}
+          </p> */}
 
-        <div className="mt-6 inline-flex items-center gap-3">
-          {tutorPhoto && (
-            // Plain <img> direct from S3 — bypasses the /_next/image transcode hop.
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={tutorPhoto} alt={lesson.tutor_name} className="w-9 h-9 rounded-full object-cover" />
-          )}
-          <span className="text-base font-medium">{lesson.tutor_name}</span>
-        </div>
+          <div className="mt-4 inline-flex items-center gap-3">
+            {tutorPhoto && (
+              // Plain <img> direct from S3 — bypasses the /_next/image transcode hop.
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={tutorPhoto} alt={lesson.tutor_name} className="w-9 h-9 rounded-full object-cover" />
+            )}
+            <span className="text-base font-medium">{lesson.tutor_name}</span>
+          </div>
 
-        {/* /download/{slug} = this tutor's App Store link. On desktop the interceptor below
-            swallows the click and pops a QR of the equivalent /qr/{slug} link (same
-            destination, but scannable without tripping the App Clip card); mobile navigates
-            normally. Either way the click is tracked as study_cta_clicked. */}
-        <a
-          href={`/download/${lesson.tutor_slug}`}
-          className="mt-8 inline-block px-12 py-3.5 rounded-full text-base font-bold"
-          style={{ backgroundColor: "#89FFB4", color: "#000000" }}
-        >
-          {copy.cta}
-        </a>
-        <DownloadQRInterceptor label={copy.qrTitle} />
-      </section>
+          {/* /download/{slug} = this tutor's App Store link. On desktop the interceptor below
+              swallows the click and pops a QR of the equivalent /qr/{slug} link (same
+              destination, but scannable without tripping the App Clip card); mobile navigates
+              normally. Either way the click is tracked as study_cta_clicked. */}
+          <a
+            href={`/download/${lesson.tutor_slug}`}
+            className="mt-5 inline-block px-12 py-3.5 rounded-full text-base font-bold"
+            style={{ backgroundColor: "#89FFB4", color: "#000000" }}
+          >
+            {copy.cta}
+          </a>
+          <DownloadQRInterceptor label={copy.qrTitle} />
+        </section>
+      </div>
 
       <footer
-        className="px-6 py-6 flex items-center justify-between flex-wrap gap-4 text-sm"
+        className="px-5 py-6 flex items-center justify-between flex-wrap gap-4 text-sm"
         style={{ color: "rgba(255,255,255,0.5)" }}
       >
         <p>&copy; {new Date().getFullYear()} The Fluency Project Inc.</p>
