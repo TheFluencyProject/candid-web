@@ -3,6 +3,7 @@ import { NextResponse, type NextFetchEvent, type NextRequest } from "next/server
 import { routing } from "./i18n/routing";
 import { APP_STORE_URL, MAC_DOWNLOAD_URL, appStoreUrlForTutor, getRedirectUrl } from "./lib/platform";
 import { captureServerEvent } from "./lib/posthog-capture";
+import { reportInstallClick } from "./lib/install-click";
 import { resolve_tutor_by_host, resolve_tutor_by_username, resolve_lesson_by_handle_and_code } from "./lib/resolve-domain";
 import { isCanonicalHost } from "./lib/canonical-hosts";
 import { pickLocale } from "./lib/i18n-helpers";
@@ -163,6 +164,7 @@ export default async function middleware(request: NextRequest, event: NextFetchE
         $current_url: request.url,
       }),
     );
+    event.waitUntil(reportInstallClick(request, { handle: slug, source: "qr", lessonId: params.get("l") }));
     const ua = request.headers.get("user-agent") ?? "";
     return NextResponse.redirect(getRedirectUrl(ua, appStoreUrlForTutor(slug)), { status: 307 });
   }
@@ -180,6 +182,14 @@ export default async function middleware(request: NextRequest, event: NextFetchE
     // if (redirect.appClip && iphoneIOSMajor(ua) >= 18) {
     //   return NextResponse.next();
     // }
+    // Only the per-tutor /download/<slug> form is attributable; bare /download, /download/mac
+    // and the vanity EXACT_REDIRECTS carry no tutor handle.
+    if (pathname.startsWith("/download/") && pathname !== "/download/mac") {
+      event.waitUntil(reportInstallClick(request, {
+        handle: pathname.slice("/download/".length),
+        source: "download",
+      }));
+    }
     const dest = getRedirectUrl(ua, redirect.dest);
     return NextResponse.redirect(dest, { status: redirect.status });
   }
@@ -196,6 +206,7 @@ export default async function middleware(request: NextRequest, event: NextFetchE
   // (e.g. "hayden") would otherwise match its share-code regex. 307: handles/ppids can change.
   if (segments.length === 2 && segments[0] === "redirects") {
     const ua = request.headers.get("user-agent") ?? "";
+    event.waitUntil(reportInstallClick(request, { handle: segments[1], source: "redirects" }));
     return NextResponse.redirect(
       getRedirectUrl(ua, appStoreUrlForTutor(segments[1])),
       { status: 307 },
