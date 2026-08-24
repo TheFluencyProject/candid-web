@@ -40,7 +40,7 @@ interface RedirectEntry {
 
 const EXACT_REDIRECTS: Record<string, RedirectEntry> = {
   "/join": { permanent: false, interstitial: true },
-  "/app": { permanent: true },
+  "/app": { permanent: false, interstitial: true },
   "/yooooooooooooooooooooooo": { permanent: true },
   "/studywithus": { permanent: true },
   "/learnwithus": { permanent: true },
@@ -179,8 +179,8 @@ export default async function middleware(request: NextRequest, event: NextFetchE
   if (redirect) {
     // Escape pages render instead of redirecting. Returning here (rather than dropping the entry
     // from EXACT_REDIRECTS) is what keeps the path off the single-segment username branch below —
-    // "join" isn't in RESERVED_USERNAME_PATHS, so falling through would cost a DB lookup
-    // and then hand the path to intlMiddleware, which prefixes a locale and 404s.
+    // neither "join" nor "app" is in RESERVED_USERNAME_PATHS, so falling through would cost a DB
+    // lookup and then hand the path to intlMiddleware, which prefixes a locale and 404s.
     if (redirect.interstitial) return NextResponse.next();
     const ua = request.headers.get("user-agent") ?? "";
     // App Clip funnel — DISABLED for now. When enabled, a /download or /download/<slug> visit on a
