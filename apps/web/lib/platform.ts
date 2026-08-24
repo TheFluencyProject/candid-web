@@ -1,3 +1,5 @@
+import { detectInAppBrowser } from "./in-app-browser";
+
 export const APP_STORE_URL = "https://apps.apple.com/app/id6754859158";
 // macOS DMG "latest" alias — the fastlane mac_release lane overwrites this key each release.
 export const MAC_DOWNLOAD_URL =
@@ -14,10 +16,11 @@ export function isIOSUserAgent(ua: string): boolean {
   return /iPhone|iPad|iPod/i.test(ua);
 }
 
-// These in-app browsers block navigation to apps.apple.com links.
+// TikTok specifically: the one in-app browser with no known escape to the system browser, so
+// callers have to degrade to "search the App Store yourself" instead of routing to a store link.
+// Every other social webview is handled by escapeToNativeBrowser.
 export function isRestrictedInAppBrowser(): boolean {
-  if (typeof navigator === "undefined") return false;
-  return /TikTok|BytedanceWebview|musical_ly/i.test(navigator.userAgent);
+  return detectInAppBrowser() === "tiktok";
 }
 
 // App Store Custom Product Page ids. Keyed by BOTH the tutor's slug (/download/<slug>, /qr/<slug>)
