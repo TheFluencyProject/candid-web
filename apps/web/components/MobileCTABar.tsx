@@ -5,6 +5,7 @@ import { useLocale, useTranslations } from "next-intl";
 import posthog from "posthog-js";
 import { CTA_FLAG_KEY, type MobileCtaVariant } from "@/lib/posthog-config";
 import { openJoinForFree } from "@/lib/join-for-free-store";
+import { detectInAppBrowser } from "@/lib/in-app-browser";
 
 const DEFAULT_URL = "/download";
 
@@ -14,9 +15,10 @@ const CTA_VARIANTS = {
   download_app: { labelKey: "get_the_app", subtextKey: "free_trial" },
 } as const;
 
-function isTikTokOrInstagram(): boolean {
-  if (typeof navigator === "undefined") return false;
-  return /TikTok|BytedanceWebview|musical_ly|Instagram/i.test(navigator.userAgent);
+// Social webviews never show enough of the page to reach the CTA by scrolling, so pin the bar.
+function isSocialInAppBrowser(): boolean {
+  const family = detectInAppBrowser();
+  return family === "tiktok" || family === "instagram" || family === "threads";
 }
 
 type Props = {
@@ -46,7 +48,7 @@ export default function MobileCTABar({ downloadUrl, ctaLabel, ctaSubtext, ctaVar
   const activeVariant: MobileCtaVariant = ctaVariant ?? "control";
 
   useEffect(() => {
-    if (alwaysVisible || isTikTokOrInstagram()) {
+    if (alwaysVisible || isSocialInAppBrowser()) {
       setVisible(true);
       document.documentElement.style.setProperty("--mobile-cta-offset", "64px");
       return;

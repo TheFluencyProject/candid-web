@@ -30,10 +30,15 @@ function ensureDistinctIdCookie(request: NextRequest, response: NextResponse): v
 interface RedirectEntry {
   permanent: boolean;
   ppid?: string;
+  // Render the client-side escape page instead of redirecting — see app/join/page.tsx. A server
+  // redirect can't get out of the Instagram/Facebook webview: it just loads apps.apple.com inside
+  // the webview, which then drops Apple's itms-apps:// hand-off and dead-ends. The hop to the
+  // system browser has to run as JS on a page we serve, so these return next() below.
+  interstitial?: boolean;
 }
 
 const EXACT_REDIRECTS: Record<string, RedirectEntry> = {
-  "/join": { permanent: true },
+  "/join": { permanent: false, interstitial: true },
   "/app": { permanent: true },
   "/yooooooooooooooooooooooo": { permanent: true },
   "/studywithus": { permanent: true },
@@ -50,7 +55,7 @@ const EXACT_REDIRECTS: Record<string, RedirectEntry> = {
 
 function resolveAppStoreRedirect(
   pathname: string,
-): { dest: string; status: number; appClip?: boolean } | null {
+): { dest: string; status: number; appClip?: boolean; interstitial?: boolean } | null {
   // Mac desktop DMG — must precede the /download/* → App Store catch-all below.
   if (pathname === "/download/mac") {
     return { dest: MAC_DOWNLOAD_URL, status: 307 };
@@ -58,7 +63,7 @@ function resolveAppStoreRedirect(
   const exact = EXACT_REDIRECTS[pathname];
   if (exact) {
     const appUrl = exact.ppid ? `${APP_STORE_URL}?ppid=${exact.ppid}` : APP_STORE_URL;
-    return { dest: appUrl, status: exact.permanent ? 308 : 307 };
+    return { dest: appUrl, status: exact.permanent ? 308 : 307, interstitial: exact.interstitial };
   }
   // Catch-all: /download or /download/:slug → that tutor's Custom Product Page when they have
   // one, else the plain App Store URL.
@@ -170,6 +175,11 @@ export default async function middleware(request: NextRequest, event: NextFetchE
   // ── App Store / waitlist redirects (UA-aware) ──
   const redirect = resolveAppStoreRedirect(pathname);
   if (redirect) {
+    // Escape pages render instead of redirecting. Returning here (rather than dropping the entry
+    // from EXACT_REDIRECTS) is what keeps the path off the single-segment username branch below —
+    // "join" isn't in RESERVED_USERNAME_PATHS, so falling through would cost a DB lookup
+    // and then hand the path to intlMiddleware, which prefixes a locale and 404s.
+    if (redirect.interstitial) return NextResponse.next();
     const ua = request.headers.get("user-agent") ?? "";
     // App Clip funnel — DISABLED for now. When enabled, a /download or /download/<slug> visit on a
     // clip-capable iPhone (iOS 18+, the clip's min target) renders the landing page so Safari
