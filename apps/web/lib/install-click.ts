@@ -41,6 +41,21 @@ export async function reportInstallClick(
     return;
   }
 
+  // Vercel percent-encodes the city (non-ASCII names); country and coordinates are plain.
+  const raw_city = request.headers.get("x-vercel-ip-city");
+  let geo_city = raw_city;
+  try {
+    geo_city = raw_city ? decodeURIComponent(raw_city) : null;
+  } catch {
+    // Malformed escape — the raw value still beats dropping the field.
+  }
+  const latitude = parseFloat(request.headers.get("x-vercel-ip-latitude") ?? "");
+  const longitude = parseFloat(request.headers.get("x-vercel-ip-longitude") ?? "");
+  // Send the pair or neither: one coordinate can't be distance-checked against the app's.
+  const coordinates = Number.isFinite(latitude) && Number.isFinite(longitude)
+    ? { geo_latitude: latitude, geo_longitude: longitude }
+    : {};
+
   try {
     const res = await fetch(`${API_BASE_URL}/public/install-clicks`, {
       method: "POST",
@@ -52,6 +67,9 @@ export async function reportInstallClick(
         ua: request.headers.get("user-agent") ?? "",
         locale: request.headers.get("accept-language")?.split(",")[0] ?? null,
         geo_timezone: request.headers.get("x-vercel-ip-timezone") ?? null,
+        geo_country: request.headers.get("x-vercel-ip-country") ?? null,
+        geo_city,
+        ...coordinates,
         lesson_id: click.lessonId ?? null,
       }),
       signal: AbortSignal.timeout(3000),
