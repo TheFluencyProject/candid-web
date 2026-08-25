@@ -234,7 +234,7 @@ export default async function LessonPage({
               destination, but scannable without tripping the App Clip card); mobile navigates
               normally. Either way the click is tracked as study_cta_clicked. */}
           <a
-            href={`/download/${lesson.tutor_slug}`}
+            href={`/download/${lesson.tutor_slug}?l=${lesson.lesson_id}`}
             className="mt-5 inline-block px-12 py-3.5 rounded-full text-base font-bold"
             style={{ backgroundColor: "#89FFB4", color: "#000000" }}
           >
