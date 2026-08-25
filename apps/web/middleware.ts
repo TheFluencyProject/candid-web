@@ -31,6 +31,9 @@ function ensureDistinctIdCookie(request: NextRequest, response: NextResponse): v
 interface RedirectEntry {
   permanent: boolean;
   ppid?: string;
+  // Campaign words that belong to one tutor. The ppid already attributes the install on
+  // Apple's side; the handle is what lets our own snapshot match it.
+  handle?: string;
   // Render the client-side escape page instead of redirecting — see app/join/page.tsx. A server
   // redirect can't get out of the Instagram/Facebook webview: it just loads apps.apple.com inside
   // the webview, which then drops Apple's itms-apps:// hand-off and dead-ends. The hop to the
@@ -50,13 +53,13 @@ const EXACT_REDIRECTS: Record<string, RedirectEntry> = {
   "/basketball": { permanent: true },
   "/startups": { permanent: true, ppid: "c038ad6e-6323-481e-95fd-2dadeb0bd04d" },
   "/englishmode": { permanent: true, ppid: "a34b9b94-7d2a-4fac-b792-6e59fb0e5e59" },
-  "/business": { permanent: true, ppid: "a5bb8fc4-a398-442f-b401-92c2cc1e050a" },
-  "/news": { permanent: true, ppid: "86959fbf-bcba-4bea-829f-5b7d73270854" },
+  "/business": { permanent: true, ppid: "a5bb8fc4-a398-442f-b401-92c2cc1e050a", handle: "english-adam" },
+  "/news": { permanent: true, ppid: "86959fbf-bcba-4bea-829f-5b7d73270854", handle: "korean-mia" },
 };
 
 function resolveAppStoreRedirect(
   pathname: string,
-): { dest: string; status: number; appClip?: boolean; interstitial?: boolean } | null {
+): { dest: string; status: number; appClip?: boolean; interstitial?: boolean; handle?: string } | null {
   // Mac desktop DMG — must precede the /download/* → App Store catch-all below.
   if (pathname === "/download/mac") {
     return { dest: MAC_DOWNLOAD_URL, status: 307 };
@@ -64,7 +67,12 @@ function resolveAppStoreRedirect(
   const exact = EXACT_REDIRECTS[pathname];
   if (exact) {
     const appUrl = exact.ppid ? `${APP_STORE_URL}?ppid=${exact.ppid}` : APP_STORE_URL;
-    return { dest: appUrl, status: exact.permanent ? 308 : 307, interstitial: exact.interstitial };
+    return {
+      dest: appUrl,
+      status: exact.permanent ? 308 : 307,
+      interstitial: exact.interstitial,
+      handle: exact.handle,
+    };
   }
   // Catch-all: /download or /download/:slug → that tutor's Custom Product Page when they have
   // one, else the plain App Store URL.
@@ -153,13 +161,17 @@ export default async function middleware(request: NextRequest, event: NextFetchE
     return NextResponse.rewrite(url);
   }
 
+  // Every store branch below matches on the locale-stripped path: these destinations are
+  // locale-agnostic, and matching the raw path 404'd every /ko|/en-prefixed store link.
+  const locale_stripped = pathname.replace(/^\/(?:en|ko)(?=\/|$)/, "") || "/";
+
   // ── Scanned QR → App Store (tracked) ──
   // Deliberately NOT /download/*: that prefix is a registered App Clip Experience, so scanning it
   // pops the clip card before any redirect can run. /qr is unregistered, so it goes straight to
   // the store. `sid` is the distinct_id of the desktop session that rendered the QR, so the scan
   // joins that visitor's funnel even though it arrives from a different device.
-  if (pathname === "/qr" || pathname.startsWith("/qr/")) {
-    const slug = pathname.slice("/qr/".length); // "" for bare /qr
+  if (locale_stripped === "/qr" || locale_stripped.startsWith("/qr/")) {
+    const slug = locale_stripped.slice("/qr/".length); // "" for bare /qr
     const params = request.nextUrl.searchParams;
     event.waitUntil(
       captureServerEvent("qr_scanned", params.get("sid") ?? crypto.randomUUID(), {
@@ -169,19 +181,27 @@ export default async function middleware(request: NextRequest, event: NextFetchE
         $current_url: request.url,
       }),
     );
-    event.waitUntil(reportInstallClick(request, { handle: slug, source: "qr", lessonId: params.get("l") }));
+    if (slug) {
+      event.waitUntil(reportInstallClick(request, { handle: slug, source: "qr", lessonId: params.get("l") }));
+    }
     const ua = request.headers.get("user-agent") ?? "";
     return NextResponse.redirect(getRedirectUrl(ua, appStoreUrlForTutor(slug)), { status: 307 });
   }
 
   // ── App Store / waitlist redirects (UA-aware) ──
-  const redirect = resolveAppStoreRedirect(pathname);
+  const redirect = resolveAppStoreRedirect(locale_stripped);
   if (redirect) {
     // Escape pages render instead of redirecting. Returning here (rather than dropping the entry
     // from EXACT_REDIRECTS) is what keeps the path off the single-segment username branch below —
     // neither "join" nor "app" is in RESERVED_USERNAME_PATHS, so falling through would cost a DB
     // lookup and then hand the path to intlMiddleware, which prefixes a locale and 404s.
-    if (redirect.interstitial) return NextResponse.next();
+    // The escape page has no locale variant, so a prefixed hit redirects to the bare path first.
+    if (redirect.interstitial) {
+      if (locale_stripped === pathname) return NextResponse.next();
+      const url = request.nextUrl.clone();
+      url.pathname = locale_stripped;
+      return NextResponse.redirect(url, 307);
+    }
     const ua = request.headers.get("user-agent") ?? "";
     // App Clip funnel — DISABLED for now. When enabled, a /download or /download/<slug> visit on a
     // clip-capable iPhone (iOS 18+, the clip's min target) renders the landing page so Safari
@@ -192,13 +212,17 @@ export default async function middleware(request: NextRequest, event: NextFetchE
     // if (redirect.appClip && iphoneIOSMajor(ua) >= 18) {
     //   return NextResponse.next();
     // }
-    // Only the per-tutor /download/<slug> form is attributable; bare /download, /download/mac
-    // and the vanity EXACT_REDIRECTS carry no tutor handle.
-    if (pathname.startsWith("/download/") && pathname !== "/download/mac") {
+    // Bare /download and /download/mac carry no tutor; the vanity words carry one only when
+    // EXACT_REDIRECTS names it. The lesson page's CTA appends ?l= so a lesson-share install
+    // keeps its lesson through the store hop.
+    if (locale_stripped.startsWith("/download/") && locale_stripped !== "/download/mac") {
       event.waitUntil(reportInstallClick(request, {
-        handle: pathname.slice("/download/".length),
+        handle: locale_stripped.slice("/download/".length),
         source: "download",
+        lessonId: request.nextUrl.searchParams.get("l"),
       }));
+    } else if (redirect.handle) {
+      event.waitUntil(reportInstallClick(request, { handle: redirect.handle, source: "vanity" }));
     }
     const dest = getRedirectUrl(ua, redirect.dest);
     return NextResponse.redirect(dest, { status: redirect.status });
@@ -207,7 +231,6 @@ export default async function middleware(request: NextRequest, event: NextFetchE
   // ── Username vanity redirect: joincandid.co/{username} → /tutor/{slug} ──
   // Runtime DB lookup (replaces the old hardcoded next.config redirects). Single-segment
   // paths only; reserved words are skipped so a username can't shadow a real route.
-  const locale_stripped = pathname.replace(/^\/(?:en|ko)(?=\/|$)/, "");
   const segments = locale_stripped.split("/").filter(Boolean);
 
   // ── Tutor referral deep link: joincandid.co/redirects/<handle> → App Store ──
@@ -226,6 +249,9 @@ export default async function middleware(request: NextRequest, event: NextFetchE
   if (segments.length === 1 && !RESERVED_USERNAME_PATHS.has(segments[0])) {
     const slug = await resolve_tutor_by_username(segments[0]);
     if (slug) {
+      // Report at the share link itself, not just at the page's CTA: someone who reads the
+      // profile and then installs from App Store search never touches /download.
+      event.waitUntil(reportInstallClick(request, { handle: segments[0], source: "profile" }));
       // 307 (temporary): usernames can change, so browsers must not cache the mapping.
       const wants_ko = pathname.startsWith("/ko/") || prefersKorean(request);
       const url = request.nextUrl.clone();
@@ -245,6 +271,9 @@ export default async function middleware(request: NextRequest, event: NextFetchE
   ) {
     const lesson_id = await resolve_lesson_by_handle_and_code(segments[0], segments[1]);
     if (lesson_id) {
+      // Same first-hop reasoning as the profile branch above, and this is the only place
+      // the lesson is known for a mobile share tap.
+      event.waitUntil(reportInstallClick(request, { handle: segments[0], source: "lesson_share", lessonId: lesson_id }));
       // 307 (temporary): share codes / usernames can change, so don't cache the mapping.
       const url = request.nextUrl.clone();
       url.pathname = `/lesson/${lesson_id}`;

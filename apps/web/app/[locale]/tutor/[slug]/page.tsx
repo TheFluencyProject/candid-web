@@ -16,7 +16,6 @@ import MarketingClipMarquee from "@/components/MarketingClipMarquee";
 import { localizeLanguageName, localizeMapCountry, capitalize, withKoreanParticle, formatHeroTitle } from "@/lib/i18n-helpers";
 import { type Tutor, type TutorLanguageProficiency, type MarketingClip, fetchTutor, fetchMarketingClips } from "@/lib/api";
 import { isJoinForFreeContext, isCandidtutorsHost } from "@/lib/canonical-hosts";
-import { APP_CLIP_URL } from "@/lib/platform";
 
 function formatLanguages(languages: TutorLanguageProficiency[]): string {
   return languages
@@ -143,9 +142,9 @@ export default async function TutorPage({ params, searchParams }: Props) {
   // candidtutors.co AND on the ?v=meta ad variant; original subtitle otherwise.
   const use_study_club_framing = is_meta_variant || candidtutors_brand;
 
-  // Adam's page sends its "Start free" CTA to Candid's App Clip link (clip card on iOS),
-  // not the /download App-Store funnel every other tutor uses.
-  const cta_href = slug === "english-adam" ? APP_CLIP_URL : `/download/${slug}`;
+  // Every tutor's CTA goes through /download/<slug>: the App Clip link carries no slug, so it
+  // bypassed middleware and left those installs unattributable.
+  const cta_href = `/download/${slug}`;
 
   const firstName = tutor.name.split(" ")[0];
   const localizedFirstName =

@@ -4,7 +4,6 @@ import { useState, useEffect, useCallback } from "react";
 import posthog from "posthog-js";
 import { QRCodeSVG } from "qrcode.react";
 import ResponsiveOverlay from "@/components/ResponsiveOverlay";
-import { APP_CLIP_URL } from "@/lib/platform";
 
 const BASE_URL = "https://joincandid.co";
 
@@ -42,11 +41,11 @@ export default function DownloadQRInterceptor({ label }: { label: string }) {
     const anchor = (e.target as HTMLElement).closest("a");
     const href = anchor?.getAttribute("href") ?? "";
     const isDownload = href.startsWith("/download");
-    // Adam's tutor page sends its CTA to the App Clip link instead — track it, but never intercept.
-    if (!isDownload && href !== APP_CLIP_URL) return;
+    if (!isDownload) return;
 
     const { surface, lesson_id } = describePage(window.location.pathname);
-    const tutor_slug = isDownload ? href.slice("/download/".length) : "";
+    // The lesson page's CTA carries ?l=<lesson_id>; split it off or it lands in the slug.
+    const tutor_slug = href.slice("/download/".length).split("?")[0];
     const isDesktop = window.matchMedia("(min-width: 1024px)").matches;
     const showQR = isDownload && isDesktop;
 
