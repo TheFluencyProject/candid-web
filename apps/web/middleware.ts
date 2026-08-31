@@ -43,7 +43,7 @@ interface RedirectEntry {
 
 const EXACT_REDIRECTS: Record<string, RedirectEntry> = {
   "/join": { permanent: false, interstitial: true },
-  "/app": { permanent: false, interstitial: true },
+  "/app": { permanent: true },
   "/yooooooooooooooooooooooo": { permanent: true },
   "/studywithus": { permanent: true },
   "/learnwithus": { permanent: true },
@@ -193,8 +193,8 @@ export default async function middleware(request: NextRequest, event: NextFetchE
   if (redirect) {
     // Escape pages render instead of redirecting. Returning here (rather than dropping the entry
     // from EXACT_REDIRECTS) is what keeps the path off the single-segment username branch below —
-    // neither "join" nor "app" is in RESERVED_USERNAME_PATHS, so falling through would cost a DB
-    // lookup and then hand the path to intlMiddleware, which prefixes a locale and 404s.
+    // "join" isn't in RESERVED_USERNAME_PATHS, so falling through would cost a DB lookup
+    // and then hand the path to intlMiddleware, which prefixes a locale and 404s.
     // The escape page has no locale variant, so a prefixed hit redirects to the bare path first.
     if (redirect.interstitial) {
       if (locale_stripped === pathname) return NextResponse.next();
