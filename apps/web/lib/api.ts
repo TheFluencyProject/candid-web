@@ -80,6 +80,8 @@ export interface MarketingClip {
   lesson_id: string;
   caption_segment_id: string;
   tutor_name: string;
+  /** Optional: absent until the backend ships it — the card falls back to an initial. */
+  tutor_profile_picture_url?: string | null;
   title: string;
   text: string;
   translation: string | null;

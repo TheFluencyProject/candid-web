@@ -19,31 +19,10 @@ const MUX_DATA_ENV_KEY = "cgtcg54i9amt7o6nidcm9g8di";
 // every visit. Gates SDK download + monitoring together, so unsampled visits pay nothing.
 const MUX_SAMPLE = typeof window !== "undefined" && Math.random() < 0.15;
 
-// How far the stories bar creeps forward over one clip's playback — small on purpose.
-const PROGRESS_ADVANCE = 0.025;
-
 // Poster width: the card renders ≤281px (desktop) / 191px (mobile); 640 covers retina while
 // being ~3x smaller than the backend's 1200px default (sized for full-screen iOS surfaces).
 // Small enough that all 12 unique posters load near-instantly — eager, so none pop in mid-drift.
 const POSTER_WIDTH = 640;
-
-// Deterministic pseudo-random in [0,1) from a string — stable across SSR/client so the
-// per-card story-bar start fill doesn't cause a hydration mismatch.
-function seeded_unit(s: string): number {
-  let h = 2166136261;
-  for (let i = 0; i < s.length; i++) {
-    h ^= s.charCodeAt(i);
-    h = Math.imul(h, 16777619);
-  }
-  return ((h >>> 0) % 1000) / 1000;
-}
-
-// Strip emoji (plus skin-tone modifiers, regional indicators, ZWJ, variation
-// selectors, keycap) from a title so the chrome stays clean — no emoji shown.
-function strip_emoji(title: string): string {
-  const re = /[\p{Extended_Pictographic}\u{1F3FB}-\u{1F3FF}\u{1F1E6}-\u{1F1FF}\u200D\uFE0F\u20E3]/gu;
-  return title.replace(re, "").replace(/\s+/g, " ").trim();
-}
 
 // Shrink the Mux poster to the card's size. The size rides on a ?width= query param, so swap
 // it down (or append) \u2014 leaves non-Mux/S3 fallback URLs untouched.
@@ -81,10 +60,6 @@ function MarketingClipCard({ clip, dataKey, isActive, shouldLoad, onSegmentEnd, 
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const [activeWordIdx, setActiveWordIdx] = useState(-1);
   const [ready, setReady] = useState(false); // first frame buffered → fade video over poster
-  // Stories-style bar: a seeded random start fill (≤90%) that creeps forward a little while
-  // the clip plays. NOT reset on deactivate, so a card holds its fill where it stopped.
-  const start_fill = 0.15 + seeded_unit(clip.caption_segment_id) * 0.75;
-  const [progress, setProgress] = useState(start_fill);
   // Live playback position (absolute video time) driving the karaoke reveal. Separate from
   // activeWordIdx so the classic path's frozen captions stay unchanged.
   const [playhead, setPlayhead] = useState(clip.start_time);
@@ -192,7 +167,6 @@ function MarketingClipCard({ clip, dataKey, isActive, shouldLoad, onSegmentEnd, 
       // Recycle like a LazyHStack: a card torn down off-screen resets its karaoke progress
       // so it returns as a fresh (dim) preview, not frozen-lit.
       setPlayhead(clip.start_time);
-      setProgress(start_fill);
       setActiveWordIdx(-1);
     };
   }, [shouldLoad, clip]);
@@ -237,8 +211,6 @@ function MarketingClipCard({ clip, dataKey, isActive, shouldLoad, onSegmentEnd, 
       }
       const t = video.currentTime;
       setPlayhead(t);
-      const dur = clip.end_time - clip.start_time;
-      if (dur > 0) setProgress(start_fill + PROGRESS_ADVANCE * Math.min(1, Math.max(0, (t - clip.start_time) / dur)));
       const wlc = clip.word_level_captions;
       if (wlc) {
         // Keep each word highlighted until the NEXT word starts (or the clip ends) —
@@ -264,7 +236,6 @@ function MarketingClipCard({ clip, dataKey, isActive, shouldLoad, onSegmentEnd, 
       cancelAnimationFrame(raf);
       setActiveWordIdx(-1);
       video.pause();
-      // leave progress where it stopped — the bar matches the frozen frame
     };
   }, [isActive, clip, frozen]);
 
@@ -331,7 +302,6 @@ function MarketingClipCard({ clip, dataKey, isActive, shouldLoad, onSegmentEnd, 
   }, [posterOnly]); // re-attach when the <video> mounts/unmounts with poster-only mode
 
   const words = clip.word_level_captions;
-  const title_text = strip_emoji(clip.title);
 
   return (
     <div
@@ -366,24 +336,17 @@ function MarketingClipCard({ clip, dataKey, isActive, shouldLoad, onSegmentEnd, 
         />
       )}
 
-      {/* Top chrome — title + toggle icon, with the stories-style progress bars below it. */}
+      {/* Top chrome — tutor avatar + name, one row. */}
       <div className="absolute inset-x-0 top-0 z-10 px-4 pt-3 pb-6 bg-gradient-to-b from-black/45 to-transparent">
-        <div className="flex items-center justify-between gap-2">
-          <span className="min-w-0 flex-1 truncate text-white text-sm md:text-base font-semibold drop-shadow">{title_text}</span>
-          {/* SF Symbols switch.2 (iOS immersion toggle) — the exact asset from /public.
-              Sized a touch smaller than the title text. */}
-          <img src="/switch.2.svg" alt="" aria-hidden draggable={false} className="shrink-0 h-[13px] w-[13px] md:h-[15px] md:w-[15px] drop-shadow" />
-        </div>
-        {/* Progress bars UNDER the title; the fill tracks the clip's actual playback position. */}
-        <div className="mt-1.5 flex gap-1">
-          {[0, 1, 2].map((i) => {
-            const fill = Math.max(0, Math.min(1, (progress - i / 3) * 3));
-            return (
-              <div key={i} className="h-[4px] flex-1 overflow-hidden rounded-full bg-white/30">
-                <div className="h-full rounded-full bg-white" style={{ width: `${fill * 100}%` }} />
-              </div>
-            );
-          })}
+        <div className="flex items-center gap-2">
+          {clip.tutor_profile_picture_url ? (
+            <img src={clip.tutor_profile_picture_url} alt="" draggable={false} decoding="async" className="shrink-0 h-6 w-6 md:h-7 md:w-7 rounded-full object-cover" />
+          ) : (
+            <span aria-hidden className="shrink-0 flex h-6 w-6 md:h-7 md:w-7 items-center justify-center rounded-full bg-white/25 text-white text-xs md:text-sm font-semibold">
+              {clip.tutor_name.charAt(0)}
+            </span>
+          )}
+          <span className="min-w-0 flex-1 truncate text-white text-sm md:text-base font-semibold drop-shadow">{clip.tutor_name}</span>
         </div>
       </div>
 
@@ -436,7 +399,7 @@ function MarketingClipCard({ clip, dataKey, isActive, shouldLoad, onSegmentEnd, 
           )}
         </p>
         {clip.translation && clip.translation !== clip.text && (
-          <p className="mt-1.5 text-white/90 text-[0.9rem] md:text-[1.0125rem] font-medium leading-snug drop-shadow">{clip.translation}</p>
+          <p className="mt-1.5 text-white/90 text-[0.9rem] md:text-[1.0125rem] font-normal leading-snug drop-shadow">{clip.translation}</p>
         )}
       </div>
     </div>
