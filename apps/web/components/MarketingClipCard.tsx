@@ -340,21 +340,20 @@ function MarketingClipCard({ clip, dataKey, isActive, shouldLoad, onSegmentEnd, 
       <div className="absolute inset-x-0 top-0 z-10 px-4 pt-3 pb-6 bg-gradient-to-b from-black/45 to-transparent">
         <div className="flex items-center gap-2">
           {clip.tutor_profile_picture_url ? (
-            <img src={clip.tutor_profile_picture_url} alt="" draggable={false} decoding="async" className="shrink-0 h-6 w-6 md:h-7 md:w-7 rounded-full object-cover" />
+            <img src={clip.tutor_profile_picture_url} alt="" draggable={false} decoding="async" className="shrink-0 h-[26.4px] w-[26.4px] md:h-[30.8px] md:w-[30.8px] rounded-full object-cover" />
           ) : (
-            <span aria-hidden className="shrink-0 flex h-6 w-6 md:h-7 md:w-7 items-center justify-center rounded-full bg-white/25 text-white text-xs md:text-sm font-semibold">
+            <span aria-hidden className="shrink-0 flex h-[26.4px] w-[26.4px] md:h-[30.8px] md:w-[30.8px] items-center justify-center rounded-full bg-white/25 text-white text-[13.2px] md:text-[15.4px] font-semibold">
               {clip.tutor_name.charAt(0)}
             </span>
           )}
-          <span className="min-w-0 flex-1 truncate text-white text-sm md:text-base font-semibold drop-shadow">{clip.tutor_name}</span>
+          <span className="min-w-0 flex-1 truncate text-white text-[15.4px] md:text-[17.6px] font-semibold drop-shadow">{clip.tutor_name}</span>
         </div>
       </div>
 
-      {/* Bottom — caption (word-level karaoke) + translation. The fade runs all the way to solid
-          black and holds it for the last 6%, so no video colour survives at the card's bottom edge
-          (a partly-transparent bottom stop leaves a bright band there); it then sustains darkness
+      {/* Bottom — caption (word-level karaoke) + translation. The fade bottoms out at 75% black (not
+          solid) so the video still shows through at the card's bottom; it then sustains darkness
           higher up so the caption stays legible. */}
-      <div className={`pointer-events-none absolute inset-x-0 bottom-0 z-10 h-[62%] bg-gradient-to-t to-transparent from-black from-[6%] ${karaoke ? "via-black/70" : "via-black/45"}`} />
+      <div className={`pointer-events-none absolute inset-x-0 bottom-0 z-10 h-[62%] bg-gradient-to-t to-transparent from-black/75 ${karaoke ? "via-black/55" : "via-black/45"}`} />
       {/* always-mounted + opacity so it fades OUT too; gated on isActive → one playing card at a time */}
       {karaoke && (
         <div className={`pointer-events-none absolute inset-x-0 top-[56%] z-20 flex justify-center -translate-y-[calc(100%+8px)] md:-translate-y-[calc(100%+12px)] transition-opacity duration-300 ease-out ${isActive && ready ? "opacity-100" : "opacity-0"}`}>
