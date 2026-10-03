@@ -17,9 +17,9 @@ const SHARE_DESCRIPTIONS: Record<"en" | "ko", string> = {
 
 // This route lives OUTSIDE the [locale] group (excluded from the next-intl matcher),
 // so there's no translation context here — keep the little UI copy in a local map.
-const COPY: Record<"en" | "ko", { cta: string; qrTitle: string; privacy: string; terms: string }> = {
-  en: { cta: "Study with Candid", qrTitle: "Download Candid for iOS", privacy: "Privacy", terms: "Terms" },
-  ko: { cta: "Candid에서 공부하기", qrTitle: "iOS용 Candid 다운로드", privacy: "개인정보", terms: "이용약관" },
+const COPY: Record<"en" | "ko", { cta: (name: string) => string; qrTitle: string; privacy: string; terms: string }> = {
+  en: { cta: (name) => `Study with ${name}`, qrTitle: "Download Candid for iOS", privacy: "Privacy", terms: "Terms" },
+  ko: { cta: (name) => `${name}와 공부하기`, qrTitle: "iOS용 Candid 다운로드", privacy: "개인정보", terms: "이용약관" },
 };
 
 // Band labels match the app's feed filter + dashboard wording.
@@ -238,7 +238,7 @@ export default async function LessonPage({
             className="mt-5 inline-block px-12 py-3.5 rounded-full text-base font-bold"
             style={{ backgroundColor: "#89FFB4", color: "#000000" }}
           >
-            {copy.cta}
+            {copy.cta(lesson.tutor_name || "Candid")}
           </a>
           <DownloadQRInterceptor label={copy.qrTitle} />
         </section>
