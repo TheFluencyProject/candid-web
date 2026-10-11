@@ -19,7 +19,7 @@ const MUX_DATA_ENV_KEY = "cgtcg54i9amt7o6nidcm9g8di";
 // every visit. Gates SDK download + monitoring together, so unsampled visits pay nothing.
 const MUX_SAMPLE = typeof window !== "undefined" && Math.random() < 0.15;
 
-// Poster width: the card renders ≤285px (desktop) / 195px (mobile); 640 covers retina while
+// Poster width: the card renders ≤345px (desktop) / 255px (mobile); 640 covers retina while
 // being ~3x smaller than the backend's 1200px default (sized for full-screen iOS surfaces).
 // Small enough that all 12 unique posters load near-instantly — eager, so none pop in mid-drift.
 const POSTER_WIDTH = 640;
@@ -319,7 +319,7 @@ function MarketingClipCard({ clip, dataKey, isActive, shouldLoad, onSegmentEnd, 
       // isolate: own stacking context so the overlay layers always paint above the
       // <video> (mobile promotes playing video to its own layer otherwise).
       // overflow-hidden+rounded is the ONLY round-clip; media stays square (a rounded video layer paints a white corner AA).
-      className="relative isolate h-[260px] md:h-[380px] aspect-[3/4] shrink-0 overflow-hidden rounded-[1.25rem] shadow-[0_4px_20px_rgba(0,0,0,0.22)] select-none bg-black"
+      className="relative isolate h-[340px] md:h-[460px] aspect-[3/4] shrink-0 overflow-hidden rounded-[1.25rem] shadow-[0_4px_20px_rgba(0,0,0,0.22)] select-none bg-black"
       // WebKit clips a composited <video> to the border-box RECT and applies the radius as a
       // separate mask, so the two can disagree by a device pixel and leak a bright row of raw
       // video at the card's edge. A (fully opaque, so visually inert) mask forces one mask over
