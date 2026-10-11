@@ -69,16 +69,21 @@ export default async function SimpleLanding({ locale, karaoke = true }: Props) {
   let clips: MarketingClip[] = [];
   try {
     // Home markets Korean — show only Korean creators' clips, not English tutors'.
-    // The backend returns clips grouped by tutor; group + round-robin (same as the
-    // screenshots above) so the row alternates creators instead of running several
-    // clips from one tutor together. Shuffle within/across tutors for per-load variety.
-    const by_tutor = new Map<string, MarketingClip[]>();
-    for (const clip of await fetchMarketingClips(locale, { language: "korean" })) {
-      const list = by_tutor.get(clip.tutor_name) ?? [];
-      list.push(clip);
-      by_tutor.set(clip.tutor_name, list);
-    }
-    clips = interleave(shuffle([...by_tutor.values()]).map((l) => shuffle(l)));
+    // Every starred clip plays before any recency fill (unstarred openers), so a tutor
+    // with few stars doesn't get equal airtime with one who starred many. Within each
+    // tier, group by tutor + round-robin (same as the screenshots above) so the row
+    // alternates creators; shuffle within/across tutors for per-load variety.
+    const all = await fetchMarketingClips(locale, { language: "korean" });
+    const alternate = (tier: MarketingClip[]) => {
+      const by_tutor = new Map<string, MarketingClip[]>();
+      for (const clip of tier) {
+        const list = by_tutor.get(clip.tutor_name) ?? [];
+        list.push(clip);
+        by_tutor.set(clip.tutor_name, list);
+      }
+      return interleave(shuffle([...by_tutor.values()]).map((l) => shuffle(l)));
+    };
+    clips = [...alternate(all.filter((c) => c.featured)), ...alternate(all.filter((c) => !c.featured))];
   } catch {
     clips = [];
   }
