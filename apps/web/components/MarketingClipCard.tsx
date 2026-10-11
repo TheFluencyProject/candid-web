@@ -373,7 +373,7 @@ function MarketingClipCard({ clip, dataKey, isActive, shouldLoad, onSegmentEnd, 
         </div>
       )}
       <div className="absolute inset-x-0 top-[56%] z-10 px-4">
-        <p className="text-white text-[1.35rem] md:text-[1.6875rem] font-bold leading-tight drop-shadow-[0_1px_3px_rgba(0,0,0,0.9)]">
+        <p className="text-white text-[1.35rem] md:text-[1.6875rem] font-bold leading-tight">
           {karaoke ? (
             words && words.length > 0 ? (
               words.map((w, i) => {
