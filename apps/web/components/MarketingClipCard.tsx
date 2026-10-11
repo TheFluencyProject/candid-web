@@ -384,7 +384,7 @@ function MarketingClipCard({ clip, dataKey, isActive, shouldLoad, onSegmentEnd, 
           </span>
         </div>
       )}
-        <p className="text-white text-[1.35rem] md:text-[1.6875rem] font-bold leading-tight">
+        <p className="text-white text-[1.62rem] md:text-[2.025rem] font-bold leading-tight">
           {karaoke ? (
             words && words.length > 0 ? (
               words.map((w, i) => {
@@ -418,7 +418,7 @@ function MarketingClipCard({ clip, dataKey, isActive, shouldLoad, onSegmentEnd, 
           )}
         </p>
         {clip.translation && clip.translation !== clip.text && (
-          <p className="mt-1.5 text-white/90 text-[0.9rem] md:text-[1.0125rem] font-normal leading-snug drop-shadow-[0_1px_3px_rgba(0,0,0,0.9)]">{clip.translation}</p>
+          <p className="mt-1.5 text-white/90 text-[1.08rem] md:text-[1.215rem] font-normal leading-snug drop-shadow-[0_1px_3px_rgba(0,0,0,0.9)]">{clip.translation}</p>
         )}
       </div>
     </div>
