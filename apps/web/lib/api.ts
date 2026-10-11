@@ -90,6 +90,8 @@ export interface MarketingClip {
   end_time: number;
   mux_playback_id: string;
   thumbnail_url: string | null;
+  /** A tutor's dashboard-starred pick. Optional: absent until the backend ships it. */
+  featured?: boolean;
 }
 
 /**
