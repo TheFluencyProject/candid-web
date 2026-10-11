@@ -328,9 +328,11 @@ function MarketingClipCard({ clip, dataKey, isActive, shouldLoad, onSegmentEnd, 
     >
       {/* Poster stays mounted: instant paint + stable width before the video buffers. Eager +
           shrunk (POSTER_WIDTH): the 12 unique posters load up front so none pop in as the row
-          drifts, yet they're small enough not to starve the cold first-clip load. */}
+          drifts, yet they're small enough not to starve the cold first-clip load. Hidden once the
+          video is ready: both layers carry the see-through fade mask, so a visible poster would
+          ghost through the playing video and halve the fade. */}
       {clip.thumbnail_url && (
-        <img src={poster_url(clip.thumbnail_url)} alt="" draggable={false} decoding="async" className="absolute inset-0 z-0 h-full w-full object-cover" style={media_fade(karaoke)} />
+        <img src={poster_url(clip.thumbnail_url)} alt="" draggable={false} decoding="async" className={`absolute inset-0 z-0 h-full w-full object-cover transition-opacity duration-300 ${ready ? "opacity-0" : "opacity-100"}`} style={media_fade(karaoke)} />
       )}
       {/* pointer-events-none: the video is purely presentational (no controls; the marquee owns
           dragging) — a tap that reaches a media element makes restricted webviews open the native
