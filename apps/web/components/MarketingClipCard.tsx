@@ -321,7 +321,7 @@ function MarketingClipCard({ clip, dataKey, isActive, shouldLoad, onSegmentEnd, 
           shrunk (POSTER_WIDTH): the 12 unique posters load up front so none pop in as the row
           drifts, yet they're small enough not to starve the cold first-clip load. */}
       {clip.thumbnail_url && (
-        <img src={poster_url(clip.thumbnail_url)} alt="" draggable={false} decoding="async" className="absolute inset-0 z-0 h-[calc(100%-1px)] w-full object-cover" />
+        <img src={poster_url(clip.thumbnail_url)} alt="" draggable={false} decoding="async" className="absolute inset-0 z-0 h-full w-full object-cover" />
       )}
       {/* pointer-events-none: the video is purely presentational (no controls; the marquee owns
           dragging) — a tap that reaches a media element makes restricted webviews open the native
@@ -332,7 +332,7 @@ function MarketingClipCard({ clip, dataKey, isActive, shouldLoad, onSegmentEnd, 
           muted={muted || !isActive}
           playsInline
           preload="auto"
-          className={`pointer-events-none absolute inset-0 z-0 h-[calc(100%-1px)] w-full object-cover transition-opacity duration-300 ${ready ? "opacity-100" : "opacity-0"}`}
+          className={`pointer-events-none absolute inset-0 z-0 h-full w-full object-cover transition-opacity duration-300 ${ready ? "opacity-100" : "opacity-0"}`}
         />
       )}
 
