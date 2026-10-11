@@ -373,15 +373,17 @@ function MarketingClipCard({ clip, dataKey, isActive, shouldLoad, onSegmentEnd, 
 
       {/* Bottom — caption (word-level karaoke) + translation, over the media_fade mask above. */}
       {/* always-mounted + opacity so it fades OUT too; gated on isActive → one playing card at a time */}
+      {/* Bottom-anchored: the pill + caption block grows upward, so short and long lines both sit
+          on the darkest part of the fade instead of hanging from a fixed line mid-card. */}
+      <div className="absolute inset-x-0 bottom-0 z-10 px-4 pb-5 md:pb-6">
       {karaoke && (
-        <div className={`pointer-events-none absolute inset-x-0 top-[56%] z-20 flex justify-center -translate-y-[calc(100%+8px)] md:-translate-y-[calc(100%+12px)] transition-opacity duration-300 ease-out ${isActive && ready ? "opacity-100" : "opacity-0"}`}>
-          {/* size tracks the card: smaller on the 340px mobile card, larger on the 500px desktop one */}
+        <div className={`pointer-events-none mb-2 md:mb-3 flex justify-center transition-opacity duration-300 ease-out ${isActive && ready ? "opacity-100" : "opacity-0"}`}>
+          {/* size tracks the card: smaller on the 340px mobile card, larger on the 460px desktop one */}
           <span className="inline-block rounded-md px-2 py-1 md:px-2.5 text-xs md:text-base font-semibold leading-tight text-black shadow" style={{ backgroundColor: KARAOKE_ACCENT }}>
             Speak now
           </span>
         </div>
       )}
-      <div className="absolute inset-x-0 top-[56%] z-10 px-4">
         <p className="text-white text-[1.35rem] md:text-[1.6875rem] font-bold leading-tight">
           {karaoke ? (
             words && words.length > 0 ? (
