@@ -69,6 +69,7 @@ function MarketingClipCard({ clip, dataKey, isActive, shouldLoad, onSegmentEnd, 
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const [activeWordIdx, setActiveWordIdx] = useState(-1);
   const [ready, setReady] = useState(false); // first frame buffered → fade video over poster
+  const [hasFrame, setHasFrame] = useState(false); // a decoded frame is on screen → poster can go
   // Live playback position (absolute video time) driving the karaoke reveal. Separate from
   // activeWordIdx so the classic path's frozen captions stay unchanged.
   const [playhead, setPlayhead] = useState(clip.start_time);
@@ -135,6 +136,11 @@ function MarketingClipCard({ clip, dataKey, isActive, shouldLoad, onSegmentEnd, 
     };
     let hls: import("hls.js").default | null = null;
     let cancelled = false;
+    // ready fires on metadata, before any frame is decoded; hiding the poster then left the card
+    // black until the first frame arrived. iOS native HLS may not decode until play(), hence "playing".
+    const on_frame = () => { if (!cancelled) setHasFrame(true); };
+    video.addEventListener("loadeddata", on_frame);
+    video.addEventListener("playing", on_frame);
     const on_ready = () => {
       if (cancelled) return;
       try { video.currentTime = clip.start_time; } catch { /* ignore */ }
@@ -169,10 +175,13 @@ function MarketingClipCard({ clip, dataKey, isActive, shouldLoad, onSegmentEnd, 
 
     return () => {
       cancelled = true;
+      video.removeEventListener("loadeddata", on_frame);
+      video.removeEventListener("playing", on_frame);
       (video as { mux?: { destroy(): void } }).mux?.destroy(); // before hls.destroy() — mux hooks hls events; no-op if unattached
       if (hls) hls.destroy();
       video.removeAttribute("src");
       setReady(false);
+      setHasFrame(false);
       // Recycle like a LazyHStack: a card torn down off-screen resets its karaoke progress
       // so it returns as a fresh (dim) preview, not frozen-lit.
       setPlayhead(clip.start_time);
@@ -329,10 +338,10 @@ function MarketingClipCard({ clip, dataKey, isActive, shouldLoad, onSegmentEnd, 
       {/* Poster stays mounted: instant paint + stable width before the video buffers. Eager +
           shrunk (POSTER_WIDTH): the 12 unique posters load up front so none pop in as the row
           drifts, yet they're small enough not to starve the cold first-clip load. Hidden once the
-          video is ready: both layers carry the see-through fade mask, so a visible poster would
+          video has a frame: both layers carry the see-through fade mask, so a visible poster would
           ghost through the playing video and halve the fade. */}
       {clip.thumbnail_url && (
-        <img src={poster_url(clip.thumbnail_url)} alt="" draggable={false} decoding="async" className={`absolute inset-0 z-0 h-full w-full object-cover transition-opacity duration-300 ${ready ? "opacity-0" : "opacity-100"}`} style={media_fade(karaoke)} />
+        <img src={poster_url(clip.thumbnail_url)} alt="" draggable={false} decoding="async" className={`absolute inset-0 z-0 h-full w-full object-cover transition-opacity duration-300 ${hasFrame ? "opacity-0" : "opacity-100"}`} style={media_fade(karaoke)} />
       )}
       {/* pointer-events-none: the video is purely presentational (no controls; the marquee owns
           dragging) — a tap that reaches a media element makes restricted webviews open the native
