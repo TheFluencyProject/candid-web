@@ -25,11 +25,11 @@ const MUX_SAMPLE = typeof window !== "undefined" && Math.random() < 0.15;
 const POSTER_WIDTH = 640;
 
 // The caption fade, applied as a mask on the media itself (over the card's bg-black) instead of a
-// black overlay on top. Same result — 75% dark at the bottom, clear by 62% up — but the dimming
+// black overlay on top. Same result — 90% dark at the bottom, clear by 62% up — but the dimming
 // lives in the video's own layer, so the row WebKit leaks past the card's clip at the bottom edge
 // is dimmed too (an overlay couldn't cover it: bright line; insetting the media: black line).
 function media_fade(karaoke: boolean) {
-  const mask = `linear-gradient(to top, rgba(0,0,0,0.25) 0%, rgba(0,0,0,${karaoke ? 0.45 : 0.55}) 31%, #000 62%)`;
+  const mask = `linear-gradient(to top, rgba(0,0,0,0.1) 0%, rgba(0,0,0,${karaoke ? 0.3 : 0.4}) 31%, #000 62%)`;
   return { WebkitMaskImage: mask, maskImage: mask };
 }
 
@@ -371,7 +371,7 @@ function MarketingClipCard({ clip, dataKey, isActive, shouldLoad, onSegmentEnd, 
         </div>
       )}
       <div className="absolute inset-x-0 top-[56%] z-10 px-4">
-        <p className="text-white text-[1.35rem] md:text-[1.6875rem] font-bold leading-tight drop-shadow">
+        <p className="text-white text-[1.35rem] md:text-[1.6875rem] font-bold leading-tight drop-shadow-[0_1px_3px_rgba(0,0,0,0.9)]">
           {karaoke ? (
             words && words.length > 0 ? (
               words.map((w, i) => {
@@ -405,7 +405,7 @@ function MarketingClipCard({ clip, dataKey, isActive, shouldLoad, onSegmentEnd, 
           )}
         </p>
         {clip.translation && clip.translation !== clip.text && (
-          <p className="mt-1.5 text-white/90 text-[0.9rem] md:text-[1.0125rem] font-normal leading-snug drop-shadow">{clip.translation}</p>
+          <p className="mt-1.5 text-white/90 text-[0.9rem] md:text-[1.0125rem] font-normal leading-snug drop-shadow-[0_1px_3px_rgba(0,0,0,0.9)]">{clip.translation}</p>
         )}
       </div>
     </div>
