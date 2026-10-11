@@ -24,6 +24,15 @@ const MUX_SAMPLE = typeof window !== "undefined" && Math.random() < 0.15;
 // Small enough that all 12 unique posters load near-instantly — eager, so none pop in mid-drift.
 const POSTER_WIDTH = 640;
 
+// The caption fade, applied as a mask on the media itself (over the card's bg-black) instead of a
+// black overlay on top. Same result — 75% dark at the bottom, clear by 62% up — but the dimming
+// lives in the video's own layer, so the row WebKit leaks past the card's clip at the bottom edge
+// is dimmed too (an overlay couldn't cover it: bright line; insetting the media: black line).
+function media_fade(karaoke: boolean) {
+  const mask = `linear-gradient(to top, rgba(0,0,0,0.25) 0%, rgba(0,0,0,${karaoke ? 0.45 : 0.55}) 31%, #000 62%)`;
+  return { WebkitMaskImage: mask, maskImage: mask };
+}
+
 // Shrink the Mux poster to the card's size. The size rides on a ?width= query param, so swap
 // it down (or append) \u2014 leaves non-Mux/S3 fallback URLs untouched.
 function poster_url(url: string): string {
@@ -321,7 +330,7 @@ function MarketingClipCard({ clip, dataKey, isActive, shouldLoad, onSegmentEnd, 
           shrunk (POSTER_WIDTH): the 12 unique posters load up front so none pop in as the row
           drifts, yet they're small enough not to starve the cold first-clip load. */}
       {clip.thumbnail_url && (
-        <img src={poster_url(clip.thumbnail_url)} alt="" draggable={false} decoding="async" className="absolute inset-0 z-0 h-full w-full object-cover" />
+        <img src={poster_url(clip.thumbnail_url)} alt="" draggable={false} decoding="async" className="absolute inset-0 z-0 h-full w-full object-cover" style={media_fade(karaoke)} />
       )}
       {/* pointer-events-none: the video is purely presentational (no controls; the marquee owns
           dragging) — a tap that reaches a media element makes restricted webviews open the native
@@ -332,6 +341,7 @@ function MarketingClipCard({ clip, dataKey, isActive, shouldLoad, onSegmentEnd, 
           muted={muted || !isActive}
           playsInline
           preload="auto"
+          style={media_fade(karaoke)}
           className={`pointer-events-none absolute inset-0 z-0 h-full w-full object-cover transition-opacity duration-300 ${ready ? "opacity-100" : "opacity-0"}`}
         />
       )}
@@ -350,10 +360,7 @@ function MarketingClipCard({ clip, dataKey, isActive, shouldLoad, onSegmentEnd, 
         </div>
       </div>
 
-      {/* Bottom — caption (word-level karaoke) + translation. The fade bottoms out at 75% black (not
-          solid) so the video still shows through at the card's bottom; it then sustains darkness
-          higher up so the caption stays legible. */}
-      <div className={`pointer-events-none absolute inset-x-0 bottom-0 z-10 h-[62%] bg-gradient-to-t to-transparent from-black/75 ${karaoke ? "via-black/55" : "via-black/45"}`} />
+      {/* Bottom — caption (word-level karaoke) + translation, over the media_fade mask above. */}
       {/* always-mounted + opacity so it fades OUT too; gated on isActive → one playing card at a time */}
       {karaoke && (
         <div className={`pointer-events-none absolute inset-x-0 top-[56%] z-20 flex justify-center -translate-y-[calc(100%+8px)] md:-translate-y-[calc(100%+12px)] transition-opacity duration-300 ease-out ${isActive && ready ? "opacity-100" : "opacity-0"}`}>
