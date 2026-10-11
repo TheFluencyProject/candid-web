@@ -418,7 +418,7 @@ function MarketingClipCard({ clip, dataKey, isActive, shouldLoad, onSegmentEnd, 
           )}
         </p>
         {clip.translation && clip.translation !== clip.text && (
-          <p className="mt-1.5 text-white/90 text-[1.08rem] md:text-[1.215rem] font-normal leading-snug drop-shadow-[0_1px_3px_rgba(0,0,0,0.9)]">{clip.translation}</p>
+          <p className="mt-1.5 text-white/90 text-[0.945rem] md:text-[1.063rem] font-normal leading-snug drop-shadow-[0_1px_3px_rgba(0,0,0,0.9)]">{clip.translation}</p>
         )}
       </div>
     </div>

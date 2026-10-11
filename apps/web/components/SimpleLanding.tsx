@@ -128,8 +128,8 @@ export default async function SimpleLanding({ locale, karaoke = true }: Props) {
             from the top (md:justify-center only) with real breathing room above the title. */}
         <div className="flex flex-1 flex-col md:justify-center">
           <div className="px-6 text-center pt-12 md:pt-0">
-            {/* whitespace-pre-line: both strings carry a \n to control their line break. */}
-            <h1 className="text-4xl md:text-6xl font-normal tracking-tight leading-[1.1] mb-5 whitespace-pre-line">
+            {/* Title \n breaks on mobile only; the subtitle's \n breaks on desktop only. */}
+            <h1 className="text-4xl md:text-6xl font-normal tracking-tight leading-[1.1] mb-5 whitespace-pre-line md:whitespace-normal">
               {t("hero_title")}
             </h1>
             <p className="max-w-2xl mx-auto text-base md:text-xl leading-relaxed text-gray-300 md:whitespace-pre-line">
