@@ -25,11 +25,11 @@ const MUX_SAMPLE = typeof window !== "undefined" && Math.random() < 0.15;
 const POSTER_WIDTH = 640;
 
 // The caption fade, applied as a mask on the media itself (over the card's bg-black) instead of a
-// black overlay on top. Same result — 90% dark at the bottom, clear by 62% up — but the dimming
+// black overlay on top. Same result — 80% dark at the bottom, clear by 62% up — but the dimming
 // lives in the video's own layer, so the row WebKit leaks past the card's clip at the bottom edge
 // is dimmed too (an overlay couldn't cover it: bright line; insetting the media: black line).
 function media_fade(karaoke: boolean) {
-  const mask = `linear-gradient(to top, rgba(0,0,0,0.1) 0%, rgba(0,0,0,${karaoke ? 0.3 : 0.4}) 31%, #000 62%)`;
+  const mask = `linear-gradient(to top, rgba(0,0,0,0.2) 0%, rgba(0,0,0,${karaoke ? 0.3 : 0.4}) 31%, #000 62%)`;
   return { WebkitMaskImage: mask, maskImage: mask };
 }
 
