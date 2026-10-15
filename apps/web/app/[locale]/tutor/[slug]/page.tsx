@@ -343,6 +343,17 @@ export default async function TutorPage({ params, searchParams }: Props) {
               />
             </div>
           )}
+          {/* No screenshot uploaded yet → fall back to the round profile photo. */}
+          {!speakingShot && tutor.profile_picture_url && (
+            <div className="order-first lg:order-none flex justify-center mb-8 lg:mb-0 animate-fade-in-up-delay-1">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={tutor.profile_picture_url}
+                alt={tutor.name}
+                className="block w-48 h-48 lg:w-80 lg:h-80 rounded-full object-cover shadow-2xl"
+              />
+            </div>
+          )}
         </div>
 
         {/* Sentinel — drives the navbar CTA reveal on scroll. */}
