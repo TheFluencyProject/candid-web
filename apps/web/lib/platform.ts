@@ -1,6 +1,9 @@
 import { detectInAppBrowser } from "./in-app-browser";
 
 export const APP_STORE_URL = "https://apps.apple.com/app/id6754859158";
+// Chrome Web Store listing of the Candid extension (not linked anywhere yet).
+export const CHROME_EXTENSION_STORE_URL =
+  "https://chromewebstore.google.com/detail/bgeacdmeaafjkeioebfacgleachdidhc";
 // macOS DMG "latest" alias — the fastlane mac_release lane overwrites this key each release.
 export const MAC_DOWNLOAD_URL =
   "https://tfp-app-downloads.s3.us-west-1.amazonaws.com/mac/Candid.dmg";
