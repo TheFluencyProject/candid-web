@@ -99,7 +99,7 @@ const RESERVED_USERNAME_PATHS = new Set([
 
 // Routes that render their own <html> and are excluded from the intl matcher below, but still
 // need candid_did stamped — AnonAnalytics reads that cookie to keep a visitor one PostHog person.
-const ANON_ANALYTICS_ROUTES = ["/lesson", "/videos", "/desktop", "/g"];
+const ANON_ANALYTICS_ROUTES = ["/lesson", "/videos", "/desktop", "/g", "/extension"];
 
 
 export default async function middleware(request: NextRequest, event: NextFetchEvent) {
@@ -118,7 +118,7 @@ export default async function middleware(request: NextRequest, event: NextFetchE
     return NextResponse.rewrite(new URL(upstream_path + request.nextUrl.search, upstream));
   }
 
-  // ── candid_did for the non-intl routes (/lesson, /videos, /desktop, /g) ──
+  // ── candid_did for the non-intl routes (/lesson, /videos, /desktop, /g, /extension) ──
   // These own their <html> and are excluded from the intl matcher, so they get their own matcher
   // entries and return here: they must never reach intlMiddleware (it would add a locale prefix).
   // Must stay ABOVE the custom-domain branch, which rewrites ANY path on a tutor domain to that
@@ -306,6 +306,7 @@ export const config = {
   // - /videos (video share pages, no i18n needed)
   // - /lesson (lesson share pages, no i18n needed)
   // - /desktop (Mac download page — detects locale itself, like /download)
+  // - /extension (Chrome extension sign-in, English only)
   // - Static files (images, fonts, etc.)
   //
   // /lx/* needs its own entry: the dotted-file exclusion above would drop the PostHog CDN
@@ -315,11 +316,12 @@ export const config = {
   // candid_did — they stay out of the lookahead above so they never reach intlMiddleware, and the
   // ANON_ANALYTICS_ROUTES branch returns before anything else can touch them.
   matcher: [
-    "/((?!api|_next|videos|lesson|desktop|g/|.*\\..*).*)",
+    "/((?!api|_next|videos|lesson|desktop|extension|g/|.*\\..*).*)",
     "/lx/:path*",
     "/lesson/:path*",
     "/videos/:path*",
     "/desktop/:path*",
+    "/extension/:path*",
     "/g/:path*",
   ],
 };

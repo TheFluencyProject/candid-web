@@ -1,5 +1,6 @@
 "use client";
 
+import type { Auth } from "firebase/auth";
 import { sign_in_with_google, type SignInResult } from "@/lib/firebase";
 
 interface Props {
@@ -7,12 +8,14 @@ interface Props {
   onSuccess: (result: SignInResult) => void;
   onError: (error: unknown) => void;
   disabled?: boolean;
+  /** Firebase Auth to sign in on; defaults to the join-for-free instance. */
+  auth?: Auth;
 }
 
-export default function GoogleSignInButton({ label, onSuccess, onError, disabled }: Props) {
+export default function GoogleSignInButton({ label, onSuccess, onError, disabled, auth }: Props) {
   const onClick = async () => {
     try {
-      const result = await sign_in_with_google();
+      const result = await sign_in_with_google(auth);
       onSuccess(result);
     } catch (e) {
       onError(e);

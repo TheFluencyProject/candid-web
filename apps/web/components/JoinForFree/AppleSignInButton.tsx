@@ -1,5 +1,6 @@
 "use client";
 
+import type { Auth } from "firebase/auth";
 import { sign_in_with_apple, type SignInResult } from "@/lib/firebase";
 
 interface Props {
@@ -7,12 +8,14 @@ interface Props {
   onSuccess: (result: SignInResult) => void;
   onError: (error: unknown) => void;
   disabled?: boolean;
+  /** Firebase Auth to sign in on; defaults to the join-for-free instance. */
+  auth?: Auth;
 }
 
-export default function AppleSignInButton({ label, onSuccess, onError, disabled }: Props) {
+export default function AppleSignInButton({ label, onSuccess, onError, disabled, auth }: Props) {
   const onClick = async () => {
     try {
-      const result = await sign_in_with_apple();
+      const result = await sign_in_with_apple(auth);
       onSuccess(result);
     } catch (e) {
       // Apple cancellation surfaces as a Firebase error code — caller decides UX.
