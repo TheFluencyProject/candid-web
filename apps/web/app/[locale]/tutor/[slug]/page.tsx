@@ -254,7 +254,8 @@ export default async function TutorPage({ params, searchParams }: Props) {
   const languageClips = await fetchMarketingClips(locale, { language: tutor.teaching_language }).catch(
     () => [] as MarketingClip[],
   );
-  const creatorClips = interleaveByTutor(languageClips, tutor.name);
+  // Starred clips only, same as the home hero — unstarred recency fill never shows here.
+  const creatorClips = interleaveByTutor(languageClips.filter((c) => c.featured), tutor.name);
   // Only this tutor's clips in the row → "their daily dose"; multiple creators → discovery title.
   const singleCreator = new Set(creatorClips.map((c) => c.tutor_name)).size <= 1;
 
