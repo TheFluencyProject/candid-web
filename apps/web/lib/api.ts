@@ -120,7 +120,8 @@ export async function fetchMarketingClips(
     throw new Error(`fetchMarketingClips(${locale}${slug ? `, slug=${slug}` : language ? `, language=${language}` : ""}): HTTP ${res.status}`);
   }
   const body = (await res.json()) as { clips?: MarketingClip[] };
-  return body.clips ?? [];
+  // Starred (dashboard-approved) clips only, for every caller — unstarred fill never ships.
+  return (body.clips ?? []).filter((c) => c.featured);
 }
 
 // ── Web signup (Join-for-free) ───────────────────────────────────────
