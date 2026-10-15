@@ -93,7 +93,6 @@ export default async function SimpleLanding({ locale, karaoke = true }: Props) {
     // each tutor evenly so names stay balanced along the row; shuffle for per-load variety.
     const by_tutor = new Map<string, MarketingClip[]>();
     for (const clip of await fetchMarketingClips(locale, { language: "korean" })) {
-      if (!clip.featured) continue;
       const list = by_tutor.get(clip.tutor_name) ?? [];
       list.push(clip);
       by_tutor.set(clip.tutor_name, list);
