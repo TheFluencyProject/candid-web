@@ -85,10 +85,10 @@ type PageState =
   | { kind: "no_extension" };
 
 const INK = "#18181C";
-const MUTED = "#666666";
+const MUTED = "rgba(255,255,255,0.6)";
 
 function Title({ children }: { children: React.ReactNode }) {
-  return <h1 className="text-2xl font-semibold text-center mb-2" style={{ color: INK }}>{children}</h1>;
+  return <h1 className="text-2xl font-semibold text-center mb-2 text-white">{children}</h1>;
 }
 
 function Body({ children }: { children: React.ReactNode }) {
@@ -142,12 +142,12 @@ export default function ExtensionSignIn() {
 
   return (
     <main
-      className="min-h-screen flex flex-col items-center justify-center px-6 py-12"
+      className="relative min-h-screen flex flex-col items-center justify-center px-6 py-24"
       style={{ backgroundColor: INK }}
     >
       {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src="/wordmark-white.svg" alt="Candid" className="h-7 mb-8" />
-      <div className="w-full max-w-sm rounded-3xl shadow-2xl px-6 py-8" style={{ backgroundColor: "#F8F5EE" }}>
+      <img src="/wordmark-white.svg" alt="Candid" className="absolute top-6 left-6 h-7" />
+      <div className="w-full max-w-sm rounded-3xl px-6 py-8" style={{ backgroundColor: "rgba(255,255,255,0.08)" }}>
         {state.kind === "signed_in" ? (
           <div className="text-center">
             <div
@@ -173,7 +173,7 @@ export default function ExtensionSignIn() {
               target="_blank"
               rel="noopener noreferrer"
               className="mt-8 block w-full py-3 rounded-full text-base font-semibold text-center"
-              style={{ backgroundColor: INK, color: "#FFFFFF" }}
+              style={{ backgroundColor: "#FFFFFF", color: INK }}
             >
               Get Candid on the App Store
             </a>
@@ -185,10 +185,9 @@ export default function ExtensionSignIn() {
           </div>
         ) : (
           <div>
-            <Title>Sign in to Candid</Title>
-            <p className="text-base text-center mb-8" style={{ color: MUTED }}>
-              Use the same Apple or Google account as in the Candid app.
-            </p>
+            <div className="mb-8">
+              <Title>Sign in to Candid</Title>
+            </div>
             <div className="flex flex-col gap-3">
               <AppleSignInButton
                 label="Continue with Apple"
@@ -206,21 +205,16 @@ export default function ExtensionSignIn() {
               />
             </div>
             {state.kind === "idle" && state.error && (
-              <p className="text-sm text-center mt-4" style={{ color: "#B3261E" }}>{state.error}</p>
+              <p className="text-sm text-center mt-4" style={{ color: "#FF8A80" }}>{state.error}</p>
             )}
-            <div className="flex items-center gap-3 mt-8 mb-4">
-              <div className="h-px flex-1" style={{ backgroundColor: "#E0E0E0" }} />
-              <span className="text-sm" style={{ color: MUTED }}>Don&apos;t have Candid yet?</span>
-              <div className="h-px flex-1" style={{ backgroundColor: "#E0E0E0" }} />
-            </div>
             <a
               href={APP_STORE_URL}
               target="_blank"
               rel="noopener noreferrer"
-              className="block w-full py-3 rounded-full text-base font-semibold text-center"
-              style={{ backgroundColor: "#89FFB4", color: INK }}
+              className="block mt-6 text-sm text-center underline"
+              style={{ color: MUTED }}
             >
-              Get the app
+              Don&apos;t have the app?
             </a>
           </div>
         )}
