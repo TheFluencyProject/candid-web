@@ -3,13 +3,18 @@ import Script from "next/script";
 import { cookies } from "next/headers";
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages, setRequestLocale } from "next-intl/server";
-import { routing } from "@/i18n/routing";
+import { isLocale, routing, type Locale } from "@/i18n/routing";
 import { notFound } from "next/navigation";
 import { PostHogProvider } from "@/components/PostHogProvider";
 import InAppBrowserBlocker from "@/components/InAppBrowserBlocker";
 import DownloadQRInterceptor from "@/components/DownloadQRInterceptor";
 import { CTA_FLAG_KEY } from "@/lib/posthog-config";
 import { getMobileCtaVariant } from "@/lib/posthog-server";
+
+const OG_LOCALES: Record<Locale, string> = {
+  en: "en_US", ko: "ko_KR", ja: "ja_JP", zh: "zh_CN", es: "es_ES",
+  ru: "ru_RU", fr: "fr_FR", vi: "vi_VN", th: "th_TH", id: "id_ID",
+};
 
 type Props = {
   children: React.ReactNode;
@@ -34,7 +39,7 @@ export async function generateMetadata({
     description: t.description,
     openGraph: {
       type: "website",
-      locale: locale === "ko" ? "ko_KR" : "en_US",
+      locale: OG_LOCALES[locale as Locale] ?? OG_LOCALES.en,
       url: "https://joincandid.co",
       title: t.title,
       description: t.description,
@@ -59,7 +64,7 @@ export default async function LocaleLayout({ children, params }: Props) {
   const { locale } = await params;
 
   // Validate locale
-  if (!routing.locales.includes(locale as "ko" | "en")) {
+  if (!isLocale(locale)) {
     notFound();
   }
 

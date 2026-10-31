@@ -1,3 +1,5 @@
+import type { Locale } from "@/i18n/routing";
+
 export const API_BASE_URL = "https://api.joincandid.co";
 
 export interface TutorLanguageProficiency {
@@ -130,7 +132,7 @@ export interface WebSignupPayload {
   id_token: string;
   tutor_slug: string;
   display_name?: string | null;
-  locale: "en" | "ko";
+  locale: Locale;
   auth_provider: "apple" | "google";
 }
 

@@ -3,6 +3,7 @@ import Image from "next/image";
 import { headers } from "next/headers";
 import { APP_STORE_URL } from "@/lib/platform";
 import { pickLocale } from "@/lib/i18n-helpers";
+import type { Locale } from "@/i18n/routing";
 
 // Slug-less App Store landing for /download. App Clip funnel is disabled for now — the middleware
 // always redirects /download to the App Store, so this body only renders for clip-incapable clients
@@ -11,9 +12,17 @@ import { pickLocale } from "@/lib/i18n-helpers";
 // const APP_CLIP_META =
 //   "app-id=6754859158, app-clip-bundle-id=co.thefluencyproject.bloom-ios.Clip, app-clip-display=card";
 
-const COPY = {
+const COPY: Record<Locale, { hint: string; alt: string }> = {
   en: { hint: "Tap the banner above to start instantly — or download the full app.", alt: "Download on the App Store" },
   ko: { hint: "위 배너를 눌러 바로 시작하거나, 앱을 다운로드하세요.", alt: "App Store에서 다운로드" },
+  ja: { hint: "上のバナーをタップしてすぐに始めるか、アプリをダウンロードしてください。", alt: "App Storeからダウンロード" },
+  zh: { hint: "点击上方横幅立即开始，或下载完整应用。", alt: "在 App Store 下载" },
+  es: { hint: "Toca el banner de arriba para empezar al instante, o descarga la app completa.", alt: "Descargar en el App Store" },
+  ru: { hint: "Нажмите на баннер выше, чтобы начать сразу, или скачайте полное приложение.", alt: "Загрузить в App Store" },
+  fr: { hint: "Touche la bannière ci-dessus pour commencer tout de suite, ou télécharge l’app complète.", alt: "Télécharger dans l’App Store" },
+  vi: { hint: "Chạm vào biểu ngữ phía trên để bắt đầu ngay, hoặc tải ứng dụng đầy đủ.", alt: "Tải về trên App Store" },
+  th: { hint: "แตะแบนเนอร์ด้านบนเพื่อเริ่มทันที หรือดาวน์โหลดแอปเต็ม", alt: "ดาวน์โหลดบน App Store" },
+  id: { hint: "Ketuk banner di atas untuk langsung mulai, atau unduh aplikasi lengkapnya.", alt: "Unduh di App Store" },
 };
 
 export async function generateMetadata(): Promise<Metadata> {

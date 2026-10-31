@@ -17,6 +17,7 @@ import PhoneClipHero from "@/components/PhoneClipHero";
 import { localizeLanguageName, localizeMapCountry, capitalize, withKoreanParticle, formatHeroTitle } from "@/lib/i18n-helpers";
 import { type Tutor, type TutorLanguageProficiency, type MarketingClip, fetchTutor, fetchMarketingClips } from "@/lib/api";
 import { isJoinForFreeContext, isCandidtutorsHost } from "@/lib/canonical-hosts";
+import { isLocale, routing, type Locale } from "@/i18n/routing";
 
 function formatLanguages(languages: TutorLanguageProficiency[]): string {
   return languages
@@ -127,7 +128,7 @@ export default async function TutorPage({ params, searchParams }: Props) {
   //  - default       → existing "Get the app" / App Store badge (joincandid.co + previews)
   const candidtutors_brand = isCandidtutorsHost(host_header);
   const join_for_free = isJoinForFreeContext(host_header);
-  const join_for_free_locale: "en" | "ko" = locale === "ko" ? "ko" : "en";
+  const join_for_free_locale: Locale = isLocale(locale) ? locale : routing.defaultLocale;
 
   // Meta-ad landing variant: ?v=meta swaps hero copy + CTA, always-shows mobile sticky.
   const is_meta_variant = sp.v === "meta";

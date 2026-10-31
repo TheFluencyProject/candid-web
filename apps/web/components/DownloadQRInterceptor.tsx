@@ -16,7 +16,7 @@ const BASE_URL = "https://joincandid.co";
 function describePage(pathname: string): { surface: AndroidWaitlistSurface; lesson_id: string | null } {
   const lesson = pathname.match(/^\/lesson\/([^/]+)/);
   if (lesson) return { surface: "lesson", lesson_id: lesson[1] };
-  if (/^(?:\/(?:en|ko))?\/tutor\//.test(pathname)) return { surface: "tutor", lesson_id: null };
+  if (/^(?:\/[a-z]{2})?\/tutor\//.test(pathname)) return { surface: "tutor", lesson_id: null };
   return { surface: "site", lesson_id: null };
 }
 
