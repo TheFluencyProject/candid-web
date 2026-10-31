@@ -230,7 +230,7 @@ export default async function TutorPage({ params, searchParams }: Props) {
         {/* Tutor's own clips — full-width row below the card (breaks out of max-w-2xl). */}
         {clips.length > 0 && (
           <div className="w-full">
-            <MarketingClipMarquee clips={clips} karaoke={karaoke} />
+            <MarketingClipMarquee clips={clips} karaoke={karaoke} muteToggle={false} />
           </div>
         )}
         <footer className="px-6 py-6 flex items-center justify-between flex-wrap gap-4 text-sm" style={{ color: "rgba(255,255,255,0.5)" }}>
@@ -427,7 +427,7 @@ export default async function TutorPage({ params, searchParams }: Props) {
               {t("creators_subtitle", { language: langLabel })}
             </p>
           </div>
-          <MarketingClipMarquee clips={creatorClips} karaoke={karaoke} />
+          <MarketingClipMarquee clips={creatorClips} karaoke={karaoke} muteToggle={false} />
         </div>
       )}
 

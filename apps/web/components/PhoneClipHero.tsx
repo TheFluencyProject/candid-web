@@ -217,7 +217,7 @@ function ClipLayer({ clip, role, posterOnly, onEnd }: LayerProps) {
       )}
 
       {/* Scrims: light at the top for the status bar + title, heavy at the bottom for captions. */}
-      <div className="absolute inset-x-0 top-0 h-[40cqw] bg-gradient-to-b from-black/45 to-transparent" />
+      <div className="absolute inset-x-0 top-0 h-[50cqw] bg-gradient-to-b from-black/65 via-black/35 to-transparent" />
       <div className="absolute inset-x-0 bottom-0 h-[74%] bg-gradient-to-t from-black/95 via-black/65 to-transparent" />
 
       {/* Lesson title row + progress */}
