@@ -1,12 +1,12 @@
 {
   "metadata": {
     "title": "Candid: coreano de la vida real",
-    "description": "Videolecciones diarias a través de los ojos de un tutor nativo, nuevas cada semana."
+    "description": "Videolecciones diarias desde la mirada de un tutor nativo, nuevas cada semana."
   },
   "home": {
-    "download_alt": "Descárgala en la App Store",
+    "download_alt": "Descárgalo en el App Store",
     "hero_title": "No es otro tutor de IA.",
-    "hero_subtitle": "Aprende coreano de la vida real con práctica diaria de escucha y habla\nde la mano de tus creadores favoritos.",
+    "hero_subtitle": "Aprende el coreano de la vida real escuchando y hablando cada día\ncon tus creadores favoritos.",
     "cta_learn": "PRUEBA GRATIS",
     "cta_teach": "ENSEÑA EN CANDID",
     "tap_to_unmute": "Toca para activar el sonido",
@@ -14,7 +14,7 @@
   },
   "teach": {
     "title": "Conviértete en creador de Candid",
-    "subtitle": "Gana dinero creando contenido en tu idioma nativo y ayudando a tus seguidores a aprenderlo.",
+    "subtitle": "Gana dinero creando contenido en tu lengua materna mientras ayudas a tus seguidores a aprenderla.",
     "invite_only": "Nota: por ahora, ser creador de Candid es solo por invitación."
   },
   "footer": {
@@ -44,22 +44,22 @@
     "title": "Información de la empresa"
   },
   "tutor": {
-    "subtitle": "Recibe cada semana las lecciones de escucha y habla de {name}<br/>para hablar {language} en la vida real",
+    "subtitle": "Recibe cada semana las lecciones de {name} para escuchar<br/>y hablar {language} como en la vida real",
     "hero_title": "Aprende {language} con {name}",
-    "hero_subtitle": "Práctica diaria de escucha y habla para hablar {language} en la vida real",
+    "hero_subtitle": "Escucha y habla {language} cada día, como en la vida real",
     "hero_title_alt": "Aprende {language} despacio con {name}",
-    "hero_subtitle_alt": "Practica cada día escucha y habla con {name} para hablar {language} en la vida real.",
+    "hero_subtitle_alt": "Escucha y habla {language} cada día con {name}, como en la vida real.",
     "hero_tagline_horizontal": "Te toca hablar a ti.",
-    "hero_tagline_vertical": "Menos scroll.\nMás hablar.",
+    "hero_tagline_vertical": "Menos scroll.\nMás conversación.",
     "download_for_ios": "Descarga Candid para iOS",
     "learn_with_creators": "Aprende con {name} y otros creadores que te van a encantar",
     "daily_dose_with_tutor": "Tu dosis diaria de {language} con {name}",
-    "creators_subtitle": "Videolecciones cortas para estudiantes de {language} de nivel principiante avanzado e intermedio.",
-    "tutor_label": "Tutor {firstName}",
+    "creators_subtitle": "Videolecciones cortas para estudiantes de {language} de nivel preintermedio e intermedio.",
+    "tutor_label": "Profe {firstName}",
     "download_qr": "Descarga y prueba gratis",
     "start_with_name": "Empieza a aprender con {name}",
     "start_with_candid": "Empieza a aprender con Candid",
-    "or_app_store": "O abre la App Store",
+    "or_app_store": "O abre el App Store",
     "get_started": "PRUEBA GRATIS",
     "no_credit_card": "Disponible en iOS",
     "get_the_app": "DESCARGA LA APP",
@@ -72,7 +72,7 @@
     "home_shadow": "Habla el idioma igual que tu tutor",
     "home_map": "Descubre el país a través de los ojos de tu tutor",
     "map": "Descubre {country} a través de los ojos de {firstName}",
-    "intro": "Con tutoría en cada paso",
+    "intro": "Un tutor que te acompaña en todo momento",
     "community": "Resuelve todas tus dudas",
     "personality": "Personalidad",
     "about": "Acerca de",
@@ -91,7 +91,7 @@
     "join_for_free_subtext": "Gratis, sin tarjeta",
     "find_your_tutor": "Encuentra a tu tutor",
     "become_a_tutor": "Conviértete en tutor de Candid",
-    "become_a_tutor_short": "Sé tutor",
+    "become_a_tutor_short": "Hazte tutor",
     "study_with": "Estudia con {name}",
     "try_for_free": "Prueba gratis",
     "meta_subtitle": "Únete al club de<br/>estudio de {name}<br/>para hablar {language}"
@@ -102,14 +102,14 @@
     "signin_step_title": "Únete al club de estudio de {name}",
     "signin_step_subtitle": "Recibe tu invitación por correo:",
     "signin_step_title_v2": "Crea tu cuenta de Candid",
-    "signin_step_subtitle_v2": "para unirte al Club de estudio de {name}",
+    "signin_step_subtitle_v2": "para unirte al club de estudio de {name}",
     "signin_step_disclaimer": "Al registrarte, aceptas nuestros <terms>términos</terms> y nuestra <privacy>política de privacidad</privacy>.",
     "signin_continue_with_apple": "Continuar con Apple",
     "signin_continue_with_google": "Continuar con Google",
     "success_title": "¡Ya estás dentro!",
     "success_subtitle": "Enviamos la invitación a {email}",
-    "success_subtitle_v2": "Te enviamos por correo una invitación al Club de estudio de {name}",
-    "success_already_title": "Te damos la bienvenida de nuevo",
+    "success_subtitle_v2": "Te enviamos por correo una invitación al club de estudio de {name}",
+    "success_already_title": "¡Hola de nuevo!",
     "success_already_subtitle": "Abre Candid para seguir a {name}",
     "success_close": "Listo",
     "error_title": "Algo salió mal",
@@ -121,8 +121,8 @@
   "youtube_videos": {
     "title": "Derechos de contenido",
     "brand_name": "Candid",
-    "description_1": "Esta es la lista de videos de YouTube que hemos reunido para ayudarte a aprender inglés.",
-    "description_2": "En la app, elegimos videos de esta lista según tu nivel de inglés. Además de verlos, puedes ver traducciones contextuales a tu idioma, practicar el \"shadowing\" (repetir después de quienes hablan), seguir tu progreso de inmersión y más.",
+    "description_1": "Esta es la lista de videos de YouTube que hemos seleccionado para ayudarte a aprender inglés.",
+    "description_2": "En la app, elegimos videos de esta lista según tu nivel de inglés. Además de verlos, puedes ver traducciones contextuales a tu idioma, practicar el \"shadowing\" (repetir lo que dicen los hablantes), seguir tu progreso de inmersión y más.",
     "description_3": "Nos aseguramos de cumplir con todas las Normas de la comunidad y las Condiciones del servicio de YouTube.",
     "loading": "Cargando videos...",
     "load_more": "Ver más"

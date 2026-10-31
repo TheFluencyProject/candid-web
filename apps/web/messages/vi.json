@@ -1,12 +1,12 @@
 {
   "metadata": {
     "title": "Candid: Tiếng Hàn đời thực",
-    "description": "Bài học video mỗi ngày qua góc nhìn của gia sư bản ngữ, mới mỗi tuần."
+    "description": "Mỗi ngày một bài học video qua góc nhìn của gia sư bản xứ, có bài mới mỗi tuần."
   },
   "home": {
     "download_alt": "Tải về trên App Store",
-    "hero_title": "Không phải thêm một gia sư AI nữa.",
-    "hero_subtitle": "Học tiếng Hàn đời thực với bài luyện nghe & nói mỗi ngày\ncùng những nhà sáng tạo nội dung bạn yêu thích.",
+    "hero_title": "Không phải gia sư AI.",
+    "hero_subtitle": "Học tiếng Hàn đời thực qua bài luyện nghe & nói mỗi ngày\ncùng những nhà sáng tạo nội dung bạn yêu thích.",
     "cta_learn": "DÙNG THỬ MIỄN PHÍ",
     "cta_teach": "DẠY TRÊN CANDID",
     "tap_to_unmute": "Chạm để bật tiếng",
@@ -14,13 +14,13 @@
   },
   "teach": {
     "title": "Trở thành Creator của Candid",
-    "subtitle": "Kiếm thu nhập khi tạo nội dung bằng tiếng mẹ đẻ của bạn & giúp người theo dõi học ngôn ngữ đó.",
+    "subtitle": "Kiếm tiền từ việc làm nội dung bằng tiếng mẹ đẻ & giúp người theo dõi học ngôn ngữ ấy.",
     "invite_only": "Lưu ý: hiện tại vị trí Creator của Candid chỉ dành cho người được mời."
   },
   "footer": {
     "privacy": "Chính sách quyền riêng tư",
     "terms": "Điều khoản sử dụng",
-    "youtube_videos": "Quyền nội dung",
+    "youtube_videos": "Bản quyền nội dung",
     "company_info": "Thông tin công ty",
     "pages_heading": "Trang",
     "home": "Trang chủ",
@@ -30,7 +30,7 @@
     "connect_heading": "Kết nối",
     "elevenlabs_partner": "Đối tác ElevenLabs",
     "company_heading": "Công ty",
-    "company_letter": "Thư từ nhà sáng lập"
+    "company_letter": "Thư của nhà sáng lập"
   },
   "privacy": {
     "title": "Chính sách quyền riêng tư",
@@ -44,43 +44,43 @@
     "title": "Thông tin công ty"
   },
   "tutor": {
-    "subtitle": "Nhận bộ bài học nghe & nói hằng tuần của {name}<br/>để giao tiếp {language} như đời thực",
+    "subtitle": "Nhận bộ bài nghe & nói hằng tuần của {name}<br/>để giao tiếp {language} tự nhiên ngoài đời thực",
     "hero_title": "Học {language} cùng {name}",
-    "hero_subtitle": "Luyện nghe & nói mỗi ngày để giao tiếp {language} tự nhiên như đời thực",
-    "hero_title_alt": "{language} chậm rãi cùng {name}",
-    "hero_subtitle_alt": "Luyện nghe & nói hằng ngày cùng {name} để giao tiếp {language} tự nhiên như đời thực.",
+    "hero_subtitle": "Luyện nghe & nói mỗi ngày để giao tiếp {language} tự nhiên ngoài đời thực",
+    "hero_title_alt": "Học {language} chậm rãi cùng {name}",
+    "hero_subtitle_alt": "Luyện nghe & nói mỗi ngày cùng {name} để giao tiếp {language} tự nhiên ngoài đời thực.",
     "hero_tagline_horizontal": "Đến lượt bạn nói.",
     "hero_tagline_vertical": "Lướt ít hơn.\nNói nhiều hơn.",
     "download_for_ios": "Tải Candid cho iOS",
-    "learn_with_creators": "Học cùng {name} & những creator khác mà bạn sẽ yêu thích",
-    "daily_dose_with_tutor": "Liều {language} mỗi ngày cùng {name}",
-    "creators_subtitle": "Bài học video ngắn cho người học {language} trình độ sơ cấp cao & trung cấp.",
+    "learn_with_creators": "Học cùng {name} & những nhà sáng tạo khác bạn sẽ mê",
+    "daily_dose_with_tutor": "Mỗi ngày một chút {language} cùng {name}",
+    "creators_subtitle": "Bài học video ngắn cho người học {language} từ sơ cấp cao đến trung cấp.",
     "tutor_label": "Gia sư {firstName}",
     "download_qr": "Tải về & dùng thử miễn phí",
     "start_with_name": "Bắt đầu học cùng {name}",
     "start_with_candid": "Bắt đầu học cùng Candid",
     "or_app_store": "Hoặc mở App Store",
     "get_started": "DÙNG THỬ MIỄN PHÍ",
-    "no_credit_card": "Có mặt trên iOS",
+    "no_credit_card": "Đã có trên iOS",
     "get_the_app": "TẢI ỨNG DỤNG",
     "free_trial": "Dùng thử miễn phí 7 ngày",
     "listen": "Học {language} qua cuộc sống thường ngày của {firstName}",
     "week": "Bài học video mỗi ngày, mới mỗi tuần",
     "learn": "Giải thích từ người bản ngữ, không phải AI",
-    "shadow": "Nói {language} y hệt như {firstName}",
-    "home_listen": "Học ngôn ngữ qua cuộc sống thường ngày của gia sư",
-    "home_shadow": "Nói ngôn ngữ y hệt như gia sư của bạn",
-    "home_map": "Khám phá đất nước qua đôi mắt của gia sư",
-    "map": "Khám phá {country} qua đôi mắt của {firstName}",
+    "shadow": "Nói {language} giống hệt {firstName}",
+    "home_listen": "Học ngoại ngữ qua cuộc sống thường ngày của gia sư",
+    "home_shadow": "Nói giống hệt gia sư của bạn",
+    "home_map": "Khám phá đất nước ấy qua góc nhìn của gia sư",
+    "map": "Khám phá {country} qua góc nhìn của {firstName}",
     "intro": "Có gia sư đồng hành mọi lúc",
-    "community": "Nhận câu trả lời cho thắc mắc của bạn",
+    "community": "Được giải đáp mọi thắc mắc",
     "personality": "Tính cách",
     "about": "Giới thiệu",
     "these_days": "Dạo này",
     "teaches": "Dạy",
     "difficulty": "Độ khó",
     "based_in": "Sống tại",
-    "speaks": "Nói",
+    "speaks": "Nói được",
     "all_levels": "Mọi trình độ",
     "follow": "Theo dõi {name}",
     "ready_to_learn": "Sẵn sàng học cùng {name} chưa?",
@@ -90,11 +90,11 @@
     "join_for_free": "Tham gia miễn phí",
     "join_for_free_subtext": "Miễn phí — không cần thẻ",
     "find_your_tutor": "Tìm gia sư của bạn",
-    "become_a_tutor": "Trở thành gia sư của Candid",
+    "become_a_tutor": "Trở thành gia sư Candid",
     "become_a_tutor_short": "Trở thành gia sư",
     "study_with": "Học cùng {name}",
     "try_for_free": "Dùng thử miễn phí",
-    "meta_subtitle": "Tham gia câu lạc bộ<br/>học tập của {name}<br/>để giao tiếp {language}"
+    "meta_subtitle": "Tham gia câu lạc bộ<br/>học {language} giao tiếp<br/>cùng {name}"
   },
   "join_for_free": {
     "sheet_title": "Tham gia miễn phí",
@@ -106,7 +106,7 @@
     "signin_step_disclaimer": "Khi đăng ký, bạn đồng ý với <terms>điều khoản</terms> và <privacy>chính sách quyền riêng tư</privacy> của chúng tôi.",
     "signin_continue_with_apple": "Tiếp tục với Apple",
     "signin_continue_with_google": "Tiếp tục với Google",
-    "success_title": "Bạn đã vào rồi",
+    "success_title": "Bạn đã tham gia rồi!",
     "success_subtitle": "Chúng tôi đã gửi thư mời đến {email}",
     "success_subtitle_v2": "Chúng tôi đã gửi email mời bạn tham gia Câu lạc bộ học tập của {name}",
     "success_already_title": "Chào mừng trở lại",
@@ -114,24 +114,24 @@
     "success_close": "Xong",
     "error_title": "Đã xảy ra lỗi",
     "error_retry": "Thử lại",
-    "error_no_email": "Chúng tôi không đọc được email của bạn — hãy thử dùng Google.",
+    "error_no_email": "Không lấy được email của bạn — hãy thử đăng nhập bằng Google nhé.",
     "error_signin_failed": "Đăng nhập chưa hoàn tất. Vui lòng thử lại.",
-    "error_signup_failed": "Chúng tôi không thể lưu thông tin đăng ký của bạn. Vui lòng thử lại."
+    "error_signup_failed": "Không lưu được thông tin đăng ký của bạn. Vui lòng thử lại."
   },
   "youtube_videos": {
-    "title": "Quyền nội dung",
+    "title": "Bản quyền nội dung",
     "brand_name": "Candid",
     "description_1": "Dưới đây là danh sách các video YouTube mà chúng tôi tuyển chọn để giúp bạn học tiếng Anh.",
-    "description_2": "Trong ứng dụng, chúng tôi chọn cho bạn các video từ danh sách này theo trình độ tiếng Anh của bạn. Không chỉ xem, bạn còn có thể xem bản dịch theo ngữ cảnh sang tiếng mẹ đẻ, luyện \"shadowing\" tức nhắc lại theo người nói, theo dõi tiến độ đắm mình trong ngôn ngữ, & nhiều tính năng khác.",
+    "description_2": "Trong ứng dụng, chúng tôi chọn video từ danh sách này phù hợp với trình độ tiếng Anh của bạn. Không chỉ xem, bạn còn có thể đọc bản dịch theo ngữ cảnh sang tiếng mẹ đẻ, luyện \"shadowing\" (nói nhại theo người nói), theo dõi quá trình luyện nghe & nhiều tính năng khác.",
     "description_3": "Chúng tôi luôn tuân thủ Nguyên tắc cộng đồng và Điều khoản dịch vụ của YouTube.",
     "loading": "Đang tải video...",
     "load_more": "Xem thêm"
   },
   "android_waitlist": {
-    "title": "Đăng ký danh sách chờ Candid cho Android",
+    "title": "Đăng ký chờ Candid bản Android",
     "placeholder": "you@email.com",
-    "button": "Tham gia danh sách chờ",
-    "success": "Bạn đã có tên trong danh sách! Chúng tôi sẽ gửi email khi Candid có mặt trên Android.",
+    "button": "Đăng ký chờ",
+    "success": "Bạn đã có tên trong danh sách! Chúng tôi sẽ báo qua email khi Candid ra mắt trên Android.",
     "error": "Đã xảy ra lỗi"
   }
 }
