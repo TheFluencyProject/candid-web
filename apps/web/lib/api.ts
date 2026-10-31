@@ -161,6 +161,34 @@ export async function submit_web_signup(payload: WebSignupPayload): Promise<WebS
   return res.json();
 }
 
+// ── Android waitlist (Download tap on Android) ───────────────────────
+
+export type AndroidWaitlistSurface = "tutor" | "lesson" | "site";
+
+export interface AndroidWaitlistPayload {
+  email: string;
+  tutor_slug: string | null;
+  surface: AndroidWaitlistSurface;
+  locale: string | null;
+}
+
+/**
+ * Join the Android waitlist. Public endpoint (no auth) — backend stores the email in
+ * android_waitlist and pings Slack. A repeat email still returns ok.
+ */
+export async function submit_android_waitlist(payload: AndroidWaitlistPayload): Promise<{ ok: boolean }> {
+  const res = await fetch(`${API_BASE_URL}/public/android-waitlist`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+    signal: AbortSignal.timeout(10000),
+  });
+  if (!res.ok) {
+    throw new Error(`submit_android_waitlist: HTTP ${res.status}`);
+  }
+  return res.json();
+}
+
 // ── Match request (candidtutors.co/ intake) ───────────────────────────
 
 export interface MatchRequestPayload {
