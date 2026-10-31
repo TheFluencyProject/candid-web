@@ -41,36 +41,14 @@ function spaced_title(title: string): string {
   return title.replace(/(\S)(\p{Extended_Pictographic}[\p{Extended_Pictographic}\u200d\ufe0f]*)$/u, "$1 $2");
 }
 
-// Landscape clips play like the app's vertical-format lessons (iOS VerticalFormatEdgeExtend): the
-// centre 9:16-ish band is zoomed to fill a full-width box from under the progress bar to just above
-// the bottom edge, and the strips above and below continue the box's own outermost rows, stretched
-// to fill and blurred (lightly on top, heavily at the bottom) — the picture carrying on out of focus.
-const BOX_TOP_CQW = 28; // just under the title row's progress bar
-const BOX_BOTTOM_CQW = 6; // the app's bottom bar sits about here
-const SCREEN_H_CQW = 216.7; // the screen cut-out is 1795:3889
-const BOX_ASPECT = 100 / (SCREEN_H_CQW - BOX_TOP_CQW - BOX_BOTTOM_CQW);
-// Edge rows kept per strip, as a share of the frame height (iOS keeps 2pt of the box).
-const EDGE_ROWS = 0.012;
-
-type Frame = HTMLVideoElement | HTMLImageElement;
-
-function frame_size(src: Frame): [number, number] {
-  return src instanceof HTMLVideoElement ? [src.videoWidth, src.videoHeight] : [src.naturalWidth, src.naturalHeight];
-}
-
-// Stretch the box's top/bottom edge rows (same horizontal crop as the box's object-cover) into
-// the two strip canvases. Works from the poster until the video has a frame.
-function paint_edges(src: Frame, top: HTMLCanvasElement | null, bottom: HTMLCanvasElement | null) {
-  const [w, h] = frame_size(src);
-  if (!w || !h || (src instanceof HTMLVideoElement && src.readyState < 2)) return;
-  const sw = Math.min(w, h * BOX_ASPECT);
-  const sx = (w - sw) / 2;
-  const rows = Math.max(1, h * EDGE_ROWS);
-  for (const [canvas, sy] of [[top, 0], [bottom, h - rows]] as const) {
-    const ctx = canvas?.getContext("2d");
-    if (canvas && ctx) ctx.drawImage(src, sx, sy, sw, rows, 0, 0, canvas.width, canvas.height);
-  }
-}
+// Landscape clips get the app's shadowing layout for wide video (iOS NativeFullScreenVideoScreen's
+// square box): the frame's centre is carved out and zoomed to fill a rounded box under the progress
+// bar — square at most, 16:9 at least — on the clip's own thumbnail, blurred, turned 90° and
+// darkened (LessonBlurredBackground). iOS numbers on a 393pt screen: 15pt sides, 16pt corners.
+const BOX_TOP_CQW = 29; // 6pt under the progress bar
+const BOX_SIDE_CQW = 3.8;
+const BOX_HEIGHT_CQW = 74; // the room left above the captions; 16:9 would be 52, square 92.4
+const BOX_RADIUS_CQW = 4.1;
 
 function StatusIcons() {
   return (
@@ -114,19 +92,13 @@ type LayerProps = {
 function ClipLayer({ clip, role, posterOnly, onEnd }: LayerProps) {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const posterRef = useRef<HTMLImageElement | null>(null);
-  const topEdgeRef = useRef<HTMLCanvasElement | null>(null);
-  const bottomEdgeRef = useRef<HTMLCanvasElement | null>(null);
   const [hasFrame, setHasFrame] = useState(false); // a decoded frame is up → poster can go
-  const hasFrameRef = useRef(false);
-  hasFrameRef.current = hasFrame;
-  // Wider than tall → the letterboxed layout. Read off the poster first (same frame, so same
-  // aspect, and it's up before the stream), then confirmed by the video's own size.
+  // Wider than tall → the boxed layout. Read off the poster first (same frame, so same aspect, and
+  // it's up before the stream), then confirmed by the video's own size.
   const [landscape, setLandscape] = useState(false);
   const read_poster_aspect = () => {
     const img = posterRef.current;
-    if (!img?.naturalWidth) return;
-    setLandscape(img.naturalWidth > img.naturalHeight);
-    if (!hasFrameRef.current) paint_edges(img, topEdgeRef.current, bottomEdgeRef.current);
+    if (img?.naturalWidth) setLandscape(img.naturalWidth > img.naturalHeight);
   };
   // The poster can finish loading before hydration attaches onLoad — read it once on mount too.
   useEffect(read_poster_aspect, []);
@@ -146,8 +118,8 @@ function ClipLayer({ clip, role, posterOnly, onEnd }: LayerProps) {
     video.setAttribute("playsinline", "");
     video.setAttribute("webkit-playsinline", "");
     video.muted = true; // iOS: set imperatively — the prop doesn't reliably reach the element
-    // 1080p, not the marquee's 720p cap: vertical-crop sources show only part of the frame's
-    // width and need the extra pixels to stay sharp.
+    // 1080p, not the marquee's 720p cap: landscape sources are cropped to a tall sliver here,
+    // so the screen shows only ~45% of the frame's width and needs the extra pixels to stay sharp.
     const src = `https://stream.mux.com/${clip.mux_playback_id}.m3u8?max_resolution=1080p`;
     let hls: import("hls.js").default | null = null;
     let cancelled = false;
@@ -155,7 +127,6 @@ function ClipLayer({ clip, role, posterOnly, onEnd }: LayerProps) {
       if (cancelled) return;
       setHasFrame(true);
       setLandscape(video.videoWidth > video.videoHeight);
-      paint_edges(video, topEdgeRef.current, bottomEdgeRef.current); // a preloaded layer fades in over its real first frame
     };
     video.addEventListener("loadeddata", on_frame);
     video.addEventListener("playing", on_frame);
@@ -225,7 +196,6 @@ function ClipLayer({ clip, role, posterOnly, onEnd }: LayerProps) {
       if (video.playbackRate !== PLAYBACK_RATE) video.playbackRate = PLAYBACK_RATE; // hls/seek can reset it
       const t = video.currentTime;
       if (t >= clip.start_time) setPlayhead(t);
-      paint_edges(video, topEdgeRef.current, bottomEdgeRef.current);
       if (t >= clip.end_time) {
         video.pause();
         done = true;
@@ -249,31 +219,34 @@ function ClipLayer({ clip, role, posterOnly, onEnd }: LayerProps) {
       className={`absolute inset-0 transition-opacity ease-out ${role === "next" ? "opacity-0" : "opacity-100"}`}
       style={{ zIndex: role === "active" ? 2 : role === "prev" ? 1 : 0, transitionDuration: `${FADE_MS}ms` }}
     >
-      {/* Landscape only: the edge-extended strips above and below the box. The canvases are
-          mounted first (landscape is known only after the poster loads), so the poster can paint
-          into them. Top is barely blurred — it reads as the picture's own edge running up under
-          the title; the bottom one is soft. */}
-      <div aria-hidden className={`absolute inset-0 overflow-hidden ${landscape ? "" : "hidden"}`}>
-        <canvas
-          ref={topEdgeRef}
-          width={120}
-          height={24}
-          className="absolute inset-x-0 top-0 w-full blur-[2px] brightness-[0.85]"
-          style={{ height: `${BOX_TOP_CQW + 1}cqw` }}
-        />
-        <canvas
-          ref={bottomEdgeRef}
-          width={120}
-          height={8}
-          className="absolute inset-x-0 bottom-0 w-full scale-x-110 blur-md brightness-90"
-          style={{ height: `${BOX_BOTTOM_CQW + 4}cqw` }}
-        />
-      </div>
-      {/* The clip itself: full screen for vertical video; for landscape, the zoomed centre band in
-          the box (object-cover crops the sides). */}
+      {landscape ? (
+        // Backdrop: the thumbnail turned 90° to fill the tall screen, blurred, under two 50% darks
+        // (iOS's FullscreenThumbnailBackground overlay + the square layout's own scrim).
+        <div aria-hidden className="absolute inset-0 overflow-hidden bg-black">
+          {clip.thumbnail_url && (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={clip.thumbnail_url}
+              alt=""
+              className="absolute left-1/2 top-1/2 h-[100cqw] w-[216.7cqw] max-w-none object-cover"
+              style={{ transform: "translate(-50%, -50%) rotate(90deg) scale(1.5)", filter: "blur(7.6cqw)" }}
+            />
+          )}
+          <div className="absolute inset-0 bg-black/75" />
+        </div>
+      ) : (
+        <>
+          {/* Scrims (vertical video only): light at the top for the status bar + title, heavy at
+              the bottom for captions. Rendered after the media below via z-order. */}
+          <div className="absolute inset-x-0 top-0 z-[1] h-[50cqw] bg-gradient-to-b from-black/65 via-black/35 to-transparent" />
+          <div className="absolute inset-x-0 bottom-0 z-[1] h-[74%] bg-gradient-to-t from-black/95 via-black/65 to-transparent" />
+        </>
+      )}
+
+      {/* The clip: full screen for vertical video; for landscape, the zoomed centre in the box. */}
       <div
-        className="absolute inset-x-0 overflow-hidden"
-        style={landscape ? { top: `${BOX_TOP_CQW}cqw`, bottom: `${BOX_BOTTOM_CQW}cqw` } : { top: 0, bottom: 0 }}
+        className={`absolute overflow-hidden ${landscape ? "bg-black shadow-[0_1cqw_6cqw_rgba(0,0,0,0.25)]" : "inset-0"}`}
+        style={landscape ? { top: `${BOX_TOP_CQW}cqw`, left: `${BOX_SIDE_CQW}cqw`, right: `${BOX_SIDE_CQW}cqw`, height: `${BOX_HEIGHT_CQW}cqw`, borderRadius: `${BOX_RADIUS_CQW}cqw` } : undefined}
       >
         {clip.thumbnail_url && (
           // The caption segment's own first frame (Mux thumbnail at its start time).
@@ -298,12 +271,8 @@ function ClipLayer({ clip, role, posterOnly, onEnd }: LayerProps) {
         )}
       </div>
 
-      {/* Scrims: light at the top for the status bar + title, heavy at the bottom for captions. */}
-      <div className="absolute inset-x-0 top-0 h-[50cqw] bg-gradient-to-b from-black/65 via-black/35 to-transparent" />
-      <div className="absolute inset-x-0 bottom-0 h-[74%] bg-gradient-to-t from-black/95 via-black/65 to-transparent" />
-
       {/* Lesson title row + progress */}
-      <div className="absolute inset-x-0 top-[15.6cqw] px-[6cqw]">
+      <div className="absolute inset-x-0 top-[15.6cqw] z-[2] px-[6cqw]">
         <div className="flex items-center gap-[3cqw]">
           <span className="min-w-0 flex-1 truncate text-white text-[5.4cqw] font-bold leading-tight tracking-[-0.02em] [font-stretch:condensed] drop-shadow">
             {spaced_title(clip.title)}
@@ -318,7 +287,7 @@ function ClipLayer({ clip, role, posterOnly, onEnd }: LayerProps) {
 
       {/* Speak now + caption + translation — top-anchored: Speak now sits at the screen's middle
           (the screen is ~217cqw tall) and longer captions grow down toward the speed button. */}
-      <div className="absolute inset-x-0 top-[104cqw] px-[6.2cqw]">
+      <div className={`absolute inset-x-0 z-[2] px-[6.2cqw] ${landscape ? "top-[108cqw]" : "top-[104cqw]"}`}>
         <div className="mb-[6.6cqw] flex justify-center">
           <span className="rounded-[2.8cqw] px-[4.6cqw] py-[2.6cqw] text-[4.8cqw] font-semibold leading-none text-black" style={{ backgroundColor: ACCENT }}>
             Speak now
