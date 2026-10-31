@@ -189,6 +189,49 @@ function StatusIcons() {
   );
 }
 
+// Watch's collapsed bottom sheet (iOS VideoOverlayBar, isInSheetSmallState): speed · rewind ·
+// pause · listen mode · captions, evenly spread in 55pt cells on a floating dark glass (the sheet's
+// #171717 backdrop at 40%), its 80pt detent topping out ~94pt up.
+function ButtonRow() {
+  return (
+    <div
+      className="absolute inset-x-[2cqw] bottom-[2cqw] h-[22cqw] rounded-[10cqw] border border-white/[0.08] bg-[#171717]/40 [backdrop-filter:blur(6cqw)_saturate(1.4)]"
+      style={{ WebkitBackdropFilter: "blur(6cqw) saturate(1.4)" }}
+    >
+      <div className="flex h-[14cqw] items-center px-[1cqw] pt-[2cqw] text-white">
+        <span className="flex-1 text-center text-[5.1cqw] font-semibold tracking-[-0.03em] [font-stretch:condensed]">{PLAYBACK_RATE}x</span>
+        <span className="flex flex-1 justify-center">
+          {/* arrow.trianglehead.counterclockwise */}
+          <svg viewBox="0 0 24 24" className="h-[5.8cqw]" fill="none" stroke="white" strokeWidth="2.3" strokeLinecap="round" aria-hidden>
+            <path d="M5.2 8.3A8 8 0 1 1 4 12.5" />
+            <path d="M2.6 4.4 5.6 9.2l4.9-2.6Z" fill="white" strokeLinejoin="round" strokeWidth="1.2" />
+          </svg>
+        </span>
+        <span className="flex flex-1 justify-center">
+          {/* pause.fill */}
+          <svg viewBox="0 0 24 24" className="h-[5.6cqw]" fill="white" aria-hidden>
+            <rect x="4.5" y="3" width="5.4" height="18" rx="1.6" />
+            <rect x="14.1" y="3" width="5.4" height="18" rx="1.6" />
+          </svg>
+        </span>
+        <span className="flex flex-1 justify-center">
+          {/* play.square */}
+          <svg viewBox="0 0 24 24" className="h-[5.9cqw]" fill="none" stroke="white" strokeWidth="2" aria-hidden>
+            <rect x="2.5" y="2.5" width="19" height="19" rx="4.5" />
+            <path d="M9.6 7.9v8.2a.6.6 0 0 0 .9.5l6.5-4.1a.6.6 0 0 0 0-1L10.5 7.4a.6.6 0 0 0-.9.5Z" fill="white" stroke="none" />
+          </svg>
+        </span>
+        <span className="flex flex-1 justify-center">
+          {/* Phosphor subtitles (regular) */}
+          <svg viewBox="0 0 256 256" className="h-[7.1cqw]" fill="white" aria-hidden>
+            <path d="M224,48H32A16,16,0,0,0,16,64V192a16,16,0,0,0,16,16H224a16,16,0,0,0,16-16V64A16,16,0,0,0,224,48Zm0,144H32V64H224V192ZM48,136a8,8,0,0,1,8-8H72a8,8,0,0,1,0,16H56A8,8,0,0,1,48,136Zm160,0a8,8,0,0,1-8,8H104a8,8,0,0,1,0-16h96A8,8,0,0,1,208,136Zm-48,32a8,8,0,0,1-8,8H56a8,8,0,0,1,0-16h96A8,8,0,0,1,160,168Zm48,0a8,8,0,0,1-8,8H184a8,8,0,0,1,0-16h16A8,8,0,0,1,208,168Z" />
+          </svg>
+        </span>
+      </div>
+    </div>
+  );
+}
+
 type LayerRole = "prev" | "active" | "next";
 
 type LayerProps = {
@@ -539,9 +582,7 @@ export default function PhoneClipHero({ clips, alt, landscapeLayout = "square" }
             <span className="text-white text-[3.9cqw] font-semibold leading-none tracking-tight">9:41</span>
             <StatusIcons />
           </div>
-          <div className="absolute right-[6.5cqw] bottom-[11cqw] flex h-[16.5cqw] w-[16.5cqw] items-center justify-center rounded-full border border-white/[0.07] bg-[#1c1c1e]/85 text-white text-[4.6cqw] font-semibold tracking-[-0.02em]">
-            {PLAYBACK_RATE}x
-          </div>
+          <ButtonRow />
           <div className="absolute bottom-[1.6cqw] left-1/2 h-[1.1cqw] w-[32cqw] -translate-x-1/2 rounded-full bg-white/60" />
         </div>
       </div>
