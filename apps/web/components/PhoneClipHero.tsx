@@ -41,21 +41,11 @@ function spaced_title(title: string): string {
   return title.replace(/(\S)(\p{Extended_Pictographic}[\p{Extended_Pictographic}\u200d\ufe0f]*)$/u, "$1 $2");
 }
 
-// Landscape clips get the app's shadowing layout for wide video (iOS NativeFullScreenVideoScreen's
-// square box): the frame's centre is carved out and zoomed to fill a rounded box under the progress
-// bar — square at most, 16:9 at least — on the clip's own thumbnail, blurred, turned 90° and
-// darkened (LessonBlurredBackground). iOS numbers on a 393pt screen: 15pt sides, 16pt corners.
-const BOX_TOP_CQW = 29; // 6pt under the progress bar
-const BOX_SIDE_CQW = 3.8;
-const BOX_HEIGHT_CQW = 74; // the room left above the captions; 16:9 would be 52, square 92.4
-const BOX_RADIUS_CQW = 4.1;
-
-// The other wide-video treatment: the app's vertical-format player, ported from iOS
+// Landscape clips get the app's vertical-format player, ported from iOS
 // NativeFullScreenVideoScreen.verticalFormatBox + VerticalFormatEdgeExtend + VerticalFormatBandBlur
 // (+ VerticalFormatBandTuning's defaults). The centre fills a full-width sharp box from under the
 // header's bars to the stretch bar; the bands above and below stretch the box's own outermost 2pt,
 // under blurs that ease in from the box edge — light on top, heavy at the bottom.
-export type LandscapeLayout = "square" | "extend";
 const PT = 100 / 393; // cqw per iOS point (393pt-wide iPhone)
 const SCREEN_H_CQW = 216.7; // the screen cut-out is 1795:3889
 const EXTEND_TOP_CQW = 28; // iOS headerBottom: just under the title row's progress bar
@@ -189,6 +179,9 @@ function StatusIcons() {
   );
 }
 
+// Off for now (Adam 10/31): the lone speed button reads more like shadowing. Kept to try again.
+const SHOWS_BUTTON_ROW = false;
+
 // Watch's collapsed bottom sheet (iOS VideoOverlayBar, isInSheetSmallState): speed · rewind ·
 // pause · listen mode · captions, evenly spread in 55pt cells on a floating dark glass (the sheet's
 // #171717 backdrop at 40%), its 80pt detent topping out ~94pt up.
@@ -240,13 +233,12 @@ type LayerProps = {
   // frozen on its last frame beneath until the fade completes).
   role: LayerRole;
   posterOnly: boolean;
-  landscapeLayout: LandscapeLayout;
   onEnd: () => void;
 };
 
 // One clip's whole screen — video, scrims, title row, Speak now + caption — so a clip change
 // crossfades everything together.
-function ClipLayer({ clip, role, posterOnly, landscapeLayout, onEnd }: LayerProps) {
+function ClipLayer({ clip, role, posterOnly, onEnd }: LayerProps) {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const posterRef = useRef<HTMLImageElement | null>(null);
   const topEdgeRef = useRef<HTMLCanvasElement | null>(null);
@@ -379,50 +371,30 @@ function ClipLayer({ clip, role, posterOnly, landscapeLayout, onEnd }: LayerProp
   }, [role, ready, clip]);
 
   const words = clip.word_level_captions;
-  const square = landscape && landscapeLayout === "square";
-  const extend = landscape && landscapeLayout === "extend";
+  const extend = landscape;
 
   return (
     <div
       className={`absolute inset-0 transition-opacity ease-out ${role === "next" ? "opacity-0" : "opacity-100"}`}
       style={{ zIndex: role === "active" ? 2 : role === "prev" ? 1 : 0, transitionDuration: `${FADE_MS}ms` }}
     >
-      {square ? (
-        // Backdrop: the thumbnail turned 90° to fill the tall screen, blurred, under two 50% darks
-        // (iOS's FullscreenThumbnailBackground overlay + the square layout's own scrim).
-        <div aria-hidden className="absolute inset-0 overflow-hidden bg-black">
-          {clip.thumbnail_url && (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={clip.thumbnail_url}
-              alt=""
-              className="absolute left-1/2 top-1/2 h-[100cqw] w-[216.7cqw] max-w-none object-cover"
-              style={{ transform: "translate(-50%, -50%) rotate(90deg) scale(1.5)", filter: "blur(7.6cqw)" }}
-            />
-          )}
-          <div className="absolute inset-0 bg-black/75" />
-        </div>
+      {/* Scrims: light at the top for the status bar + title, heavy at the bottom for captions.
+          Rendered over the media below via z-order. */}
+      {extend ? (
+        // iOS vertical-format holds the top fade's 0.5 over the band above the box, releasing
+        // below the header's bars, by a quarter of the screen down.
+        <div
+          className="absolute inset-x-0 top-0 z-[1]"
+          style={{ height: `${SCREEN_H_CQW / 4}cqw`, background: `linear-gradient(to bottom, rgba(0,0,0,0.5) ${EXTEND_TOP_CQW}cqw, transparent)` }}
+        />
       ) : (
-        <>
-          {/* Scrims: light at the top for the status bar + title, heavy at the bottom for captions.
-              Rendered over the media below via z-order. */}
-          {extend ? (
-            // iOS vertical-format holds the top fade's 0.5 over the band above the box, releasing
-            // below the header's bars, by a quarter of the screen down.
-            <div
-              className="absolute inset-x-0 top-0 z-[1]"
-              style={{ height: `${SCREEN_H_CQW / 4}cqw`, background: `linear-gradient(to bottom, rgba(0,0,0,0.5) ${EXTEND_TOP_CQW}cqw, transparent)` }}
-            />
-          ) : (
-            <div className="absolute inset-x-0 top-0 z-[1] h-[50cqw] bg-gradient-to-b from-black/65 via-black/35 to-transparent" />
-          )}
-          {extend ? (
-            // iOS's bottom vignette: clear at mid-screen, 0.75 three quarters of the way down, held.
-            <div className="absolute inset-x-0 bottom-0 z-[1] h-1/2" style={{ background: "linear-gradient(to bottom, transparent, rgba(0,0,0,0.75) 75%)" }} />
-          ) : (
-            <div className="absolute inset-x-0 bottom-0 z-[1] h-[74%] bg-gradient-to-t from-black/95 via-black/65 to-transparent" />
-          )}
-        </>
+        <div className="absolute inset-x-0 top-0 z-[1] h-[50cqw] bg-gradient-to-b from-black/65 via-black/35 to-transparent" />
+      )}
+      {extend ? (
+        // iOS's bottom vignette: clear at mid-screen, 0.75 three quarters of the way down, held.
+        <div className="absolute inset-x-0 bottom-0 z-[1] h-1/2" style={{ background: "linear-gradient(to bottom, transparent, rgba(0,0,0,0.75) 75%)" }} />
+      ) : (
+        <div className="absolute inset-x-0 bottom-0 z-[1] h-[74%] bg-gradient-to-t from-black/95 via-black/65 to-transparent" />
       )}
 
       {/* Edge-extend strips (mounted always so the poster can paint into them before the layout
@@ -434,12 +406,8 @@ function ClipLayer({ clip, role, posterOnly, landscapeLayout, onEnd }: LayerProp
 
       {/* The clip: full screen for vertical video; for landscape, the zoomed centre in its box. */}
       <div
-        className={`absolute overflow-hidden ${square ? "bg-black shadow-[0_1cqw_6cqw_rgba(0,0,0,0.25)]" : "inset-x-0"}`}
-        style={
-          square ? { top: `${BOX_TOP_CQW}cqw`, left: `${BOX_SIDE_CQW}cqw`, right: `${BOX_SIDE_CQW}cqw`, height: `${BOX_HEIGHT_CQW}cqw`, borderRadius: `${BOX_RADIUS_CQW}cqw` }
-          : extend ? { top: `${EXTEND_TOP_CQW}cqw`, bottom: `${EXTEND_BOTTOM_CQW}cqw` }
-          : { top: 0, bottom: 0 }
-        }
+        className="absolute inset-x-0 overflow-hidden"
+        style={extend ? { top: `${EXTEND_TOP_CQW}cqw`, bottom: `${EXTEND_BOTTOM_CQW}cqw` } : { top: 0, bottom: 0 }}
       >
         {clip.thumbnail_url && (
           // The caption segment's own first frame (Mux thumbnail at its start time).
@@ -486,7 +454,7 @@ function ClipLayer({ clip, role, posterOnly, landscapeLayout, onEnd }: LayerProp
 
       {/* Speak now + caption + translation — top-anchored: Speak now sits at the screen's middle
           (the screen is ~217cqw tall) and longer captions grow down toward the speed button. */}
-      <div className={`absolute inset-x-0 z-[2] px-[6.2cqw] ${square ? "top-[108cqw]" : "top-[104cqw]"}`}>
+      <div className="absolute inset-x-0 top-[104cqw] z-[2] px-[6.2cqw]">
         <div className="mb-[6.6cqw] flex justify-center">
           <span className="rounded-[2.8cqw] px-[4.6cqw] py-[2.6cqw] text-[4.8cqw] font-semibold leading-none text-black" style={{ backgroundColor: ACCENT }}>
             Speak now
@@ -525,11 +493,9 @@ type Props = {
   /** The tutor's starred clips, played in turn. One clip plays once and rests on its end. */
   clips: MarketingClip[];
   alt: string;
-  /** How wide clips are framed (see LandscapeLayout). */
-  landscapeLayout?: LandscapeLayout;
 };
 
-export default function PhoneClipHero({ clips, alt, landscapeLayout = "square" }: Props) {
+export default function PhoneClipHero({ clips, alt }: Props) {
   // seq counts plays (clip = clips[seq % n]); layers are keyed by seq, so with 2 clips the
   // outgoing and preloading layers are separate videos even though they show the same clip.
   const [seq, setSeq] = useState(0);
@@ -571,7 +537,6 @@ export default function PhoneClipHero({ clips, alt, landscapeLayout = "square" }
             clip={clips[s % clips.length]}
             role={s < seq ? "prev" : s === seq ? "active" : "next"}
             posterOnly={posterOnly}
-            landscapeLayout={landscapeLayout}
             onEnd={() => setEndedSeq(s)}
           />
         ))}
@@ -582,7 +547,13 @@ export default function PhoneClipHero({ clips, alt, landscapeLayout = "square" }
             <span className="text-white text-[3.9cqw] font-semibold leading-none tracking-tight">9:41</span>
             <StatusIcons />
           </div>
-          <ButtonRow />
+          {SHOWS_BUTTON_ROW ? (
+            <ButtonRow />
+          ) : (
+            <div className="absolute right-[6.5cqw] bottom-[11cqw] flex h-[16.5cqw] w-[16.5cqw] items-center justify-center rounded-full border border-white/[0.07] bg-[#1c1c1e]/85 text-white text-[4.6cqw] font-semibold tracking-[-0.02em]">
+              {PLAYBACK_RATE}x
+            </div>
+          )}
           <div className="absolute bottom-[1.6cqw] left-1/2 h-[1.1cqw] w-[32cqw] -translate-x-1/2 rounded-full bg-white/60" />
         </div>
       </div>
