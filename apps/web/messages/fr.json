@@ -1,12 +1,12 @@
 {
   "metadata": {
     "title": "Candid : le coréen de la vraie vie",
-    "description": "Des leçons vidéo quotidiennes vues par un tuteur natif, de nouvelles chaque semaine."
+    "description": "Des leçons vidéo quotidiennes à travers le regard d’un tuteur natif, renouvelées chaque semaine."
   },
   "home": {
     "download_alt": "Télécharger sur l’App Store",
     "hero_title": "Pas un énième tuteur IA.",
-    "hero_subtitle": "Apprends le coréen du quotidien avec des exercices d’écoute et d’expression orale\navec tes créateurs préférés.",
+    "hero_subtitle": "Apprends le coréen du quotidien en t’entraînant chaque jour à écouter et à parler\navec tes créateurs préférés.",
     "cta_learn": "ESSAIE GRATUITEMENT",
     "cta_teach": "ENSEIGNE SUR CANDID",
     "tap_to_unmute": "Appuie pour activer le son",
@@ -14,13 +14,13 @@
   },
   "teach": {
     "title": "Deviens créateur Candid",
-    "subtitle": "Sois payé pour créer du contenu dans ta langue maternelle et aider ta communauté à l’apprendre.",
-    "invite_only": "Remarque : pour l’instant, le poste de créateur Candid est sur invitation uniquement."
+    "subtitle": "Gagne de l’argent en créant du contenu dans ta langue maternelle, tout en aidant ta communauté à l’apprendre.",
+    "invite_only": "Remarque : pour l’instant, on ne devient créateur Candid que sur invitation."
   },
   "footer": {
     "privacy": "Politique de confidentialité",
     "terms": "Conditions d’utilisation",
-    "youtube_videos": "Droits de contenu",
+    "youtube_videos": "Droits sur les contenus",
     "company_info": "Informations sur l’entreprise",
     "pages_heading": "Pages",
     "home": "Accueil",
@@ -45,16 +45,16 @@
   },
   "tutor": {
     "subtitle": "Reçois chaque semaine les leçons d’écoute et d’expression orale de {name}<br/>pour parler {language} au quotidien",
-    "hero_title": "Apprends le {language} avec {name}",
+    "hero_title": "Apprends à parler {language} avec {name}",
     "hero_subtitle": "Entraîne ton écoute et ton oral chaque jour pour parler {language} comme dans la vraie vie",
-    "hero_title_alt": "Le {language} au ralenti avec {name}",
+    "hero_title_alt": "Parle {language} à ton rythme avec {name}",
     "hero_subtitle_alt": "Entraîne ton écoute et ton oral chaque jour avec {name} pour parler {language} comme dans la vraie vie.",
     "hero_tagline_horizontal": "À toi de parler.",
     "hero_tagline_vertical": "Moins de scroll.\nPlus d’oral.",
     "download_for_ios": "Télécharge Candid pour iOS",
     "learn_with_creators": "Apprends avec {name} et d’autres créateurs que tu vas adorer",
-    "daily_dose_with_tutor": "Ta dose quotidienne de {language} avec {name}",
-    "creators_subtitle": "De courtes leçons vidéo pour les apprenants de {language} de niveau débutant avancé à intermédiaire.",
+    "daily_dose_with_tutor": "Ton {language} de tous les jours avec {name}",
+    "creators_subtitle": "De courtes leçons vidéo en {language}, pour les niveaux débutant avancé et intermédiaire.",
     "tutor_label": "Tuteur {firstName}",
     "download_qr": "Télécharge et essaie gratuitement",
     "start_with_name": "Commence à apprendre avec {name}",
@@ -64,22 +64,22 @@
     "no_credit_card": "Disponible sur iOS",
     "get_the_app": "TÉLÉCHARGE L’APP",
     "free_trial": "7 jours d’essai gratuit",
-    "listen": "Apprends le {language} à travers le quotidien de {firstName}",
-    "week": "Des leçons vidéo chaque jour, de nouvelles chaque semaine",
+    "listen": "Plonge dans le quotidien de {firstName}, en {language}",
+    "week": "Des leçons vidéo chaque jour, des nouveautés chaque semaine",
     "learn": "Des explications d’un natif, pas d’une IA",
     "shadow": "Parle {language} comme {firstName}",
     "home_listen": "Apprends la langue à travers le quotidien de ton tuteur",
     "home_shadow": "Parle la langue comme ton tuteur",
     "home_map": "Découvre le pays à travers les yeux de ton tuteur",
-    "map": "Découvre {country} à travers les yeux de {firstName}",
+    "map": "{country} à travers les yeux de {firstName}",
     "intro": "Un accompagnement à chaque étape",
-    "community": "Obtiens des réponses à tes questions",
+    "community": "Pose toutes tes questions",
     "personality": "Personnalité",
     "about": "À propos",
     "these_days": "En ce moment",
     "teaches": "Enseigne",
     "difficulty": "Difficulté",
-    "based_in": "Vit à",
+    "based_in": "Lieu de vie",
     "speaks": "Parle",
     "all_levels": "Tous niveaux",
     "follow": "Suivre {name}",
@@ -87,7 +87,7 @@
     "free_to_try": "Essai gratuit, sans carte bancaire",
     "privacy": "Politique de confidentialité",
     "terms": "Conditions d’utilisation",
-    "join_for_free": "Rejoins gratuitement",
+    "join_for_free": "Inscris-toi gratuitement",
     "join_for_free_subtext": "Gratuit, sans carte bancaire",
     "find_your_tutor": "Trouve ton tuteur",
     "become_a_tutor": "Deviens tuteur Candid",
@@ -97,19 +97,19 @@
     "meta_subtitle": "Rejoins le<br/>club d’étude de {name}<br/>pour parler {language}"
   },
   "join_for_free": {
-    "sheet_title": "Rejoins gratuitement",
+    "sheet_title": "Inscris-toi gratuitement",
     "sheet_description": "Crée ton compte pour rejoindre la communauté de {name}",
     "signin_step_title": "Rejoins le club d’étude de {name}",
     "signin_step_subtitle": "Reçois ton invitation par e-mail :",
     "signin_step_title_v2": "Crée ton compte Candid",
-    "signin_step_subtitle_v2": "pour rejoindre le Club d’étude de {name}",
+    "signin_step_subtitle_v2": "pour rejoindre le club d’étude de {name}",
     "signin_step_disclaimer": "En t’inscrivant, tu acceptes nos <terms>conditions d’utilisation</terms> et notre <privacy>politique de confidentialité</privacy>.",
     "signin_continue_with_apple": "Continuer avec Apple",
     "signin_continue_with_google": "Continuer avec Google",
     "success_title": "Bienvenue à bord !",
     "success_subtitle": "Nous avons envoyé l’invitation à {email}",
-    "success_subtitle_v2": "Nous t’avons envoyé par e-mail une invitation au Club d’étude de {name}",
-    "success_already_title": "Content de te revoir",
+    "success_subtitle_v2": "Nous t’avons envoyé par e-mail une invitation au club d’étude de {name}",
+    "success_already_title": "Bon retour parmi nous !",
     "success_already_subtitle": "Ouvre Candid pour suivre {name}",
     "success_close": "Terminé",
     "error_title": "Une erreur s’est produite",
@@ -119,19 +119,19 @@
     "error_signup_failed": "Nous n’avons pas pu enregistrer ton inscription. Réessaie."
   },
   "youtube_videos": {
-    "title": "Droits de contenu",
+    "title": "Droits sur les contenus",
     "brand_name": "Candid",
     "description_1": "Voici la liste des vidéos YouTube que nous avons rassemblées pour t’aider à apprendre l’anglais.",
-    "description_2": "Dans l’app, nous te sélectionnons des vidéos de cette liste selon ton niveau d’anglais. Tu peux aussi les regarder avec des traductions contextuelles dans ta langue, t’entraîner au « shadowing » (répéter après les locuteurs), suivre ta progression en immersion, et plus encore.",
+    "description_2": "Dans l’app, nous choisissons pour toi des vidéos de cette liste selon ton niveau d’anglais. En plus de les regarder, tu peux afficher des traductions en contexte dans ta langue, t’entraîner au « shadowing » (répéter après les locuteurs), suivre ta progression en immersion, et plus encore.",
     "description_3": "Nous veillons à respecter les Règles de la communauté et les Conditions d’utilisation de YouTube.",
     "loading": "Chargement des vidéos...",
     "load_more": "Voir plus"
   },
   "android_waitlist": {
-    "title": "Rejoignez la liste d'attente de Candid pour Android",
+    "title": "Rejoins la liste d’attente de Candid pour Android",
     "placeholder": "you@email.com",
     "button": "Rejoindre la liste",
-    "success": "Vous êtes sur la liste ! Nous vous écrirons dès que Candid sera disponible sur Android.",
-    "error": "Une erreur s'est produite"
+    "success": "Tu es sur la liste ! On t’écrit dès que Candid est disponible sur Android.",
+    "error": "Une erreur s’est produite"
   }
 }
