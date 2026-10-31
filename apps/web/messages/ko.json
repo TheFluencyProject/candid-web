@@ -124,5 +124,12 @@
     "description_3": "저희는 YouTube의 모든 커뮤니티 가이드라인과 서비스 약관을 준수합니다.",
     "loading": "동영상 로딩 중...",
     "load_more": "더 보기"
+  },
+  "android_waitlist": {
+    "title": "Candid 안드로이드 대기자 명단에 등록하세요",
+    "placeholder": "you@email.com",
+    "button": "대기자 명단 등록",
+    "success": "등록되었어요! Candid가 안드로이드에 출시되면 이메일로 알려드릴게요.",
+    "error": "문제가 발생했어요"
   }
 }

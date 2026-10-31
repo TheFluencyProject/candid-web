@@ -1,5 +1,5 @@
 import { getRequestConfig } from "next-intl/server";
-import { routing } from "./routing";
+import { isLocale, routing } from "./routing";
 
 function deepMerge(base: Record<string, unknown>, override: Record<string, unknown>): Record<string, unknown> {
   const result = { ...base };
@@ -21,7 +21,7 @@ export default getRequestConfig(async ({ requestLocale }) => {
   let locale = await requestLocale;
 
   // Validate that the incoming locale is valid
-  if (!locale || !routing.locales.includes(locale as "ko" | "en")) {
+  if (!locale || !isLocale(locale)) {
     locale = routing.defaultLocale;
   }
 

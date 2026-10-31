@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { headers } from "next/headers";
 import { setRequestLocale } from "next-intl/server";
+import { routing } from "@/i18n/routing";
 import { isCandidtutorsHost } from "@/lib/canonical-hosts";
 import CandidtutorsLanding from "@/components/CandidtutorsLanding";
 import SimpleLanding from "@/components/SimpleLanding";
@@ -11,7 +12,7 @@ type Props = {
 };
 
 /**
- * hreflang for the two home variants. Lives on the page, not [locale]/layout.tsx —
+ * hreflang for the home page in every locale. Lives on the page, not [locale]/layout.tsx —
  * the layout also wraps /privacy, /terms, /tutor/*, which would all inherit a home
  * canonical and be mis-canonicalized.
  *
@@ -26,14 +27,14 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     ? `http://${host}`
     : `https://${host}`;
 
+  const url_for = (l: string) => (l === routing.defaultLocale ? origin : `${origin}/${l}`);
+  // hreflang wants the script for Chinese: /zh is Simplified.
+  const languages = Object.fromEntries(routing.locales.map((l) => [l === "zh" ? "zh-Hans" : l, url_for(l)]));
+
   return {
     alternates: {
-      canonical: locale === "ko" ? `${origin}/ko` : origin,
-      languages: {
-        en: origin,
-        ko: `${origin}/ko`,
-        "x-default": origin,
-      },
+      canonical: url_for(locale),
+      languages: { ...languages, "x-default": origin },
     },
   };
 }

@@ -78,6 +78,12 @@ html {
 .hero-heading {
   word-break: keep-all;
 }
+/* Japanese and Chinese have no spaces, so keep-all leaves them no break point at all and
+   the heading runs off the screen. Their normal line breaking already respects words. */
+:lang(ja) .hero-heading,
+:lang(zh) .hero-heading {
+  word-break: normal;
+}
 
 /* The cursive em renders shadow much heavier than the sans-serif line1
    (thicker strokes catch the blur). On white-hero tutors, halve the

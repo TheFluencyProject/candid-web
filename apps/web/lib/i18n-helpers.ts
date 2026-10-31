@@ -1,3 +1,5 @@
+import { isLocale, type Locale } from "@/i18n/routing";
+
 /**
  * Resolve the UI locale from request headers.
  *
@@ -9,29 +11,51 @@
  * Edge and the top-level routes run in RSC, and only a runtime-agnostic signature
  * can be imported by both.
  */
-export function pickLocale(acceptLanguage: string | null, country?: string | null): "en" | "ko" {
+export function pickLocale(acceptLanguage: string | null, country?: string | null): Locale {
   const header = (acceptLanguage ?? "").toLowerCase();
-  const primary = header.split(",")[0]?.split(";")[0]?.trim() ?? "";
-  if (primary.startsWith("ko")) return "ko";
+  // "zh-Hant-TW;q=0.8" → "zh". Every Chinese variant gets /zh (the app ships Simplified only).
+  const tags = header.split(",").map((part) => part.split(";")[0].trim().split("-")[0]).filter(Boolean);
+  const primary = tags[0] ?? "";
+  if (primary !== "en" && isLocale(primary)) return primary;
   // Korean isn't the primary tag, but it's accepted (or nothing is) and the request
-  // is from Korea — e.g. a local whose phone UI is set to English. \b keeps "kok"
-  // (Konkani) from matching.
-  if (country?.toUpperCase() === "KR" && (!primary || /(^|,)\s*ko\b/.test(header))) return "ko";
-  return "en";
+  // is from Korea — e.g. a local whose phone UI is set to English.
+  if (country?.toUpperCase() === "KR" && (!primary || tags.includes("ko"))) return "ko";
+  if (primary === "en") return "en";
+  // Primary language isn't one we serve (say de): take the first one listed that we do.
+  return tags.find(isLocale) ?? "en";
 }
 
-const KO_LANG_NAMES: Record<string, string> = { english: "영어", korean: "한국어" };
+const LANG_NAMES: Partial<Record<Locale, Record<string, string>>> = {
+  ko: { english: "영어", korean: "한국어" },
+  ja: { english: "英語", korean: "韓国語" },
+  zh: { english: "英语", korean: "韩语" },
+  es: { english: "inglés", korean: "coreano" },
+  ru: { english: "английский", korean: "корейский" },
+  fr: { english: "anglais", korean: "coréen" },
+  vi: { english: "tiếng Anh", korean: "tiếng Hàn" },
+  th: { english: "ภาษาอังกฤษ", korean: "ภาษาเกาหลี" },
+  id: { english: "bahasa Inggris", korean: "bahasa Korea" },
+};
 
 export function localizeLanguageName(lang: string, locale: string): string {
-  if (locale === "ko") return KO_LANG_NAMES[lang] ?? capitalize(lang);
-  return capitalize(lang);
+  return LANG_NAMES[locale as Locale]?.[lang] ?? capitalize(lang);
 }
 
-const MAP_COUNTRY_EN: Record<string, string> = { english: "America", korean: "Korea" };
-const MAP_COUNTRY_KO: Record<string, string> = { english: "미국인", korean: "한국인" };
+const MAP_COUNTRIES: Partial<Record<Locale, Record<string, string>>> = {
+  en: { english: "America", korean: "Korea" },
+  ko: { english: "미국인", korean: "한국인" },
+  ja: { english: "アメリカ", korean: "韓国" },
+  zh: { english: "美国", korean: "韩国" },
+  es: { english: "Estados Unidos", korean: "Corea" },
+  ru: { english: "Америку", korean: "Корею" },
+  fr: { english: "les États-Unis", korean: "la Corée" },
+  vi: { english: "Mỹ", korean: "Hàn Quốc" },
+  th: { english: "อเมริกา", korean: "เกาหลี" },
+  id: { english: "Amerika", korean: "Korea" },
+};
 
 export function localizeMapCountry(teachingLanguage: string, locale: string): string {
-  const map = locale === "ko" ? MAP_COUNTRY_KO : MAP_COUNTRY_EN;
+  const map = MAP_COUNTRIES[locale as Locale] ?? MAP_COUNTRIES.en!;
   return map[teachingLanguage] ?? capitalize(teachingLanguage);
 }
 

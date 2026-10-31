@@ -1,6 +1,6 @@
 import createMiddleware from "next-intl/middleware";
 import { NextResponse, type NextFetchEvent, type NextRequest } from "next/server";
-import { routing } from "./i18n/routing";
+import { routing, type Locale } from "./i18n/routing";
 import { APP_STORE_URL, MAC_DOWNLOAD_URL, appStoreUrlForTutor, getRedirectUrl } from "./lib/platform";
 import { captureServerEvent } from "./lib/posthog-capture";
 import { reportInstallClick } from "./lib/install-click";
@@ -85,16 +85,19 @@ function resolveAppStoreRedirect(
 // Accept-Language only — no country. The two callers below are a rewrite (locale never
 // appears in the URL) and a vanity redirect, neither of which leaves a way back to English,
 // so geo must not widen who they catch. Only the landing check does, and it's cookie-gated.
-function prefersKorean(request: NextRequest): boolean {
-  return pickLocale(request.headers.get("accept-language")) === "ko";
+function preferredLocale(request: NextRequest): Locale {
+  return pickLocale(request.headers.get("accept-language"));
 }
+
+// "/ja/foo" → "ja"; null when the path carries no locale prefix.
+const LOCALE_PREFIX = new RegExp(`^/(${routing.locales.join("|")})(?=/|$)`);
 
 // Single-segment paths that are real routes (or locale prefixes) — never treat these as a
 // username, so a username lookup can't shadow a page. App Store vanity words are handled
 // above; api/_next/videos/lesson/g are excluded by the matcher.
 const RESERVED_USERNAME_PATHS = new Set([
   "classic", "company-info", "privacy", "terms", "tutor", "youtube-videos",
-  "download", "g", "lesson", "qr", "teach", "videos", "en", "ko",
+  "download", "g", "lesson", "qr", "teach", "videos", ...routing.locales,
 ]);
 
 // Routes that render their own <html> and are excluded from the intl matcher below, but still
@@ -145,7 +148,7 @@ export default async function middleware(request: NextRequest, event: NextFetchE
     if (!slug) return new NextResponse("Not found", { status: 404 });
 
     // Rewrite (not redirect) — URL must stay on the custom domain.
-    const locale = prefersKorean(request) ? "ko" : "en";
+    const locale = preferredLocale(request);
     const url = request.nextUrl.clone();
     url.pathname = `/${locale}/tutor/${slug}`;
     return NextResponse.rewrite(url);
@@ -153,7 +156,7 @@ export default async function middleware(request: NextRequest, event: NextFetchE
 
   // Every store branch below matches on the locale-stripped path: these destinations are
   // locale-agnostic, and matching the raw path 404'd every /ko|/en-prefixed store link.
-  const locale_stripped = pathname.replace(/^\/(?:en|ko)(?=\/|$)/, "") || "/";
+  const locale_stripped = pathname.replace(LOCALE_PREFIX, "") || "/";
 
   // ── Scanned QR → App Store (tracked) ──
   // Deliberately NOT /download/*: that prefix is a registered App Clip Experience, so scanning it
@@ -232,9 +235,9 @@ export default async function middleware(request: NextRequest, event: NextFetchE
       // profile and then installs from App Store search never touches /download.
       event.waitUntil(reportInstallClick(request, { handle: segments[0], source: "profile" }));
       // 307 (temporary): usernames can change, so browsers must not cache the mapping.
-      const wants_ko = pathname.startsWith("/ko/") || prefersKorean(request);
+      const locale = (pathname.match(LOCALE_PREFIX)?.[1] as Locale | undefined) ?? preferredLocale(request);
       const url = request.nextUrl.clone();
-      url.pathname = wants_ko ? `/ko/tutor/${slug}` : `/tutor/${slug}`;
+      url.pathname = locale === routing.defaultLocale ? `/tutor/${slug}` : `/${locale}/tutor/${slug}`;
       return NextResponse.redirect(url, 307);
     }
   }
@@ -264,19 +267,16 @@ export default async function middleware(request: NextRequest, event: NextFetchE
   const hasSeenCookie = request.cookies.has(FIRST_VISIT_COOKIE);
   const isRoot = pathname === "/";
 
-  // The only place the country is consulted — a redirect that leaves /ko in the URL and
-  // sets the cookie, so a mis-detected visitor can get back to English and stay there.
-  const wants_korean =
-    isRoot &&
-    !hasSeenCookie &&
-    pickLocale(
-      request.headers.get("accept-language"),
-      request.headers.get("x-vercel-ip-country"),
-    ) === "ko";
+  // The only place the country is consulted — a redirect that leaves /<locale> in the URL
+  // and sets the cookie, so a mis-detected visitor can get back to English and stay there.
+  const detected_locale =
+    isRoot && !hasSeenCookie
+      ? pickLocale(request.headers.get("accept-language"), request.headers.get("x-vercel-ip-country"))
+      : routing.defaultLocale;
 
-  if (wants_korean) {
+  if (detected_locale !== routing.defaultLocale) {
     const url = request.nextUrl.clone();
-    url.pathname = "/ko";
+    url.pathname = `/${detected_locale}`;
     const response = NextResponse.redirect(url);
     response.cookies.set(FIRST_VISIT_COOKIE, "1", {
       path: "/",

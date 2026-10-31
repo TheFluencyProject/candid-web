@@ -2,7 +2,8 @@ import { defineRouting } from "next-intl/routing";
 import { createNavigation } from "next-intl/navigation";
 
 export const routing = defineRouting({
-  locales: ["en", "ko"],
+  // The app's 10 languages. /zh is Simplified Chinese (the app ships zh-Hans only).
+  locales: ["en", "ko", "ja", "zh", "es", "ru", "fr", "vi", "th", "id"],
   defaultLocale: "en",
   localePrefix: "as-needed",
   // Browser-language detection is gated to the first visit only by our own
@@ -11,6 +12,12 @@ export const routing = defineRouting({
   // off — we run detection ourselves before delegating.
   localeDetection: false,
 });
+
+export type Locale = (typeof routing.locales)[number];
+
+export function isLocale(s: string): s is Locale {
+  return (routing.locales as readonly string[]).includes(s);
+}
 
 export const { Link, redirect, usePathname, useRouter } =
   createNavigation(routing);
