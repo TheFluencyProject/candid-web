@@ -50,6 +50,31 @@ const BOX_SIDE_CQW = 3.8;
 const BOX_HEIGHT_CQW = 74; // the room left above the captions; 16:9 would be 52, square 92.4
 const BOX_RADIUS_CQW = 4.1;
 
+// The other wide-video treatment: the app's vertical-format player (iOS VerticalFormatEdgeExtend +
+// VerticalFormatBandBlur). The centre is zoomed to fill a full-width sharp box; the strips above and
+// below stretch the box's own outermost rows, and a backdrop blur softens them — light on top,
+// heavy at the bottom, where it also ramps up into the box so there's no seam.
+export type LandscapeLayout = "square" | "extend" | "extend-short";
+const SCREEN_H_CQW = 216.7; // the screen cut-out is 1795:3889
+// The sharp box's [top, bottom] insets: iOS's (progress bar → bottom bar), and a shorter box
+// whose blurred bottom strip runs up under the captions.
+const EXTEND_INSETS = { extend: [28, 10], "extend-short": [28, 72] } as const;
+const EDGE_ROWS = 0.012; // edge rows kept per strip, as a share of the frame height (iOS: 2pt)
+const BOTTOM_RAMP_CQW = 6.4; // iOS rampAbove 25pt: the bottom blur eases in this far into the box
+
+// Stretch the sharp box's top/bottom edge rows (same centre crop as its object-cover) into the two
+// strip canvases. Painted from the poster until the video has a frame.
+function paint_edges(src: HTMLVideoElement | HTMLImageElement, top: HTMLCanvasElement | null, bottom: HTMLCanvasElement | null, box_aspect: number) {
+  const [w, h] = src instanceof HTMLVideoElement ? [src.videoWidth, src.videoHeight] : [src.naturalWidth, src.naturalHeight];
+  if (!w || !h || (src instanceof HTMLVideoElement && src.readyState < 2)) return;
+  const sw = Math.min(w, h * box_aspect);
+  const rows = Math.max(1, h * EDGE_ROWS);
+  for (const [canvas, sy] of [[top, 0], [bottom, h - rows]] as const) {
+    const ctx = canvas?.getContext("2d");
+    if (canvas && ctx) ctx.drawImage(src, (w - sw) / 2, sy, sw, rows, 0, 0, canvas.width, canvas.height);
+  }
+}
+
 function StatusIcons() {
   return (
     <div className="flex items-center gap-[1.4cqw]">
@@ -84,21 +109,32 @@ type LayerProps = {
   // frozen on its last frame beneath until the fade completes).
   role: LayerRole;
   posterOnly: boolean;
+  landscapeLayout: LandscapeLayout;
   onEnd: () => void;
 };
 
 // One clip's whole screen — video, scrims, title row, Speak now + caption — so a clip change
 // crossfades everything together.
-function ClipLayer({ clip, role, posterOnly, onEnd }: LayerProps) {
+function ClipLayer({ clip, role, posterOnly, landscapeLayout, onEnd }: LayerProps) {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const posterRef = useRef<HTMLImageElement | null>(null);
+  const topEdgeRef = useRef<HTMLCanvasElement | null>(null);
+  const bottomEdgeRef = useRef<HTMLCanvasElement | null>(null);
   const [hasFrame, setHasFrame] = useState(false); // a decoded frame is up → poster can go
+  const hasFrameRef = useRef(false);
+  hasFrameRef.current = hasFrame;
+  const insets = landscapeLayout === "square" ? null : EXTEND_INSETS[landscapeLayout];
+  const box_aspect = insets ? 100 / (SCREEN_H_CQW - insets[0] - insets[1]) : 1;
+  const boxAspectRef = useRef(box_aspect);
+  boxAspectRef.current = box_aspect;
   // Wider than tall → the boxed layout. Read off the poster first (same frame, so same aspect, and
   // it's up before the stream), then confirmed by the video's own size.
   const [landscape, setLandscape] = useState(false);
   const read_poster_aspect = () => {
     const img = posterRef.current;
-    if (img?.naturalWidth) setLandscape(img.naturalWidth > img.naturalHeight);
+    if (!img?.naturalWidth) return;
+    setLandscape(img.naturalWidth > img.naturalHeight);
+    if (!hasFrameRef.current) paint_edges(img, topEdgeRef.current, bottomEdgeRef.current, boxAspectRef.current);
   };
   // The poster can finish loading before hydration attaches onLoad — read it once on mount too.
   useEffect(read_poster_aspect, []);
@@ -127,6 +163,7 @@ function ClipLayer({ clip, role, posterOnly, onEnd }: LayerProps) {
       if (cancelled) return;
       setHasFrame(true);
       setLandscape(video.videoWidth > video.videoHeight);
+      paint_edges(video, topEdgeRef.current, bottomEdgeRef.current, boxAspectRef.current);
     };
     video.addEventListener("loadeddata", on_frame);
     video.addEventListener("playing", on_frame);
@@ -196,6 +233,7 @@ function ClipLayer({ clip, role, posterOnly, onEnd }: LayerProps) {
       if (video.playbackRate !== PLAYBACK_RATE) video.playbackRate = PLAYBACK_RATE; // hls/seek can reset it
       const t = video.currentTime;
       if (t >= clip.start_time) setPlayhead(t);
+      paint_edges(video, topEdgeRef.current, bottomEdgeRef.current, boxAspectRef.current);
       if (t >= clip.end_time) {
         video.pause();
         done = true;
@@ -213,13 +251,15 @@ function ClipLayer({ clip, role, posterOnly, onEnd }: LayerProps) {
   }, [role, ready, clip]);
 
   const words = clip.word_level_captions;
+  const square = landscape && !insets;
+  const extend = landscape && insets ? insets : null;
 
   return (
     <div
       className={`absolute inset-0 transition-opacity ease-out ${role === "next" ? "opacity-0" : "opacity-100"}`}
       style={{ zIndex: role === "active" ? 2 : role === "prev" ? 1 : 0, transitionDuration: `${FADE_MS}ms` }}
     >
-      {landscape ? (
+      {square ? (
         // Backdrop: the thumbnail turned 90° to fill the tall screen, blurred, under two 50% darks
         // (iOS's FullscreenThumbnailBackground overlay + the square layout's own scrim).
         <div aria-hidden className="absolute inset-0 overflow-hidden bg-black">
@@ -236,17 +276,28 @@ function ClipLayer({ clip, role, posterOnly, onEnd }: LayerProps) {
         </div>
       ) : (
         <>
-          {/* Scrims (vertical video only): light at the top for the status bar + title, heavy at
-              the bottom for captions. Rendered after the media below via z-order. */}
+          {/* Scrims: light at the top for the status bar + title, heavy at the bottom for captions.
+              Rendered over the media below via z-order. */}
           <div className="absolute inset-x-0 top-0 z-[1] h-[50cqw] bg-gradient-to-b from-black/65 via-black/35 to-transparent" />
           <div className="absolute inset-x-0 bottom-0 z-[1] h-[74%] bg-gradient-to-t from-black/95 via-black/65 to-transparent" />
         </>
       )}
 
-      {/* The clip: full screen for vertical video; for landscape, the zoomed centre in the box. */}
+      {/* Edge-extend strips (mounted always so the poster can paint into them before the layout
+          knows it's landscape; shown only for the extend layouts). */}
+      <div aria-hidden className={extend ? "" : "hidden"}>
+        <canvas ref={topEdgeRef} width={120} height={24} className="absolute inset-x-0 top-0 w-full" style={{ height: `${extend?.[0] ?? 0}cqw` }} />
+        <canvas ref={bottomEdgeRef} width={120} height={24} className="absolute inset-x-0 bottom-0 w-full" style={{ height: `${extend?.[1] ?? 0}cqw` }} />
+      </div>
+
+      {/* The clip: full screen for vertical video; for landscape, the zoomed centre in its box. */}
       <div
-        className={`absolute overflow-hidden ${landscape ? "bg-black shadow-[0_1cqw_6cqw_rgba(0,0,0,0.25)]" : "inset-0"}`}
-        style={landscape ? { top: `${BOX_TOP_CQW}cqw`, left: `${BOX_SIDE_CQW}cqw`, right: `${BOX_SIDE_CQW}cqw`, height: `${BOX_HEIGHT_CQW}cqw`, borderRadius: `${BOX_RADIUS_CQW}cqw` } : undefined}
+        className={`absolute overflow-hidden ${square ? "bg-black shadow-[0_1cqw_6cqw_rgba(0,0,0,0.25)]" : "inset-x-0"}`}
+        style={
+          square ? { top: `${BOX_TOP_CQW}cqw`, left: `${BOX_SIDE_CQW}cqw`, right: `${BOX_SIDE_CQW}cqw`, height: `${BOX_HEIGHT_CQW}cqw`, borderRadius: `${BOX_RADIUS_CQW}cqw` }
+          : extend ? { top: `${extend[0]}cqw`, bottom: `${extend[1]}cqw` }
+          : { top: 0, bottom: 0 }
+        }
       >
         {clip.thumbnail_url && (
           // The caption segment's own first frame (Mux thumbnail at its start time).
@@ -271,6 +322,22 @@ function ClipLayer({ clip, role, posterOnly, onEnd }: LayerProps) {
         )}
       </div>
 
+      {/* Edge-extend band blur (iOS VerticalFormatBandBlur): 5pt + 15% dim over the top strip;
+          40pt + 10% dim at the bottom, easing in from BOTTOM_RAMP_CQW inside the box. */}
+      {extend && (
+        <>
+          <div className="absolute inset-x-0 top-0 bg-black/15 [backdrop-filter:blur(1.3cqw)]" style={{ height: `${extend[0]}cqw` }} />
+          <div
+            className="absolute inset-x-0 bottom-0 bg-black/10 [backdrop-filter:blur(10cqw)]"
+            style={{
+              height: `${extend[1] + BOTTOM_RAMP_CQW}cqw`,
+              WebkitMaskImage: `linear-gradient(to bottom, transparent, black ${BOTTOM_RAMP_CQW}cqw)`,
+              maskImage: `linear-gradient(to bottom, transparent, black ${BOTTOM_RAMP_CQW}cqw)`,
+            }}
+          />
+        </>
+      )}
+
       {/* Lesson title row + progress */}
       <div className="absolute inset-x-0 top-[15.6cqw] z-[2] px-[6cqw]">
         <div className="flex items-center gap-[3cqw]">
@@ -287,7 +354,7 @@ function ClipLayer({ clip, role, posterOnly, onEnd }: LayerProps) {
 
       {/* Speak now + caption + translation — top-anchored: Speak now sits at the screen's middle
           (the screen is ~217cqw tall) and longer captions grow down toward the speed button. */}
-      <div className={`absolute inset-x-0 z-[2] px-[6.2cqw] ${landscape ? "top-[108cqw]" : "top-[104cqw]"}`}>
+      <div className={`absolute inset-x-0 z-[2] px-[6.2cqw] ${square ? "top-[108cqw]" : "top-[104cqw]"}`}>
         <div className="mb-[6.6cqw] flex justify-center">
           <span className="rounded-[2.8cqw] px-[4.6cqw] py-[2.6cqw] text-[4.8cqw] font-semibold leading-none text-black" style={{ backgroundColor: ACCENT }}>
             Speak now
@@ -326,9 +393,11 @@ type Props = {
   /** The tutor's starred clips, played in turn. One clip plays once and rests on its end. */
   clips: MarketingClip[];
   alt: string;
+  /** How wide clips are framed (see LandscapeLayout). */
+  landscapeLayout?: LandscapeLayout;
 };
 
-export default function PhoneClipHero({ clips, alt }: Props) {
+export default function PhoneClipHero({ clips, alt, landscapeLayout = "square" }: Props) {
   // seq counts plays (clip = clips[seq % n]); layers are keyed by seq, so with 2 clips the
   // outgoing and preloading layers are separate videos even though they show the same clip.
   const [seq, setSeq] = useState(0);
@@ -370,6 +439,7 @@ export default function PhoneClipHero({ clips, alt }: Props) {
             clip={clips[s % clips.length]}
             role={s < seq ? "prev" : s === seq ? "active" : "next"}
             posterOnly={posterOnly}
+            landscapeLayout={landscapeLayout}
             onEnd={() => setEndedSeq(s)}
           />
         ))}
