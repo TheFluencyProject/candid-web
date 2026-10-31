@@ -176,6 +176,7 @@ export default async function TutorPage({ params, searchParams }: Props) {
     const heroImage = tutor.web_bg_picture_url || tutor.large_profile_picture_url;
     return (
       <main
+        data-tutor-slug={slug}
         className="min-h-screen flex flex-col"
         style={{ backgroundColor: "#18181C", color: "#FFFFFF" }}
       >
@@ -266,6 +267,7 @@ export default async function TutorPage({ params, searchParams }: Props) {
 
   return (
     <main
+      data-tutor-slug={slug}
       className="min-h-screen"
       style={{ backgroundColor: "#18181C", color: "#FFFFFF" }}
     >

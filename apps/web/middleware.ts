@@ -172,10 +172,17 @@ export default async function middleware(request: NextRequest, event: NextFetchE
         tutor_slug: slug,
         lesson_id: params.get("l"),
         $current_url: request.url,
+        // The scanning phone's own request. PostHog's GeoIP and User Agent Populator
+        // transformations turn these into $geoip_*, $os, $browser and $device_type.
+        $raw_user_agent: request.headers.get("user-agent") ?? "",
+        $ip: request.headers.get("x-forwarded-for")?.split(",")[0]?.trim(),
+        $browser_language: request.headers.get("accept-language")?.split(",")[0]?.split(";")[0],
       }),
     );
     if (slug) {
-      event.waitUntil(reportInstallClick(request, { handle: slug, source: "qr", lessonId: params.get("l") }));
+      event.waitUntil(reportInstallClick(request, {
+        handle: slug, source: "qr", lessonId: params.get("l"), sid: params.get("sid"),
+      }));
     }
     const ua = request.headers.get("user-agent") ?? "";
     return NextResponse.redirect(getRedirectUrl(ua, appStoreUrlForTutor(slug)), { status: 307 });
