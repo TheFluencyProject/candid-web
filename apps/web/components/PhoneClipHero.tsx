@@ -5,16 +5,18 @@ import type { MarketingClip } from "@/lib/api";
 import { isRestrictedInAppBrowser } from "@/lib/platform";
 
 // The tutor-page hero for tutors with no uploaded Shadow screenshot: the iOS shadowing screen,
-// drawn live from one of the tutor's starred clips inside a real iPhone frame. Layout numbers
-// are measured off Mia's uploaded screenshot (the look this mirrors) and expressed in cqw —
+// drawn live from the tutor's starred clips inside a real iPhone frame. Layout numbers are
+// measured off Mia's uploaded screenshot (the look this mirrors) and expressed in cqw —
 // percent of the screen's width — so the whole screen scales as one picture.
 
 // iOS AccentColor (display-p3 0x89/0xFF/0xB4) — karaoke sweep, Speak-now pill, progress bar.
 const ACCENT = "#89FFB4";
 // The app's slowed shadowing speed; shown on the speed button.
 const PLAYBACK_RATE = 0.7;
-// Rest on the last frame, caption fully lit, before cutting to the next clip.
-const END_HOLD_MS = 1000;
+// Rest on the last frame, caption fully lit, before the next clip fades in over it.
+const END_HOLD_MS = 600;
+// The next clip's fade-in; it rests on its first frame until the fade is done, then plays.
+const FADE_MS = 700;
 
 // /iphone-frame.png is 1000x2034 with a transparent screen cut out at (101,84)-(1896,3973),
 // corner radius 250, on its 2000x4068 source. These place the live screen under that hole.
@@ -25,6 +27,14 @@ const SCREEN_STYLE = {
   height: "95.6%",
   borderRadius: "13.9% / 6.43%",
 } as const;
+
+// A fixed lesson-progress fill per clip (20–75%), from its id so SSR and client agree and each
+// clip lands somewhere different. It never moves during playback.
+function progress_for(clip: MarketingClip): number {
+  let h = 0;
+  for (const ch of clip.caption_segment_id) h = (h * 31 + ch.charCodeAt(0)) >>> 0;
+  return 20 + (h % 56);
+}
 
 function StatusIcons() {
   return (
@@ -52,6 +62,209 @@ function StatusIcons() {
   );
 }
 
+type LayerRole = "prev" | "active" | "next";
+
+type LayerProps = {
+  clip: MarketingClip;
+  // "next" preloads hidden underneath; "active" plays on top (fading in over "prev", which stays
+  // frozen on its last frame beneath until the fade completes).
+  role: LayerRole;
+  posterOnly: boolean;
+  onEnd: () => void;
+};
+
+// One clip's whole screen — video, scrims, title row, Speak now + caption — so a clip change
+// crossfades everything together.
+function ClipLayer({ clip, role, posterOnly, onEnd }: LayerProps) {
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const [hasFrame, setHasFrame] = useState(false); // a decoded frame is up → poster can go
+  const [ready, setReady] = useState(false); // stream attached + seekable
+  const [playhead, setPlayhead] = useState(clip.start_time); // absolute clip time driving the sweep
+  const onEndRef = useRef(onEnd);
+  onEndRef.current = onEnd;
+  // Was this layer preloaded hidden? Then it fades in when it goes active and must wait for that.
+  const fadesInRef = useRef(role === "next");
+
+  // Load (and buffer) as soon as the layer mounts — "next" layers preload while the current clip
+  // plays, so the fade-in starts on a moving picture instead of a still poster.
+  useEffect(() => {
+    if (posterOnly) return;
+    const video = videoRef.current;
+    if (!video) return;
+    video.setAttribute("playsinline", "");
+    video.setAttribute("webkit-playsinline", "");
+    video.muted = true; // iOS: set imperatively — the prop doesn't reliably reach the element
+    // 1080p, not the marquee's 720p cap: landscape sources are cropped to a tall sliver here,
+    // so the screen shows only ~45% of the frame's width and needs the extra pixels to stay sharp.
+    const src = `https://stream.mux.com/${clip.mux_playback_id}.m3u8?max_resolution=1080p`;
+    let hls: import("hls.js").default | null = null;
+    let cancelled = false;
+    const on_frame = () => { if (!cancelled) setHasFrame(true); };
+    video.addEventListener("loadeddata", on_frame);
+    video.addEventListener("playing", on_frame);
+    const on_ready = () => {
+      if (cancelled) return;
+      try { video.currentTime = clip.start_time; } catch { /* not seekable yet */ }
+      setReady(true);
+    };
+
+    import("hls.js").then(({ default: Hls }) => {
+      if (cancelled) return;
+      if (Hls.isSupported()) {
+        hls = new Hls({ startPosition: clip.start_time });
+        hls.on(Hls.Events.MANIFEST_PARSED, on_ready);
+        hls.loadSource(src);
+        hls.attachMedia(video);
+      } else if (video.canPlayType("application/vnd.apple.mpegurl")) {
+        video.src = src;
+        video.addEventListener("loadedmetadata", on_ready, { once: true });
+      }
+    }).catch(() => {});
+
+    // A webview that fullscreens anyway: pull it back inline; the marquee's listener (and the
+    // hero's, on fullscreen-ended) then drops the page to posters.
+    const v = video as HTMLVideoElement & { webkitDisplayingFullscreen?: boolean; webkitExitFullscreen?: () => void };
+    const on_begin = () => {
+      video.pause();
+      window.dispatchEvent(new CustomEvent("candid:fullscreen-hijack"));
+      if (v.webkitDisplayingFullscreen) v.webkitExitFullscreen?.();
+    };
+    const on_end = () => window.dispatchEvent(new CustomEvent("candid:fullscreen-ended"));
+    video.addEventListener("webkitbeginfullscreen", on_begin);
+    video.addEventListener("webkitendfullscreen", on_end);
+
+    return () => {
+      cancelled = true;
+      video.removeEventListener("loadeddata", on_frame);
+      video.removeEventListener("playing", on_frame);
+      video.removeEventListener("webkitbeginfullscreen", on_begin);
+      video.removeEventListener("webkitendfullscreen", on_end);
+      if (hls) hls.destroy();
+      video.removeAttribute("src");
+    };
+  }, [clip, posterOnly]);
+
+  // Play once while active: sweep the caption, stop on the last frame, report the end.
+  useEffect(() => {
+    const video = videoRef.current;
+    if (role !== "active" || !ready || !video) return;
+    let raf = 0;
+    let done = false;
+    try { video.currentTime = clip.start_time; } catch { /* not seekable yet */ }
+    video.defaultPlaybackRate = PLAYBACK_RATE;
+    video.playbackRate = PLAYBACK_RATE;
+    const start = () => {
+      video.play().then(() => {
+        video.playbackRate = PLAYBACK_RATE; // starting playback can reset it to 1
+      }).catch((err: DOMException) => {
+        // Muted autoplay denied = restricted webview or autoplay off → poster only (see marquee).
+        if (video.currentSrc && err?.name === "NotAllowedError") {
+          window.dispatchEvent(new CustomEvent("candid:autoplay-blocked"));
+        }
+      });
+      raf = requestAnimationFrame(tick);
+    };
+    const tick = () => {
+      if (video.playbackRate !== PLAYBACK_RATE) video.playbackRate = PLAYBACK_RATE; // hls/seek can reset it
+      const t = video.currentTime;
+      if (t >= clip.start_time) setPlayhead(t);
+      if (t >= clip.end_time) {
+        video.pause();
+        done = true;
+        onEndRef.current();
+        return;
+      }
+      raf = requestAnimationFrame(tick);
+    };
+    const wait = setTimeout(start, fadesInRef.current ? FADE_MS : 0);
+    return () => {
+      clearTimeout(wait);
+      cancelAnimationFrame(raf);
+      if (!done) video.pause();
+    };
+  }, [role, ready, clip]);
+
+  const words = clip.word_level_captions;
+
+  return (
+    <div
+      className={`absolute inset-0 transition-opacity ease-out ${role === "next" ? "opacity-0" : "opacity-100"}`}
+      style={{ zIndex: role === "active" ? 2 : role === "prev" ? 1 : 0, transitionDuration: `${FADE_MS}ms` }}
+    >
+      {clip.thumbnail_url && (
+        // The caption segment's own first frame (Mux thumbnail at its start time).
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={clip.thumbnail_url}
+          alt=""
+          draggable={false}
+          className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-300 ${hasFrame && !posterOnly ? "opacity-0" : "opacity-100"}`}
+        />
+      )}
+      {!posterOnly && (
+        <video
+          ref={videoRef}
+          muted
+          playsInline
+          preload="auto"
+          className={`pointer-events-none absolute inset-0 h-full w-full object-cover transition-opacity duration-300 ${hasFrame ? "opacity-100" : "opacity-0"}`}
+        />
+      )}
+
+      {/* Scrims: light at the top for the status bar + title, heavy at the bottom for captions. */}
+      <div className="absolute inset-x-0 top-0 h-[40cqw] bg-gradient-to-b from-black/45 to-transparent" />
+      <div className="absolute inset-x-0 bottom-0 h-[74%] bg-gradient-to-t from-black/95 via-black/65 to-transparent" />
+
+      {/* Lesson title row + progress */}
+      <div className="absolute inset-x-0 top-[15.6cqw] px-[6cqw]">
+        <div className="flex items-center gap-[3cqw]">
+          <span className="min-w-0 flex-1 truncate text-white text-[5.4cqw] font-bold leading-tight tracking-[-0.02em] [font-stretch:condensed] drop-shadow">
+            {clip.title}
+          </span>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/switch.2.svg" alt="" className="h-[5.3cqw] w-auto" />
+        </div>
+        <div className="mt-[2.4cqw] h-[1.8cqw] overflow-hidden rounded-full bg-white/35">
+          <div className="h-full rounded-full" style={{ width: `${progress_for(clip)}%`, backgroundColor: ACCENT }} />
+        </div>
+      </div>
+
+      {/* Speak now + caption + translation — bottom-anchored like the app. */}
+      <div className="absolute inset-x-0 bottom-[50cqw] px-[6.2cqw]">
+        <div className="mb-[6.6cqw] flex justify-center">
+          <span className="rounded-[2.8cqw] px-[4.6cqw] py-[2.6cqw] text-[4.8cqw] font-semibold leading-none text-black" style={{ backgroundColor: ACCENT }}>
+            Speak now
+          </span>
+        </div>
+        <p className="text-[11.5cqw] font-bold leading-[1.13] tracking-[-0.01em]">
+          {words && words.length > 0 ? (
+            words.map((w, i) => {
+              const next = words[i + 1];
+              // carry a word's sweep across a tight (<0.2s) gap so it doesn't stall (iOS parity)
+              const eff_end = next && next.start_time - w.end_time < 0.2 ? next.start_time : w.end_time;
+              const fill = Math.min(1, Math.max(0, (playhead - w.start_time) / Math.max(0.0001, eff_end - w.start_time)));
+              return (
+                <Fragment key={i}>
+                  <span className="relative inline-block align-baseline">
+                    <span style={{ color: ACCENT, opacity: 0.5 }}>{w.text}</span>
+                    <span aria-hidden className="absolute inset-0" style={{ color: ACCENT, clipPath: `inset(0 ${(1 - fill) * 100}% 0 0)` }}>{w.text}</span>
+                  </span>
+                  {i < words.length - 1 ? " " : ""}
+                </Fragment>
+              );
+            })
+          ) : (
+            <span style={{ color: ACCENT }}>{clip.text}</span>
+          )}
+        </p>
+        {clip.translation && clip.translation !== clip.text && (
+          <p className="mt-[5.4cqw] text-white text-[5cqw] font-normal leading-[1.3]">{clip.translation}</p>
+        )}
+      </div>
+    </div>
+  );
+}
+
 type Props = {
   /** The tutor's starred clips, played in turn. One clip plays once and rests on its end. */
   clips: MarketingClip[];
@@ -59,11 +272,10 @@ type Props = {
 };
 
 export default function PhoneClipHero({ clips, alt }: Props) {
-  const [idx, setIdx] = useState(0);
-  const clip = clips[idx % clips.length];
-  const videoRef = useRef<HTMLVideoElement | null>(null);
-  const [hasFrame, setHasFrame] = useState(false); // a decoded frame is up → poster can go
-  const [playhead, setPlayhead] = useState(clip.start_time); // absolute clip time driving the sweep
+  // seq counts plays (clip = clips[seq % n]); layers are keyed by seq, so with 2 clips the
+  // outgoing and preloading layers are separate videos even though they show the same clip.
+  const [seq, setSeq] = useState(0);
+  const [endedSeq, setEndedSeq] = useState(-1);
   // Restricted in-app webviews force-fullscreen any playing <video>; there, only the poster shows.
   // UA-sniffed after mount (SSR-safe), and flipped at runtime by the same window events the
   // marquee further down this page uses.
@@ -79,104 +291,14 @@ export default function PhoneClipHero({ clips, alt }: Props) {
     };
   }, []);
 
-  // Warm the next clip's poster so the cut lands on a painted frame, not black.
+  // A clip finished → brief hold on its last frame, then the next one fades in over it.
   useEffect(() => {
-    const next = clips[(idx + 1) % clips.length];
-    if (clips.length > 1 && next.thumbnail_url) new Image().src = next.thumbnail_url;
-  }, [clips, idx]);
+    if (endedSeq !== seq || clips.length < 2) return;
+    const t = setTimeout(() => setSeq(seq + 1), END_HOLD_MS);
+    return () => clearTimeout(t);
+  }, [endedSeq, seq, clips.length]);
 
-  // Load the clip (hls.js, native HLS on Safari): play the segment once, hold on its last frame,
-  // then cut to the next clip (a lone clip just rests there).
-  useEffect(() => {
-    setPlayhead(clip.start_time); // the new caption starts dim, not lit from the last clip
-    if (posterOnly) return;
-    const video = videoRef.current;
-    if (!video) return;
-    video.setAttribute("playsinline", "");
-    video.setAttribute("webkit-playsinline", "");
-    // 1080p, not the marquee's 720p cap: landscape sources are cropped to a tall sliver here,
-    // so the screen shows only ~45% of the frame's width and needs the extra pixels to stay sharp.
-    const src = `https://stream.mux.com/${clip.mux_playback_id}.m3u8?max_resolution=1080p`;
-    let hls: import("hls.js").default | null = null;
-    let raf = 0;
-    let hold: ReturnType<typeof setTimeout> | undefined;
-    let cancelled = false;
-
-    const play_from_start = () => {
-      video.muted = true; // iOS: set imperatively — the prop doesn't reliably reach the element
-      try { video.currentTime = clip.start_time; } catch { /* not seekable yet */ }
-      video.defaultPlaybackRate = PLAYBACK_RATE;
-      video.playbackRate = PLAYBACK_RATE;
-      setPlayhead(clip.start_time);
-      video.play().then(() => {
-        video.playbackRate = PLAYBACK_RATE; // starting playback can reset it to 1
-      }).catch((err: DOMException) => {
-        // Muted autoplay denied = restricted webview or autoplay off → poster only (see marquee).
-        if (video.currentSrc && err?.name === "NotAllowedError") {
-          window.dispatchEvent(new CustomEvent("candid:autoplay-blocked"));
-        }
-      });
-      raf = requestAnimationFrame(tick);
-    };
-
-    const tick = () => {
-      if (cancelled) return;
-      if (video.playbackRate !== PLAYBACK_RATE) video.playbackRate = PLAYBACK_RATE; // hls/seek can reset it
-      const t = video.currentTime;
-      if (t >= clip.start_time) setPlayhead(t);
-      if (t >= clip.end_time) {
-        video.pause();
-        if (clips.length > 1) hold = setTimeout(() => setIdx((i) => (i + 1) % clips.length), END_HOLD_MS);
-        return;
-      }
-      raf = requestAnimationFrame(tick);
-    };
-
-    const on_frame = () => { if (!cancelled) setHasFrame(true); };
-    video.addEventListener("loadeddata", on_frame);
-    video.addEventListener("playing", on_frame);
-    const on_ready = () => { if (!cancelled) play_from_start(); };
-
-    import("hls.js").then(({ default: Hls }) => {
-      if (cancelled) return;
-      if (Hls.isSupported()) {
-        hls = new Hls({ startPosition: clip.start_time });
-        hls.on(Hls.Events.MANIFEST_PARSED, on_ready);
-        hls.loadSource(src);
-        hls.attachMedia(video);
-      } else if (video.canPlayType("application/vnd.apple.mpegurl")) {
-        video.src = src;
-        video.addEventListener("loadedmetadata", on_ready, { once: true });
-      }
-    }).catch(() => {});
-
-    // A webview that fullscreens anyway: pull it back inline; the marquee's listener (and ours,
-    // on fullscreen-ended) then drops the page to posters.
-    const v = video as HTMLVideoElement & { webkitDisplayingFullscreen?: boolean; webkitExitFullscreen?: () => void };
-    const on_begin = () => {
-      video.pause();
-      window.dispatchEvent(new CustomEvent("candid:fullscreen-hijack"));
-      if (v.webkitDisplayingFullscreen) v.webkitExitFullscreen?.();
-    };
-    const on_end = () => window.dispatchEvent(new CustomEvent("candid:fullscreen-ended"));
-    video.addEventListener("webkitbeginfullscreen", on_begin);
-    video.addEventListener("webkitendfullscreen", on_end);
-
-    return () => {
-      cancelled = true;
-      cancelAnimationFrame(raf);
-      if (hold) clearTimeout(hold);
-      video.removeEventListener("loadeddata", on_frame);
-      video.removeEventListener("playing", on_frame);
-      video.removeEventListener("webkitbeginfullscreen", on_begin);
-      video.removeEventListener("webkitendfullscreen", on_end);
-      if (hls) hls.destroy();
-      video.removeAttribute("src");
-      setHasFrame(false); // the next clip's poster covers the swap until its first frame
-    };
-  }, [clip, clips.length, posterOnly]);
-
-  const words = clip.word_level_captions;
+  const seqs = clips.length > 1 && !posterOnly ? [seq - 1, seq, seq + 1].filter((s) => s >= 0) : [seq];
 
   return (
     <div className="relative w-full aspect-[1000/2034] select-none" role="img" aria-label={alt}>
@@ -185,93 +307,27 @@ export default function PhoneClipHero({ clips, alt }: Props) {
         className="absolute isolate overflow-hidden bg-black [container-type:inline-size]"
         style={{ ...SCREEN_STYLE, WebkitMaskImage: "-webkit-radial-gradient(white, black)" }}
       >
-        {clip.thumbnail_url && (
-          // The chosen caption segment's own first frame (Mux thumbnail at its start time).
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={clip.thumbnail_url}
-            alt=""
-            draggable={false}
-            // Fades out to the video, but snaps back in at a cut — fading in over a cleared
-            // video would flash dark between clips.
-            className={`absolute inset-0 h-full w-full object-cover ${hasFrame && !posterOnly ? "opacity-0 transition-opacity duration-300" : "opacity-100"}`}
+        {seqs.map((s) => (
+          <ClipLayer
+            key={s}
+            clip={clips[s % clips.length]}
+            role={s < seq ? "prev" : s === seq ? "active" : "next"}
+            posterOnly={posterOnly}
+            onEnd={() => setEndedSeq(s)}
           />
-        )}
-        {!posterOnly && (
-          <video
-            ref={videoRef}
-            muted
-            playsInline
-            preload="auto"
-            className={`pointer-events-none absolute inset-0 h-full w-full object-cover ${hasFrame ? "opacity-100 transition-opacity duration-300" : "opacity-0"}`}
-          />
-        )}
+        ))}
 
-        {/* Scrims: light at the top for the status bar + title, heavy at the bottom for captions. */}
-        <div className="absolute inset-x-0 top-0 h-[40cqw] bg-gradient-to-b from-black/45 to-transparent" />
-        <div className="absolute inset-x-0 bottom-0 h-[62%] bg-gradient-to-t from-black/85 via-black/55 to-transparent" />
-
-        {/* Status bar */}
-        <div className="absolute inset-x-0 top-[2.6cqw] flex items-center justify-between pl-[8.8cqw] pr-[8.6cqw]">
-          <span className="text-white text-[3.9cqw] font-semibold leading-none tracking-tight">9:41</span>
-          <StatusIcons />
-        </div>
-
-        {/* Lesson title row + part progress */}
-        <div className="absolute inset-x-0 top-[15.6cqw] px-[6cqw]">
-          <div className="flex items-center gap-[3cqw]">
-            <span className="min-w-0 flex-1 truncate text-white text-[5.4cqw] font-bold leading-tight tracking-[-0.02em] [font-stretch:condensed] drop-shadow">
-              {clip.title}
-            </span>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/switch.2.svg" alt="" className="h-[5.3cqw] w-auto" />
+        {/* Fixed chrome over every layer. */}
+        <div className="absolute inset-0 z-10 pointer-events-none">
+          <div className="absolute inset-x-0 top-[2.6cqw] flex items-center justify-between pl-[8.8cqw] pr-[8.6cqw]">
+            <span className="text-white text-[3.9cqw] font-semibold leading-none tracking-tight">9:41</span>
+            <StatusIcons />
           </div>
-          {/* One lesson progress bar, fixed partway — it doesn't track the clip. */}
-          <div className="mt-[2.4cqw] h-[1.2cqw] overflow-hidden rounded-full bg-white/35">
-            <div className="h-full w-[35%] rounded-full" style={{ backgroundColor: ACCENT }} />
+          <div className="absolute right-[6.5cqw] bottom-[11cqw] flex h-[16.5cqw] w-[16.5cqw] items-center justify-center rounded-full border border-white/15 bg-[#1c1c1e]/85 text-white text-[4.6cqw] font-semibold tracking-[-0.02em]">
+            {PLAYBACK_RATE}x
           </div>
+          <div className="absolute bottom-[1.6cqw] left-1/2 h-[1.1cqw] w-[32cqw] -translate-x-1/2 rounded-full bg-white/60" />
         </div>
-
-        {/* Speak now + caption + translation — bottom-anchored like the app. */}
-        <div className="absolute inset-x-0 bottom-[41cqw] px-[6.2cqw]">
-          <div className="mb-[6.6cqw] flex justify-center">
-            <span className="rounded-[2.4cqw] px-[3.8cqw] py-[2.1cqw] text-[3.9cqw] font-semibold leading-none text-black" style={{ backgroundColor: ACCENT }}>
-              Speak now
-            </span>
-          </div>
-          <p className="text-[10.2cqw] font-bold leading-[1.13] tracking-[-0.01em]">
-            {words && words.length > 0 ? (
-              words.map((w, i) => {
-                const next = words[i + 1];
-                // carry a word's sweep across a tight (<0.2s) gap so it doesn't stall (iOS parity)
-                const eff_end = next && next.start_time - w.end_time < 0.2 ? next.start_time : w.end_time;
-                const fill = Math.min(1, Math.max(0, (playhead - w.start_time) / Math.max(0.0001, eff_end - w.start_time)));
-                return (
-                  <Fragment key={i}>
-                    <span className="relative inline-block align-baseline">
-                      <span style={{ color: ACCENT, opacity: 0.5 }}>{w.text}</span>
-                      <span aria-hidden className="absolute inset-0" style={{ color: ACCENT, clipPath: `inset(0 ${(1 - fill) * 100}% 0 0)` }}>{w.text}</span>
-                    </span>
-                    {i < words.length - 1 ? " " : ""}
-                  </Fragment>
-                );
-              })
-            ) : (
-              <span style={{ color: ACCENT }}>{clip.text}</span>
-            )}
-          </p>
-          {clip.translation && clip.translation !== clip.text && (
-            <p className="mt-[5.4cqw] text-white text-[5cqw] font-normal leading-[1.3]">{clip.translation}</p>
-          )}
-        </div>
-
-        {/* Speed button */}
-        <div className="absolute right-[6cqw] bottom-[9cqw] flex h-[15cqw] w-[15cqw] items-center justify-center rounded-full border border-white/15 bg-[#1c1c1e]/80 text-white text-[6cqw] font-semibold tracking-tight">
-          {PLAYBACK_RATE}x
-        </div>
-
-        {/* Home indicator */}
-        <div className="absolute bottom-[1.6cqw] left-1/2 h-[1.1cqw] w-[32cqw] -translate-x-1/2 rounded-full bg-white/60" />
       </div>
 
       {/* Real iPhone frame (bezel, buttons, Dynamic Island) on top — always applied. */}
