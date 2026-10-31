@@ -13,8 +13,8 @@ import { isRestrictedInAppBrowser } from "@/lib/platform";
 const ACCENT = "#89FFB4";
 // The app's slowed shadowing speed; shown on the speed button.
 const PLAYBACK_RATE = 0.7;
-// Rest on the last frame, caption fully lit, before the clip replays.
-const END_HOLD_MS = 1200;
+// Rest on the last frame, caption fully lit, before cutting to the next clip.
+const END_HOLD_MS = 1000;
 
 // /iphone-frame.png is 1000x2034 with a transparent screen cut out at (101,84)-(1896,3973),
 // corner radius 250, on its 2000x4068 source. These place the live screen under that hole.
@@ -53,11 +53,14 @@ function StatusIcons() {
 }
 
 type Props = {
-  clip: MarketingClip;
+  /** The tutor's starred clips, played in turn. One clip plays once and rests on its end. */
+  clips: MarketingClip[];
   alt: string;
 };
 
-export default function PhoneClipHero({ clip, alt }: Props) {
+export default function PhoneClipHero({ clips, alt }: Props) {
+  const [idx, setIdx] = useState(0);
+  const clip = clips[idx % clips.length];
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const [hasFrame, setHasFrame] = useState(false); // a decoded frame is up → poster can go
   const [playhead, setPlayhead] = useState(clip.start_time); // absolute clip time driving the sweep
@@ -76,9 +79,16 @@ export default function PhoneClipHero({ clip, alt }: Props) {
     };
   }, []);
 
-  // Load the clip (hls.js, native HLS on Safari): play the segment once, hold on its last frame,
-  // replay.
+  // Warm the next clip's poster so the cut lands on a painted frame, not black.
   useEffect(() => {
+    const next = clips[(idx + 1) % clips.length];
+    if (clips.length > 1 && next.thumbnail_url) new Image().src = next.thumbnail_url;
+  }, [clips, idx]);
+
+  // Load the clip (hls.js, native HLS on Safari): play the segment once, hold on its last frame,
+  // then cut to the next clip (a lone clip just rests there).
+  useEffect(() => {
+    setPlayhead(clip.start_time); // the new caption starts dim, not lit from the last clip
     if (posterOnly) return;
     const video = videoRef.current;
     if (!video) return;
@@ -116,7 +126,7 @@ export default function PhoneClipHero({ clip, alt }: Props) {
       if (t >= clip.start_time) setPlayhead(t);
       if (t >= clip.end_time) {
         video.pause();
-        hold = setTimeout(play_from_start, END_HOLD_MS);
+        if (clips.length > 1) hold = setTimeout(() => setIdx((i) => (i + 1) % clips.length), END_HOLD_MS);
         return;
       }
       raf = requestAnimationFrame(tick);
@@ -162,8 +172,9 @@ export default function PhoneClipHero({ clip, alt }: Props) {
       video.removeEventListener("webkitendfullscreen", on_end);
       if (hls) hls.destroy();
       video.removeAttribute("src");
+      setHasFrame(false); // the next clip's poster covers the swap until its first frame
     };
-  }, [clip, posterOnly]);
+  }, [clip, clips.length, posterOnly]);
 
   const words = clip.word_level_captions;
 
@@ -181,7 +192,9 @@ export default function PhoneClipHero({ clip, alt }: Props) {
             src={clip.thumbnail_url}
             alt=""
             draggable={false}
-            className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-300 ${hasFrame && !posterOnly ? "opacity-0" : "opacity-100"}`}
+            // Fades out to the video, but snaps back in at a cut — fading in over a cleared
+            // video would flash dark between clips.
+            className={`absolute inset-0 h-full w-full object-cover ${hasFrame && !posterOnly ? "opacity-0 transition-opacity duration-300" : "opacity-100"}`}
           />
         )}
         {!posterOnly && (
@@ -190,7 +203,7 @@ export default function PhoneClipHero({ clip, alt }: Props) {
             muted
             playsInline
             preload="auto"
-            className={`pointer-events-none absolute inset-0 h-full w-full object-cover transition-opacity duration-300 ${hasFrame ? "opacity-100" : "opacity-0"}`}
+            className={`pointer-events-none absolute inset-0 h-full w-full object-cover ${hasFrame ? "opacity-100 transition-opacity duration-300" : "opacity-0"}`}
           />
         )}
 

@@ -160,10 +160,10 @@ export default async function TutorPage({ params, searchParams }: Props) {
   const heroTitle = t("hero_tagline_vertical"); // "Less scrolling.\nMore speaking." (two forced lines)
   const heroSubtitle = t("hero_subtitle_alt", { language: langLabel, name: heroName });
   // The speaking/shadowing app screenshot shown in the hero phone frame. No uploaded screenshot →
-  // draw that screen live from the tutor's first starred clip; the photos are the last fallback.
+  // draw that screen live from the tutor's starred clips, one after another; the photos are the last fallback.
   const appShot = tutor.screenshot_shadow_url ?? tutor.screenshot_listen_url;
-  const heroClip = appShot ? null : (clips[0] ?? null);
-  const speakingShot = appShot ?? (heroClip ? null : (tutor.web_bg_picture_url ?? tutor.large_profile_picture_url));
+  const heroClips = appShot ? [] : clips;
+  const speakingShot = appShot ?? (heroClips.length > 0 ? null : (tutor.web_bg_picture_url ?? tutor.large_profile_picture_url));
 
   // ─── simplified card layout (candidtutors.co + joincandid.co) ───────────
   // Single centered card on the dark page — no navbar, no app screenshots,
@@ -347,16 +347,16 @@ export default async function TutorPage({ params, searchParams }: Props) {
               />
             </div>
           )}
-          {heroClip && (
+          {heroClips.length > 0 && (
             <div className="flex justify-center mt-6 lg:mt-0 animate-fade-in-up-delay-1">
               {/* Explicit lg width: unlike the <img>, this has no intrinsic size to hold the row open. */}
               <div className="w-full max-w-[270px] lg:max-w-none lg:w-[min(400px,calc(80vh*1000/2034))]">
-                <PhoneClipHero clip={heroClip} alt={t("shadow", { firstName: localizedFirstName, language: langLabel })} />
+                <PhoneClipHero clips={heroClips} alt={t("shadow", { firstName: localizedFirstName, language: langLabel })} />
               </div>
             </div>
           )}
           {/* No screenshot or clip yet → fall back to the round profile photo. */}
-          {!speakingShot && !heroClip && tutor.profile_picture_url && (
+          {!speakingShot && heroClips.length === 0 && tutor.profile_picture_url && (
             <div className="order-first lg:order-none flex justify-center mb-8 lg:mb-0 animate-fade-in-up-delay-1">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
