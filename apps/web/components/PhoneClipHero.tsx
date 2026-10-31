@@ -38,21 +38,38 @@ function progress_for(clip: MarketingClip): number {
 
 // Some titles arrive with the emoji glued on ("Let's Take a Walk🍁"); space it like the rest.
 function spaced_title(title: string): string {
-  return title.replace(/(\S)(\p{Extended_Pictographic}[\p{Extended_Pictographic}‍️]*)$/u, "$1 $2");
+  return title.replace(/(\S)(\p{Extended_Pictographic}[\p{Extended_Pictographic}\u200d\ufe0f]*)$/u, "$1 $2");
 }
 
-// Landscape clips sit 16:9 between the title and Speak now; the rest of the screen is this blurred,
-// live copy of the video (like iOS's LessonBlurredBackground, but moving). Painted into a tiny
-// canvas at the screen's own aspect — the CSS blur hides the low resolution, and it costs nothing.
-const BLUR_W = 36;
-const BLUR_H = 78; // ≈ the screen's 1795:3889
+// Landscape clips play like the app's vertical-format lessons (iOS VerticalFormatEdgeExtend): the
+// centre 9:16-ish band is zoomed to fill a full-width box from under the progress bar to just above
+// the bottom edge, and the strips above and below continue the box's own outermost rows, stretched
+// to fill and blurred (lightly on top, heavily at the bottom) — the picture carrying on out of focus.
+const BOX_TOP_CQW = 28; // just under the title row's progress bar
+const BOX_BOTTOM_CQW = 6; // the app's bottom bar sits about here
+const SCREEN_H_CQW = 216.7; // the screen cut-out is 1795:3889
+const BOX_ASPECT = 100 / (SCREEN_H_CQW - BOX_TOP_CQW - BOX_BOTTOM_CQW);
+// Edge rows kept per strip, as a share of the frame height (iOS keeps 2pt of the box).
+const EDGE_ROWS = 0.012;
 
-function paint_blur(video: HTMLVideoElement, canvas: HTMLCanvasElement | null) {
-  const ctx = canvas?.getContext("2d");
-  if (!ctx || !video.videoWidth || video.readyState < 2) return;
-  // Centre-crop the frame to the screen's aspect (cover), then scale it into the canvas.
-  const sw = Math.min(video.videoWidth, video.videoHeight * (BLUR_W / BLUR_H));
-  ctx.drawImage(video, (video.videoWidth - sw) / 2, 0, sw, video.videoHeight, 0, 0, BLUR_W, BLUR_H);
+type Frame = HTMLVideoElement | HTMLImageElement;
+
+function frame_size(src: Frame): [number, number] {
+  return src instanceof HTMLVideoElement ? [src.videoWidth, src.videoHeight] : [src.naturalWidth, src.naturalHeight];
+}
+
+// Stretch the box's top/bottom edge rows (same horizontal crop as the box's object-cover) into
+// the two strip canvases. Works from the poster until the video has a frame.
+function paint_edges(src: Frame, top: HTMLCanvasElement | null, bottom: HTMLCanvasElement | null) {
+  const [w, h] = frame_size(src);
+  if (!w || !h || (src instanceof HTMLVideoElement && src.readyState < 2)) return;
+  const sw = Math.min(w, h * BOX_ASPECT);
+  const sx = (w - sw) / 2;
+  const rows = Math.max(1, h * EDGE_ROWS);
+  for (const [canvas, sy] of [[top, 0], [bottom, h - rows]] as const) {
+    const ctx = canvas?.getContext("2d");
+    if (canvas && ctx) ctx.drawImage(src, sx, sy, sw, rows, 0, 0, canvas.width, canvas.height);
+  }
 }
 
 function StatusIcons() {
@@ -97,14 +114,19 @@ type LayerProps = {
 function ClipLayer({ clip, role, posterOnly, onEnd }: LayerProps) {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const posterRef = useRef<HTMLImageElement | null>(null);
-  const blurRef = useRef<HTMLCanvasElement | null>(null);
+  const topEdgeRef = useRef<HTMLCanvasElement | null>(null);
+  const bottomEdgeRef = useRef<HTMLCanvasElement | null>(null);
   const [hasFrame, setHasFrame] = useState(false); // a decoded frame is up → poster can go
+  const hasFrameRef = useRef(false);
+  hasFrameRef.current = hasFrame;
   // Wider than tall → the letterboxed layout. Read off the poster first (same frame, so same
   // aspect, and it's up before the stream), then confirmed by the video's own size.
   const [landscape, setLandscape] = useState(false);
   const read_poster_aspect = () => {
     const img = posterRef.current;
-    if (img?.naturalWidth) setLandscape(img.naturalWidth > img.naturalHeight);
+    if (!img?.naturalWidth) return;
+    setLandscape(img.naturalWidth > img.naturalHeight);
+    if (!hasFrameRef.current) paint_edges(img, topEdgeRef.current, bottomEdgeRef.current);
   };
   // The poster can finish loading before hydration attaches onLoad — read it once on mount too.
   useEffect(read_poster_aspect, []);
@@ -133,7 +155,7 @@ function ClipLayer({ clip, role, posterOnly, onEnd }: LayerProps) {
       if (cancelled) return;
       setHasFrame(true);
       setLandscape(video.videoWidth > video.videoHeight);
-      paint_blur(video, blurRef.current); // a preloaded layer fades in over its real first frame
+      paint_edges(video, topEdgeRef.current, bottomEdgeRef.current); // a preloaded layer fades in over its real first frame
     };
     video.addEventListener("loadeddata", on_frame);
     video.addEventListener("playing", on_frame);
@@ -203,7 +225,7 @@ function ClipLayer({ clip, role, posterOnly, onEnd }: LayerProps) {
       if (video.playbackRate !== PLAYBACK_RATE) video.playbackRate = PLAYBACK_RATE; // hls/seek can reset it
       const t = video.currentTime;
       if (t >= clip.start_time) setPlayhead(t);
-      paint_blur(video, blurRef.current);
+      paint_edges(video, topEdgeRef.current, bottomEdgeRef.current);
       if (t >= clip.end_time) {
         video.pause();
         done = true;
@@ -227,24 +249,32 @@ function ClipLayer({ clip, role, posterOnly, onEnd }: LayerProps) {
       className={`absolute inset-0 transition-opacity ease-out ${role === "next" ? "opacity-0" : "opacity-100"}`}
       style={{ zIndex: role === "active" ? 2 : role === "prev" ? 1 : 0, transitionDuration: `${FADE_MS}ms` }}
     >
-      {/* Landscape only: the blurred fill behind the 16:9 band — the poster until frames arrive,
-          then the live canvas. Scaled up so the blur's soft edges stay off-screen. */}
-      {landscape && (
-        <div aria-hidden className="absolute inset-0 overflow-hidden">
-          {clip.thumbnail_url && (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={clip.thumbnail_url} alt="" className="absolute inset-0 h-full w-full scale-125 object-cover blur-xl brightness-90" />
-          )}
-          <canvas
-            ref={blurRef}
-            width={BLUR_W}
-            height={BLUR_H}
-            className={`absolute inset-0 h-full w-full scale-125 blur-xl brightness-90 transition-opacity duration-300 ${hasFrame && !posterOnly ? "opacity-100" : "opacity-0"}`}
-          />
-        </div>
-      )}
-      {/* The clip itself: full screen for vertical video, a 16:9 band for landscape. */}
-      <div className={landscape ? "absolute inset-x-0 top-[38cqw] aspect-video overflow-hidden" : "absolute inset-0"}>
+      {/* Landscape only: the edge-extended strips above and below the box. The canvases are
+          mounted first (landscape is known only after the poster loads), so the poster can paint
+          into them. Top is barely blurred — it reads as the picture's own edge running up under
+          the title; the bottom one is soft. */}
+      <div aria-hidden className={`absolute inset-0 overflow-hidden ${landscape ? "" : "hidden"}`}>
+        <canvas
+          ref={topEdgeRef}
+          width={120}
+          height={24}
+          className="absolute inset-x-0 top-0 w-full blur-[2px] brightness-[0.85]"
+          style={{ height: `${BOX_TOP_CQW + 1}cqw` }}
+        />
+        <canvas
+          ref={bottomEdgeRef}
+          width={120}
+          height={8}
+          className="absolute inset-x-0 bottom-0 w-full scale-x-110 blur-md brightness-90"
+          style={{ height: `${BOX_BOTTOM_CQW + 4}cqw` }}
+        />
+      </div>
+      {/* The clip itself: full screen for vertical video; for landscape, the zoomed centre band in
+          the box (object-cover crops the sides). */}
+      <div
+        className="absolute inset-x-0 overflow-hidden"
+        style={landscape ? { top: `${BOX_TOP_CQW}cqw`, bottom: `${BOX_BOTTOM_CQW}cqw` } : { top: 0, bottom: 0 }}
+      >
         {clip.thumbnail_url && (
           // The caption segment's own first frame (Mux thumbnail at its start time).
           // eslint-disable-next-line @next/next/no-img-element
@@ -269,10 +299,8 @@ function ClipLayer({ clip, role, posterOnly, onEnd }: LayerProps) {
       </div>
 
       {/* Scrims: light at the top for the status bar + title, heavy at the bottom for captions. */}
-      {/* Lighter over a landscape clip's blurred fill — there's no sharp detail behind the text
-          to fight, and the full-strength scrim would bury the blur in black. */}
-      <div className={`absolute inset-x-0 top-0 h-[50cqw] bg-gradient-to-b ${landscape ? "from-black/40" : "from-black/65 via-black/35"} to-transparent`} />
-      <div className={`absolute inset-x-0 bottom-0 h-[74%] bg-gradient-to-t ${landscape ? "from-black/60 via-black/20" : "from-black/95 via-black/65"} to-transparent`} />
+      <div className="absolute inset-x-0 top-0 h-[50cqw] bg-gradient-to-b from-black/65 via-black/35 to-transparent" />
+      <div className="absolute inset-x-0 bottom-0 h-[74%] bg-gradient-to-t from-black/95 via-black/65 to-transparent" />
 
       {/* Lesson title row + progress */}
       <div className="absolute inset-x-0 top-[15.6cqw] px-[6cqw]">
