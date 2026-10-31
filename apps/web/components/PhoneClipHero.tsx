@@ -54,7 +54,7 @@ const BOX_RADIUS_CQW = 4.1;
 // NativeFullScreenVideoScreen.verticalFormatBox + VerticalFormatEdgeExtend + VerticalFormatBandBlur
 // (+ VerticalFormatBandTuning's defaults). The centre fills a full-width sharp box from under the
 // header's bars to the stretch bar; the bands above and below stretch the box's own outermost 2pt,
-// under stacked backdrop blurs that ease in from the box edge — light on top, heavy at the bottom.
+// under blurs that ease in from the box edge — light on top, heavy at the bottom.
 export type LandscapeLayout = "square" | "extend";
 const PT = 100 / 393; // cqw per iOS point (393pt-wide iPhone)
 const SCREEN_H_CQW = 216.7; // the screen cut-out is 1795:3889
@@ -62,42 +62,102 @@ const EXTEND_TOP_CQW = 28; // iOS headerBottom: just under the title row's progr
 const EXTEND_BOTTOM_CQW = (113 + 2) * PT; // WatchStretchBarBottomPadding + StretchProgressBar.barHeight
 const EXTEND_BOX_CQW = SCREEN_H_CQW - EXTEND_TOP_CQW - EXTEND_BOTTOM_CQW;
 const STRIP_PT = 2; // VerticalFormatEdgeExtend.stripHeight
-// VerticalFormatBandTuning defaults, in pt.
-const BAND = { topBlur: 5, topDim: 0.15, bottomBlur: 40, bottomDim: 0.1, rampAbove: 25, fullBelow: 100 };
-// Backdrop blurs stacked per band, each masked in over its own third of the ramp; layer k blurs by
-// sqrt(2k+1)/3 of the radius, so the stack is (k+1)/3 of it after k+1 layers (Gaussians add in squares).
+// VerticalFormatBandTuning defaults, in pt — except the ramps, which start further inside the box
+// (iOS: rampAbove 25, topRamp 0) so the picture eases out of focus more gradually.
+const BAND = { topBlur: 5, topDim: 0.15, bottomBlur: 40, bottomDim: 0.1, rampAbove: 90, fullBelow: 100, topRamp: 45 };
+// iOS stacks 3 backdrop blurs per band, each masked in over its own third of the ramp, layer k at
+// sqrt(2k+1)/3 of the radius — so after k+1 layers the picture is blurred by (k+1)/3 of it. Here each
+// layer is that cumulative blur of the picture itself, with the same mask: identical result, but
+// drawn from canvases padded past every edge with real picture. (A CSS backdrop-filter samples
+// black past its box, which turns a 40pt band at the screen edge into a flat dark slab.)
 const BLUR_LAYERS = 3;
 // The dim's ease-in along the ramp: [where, share of full].
 const EASE_IN = [[0, 0], [0.25, 0.1], [0.5, 0.35], [0.75, 0.7], [1, 1]] as const;
+const BAND_PX = 4; // band canvas px per cqw
 
-// Stretch the sharp box's outermost 2pt (same centre crop as its object-cover) into the two strip
-// canvases. Painted from the poster until the video has a frame.
-function paint_edges(src: HTMLVideoElement | HTMLImageElement, top: HTMLCanvasElement | null, bottom: HTMLCanvasElement | null) {
+// A band in screen cqw: where it sits, how far its blur ramps in from the box end, and the canvas
+// padding (3σ) that keeps its blur fed with picture at every edge.
+type Band = { edge: "top" | "bottom"; top: number; height: number; ramp: number; blur: number; dim: number; pad: number };
+const band = (b: Omit<Band, "pad">): Band => ({ ...b, pad: Math.ceil(3 * b.blur) });
+const BANDS = [
+  // Full only at the screen top, none topRamp into the box.
+  band({ edge: "top", top: 0, height: EXTEND_TOP_CQW + BAND.topRamp * PT, ramp: EXTEND_TOP_CQW + BAND.topRamp * PT, blur: BAND.topBlur * PT, dim: BAND.topDim }),
+  // None rampAbove over the bar, full fullBelow under it.
+  band({
+    edge: "bottom",
+    top: SCREEN_H_CQW - EXTEND_BOTTOM_CQW - BAND.rampAbove * PT,
+    height: EXTEND_BOTTOM_CQW + BAND.rampAbove * PT,
+    ramp: BAND.rampAbove * PT + Math.min(BAND.fullBelow * PT, EXTEND_BOTTOM_CQW),
+    blur: BAND.bottomBlur * PT,
+    dim: BAND.bottomDim,
+  }),
+];
+
+// Paint the screen's picture — the box (same centre crop as its object-cover) and its outermost 2pt
+// stretched above and below it — into the strip canvases, and into each band's padded canvases with
+// the side padding clamped to the edge column. Painted from the poster until the video has a frame.
+function paint_edges(src: HTMLVideoElement | HTMLImageElement, top: HTMLCanvasElement | null, bottom: HTMLCanvasElement | null, bands: (HTMLCanvasElement | null)[][]) {
   const [w, h] = src instanceof HTMLVideoElement ? [src.videoWidth, src.videoHeight] : [src.naturalWidth, src.naturalHeight];
   if (!w || !h || (src instanceof HTMLVideoElement && src.readyState < 2)) return;
   const sw = Math.min(w, (h * 100) / EXTEND_BOX_CQW);
+  const sx = (w - sw) / 2;
   const rows = Math.max(1, (h * STRIP_PT * PT) / EXTEND_BOX_CQW);
   for (const [canvas, sy] of [[top, 0], [bottom, h - rows]] as const) {
     const ctx = canvas?.getContext("2d");
-    if (canvas && ctx) ctx.drawImage(src, (w - sw) / 2, sy, sw, rows, 0, 0, canvas.width, canvas.height);
+    if (canvas && ctx) ctx.drawImage(src, sx, sy, sw, rows, 0, 0, canvas.width, canvas.height);
   }
+  const box_bottom = EXTEND_TOP_CQW + EXTEND_BOX_CQW;
+  BANDS.forEach((b, i) => {
+    const [first, ...copies] = bands[i];
+    const ctx = first?.getContext("2d");
+    if (!first || !ctx) return;
+    const y0 = b.top - b.pad;
+    const y1 = b.top + b.height + b.pad;
+    const pad_px = b.pad * BAND_PX;
+    const draw = (a: number, z: number, sy: number, sh: number) => {
+      if (z > a) ctx.drawImage(src, sx, sy, sw, sh, pad_px, (a - y0) * BAND_PX, 100 * BAND_PX, (z - a) * BAND_PX);
+    };
+    draw(y0, Math.min(y1, EXTEND_TOP_CQW), 0, rows); // above the box: its top rows, stretched
+    const a = Math.max(y0, EXTEND_TOP_CQW);
+    const z = Math.min(y1, box_bottom);
+    draw(a, z, ((a - EXTEND_TOP_CQW) / EXTEND_BOX_CQW) * h, ((z - a) / EXTEND_BOX_CQW) * h); // the box
+    draw(Math.max(y0, box_bottom), y1, h - rows, rows); // below the box: its bottom rows, stretched
+    ctx.drawImage(first, pad_px, 0, 1, first.height, 0, 0, pad_px, first.height);
+    ctx.drawImage(first, first.width - pad_px - 1, 0, 1, first.height, first.width - pad_px, 0, pad_px, first.height);
+    for (const c of copies) c?.getContext("2d")?.drawImage(first, 0, 0);
+  });
 }
 
-// One band of VerticalFormatBandBlur: clear at the box end, eased to full over `ramp_cqw`, then full
-// out to the screen edge. Sizes in cqw.
-function BandBlur({ edge, height, ramp_cqw, blur, dim }: { edge: "top" | "bottom"; height: number; ramp_cqw: number; blur: number; dim: number }) {
-  const ramp = height > 0 ? Math.min(ramp_cqw / height, 1) * 100 : 100;
-  const dir = edge === "top" ? "to top" : "to bottom"; // from the box end out to the screen edge
+// One band of VerticalFormatBandBlur: clear at the box end, eased to full over its ramp, then full
+// out to the screen edge, plus the eased dim.
+function BandBlur({ b, canvases }: { b: Band; canvases: (HTMLCanvasElement | null)[] }) {
+  const ramp = Math.min(b.ramp / b.height, 1) * 100;
+  const dir = b.edge === "top" ? "to top" : "to bottom"; // from the box end out to the screen edge
   return (
-    <div aria-hidden className="absolute inset-x-0" style={{ [edge]: 0, height: `${height}cqw` }}>
+    <div aria-hidden className="absolute inset-x-0 overflow-hidden" style={{ top: `${b.top}cqw`, height: `${b.height}cqw` }}>
       {Array.from({ length: BLUR_LAYERS }, (_, k) => {
         const mask = `linear-gradient(${dir}, transparent ${(ramp * k) / BLUR_LAYERS}%, black ${(ramp * (k + 1)) / BLUR_LAYERS}%)`;
-        const filter = `blur(${(blur * Math.sqrt(2 * k + 1)) / BLUR_LAYERS}cqw)`;
-        return <div key={k} className="absolute inset-0" style={{ backdropFilter: filter, WebkitBackdropFilter: filter, maskImage: mask, WebkitMaskImage: mask }} />;
+        return (
+          <div key={k} className="absolute inset-0" style={{ maskImage: mask, WebkitMaskImage: mask }}>
+            <canvas
+              ref={(el) => { canvases[k] = el; }}
+              width={(100 + 2 * b.pad) * BAND_PX}
+              height={(b.height + 2 * b.pad) * BAND_PX}
+              className="absolute max-w-none"
+              style={{
+                left: `${-b.pad}cqw`,
+                top: `${-b.pad}cqw`,
+                width: `${100 + 2 * b.pad}cqw`,
+                height: `${b.height + 2 * b.pad}cqw`,
+                filter: `blur(${(b.blur * (k + 1)) / BLUR_LAYERS}cqw)`,
+              }}
+            />
+          </div>
+        );
       })}
       <div
         className="absolute inset-0"
-        style={{ background: `linear-gradient(${dir}, ${EASE_IN.map(([at, a]) => `rgba(0,0,0,${dim * a}) ${ramp * at}%`).join(", ")})` }}
+        style={{ background: `linear-gradient(${dir}, ${EASE_IN.map(([at, a]) => `rgba(0,0,0,${b.dim * a}) ${ramp * at}%`).join(", ")})` }}
       />
     </div>
   );
@@ -148,6 +208,7 @@ function ClipLayer({ clip, role, posterOnly, landscapeLayout, onEnd }: LayerProp
   const posterRef = useRef<HTMLImageElement | null>(null);
   const topEdgeRef = useRef<HTMLCanvasElement | null>(null);
   const bottomEdgeRef = useRef<HTMLCanvasElement | null>(null);
+  const bandRefs = useRef<(HTMLCanvasElement | null)[][]>(BANDS.map(() => []));
   const [hasFrame, setHasFrame] = useState(false); // a decoded frame is up → poster can go
   const hasFrameRef = useRef(false);
   hasFrameRef.current = hasFrame;
@@ -158,7 +219,7 @@ function ClipLayer({ clip, role, posterOnly, landscapeLayout, onEnd }: LayerProp
     const img = posterRef.current;
     if (!img?.naturalWidth) return;
     setLandscape(img.naturalWidth > img.naturalHeight);
-    if (!hasFrameRef.current) paint_edges(img, topEdgeRef.current, bottomEdgeRef.current);
+    if (!hasFrameRef.current) paint_edges(img, topEdgeRef.current, bottomEdgeRef.current, bandRefs.current);
   };
   // The poster can finish loading before hydration attaches onLoad — read it once on mount too.
   useEffect(read_poster_aspect, []);
@@ -187,7 +248,7 @@ function ClipLayer({ clip, role, posterOnly, landscapeLayout, onEnd }: LayerProp
       if (cancelled) return;
       setHasFrame(true);
       setLandscape(video.videoWidth > video.videoHeight);
-      paint_edges(video, topEdgeRef.current, bottomEdgeRef.current);
+      paint_edges(video, topEdgeRef.current, bottomEdgeRef.current, bandRefs.current);
     };
     video.addEventListener("loadeddata", on_frame);
     video.addEventListener("playing", on_frame);
@@ -257,7 +318,7 @@ function ClipLayer({ clip, role, posterOnly, landscapeLayout, onEnd }: LayerProp
       if (video.playbackRate !== PLAYBACK_RATE) video.playbackRate = PLAYBACK_RATE; // hls/seek can reset it
       const t = video.currentTime;
       if (t >= clip.start_time) setPlayhead(t);
-      paint_edges(video, topEdgeRef.current, bottomEdgeRef.current);
+      paint_edges(video, topEdgeRef.current, bottomEdgeRef.current, bandRefs.current);
       if (t >= clip.end_time) {
         video.pause();
         done = true;
@@ -312,7 +373,12 @@ function ClipLayer({ clip, role, posterOnly, landscapeLayout, onEnd }: LayerProp
           ) : (
             <div className="absolute inset-x-0 top-0 z-[1] h-[50cqw] bg-gradient-to-b from-black/65 via-black/35 to-transparent" />
           )}
-          <div className="absolute inset-x-0 bottom-0 z-[1] h-[74%] bg-gradient-to-t from-black/95 via-black/65 to-transparent" />
+          {extend ? (
+            // iOS's bottom vignette: clear at mid-screen, 0.75 three quarters of the way down, held.
+            <div className="absolute inset-x-0 bottom-0 z-[1] h-1/2" style={{ background: "linear-gradient(to bottom, transparent, rgba(0,0,0,0.75) 75%)" }} />
+          ) : (
+            <div className="absolute inset-x-0 bottom-0 z-[1] h-[74%] bg-gradient-to-t from-black/95 via-black/65 to-transparent" />
+          )}
         </>
       )}
 
@@ -355,20 +421,11 @@ function ClipLayer({ clip, role, posterOnly, landscapeLayout, onEnd }: LayerProp
         )}
       </div>
 
-      {/* iOS VerticalFormatBandBlur, under the scrims so it blurs the raw strips. Top: over the whole
-          band. Bottom: from rampAbove inside the box to full fullBelow under its end. */}
-      {extend && (
-        <>
-          <BandBlur edge="top" height={EXTEND_TOP_CQW} ramp_cqw={EXTEND_TOP_CQW} blur={BAND.topBlur * PT} dim={BAND.topDim} />
-          <BandBlur
-            edge="bottom"
-            height={EXTEND_BOTTOM_CQW + BAND.rampAbove * PT}
-            ramp_cqw={BAND.rampAbove * PT + Math.min(BAND.fullBelow * PT, EXTEND_BOTTOM_CQW)}
-            blur={BAND.bottomBlur * PT}
-            dim={BAND.bottomDim}
-          />
-        </>
-      )}
+      {/* iOS VerticalFormatBandBlur, under the scrims. Mounted always, like the strips, so the poster
+          can paint into it before the layout knows it's landscape. */}
+      <div className={extend ? "" : "hidden"}>
+        {BANDS.map((b, i) => <BandBlur key={b.edge} b={b} canvases={bandRefs.current[i]} />)}
+      </div>
 
       {/* Lesson title row + progress */}
       <div className="absolute inset-x-0 top-[15.6cqw] z-[2] px-[6cqw]">
