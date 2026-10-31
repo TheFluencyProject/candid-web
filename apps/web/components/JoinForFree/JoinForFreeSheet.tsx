@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useTranslations } from "next-intl";
 import { useJoinForFreeOpen, closeJoinForFree } from "@/lib/join-for-free-store";
 import ResponsiveOverlay from "@/components/ResponsiveOverlay";
+import type { Locale } from "@/i18n/routing";
 import SignInStep from "./SignInStep";
 import SuccessStep from "./SuccessStep";
 
@@ -12,7 +13,7 @@ type Step = "signin" | "success" | "error";
 interface Props {
   tutor_name: string;
   tutor_slug: string;
-  locale: "en" | "ko";
+  locale: Locale;
 }
 
 export default function JoinForFreeSheet({ tutor_name, tutor_slug, locale }: Props) {

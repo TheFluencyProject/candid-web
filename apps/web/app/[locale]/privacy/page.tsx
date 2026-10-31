@@ -15,12 +15,12 @@ export default async function PrivacyPage({ params }: Props) {
   const { locale } = await params;
   setRequestLocale(locale);
 
-  // Load locale-specific markdown
+  // Legal text exists in en + ko only; every other locale reads the English.
   const file_path = path.join(
     process.cwd(),
     "public",
     "content",
-    `privacy-${locale}.md`
+    `privacy-${locale === "ko" ? "ko" : "en"}.md`
   );
   const content = await readFile(file_path, "utf-8");
 

@@ -6,12 +6,13 @@ import Link from "next/link";
 import AppleSignInButton from "./AppleSignInButton";
 import GoogleSignInButton from "./GoogleSignInButton";
 import { submit_web_signup } from "@/lib/api";
+import type { Locale } from "@/i18n/routing";
 import type { SignInResult } from "@/lib/firebase";
 
 interface Props {
   tutor_name: string;
   tutor_slug: string;
-  locale: "en" | "ko";
+  locale: Locale;
   onSuccess: (email: string, already_has_account: boolean) => void;
   onError: (message: string) => void;
 }

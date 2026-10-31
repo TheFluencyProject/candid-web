@@ -2,93 +2,34 @@
 
 import { useEffect, useState } from "react";
 import ResponsiveOverlay from "@/components/ResponsiveOverlay";
+import { isLocale, routing, type Locale } from "@/i18n/routing";
 import { submit_android_waitlist, type AndroidWaitlistSurface } from "@/lib/api";
+import { isAndroid } from "@/lib/in-app-browser";
 
 // Candid is iOS-only, so an Android Download tap would land on an App Store page it can't
 // install from. DownloadQRInterceptor opens this instead: one email field, then a thank-you.
 //
-// Copy lives here rather than in messages/*.json because /lesson/[id] mounts the interceptor
-// outside the [locale] group (no translation context), and the site only ships en + ko while
-// Android visitors can be any of the app's languages — so the language comes from the phone.
+// Strings live in messages/<locale>.json under `android_waitlist`, but are loaded here rather
+// than through next-intl: /lesson/[id] mounts the interceptor outside the [locale] group (no
+// translation context), and the phone's language beats the page's — a /tutor link opens in
+// English for everyone. Loaded once on Android only, long before anyone taps Download.
 type Copy = { title: string; placeholder: string; button: string; success: string; error: string };
 
-const COPY: Record<string, Copy> = {
-  en: {
-    title: "Join the waitlist for Candid Android",
-    placeholder: "you@email.com",
-    button: "Join waitlist",
-    success: "You're on the list! We'll email you when Candid is on Android.",
-    error: "Something went wrong",
-  },
-  ko: {
-    title: "Candid 안드로이드 대기자 명단에 등록하세요",
-    placeholder: "you@email.com",
-    button: "대기자 명단 등록",
-    success: "등록되었어요! Candid가 안드로이드에 출시되면 이메일로 알려드릴게요.",
-    error: "문제가 발생했어요",
-  },
-  ja: {
-    title: "Candid Android版のウェイトリストに登録",
-    placeholder: "you@email.com",
-    button: "ウェイトリストに登録",
-    success: "登録しました！Candid が Android に対応したらメールでお知らせします。",
-    error: "問題が発生しました",
-  },
-  zh: {
-    title: "加入 Candid 安卓版候补名单",
-    placeholder: "you@email.com",
-    button: "加入候补名单",
-    success: "你已加入名单！Candid 安卓版上线时我们会发邮件通知你。",
-    error: "出错了",
-  },
-  es: {
-    title: "Únete a la lista de espera de Candid para Android",
-    placeholder: "you@email.com",
-    button: "Unirme a la lista",
-    success: "¡Ya estás en la lista! Te avisaremos por correo cuando Candid esté en Android.",
-    error: "Algo salió mal",
-  },
-  ru: {
-    title: "Запишитесь в лист ожидания Candid для Android",
-    placeholder: "you@email.com",
-    button: "Записаться",
-    success: "Вы в списке! Мы напишем вам, когда Candid появится на Android.",
-    error: "Что-то пошло не так",
-  },
-  fr: {
-    title: "Rejoignez la liste d'attente de Candid pour Android",
-    placeholder: "you@email.com",
-    button: "Rejoindre la liste",
-    success: "Vous êtes sur la liste ! Nous vous écrirons dès que Candid sera disponible sur Android.",
-    error: "Une erreur s'est produite",
-  },
-  vi: {
-    title: "Đăng ký danh sách chờ Candid cho Android",
-    placeholder: "you@email.com",
-    button: "Tham gia danh sách chờ",
-    success: "Bạn đã có tên trong danh sách! Chúng tôi sẽ gửi email khi Candid có mặt trên Android.",
-    error: "Đã xảy ra lỗi",
-  },
-  th: {
-    title: "ลงชื่อรอใช้ Candid บน Android",
-    placeholder: "you@email.com",
-    button: "ลงชื่อรอ",
-    success: "คุณอยู่ในรายชื่อแล้ว! เราจะส่งอีเมลแจ้งเมื่อ Candid พร้อมใช้งานบน Android",
-    error: "เกิดข้อผิดพลาด",
-  },
-  id: {
-    title: "Gabung daftar tunggu Candid untuk Android",
-    placeholder: "you@email.com",
-    button: "Gabung daftar tunggu",
-    success: "Kamu sudah masuk daftar! Kami akan mengirim email saat Candid tersedia di Android.",
-    error: "Terjadi kesalahan",
-  },
-};
-
-// "ko-KR" → ko, "zh-Hans-CN" → zh; anything the app doesn't speak falls back to English.
-function pickCopy(): Copy {
+// "ko-KR" → ko, "zh-Hans-CN" → zh; anything the site doesn't speak falls back to English.
+function phoneLocale(): Locale {
   const lang = (typeof navigator === "undefined" ? "" : navigator.language).toLowerCase().split("-")[0];
-  return COPY[lang] ?? COPY.en;
+  return isLocale(lang) ? lang : routing.defaultLocale;
+}
+
+function useWaitlistCopy(): Copy | null {
+  const [copy, setCopy] = useState<Copy | null>(null);
+  useEffect(() => {
+    if (!isAndroid()) return;
+    import(`@/messages/${phoneLocale()}.json`)
+      .catch(() => import("@/messages/en.json"))
+      .then((m) => setCopy(m.default.android_waitlist as Copy));
+  }, []);
+  return copy;
 }
 
 export type AndroidWaitlistTarget = { tutor_slug: string; surface: AndroidWaitlistSurface };
@@ -126,7 +67,7 @@ export default function AndroidWaitlistOverlay({
     };
   }, [open]);
 
-  const copy = pickCopy();
+  const copy = useWaitlistCopy();
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -148,14 +89,14 @@ export default function AndroidWaitlistOverlay({
 
   return (
     <ResponsiveOverlay
-      open={open}
+      open={open && copy !== null}
       onClose={onClose}
       keyboardInset={kbdInset}
       blurBackdrop
       panelBackground="#FFFFFF"
       desktopMaxWidthClass="max-w-[400px]"
     >
-      {state === "done" ? (
+      {copy && (state === "done" ? (
         <div className="px-8 py-10 text-center">
           <p className="text-lg font-semibold" style={{ color: "#18181C" }}>{copy.success}</p>
         </div>
@@ -189,7 +130,7 @@ export default function AndroidWaitlistOverlay({
             <p className="text-sm" style={{ color: "#B42318" }}>{copy.error}</p>
           )}
         </form>
-      )}
+      ))}
     </ResponsiveOverlay>
   );
 }

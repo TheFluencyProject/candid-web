@@ -5,6 +5,7 @@ import { headers } from "next/headers";
 import { fetchTutor } from "@/lib/api";
 import { APP_STORE_URL } from "@/lib/platform";
 import { pickLocale } from "@/lib/i18n-helpers";
+import type { Locale } from "@/i18n/routing";
 
 // App Clip funnel disabled for now — the middleware always redirects /download/<slug> to the App
 // Store, so this body only renders the App Store fallback. The apple-itunes-app App Clip meta is
@@ -16,13 +17,21 @@ import { pickLocale } from "@/lib/i18n-helpers";
 type Props = { params: Promise<{ slug: string }> };
 
 // Outside /[locale], so the header is read here instead of by the middleware.
-async function resolveLocale(): Promise<"en" | "ko"> {
+async function resolveLocale(): Promise<Locale> {
   return pickLocale((await headers()).get("accept-language"));
 }
 
-const COPY = {
+const COPY: Record<Locale, { hint: string; alt: string }> = {
   en: { hint: "Tap the banner above to start instantly — or download the full app.", alt: "Download on the App Store" },
   ko: { hint: "위 배너를 눌러 바로 시작하거나, 앱을 다운로드하세요.", alt: "App Store에서 다운로드" },
+  ja: { hint: "上のバナーをタップしてすぐに始めるか、アプリをダウンロードしてください。", alt: "App Storeからダウンロード" },
+  zh: { hint: "点击上方横幅立即开始，或下载完整应用。", alt: "在 App Store 下载" },
+  es: { hint: "Toca el banner de arriba para empezar al instante, o descarga la app completa.", alt: "Descargar en el App Store" },
+  ru: { hint: "Нажмите на баннер выше, чтобы начать сразу, или скачайте полное приложение.", alt: "Загрузить в App Store" },
+  fr: { hint: "Touche la bannière ci-dessus pour commencer tout de suite, ou télécharge l’app complète.", alt: "Télécharger dans l’App Store" },
+  vi: { hint: "Chạm vào biểu ngữ phía trên để bắt đầu ngay, hoặc tải ứng dụng đầy đủ.", alt: "Tải về trên App Store" },
+  th: { hint: "แตะแบนเนอร์ด้านบนเพื่อเริ่มทันที หรือดาวน์โหลดแอปเต็ม", alt: "ดาวน์โหลดบน App Store" },
+  id: { hint: "Ketuk banner di atas untuk langsung mulai, atau unduh aplikasi lengkapnya.", alt: "Unduh di App Store" },
 };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
