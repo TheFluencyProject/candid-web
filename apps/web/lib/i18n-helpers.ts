@@ -12,23 +12,38 @@ import { isLocale, type Locale } from "@/i18n/routing";
  * can be imported by both.
  */
 export function pickLocale(acceptLanguage: string | null, country?: string | null): Locale {
-  const header = (acceptLanguage ?? "").toLowerCase();
-  // "zh-Hant-TW;q=0.8" → "zh". Every Chinese variant gets /zh (the app ships Simplified only).
-  const tags = header.split(",").map((part) => part.split(";")[0].trim().split("-")[0]).filter(Boolean);
-  const primary = tags[0] ?? "";
-  if (primary !== "en" && isLocale(primary)) return primary;
+  // "zh-Hant-TW;q=0.8" → "zh-Hant-TW" → zh-Hant.
+  const tags = (acceptLanguage ?? "").split(",").map((part) => part.split(";")[0].trim()).filter(Boolean);
+  const locales = tags.map(siteLocaleForTag);
+  const primary = locales[0] ?? null;
+  if (primary && primary !== "en") return primary;
   // Korean isn't the primary tag, but it's accepted (or nothing is) and the request
   // is from Korea — e.g. a local whose phone UI is set to English.
-  if (country?.toUpperCase() === "KR" && (!primary || tags.includes("ko"))) return "ko";
+  if (country?.toUpperCase() === "KR" && (!tags.length || locales.includes("ko"))) return "ko";
   if (primary === "en") return "en";
   // Primary language isn't one we serve (say de): take the first one listed that we do.
-  return tags.find(isLocale) ?? "en";
+  return locales.find((l): l is Locale => l !== null) ?? "en";
+}
+
+/**
+ * The site locale for one BCP 47 tag ("ko-KR" → ko), or null when the site doesn't speak it.
+ * Chinese splits by script: zh-Hant, or a Taiwan / Hong Kong region with no script, gets
+ * Traditional; every other zh-* gets /zh (Simplified). Case-insensitive.
+ */
+export function siteLocaleForTag(tag: string): Locale | null {
+  const [base, ...subtags] = tag.toLowerCase().split("-");
+  if (base === "zh") {
+    if (subtags.includes("hans")) return "zh";
+    return subtags.some((s) => s === "hant" || s === "tw" || s === "hk") ? "zh-Hant" : "zh";
+  }
+  return isLocale(base) ? base : null;
 }
 
 const LANG_NAMES: Partial<Record<Locale, Record<string, string>>> = {
   ko: { english: "영어", korean: "한국어" },
   ja: { english: "英語", korean: "韓国語" },
   zh: { english: "英语", korean: "韩语" },
+  "zh-Hant": { english: "英語", korean: "韓語" },
   es: { english: "inglés", korean: "coreano" },
   ru: { english: "английский", korean: "корейский" },
   fr: { english: "anglais", korean: "coréen" },
@@ -46,6 +61,7 @@ const MAP_COUNTRIES: Partial<Record<Locale, Record<string, string>>> = {
   ko: { english: "미국인", korean: "한국인" },
   ja: { english: "アメリカ", korean: "韓国" },
   zh: { english: "美国", korean: "韩国" },
+  "zh-Hant": { english: "美國", korean: "韓國" },
   es: { english: "Estados Unidos", korean: "Corea" },
   ru: { english: "Америку", korean: "Корею" },
   fr: { english: "les États-Unis", korean: "la Corée" },
