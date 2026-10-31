@@ -9,12 +9,12 @@ import { isRestrictedInAppBrowser } from "@/lib/platform";
 // are measured off Mia's uploaded screenshot (the look this mirrors) and expressed in cqw —
 // percent of the screen's width — so the whole screen scales as one picture.
 
-// iOS AccentColor (display-p3 0x89/0xFF/0xB4) — karaoke sweep + Speak-now pill + waveform.
+// iOS AccentColor (display-p3 0x89/0xFF/0xB4) — karaoke sweep, Speak-now pill, progress bar.
 const ACCENT = "#89FFB4";
-// Same slowed rate as the marquee cards (clips feel rushed at 1x); shown on the speed button.
-const PLAYBACK_RATE = 0.8;
-// Hold on the fully-lit "your turn" sweep before the clip replays.
-const SPEAK_HOLD_MS = 1400;
+// The app's slowed shadowing speed; shown on the speed button.
+const PLAYBACK_RATE = 0.7;
+// Rest on the last frame, caption fully lit, before the clip replays.
+const END_HOLD_MS = 1200;
 
 // /iphone-frame.png is 1000x2034 with a transparent screen cut out at (101,84)-(1896,3973),
 // corner radius 250, on its 2000x4068 source. These place the live screen under that hole.
@@ -25,12 +25,6 @@ const SCREEN_STYLE = {
   height: "95.6%",
   borderRadius: "13.9% / 6.43%",
 } as const;
-
-// Deterministic waveform heights (% of the strip) — a fixed wobble, so SSR and client agree.
-const WAVE_BARS = Array.from({ length: 84 }, (_, i) => {
-  const v = 0.55 + 0.3 * Math.sin(i * 0.23) + 0.15 * Math.sin(i * 0.71 + 1.3) + 0.1 * Math.sin(i * 1.9);
-  return Math.round(Math.min(1, Math.max(0.12, v)) * 100); // whole percents: SSR + client print alike
-});
 
 function StatusIcons() {
   return (
@@ -58,14 +52,6 @@ function StatusIcons() {
   );
 }
 
-function LockIcon() {
-  return (
-    <svg viewBox="0 0 14 18" className="h-[5cqw]" fill="white" aria-hidden>
-      <path d="M2.2 18h9.6c1.5 0 2.2-.8 2.2-2.4V9.9c0-1.4-.6-2.2-1.8-2.3V5.5C12.2 2.1 10 0 7 0S1.8 2.1 1.8 5.5v2.1C.6 7.7 0 8.5 0 9.9v5.7C0 17.2.7 18 2.2 18ZM3.7 7.6V5.3C3.7 3.2 5 1.8 7 1.8s3.3 1.4 3.3 3.5v2.3Z" />
-    </svg>
-  );
-}
-
 type Props = {
   clip: MarketingClip;
   alt: string;
@@ -74,9 +60,6 @@ type Props = {
 export default function PhoneClipHero({ clip, alt }: Props) {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const [hasFrame, setHasFrame] = useState(false); // a decoded frame is up → poster can go
-  // "tutor": the clip plays and its caption sweeps lit. "speak": the clip rests on its last
-  // frame, Speak now shows, and the caption re-sweeps on the same timings (the learner's turn).
-  const [phase, setPhase] = useState<"tutor" | "speak">("tutor");
   const [playhead, setPlayhead] = useState(clip.start_time); // absolute clip time driving the sweep
   // Restricted in-app webviews force-fullscreen any playing <video>; there, only the poster shows.
   // UA-sniffed after mount (SSR-safe), and flipped at runtime by the same window events the
@@ -93,7 +76,8 @@ export default function PhoneClipHero({ clip, alt }: Props) {
     };
   }, []);
 
-  // Load the clip (hls.js, native HLS on Safari) and loop tutor → speak → tutor.
+  // Load the clip (hls.js, native HLS on Safari): play the segment once, hold on its last frame,
+  // replay.
   useEffect(() => {
     if (posterOnly) return;
     const video = videoRef.current;
@@ -105,14 +89,15 @@ export default function PhoneClipHero({ clip, alt }: Props) {
     const src = `https://stream.mux.com/${clip.mux_playback_id}.m3u8?max_resolution=1080p`;
     let hls: import("hls.js").default | null = null;
     let raf = 0;
+    let hold: ReturnType<typeof setTimeout> | undefined;
     let cancelled = false;
-    let speak_started = 0;
 
     const play_from_start = () => {
       video.muted = true; // iOS: set imperatively — the prop doesn't reliably reach the element
       try { video.currentTime = clip.start_time; } catch { /* not seekable yet */ }
+      video.defaultPlaybackRate = PLAYBACK_RATE;
       video.playbackRate = PLAYBACK_RATE;
-      setPhase("tutor");
+      setPlayhead(clip.start_time);
       video.play().then(() => {
         video.playbackRate = PLAYBACK_RATE; // starting playback can reset it to 1
       }).catch((err: DOMException) => {
@@ -121,28 +106,18 @@ export default function PhoneClipHero({ clip, alt }: Props) {
           window.dispatchEvent(new CustomEvent("candid:autoplay-blocked"));
         }
       });
+      raf = requestAnimationFrame(tick);
     };
 
     const tick = () => {
       if (cancelled) return;
-      if (speak_started === 0) {
-        if (video.playbackRate !== PLAYBACK_RATE) video.playbackRate = PLAYBACK_RATE;
-        const t = video.currentTime;
-        if (t >= clip.start_time) setPlayhead(t);
-        if (t >= clip.end_time) {
-          video.pause();
-          speak_started = performance.now();
-          setPhase("speak");
-          setPlayhead(clip.start_time);
-        }
-      } else {
-        // The learner's turn: re-sweep at the clip's own (1x) word timings.
-        const elapsed = (performance.now() - speak_started) / 1000;
-        setPlayhead(clip.start_time + elapsed);
-        if (elapsed * 1000 >= (clip.end_time - clip.start_time) * 1000 + SPEAK_HOLD_MS) {
-          speak_started = 0;
-          play_from_start();
-        }
+      if (video.playbackRate !== PLAYBACK_RATE) video.playbackRate = PLAYBACK_RATE; // hls/seek can reset it
+      const t = video.currentTime;
+      if (t >= clip.start_time) setPlayhead(t);
+      if (t >= clip.end_time) {
+        video.pause();
+        hold = setTimeout(play_from_start, END_HOLD_MS);
+        return;
       }
       raf = requestAnimationFrame(tick);
     };
@@ -150,11 +125,7 @@ export default function PhoneClipHero({ clip, alt }: Props) {
     const on_frame = () => { if (!cancelled) setHasFrame(true); };
     video.addEventListener("loadeddata", on_frame);
     video.addEventListener("playing", on_frame);
-    const on_ready = () => {
-      if (cancelled) return;
-      play_from_start();
-      raf = requestAnimationFrame(tick);
-    };
+    const on_ready = () => { if (!cancelled) play_from_start(); };
 
     import("hls.js").then(({ default: Hls }) => {
       if (cancelled) return;
@@ -184,6 +155,7 @@ export default function PhoneClipHero({ clip, alt }: Props) {
     return () => {
       cancelled = true;
       cancelAnimationFrame(raf);
+      if (hold) clearTimeout(hold);
       video.removeEventListener("loadeddata", on_frame);
       video.removeEventListener("playing", on_frame);
       video.removeEventListener("webkitbeginfullscreen", on_begin);
@@ -194,8 +166,6 @@ export default function PhoneClipHero({ clip, alt }: Props) {
   }, [clip, posterOnly]);
 
   const words = clip.word_level_captions;
-  // Second lesson bar fills with the clip, like the in-app part progress.
-  const progress = phase === "speak" ? 1 : Math.min(1, Math.max(0, (playhead - clip.start_time) / (clip.end_time - clip.start_time)));
 
   return (
     <div className="relative w-full aspect-[1000/2034] select-none" role="img" aria-label={alt}>
@@ -240,22 +210,18 @@ export default function PhoneClipHero({ clip, alt }: Props) {
             <span className="min-w-0 flex-1 truncate text-white text-[5.4cqw] font-bold leading-tight tracking-[-0.02em] [font-stretch:condensed] drop-shadow">
               {clip.title}
             </span>
-            <LockIcon />
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src="/switch.2.svg" alt="" className="h-[5.3cqw] w-auto" />
           </div>
-          <div className="mt-[2.4cqw] flex gap-[2.6cqw]">
-            {[0, 1, 2, 3, 4].map((i) => (
-              <div key={i} className="h-[1.2cqw] flex-1 overflow-hidden rounded-full bg-white/35">
-                <div className="h-full rounded-full bg-white" style={{ width: `${i === 0 ? 100 : i === 1 ? progress * 100 : 0}%` }} />
-              </div>
-            ))}
+          {/* One lesson progress bar, fixed partway — it doesn't track the clip. */}
+          <div className="mt-[2.4cqw] h-[1.2cqw] overflow-hidden rounded-full bg-white/35">
+            <div className="h-full w-[35%] rounded-full" style={{ backgroundColor: ACCENT }} />
           </div>
         </div>
 
         {/* Speak now + caption + translation — bottom-anchored like the app. */}
         <div className="absolute inset-x-0 bottom-[41cqw] px-[6.2cqw]">
-          <div className={`mb-[6.6cqw] flex justify-center transition-opacity duration-300 ${phase === "speak" ? "opacity-100" : "opacity-0"}`}>
+          <div className="mb-[6.6cqw] flex justify-center">
             <span className="rounded-[2.4cqw] px-[3.8cqw] py-[2.1cqw] text-[3.9cqw] font-semibold leading-none text-black" style={{ backgroundColor: ACCENT }}>
               Speak now
             </span>
@@ -287,16 +253,11 @@ export default function PhoneClipHero({ clip, alt }: Props) {
         </div>
 
         {/* Speed button */}
-        <div className="absolute right-[7cqw] bottom-[15.3cqw] flex h-[18.4cqw] w-[18.4cqw] items-center justify-center rounded-full border border-white/15 bg-[#1c1c1e]/80 text-white text-[5.6cqw] font-semibold tracking-tight">
+        <div className="absolute right-[6cqw] bottom-[9cqw] flex h-[15cqw] w-[15cqw] items-center justify-center rounded-full border border-white/15 bg-[#1c1c1e]/80 text-white text-[6cqw] font-semibold tracking-tight">
           {PLAYBACK_RATE}x
         </div>
 
-        {/* Waveform + home indicator */}
-        <div className="absolute inset-x-[4.5cqw] bottom-[1cqw] flex h-[8.6cqw] items-end gap-[0.45cqw]">
-          {WAVE_BARS.map((h, i) => (
-            <div key={i} className="flex-1 rounded-t-[0.2cqw]" style={{ height: `${h}%`, backgroundColor: ACCENT }} />
-          ))}
-        </div>
+        {/* Home indicator */}
         <div className="absolute bottom-[1.6cqw] left-1/2 h-[1.1cqw] w-[32cqw] -translate-x-1/2 rounded-full bg-white/60" />
       </div>
 
