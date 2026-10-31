@@ -36,6 +36,11 @@ function progress_for(clip: MarketingClip): number {
   return 20 + (h % 56);
 }
 
+// Some titles arrive with the emoji glued on ("Let's Take a Walk🍁"); space it like the rest.
+function spaced_title(title: string): string {
+  return title.replace(/(\S)(\p{Extended_Pictographic}[\p{Extended_Pictographic}‍️]*)$/u, "$1 $2");
+}
+
 function StatusIcons() {
   return (
     <div className="flex items-center gap-[1.4cqw]">
@@ -219,7 +224,7 @@ function ClipLayer({ clip, role, posterOnly, onEnd }: LayerProps) {
       <div className="absolute inset-x-0 top-[15.6cqw] px-[6cqw]">
         <div className="flex items-center gap-[3cqw]">
           <span className="min-w-0 flex-1 truncate text-white text-[5.4cqw] font-bold leading-tight tracking-[-0.02em] [font-stretch:condensed] drop-shadow">
-            {clip.title}
+            {spaced_title(clip.title)}
           </span>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/switch.2.svg" alt="" className="h-[5.3cqw] w-auto" />
@@ -229,8 +234,9 @@ function ClipLayer({ clip, role, posterOnly, onEnd }: LayerProps) {
         </div>
       </div>
 
-      {/* Speak now + caption + translation — bottom-anchored like the app. */}
-      <div className="absolute inset-x-0 bottom-[50cqw] px-[6.2cqw]">
+      {/* Speak now + caption + translation — top-anchored: Speak now sits at the screen's middle
+          (the screen is ~217cqw tall) and longer captions grow down toward the speed button. */}
+      <div className="absolute inset-x-0 top-[104cqw] px-[6.2cqw]">
         <div className="mb-[6.6cqw] flex justify-center">
           <span className="rounded-[2.8cqw] px-[4.6cqw] py-[2.6cqw] text-[4.8cqw] font-semibold leading-none text-black" style={{ backgroundColor: ACCENT }}>
             Speak now
@@ -323,7 +329,7 @@ export default function PhoneClipHero({ clips, alt }: Props) {
             <span className="text-white text-[3.9cqw] font-semibold leading-none tracking-tight">9:41</span>
             <StatusIcons />
           </div>
-          <div className="absolute right-[6.5cqw] bottom-[11cqw] flex h-[16.5cqw] w-[16.5cqw] items-center justify-center rounded-full border border-white/15 bg-[#1c1c1e]/85 text-white text-[4.6cqw] font-semibold tracking-[-0.02em]">
+          <div className="absolute right-[6.5cqw] bottom-[11cqw] flex h-[16.5cqw] w-[16.5cqw] items-center justify-center rounded-full border border-white/[0.07] bg-[#1c1c1e]/85 text-white text-[4.6cqw] font-semibold tracking-[-0.02em]">
             {PLAYBACK_RATE}x
           </div>
           <div className="absolute bottom-[1.6cqw] left-1/2 h-[1.1cqw] w-[32cqw] -translate-x-1/2 rounded-full bg-white/60" />
