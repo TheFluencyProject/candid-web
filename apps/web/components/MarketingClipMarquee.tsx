@@ -40,7 +40,8 @@ function SpeakerIcon({ muted }: { muted: boolean }) {
 // scrolls infinitely in both directions instead of hitting the end of two copies. Drag uses
 // pointer events with a touch axis-lock so a vertical swipe still scrolls the page. Exactly
 // one card plays at a time and follows the viewport center as you drag.
-export default function MarketingClipMarquee({ clips, karaoke = true }: { clips: MarketingClip[]; karaoke?: boolean }) {
+// muteToggle=false drops the "Tap to unmute" control (the tutor page shows the row silent).
+export default function MarketingClipMarquee({ clips, karaoke = true, muteToggle = true }: { clips: MarketingClip[]; karaoke?: boolean; muteToggle?: boolean }) {
   const t = useTranslations("home");
   const containerRef = useRef<HTMLDivElement | null>(null); // viewport (clips the track)
   const trackRef = useRef<HTMLDivElement | null>(null); // the translated 2-group track
@@ -493,18 +494,20 @@ export default function MarketingClipMarquee({ clips, karaoke = true }: { clips:
       </div>
       {/* Mute toggle, centered under the row — no background, just the dimmed white icon + label.
           md:mt-0 cancels the base mt-3 on desktop, so the gap is just the row's md:py-8 bottom padding (~32px). */}
-      <div className="mt-3 flex justify-center md:mt-0">
-        {/* hover-brighten gated to hover-capable pointers (mouse) so a touch tap doesn't leave it stuck bright */}
-        <button
-          type="button"
-          onClick={() => setMuted((m) => !m)}
-          aria-pressed={!muted}
-          className="inline-flex items-center gap-1.5 text-white/50 transition-colors [@media(hover:hover)]:hover:text-white/80"
-        >
-          <SpeakerIcon muted={muted} />
-          <span className="text-sm font-medium">{muted ? t("tap_to_unmute") : t("tap_to_mute")}</span>
-        </button>
-      </div>
+      {muteToggle && (
+        <div className="mt-3 flex justify-center md:mt-0">
+          {/* hover-brighten gated to hover-capable pointers (mouse) so a touch tap doesn't leave it stuck bright */}
+          <button
+            type="button"
+            onClick={() => setMuted((m) => !m)}
+            aria-pressed={!muted}
+            className="inline-flex items-center gap-1.5 text-white/50 transition-colors [@media(hover:hover)]:hover:text-white/80"
+          >
+            <SpeakerIcon muted={muted} />
+            <span className="text-sm font-medium">{muted ? t("tap_to_unmute") : t("tap_to_mute")}</span>
+          </button>
+        </div>
+      )}
     </div>
   );
 }

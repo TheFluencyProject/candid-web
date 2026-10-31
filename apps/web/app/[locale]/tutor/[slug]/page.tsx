@@ -13,6 +13,7 @@ import SiteFooter from "@/components/SiteFooter";
 import JoinForFreePill from "@/components/JoinForFree/JoinForFreePill";
 import JoinForFreeSheet from "@/components/JoinForFree/JoinForFreeSheet";
 import MarketingClipMarquee from "@/components/MarketingClipMarquee";
+import PhoneClipHero from "@/components/PhoneClipHero";
 import { localizeLanguageName, localizeMapCountry, capitalize, withKoreanParticle, formatHeroTitle } from "@/lib/i18n-helpers";
 import { type Tutor, type TutorLanguageProficiency, type MarketingClip, fetchTutor, fetchMarketingClips } from "@/lib/api";
 import { isJoinForFreeContext, isCandidtutorsHost } from "@/lib/canonical-hosts";
@@ -158,8 +159,11 @@ export default async function TutorPage({ params, searchParams }: Props) {
   const heroName = locale === "ko" ? withKoreanParticle(localizedFirstName) : localizedFirstName;
   const heroTitle = t("hero_tagline_vertical"); // "Less scrolling.\nMore speaking." (two forced lines)
   const heroSubtitle = t("hero_subtitle_alt", { language: langLabel, name: heroName });
-  // The speaking/shadowing app screenshot shown in the hero phone frame.
-  const speakingShot = tutor.screenshot_shadow_url ?? tutor.screenshot_listen_url ?? tutor.web_bg_picture_url ?? tutor.large_profile_picture_url;
+  // The speaking/shadowing app screenshot shown in the hero phone frame. No uploaded screenshot →
+  // draw that screen live from the tutor's starred clips, one after another; the photos are the last fallback.
+  const appShot = tutor.screenshot_shadow_url ?? tutor.screenshot_listen_url;
+  const heroClips = appShot ? [] : clips;
+  const speakingShot = appShot ?? (heroClips.length > 0 ? null : (tutor.web_bg_picture_url ?? tutor.large_profile_picture_url));
 
   // ─── simplified card layout (candidtutors.co + joincandid.co) ───────────
   // Single centered card on the dark page — no navbar, no app screenshots,
@@ -226,7 +230,7 @@ export default async function TutorPage({ params, searchParams }: Props) {
         {/* Tutor's own clips — full-width row below the card (breaks out of max-w-2xl). */}
         {clips.length > 0 && (
           <div className="w-full">
-            <MarketingClipMarquee clips={clips} karaoke={karaoke} />
+            <MarketingClipMarquee clips={clips} karaoke={karaoke} muteToggle={false} />
           </div>
         )}
         <footer className="px-6 py-6 flex items-center justify-between flex-wrap gap-4 text-sm" style={{ color: "rgba(255,255,255,0.5)" }}>
@@ -343,8 +347,16 @@ export default async function TutorPage({ params, searchParams }: Props) {
               />
             </div>
           )}
-          {/* No screenshot uploaded yet → fall back to the round profile photo. */}
-          {!speakingShot && tutor.profile_picture_url && (
+          {heroClips.length > 0 && (
+            <div className="flex justify-center mt-6 lg:mt-0 animate-fade-in-up-delay-1">
+              {/* Explicit lg width: unlike the <img>, this has no intrinsic size to hold the row open. */}
+              <div className="w-full max-w-[270px] lg:max-w-none lg:w-[min(400px,calc(80vh*1000/2034))]">
+                <PhoneClipHero clips={heroClips} alt={t("shadow", { firstName: localizedFirstName, language: langLabel })} />
+              </div>
+            </div>
+          )}
+          {/* No screenshot or clip yet → fall back to the round profile photo. */}
+          {!speakingShot && heroClips.length === 0 && tutor.profile_picture_url && (
             <div className="order-first lg:order-none flex justify-center mb-8 lg:mb-0 animate-fade-in-up-delay-1">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
@@ -415,7 +427,7 @@ export default async function TutorPage({ params, searchParams }: Props) {
               {t("creators_subtitle", { language: langLabel })}
             </p>
           </div>
-          <MarketingClipMarquee clips={creatorClips} karaoke={karaoke} />
+          <MarketingClipMarquee clips={creatorClips} karaoke={karaoke} muteToggle={false} />
         </div>
       )}
 
