@@ -12,7 +12,7 @@ import { isRestrictedInAppBrowser } from "@/lib/platform";
 // iOS AccentColor (display-p3 0x89/0xFF/0xB4) — karaoke sweep, Speak-now pill, progress bar.
 const ACCENT = "#89FFB4";
 // The app's slowed shadowing speed; shown on the speed button.
-const PLAYBACK_RATE = 0.7;
+const PLAYBACK_RATE = 0.8;
 // Rest on the last frame, caption fully lit, before the next clip fades in over it.
 const END_HOLD_MS = 600;
 // The next clip's fade-in; it rests on its first frame until the fade is done, then plays.
