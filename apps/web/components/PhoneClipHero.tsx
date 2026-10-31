@@ -53,8 +53,9 @@ const EXTEND_BOTTOM_CQW = (113 + 2) * PT; // WatchStretchBarBottomPadding + Stre
 const EXTEND_BOX_CQW = SCREEN_H_CQW - EXTEND_TOP_CQW - EXTEND_BOTTOM_CQW;
 const STRIP_PT = 2; // VerticalFormatEdgeExtend.stripHeight
 // VerticalFormatBandTuning defaults, in pt — except the ramps, which start further inside the box
-// (iOS: rampAbove 25, topRamp 0) so the picture eases out of focus more gradually.
-const BAND = { topBlur: 5, topDim: 0.15, bottomBlur: 40, bottomDim: 0.1, rampAbove: 90, fullBelow: 100, topRamp: 45 };
+// (iOS: rampAbove 25, topRamp 0) so the picture eases out of focus more gradually, and the bottom
+// dim (iOS 0.1), heavier so the bottom darkens as it blurs.
+const BAND = { topBlur: 5, topDim: 0.15, bottomBlur: 40, bottomDim: 0.25, rampAbove: 90, fullBelow: 100, topRamp: 45 };
 // iOS stacks 3 backdrop blurs per band, each masked in over its own third of the ramp, layer k at
 // sqrt(2k+1)/3 of the radius — so after k+1 layers the picture is blurred by (k+1)/3 of it. Here each
 // layer is that cumulative blur of the picture itself, with the same mask: identical result, but
@@ -391,8 +392,9 @@ function ClipLayer({ clip, role, posterOnly, onEnd }: LayerProps) {
         <div className="absolute inset-x-0 top-0 z-[1] h-[50cqw] bg-gradient-to-b from-black/65 via-black/35 to-transparent" />
       )}
       {extend ? (
-        // iOS's bottom vignette: clear at mid-screen, 0.75 three quarters of the way down, held.
-        <div className="absolute inset-x-0 bottom-0 z-[1] h-1/2" style={{ background: "linear-gradient(to bottom, transparent, rgba(0,0,0,0.75) 75%)" }} />
+        // Darker and longer than iOS's bottom vignette (clear at mid-screen, 0.75 from three quarters
+        // down): it starts a third of the way down and builds steadily to 0.8 at the bottom.
+        <div className="absolute inset-x-0 bottom-0 z-[1] h-[66%]" style={{ background: "linear-gradient(to bottom, transparent, rgba(0,0,0,0.3) 35%, rgba(0,0,0,0.58) 65%, rgba(0,0,0,0.8))" }} />
       ) : (
         <div className="absolute inset-x-0 bottom-0 z-[1] h-[74%] bg-gradient-to-t from-black/95 via-black/65 to-transparent" />
       )}
