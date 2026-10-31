@@ -23,7 +23,7 @@ function warn(message: string, detail: Record<string, unknown>): void {
 // it on first launch (POST /public/install-clicks/match).
 export async function reportInstallClick(
   request: NextRequest,
-  click: { handle: string; source: InstallClickSource; lessonId?: string | null },
+  click: { handle: string; source: InstallClickSource; lessonId?: string | null; sid?: string | null },
 ): Promise<void> {
   const secret = process.env.CLICK_REPORT_SECRET;
   // No secret configured (local/preview) → skip; the endpoint would 401 anyway. In production
@@ -71,6 +71,10 @@ export async function reportInstallClick(
         geo_city,
         ...coordinates,
         lesson_id: click.lessonId ?? null,
+        // The web visitor's PostHog id, aliased to the app user at signup. Same-browser hops carry
+        // the cookie; a QR scan comes from another device, so it carries the desktop visitor's id
+        // in the query instead.
+        web_sid: click.sid ?? request.cookies.get("candid_did")?.value ?? null,
       }),
       signal: AbortSignal.timeout(3000),
     });

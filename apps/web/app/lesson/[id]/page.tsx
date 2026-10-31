@@ -160,7 +160,7 @@ export default async function LessonPage({
   // const levelSubtitle = bandLabel ? `${bandLabel} ${languageLabel}` : languageLabel;
 
   return (
-    <main className="flex flex-col" style={{ backgroundColor: "#18181C", color: "#FFFFFF" }}>
+    <main data-tutor-slug={lesson.tutor_slug} className="flex flex-col" style={{ backgroundColor: "#18181C", color: "#FFFFFF" }}>
       {/* One viewport tall, so the CTA is always reachable without scrolling and the footer
           still starts below the fold. svh, not vh — vh on mobile Safari is the URL-bar-hidden
           viewport, which is what pushed the CTA off screen. */}
