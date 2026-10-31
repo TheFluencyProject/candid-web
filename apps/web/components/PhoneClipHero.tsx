@@ -41,6 +41,20 @@ function spaced_title(title: string): string {
   return title.replace(/(\S)(\p{Extended_Pictographic}[\p{Extended_Pictographic}‍️]*)$/u, "$1 $2");
 }
 
+// Landscape clips sit 16:9 between the title and Speak now; the rest of the screen is this blurred,
+// live copy of the video (like iOS's LessonBlurredBackground, but moving). Painted into a tiny
+// canvas at the screen's own aspect — the CSS blur hides the low resolution, and it costs nothing.
+const BLUR_W = 36;
+const BLUR_H = 78; // ≈ the screen's 1795:3889
+
+function paint_blur(video: HTMLVideoElement, canvas: HTMLCanvasElement | null) {
+  const ctx = canvas?.getContext("2d");
+  if (!ctx || !video.videoWidth || video.readyState < 2) return;
+  // Centre-crop the frame to the screen's aspect (cover), then scale it into the canvas.
+  const sw = Math.min(video.videoWidth, video.videoHeight * (BLUR_W / BLUR_H));
+  ctx.drawImage(video, (video.videoWidth - sw) / 2, 0, sw, video.videoHeight, 0, 0, BLUR_W, BLUR_H);
+}
+
 function StatusIcons() {
   return (
     <div className="flex items-center gap-[1.4cqw]">
@@ -82,7 +96,18 @@ type LayerProps = {
 // crossfades everything together.
 function ClipLayer({ clip, role, posterOnly, onEnd }: LayerProps) {
   const videoRef = useRef<HTMLVideoElement | null>(null);
+  const posterRef = useRef<HTMLImageElement | null>(null);
+  const blurRef = useRef<HTMLCanvasElement | null>(null);
   const [hasFrame, setHasFrame] = useState(false); // a decoded frame is up → poster can go
+  // Wider than tall → the letterboxed layout. Read off the poster first (same frame, so same
+  // aspect, and it's up before the stream), then confirmed by the video's own size.
+  const [landscape, setLandscape] = useState(false);
+  const read_poster_aspect = () => {
+    const img = posterRef.current;
+    if (img?.naturalWidth) setLandscape(img.naturalWidth > img.naturalHeight);
+  };
+  // The poster can finish loading before hydration attaches onLoad — read it once on mount too.
+  useEffect(read_poster_aspect, []);
   const [ready, setReady] = useState(false); // stream attached + seekable
   const [playhead, setPlayhead] = useState(clip.start_time); // absolute clip time driving the sweep
   const onEndRef = useRef(onEnd);
@@ -99,12 +124,17 @@ function ClipLayer({ clip, role, posterOnly, onEnd }: LayerProps) {
     video.setAttribute("playsinline", "");
     video.setAttribute("webkit-playsinline", "");
     video.muted = true; // iOS: set imperatively — the prop doesn't reliably reach the element
-    // 1080p, not the marquee's 720p cap: landscape sources are cropped to a tall sliver here,
-    // so the screen shows only ~45% of the frame's width and needs the extra pixels to stay sharp.
+    // 1080p, not the marquee's 720p cap: vertical-crop sources show only part of the frame's
+    // width and need the extra pixels to stay sharp.
     const src = `https://stream.mux.com/${clip.mux_playback_id}.m3u8?max_resolution=1080p`;
     let hls: import("hls.js").default | null = null;
     let cancelled = false;
-    const on_frame = () => { if (!cancelled) setHasFrame(true); };
+    const on_frame = () => {
+      if (cancelled) return;
+      setHasFrame(true);
+      setLandscape(video.videoWidth > video.videoHeight);
+      paint_blur(video, blurRef.current); // a preloaded layer fades in over its real first frame
+    };
     video.addEventListener("loadeddata", on_frame);
     video.addEventListener("playing", on_frame);
     const on_ready = () => {
@@ -173,6 +203,7 @@ function ClipLayer({ clip, role, posterOnly, onEnd }: LayerProps) {
       if (video.playbackRate !== PLAYBACK_RATE) video.playbackRate = PLAYBACK_RATE; // hls/seek can reset it
       const t = video.currentTime;
       if (t >= clip.start_time) setPlayhead(t);
+      paint_blur(video, blurRef.current);
       if (t >= clip.end_time) {
         video.pause();
         done = true;
@@ -196,29 +227,52 @@ function ClipLayer({ clip, role, posterOnly, onEnd }: LayerProps) {
       className={`absolute inset-0 transition-opacity ease-out ${role === "next" ? "opacity-0" : "opacity-100"}`}
       style={{ zIndex: role === "active" ? 2 : role === "prev" ? 1 : 0, transitionDuration: `${FADE_MS}ms` }}
     >
-      {clip.thumbnail_url && (
-        // The caption segment's own first frame (Mux thumbnail at its start time).
-        // eslint-disable-next-line @next/next/no-img-element
-        <img
-          src={clip.thumbnail_url}
-          alt=""
-          draggable={false}
-          className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-300 ${hasFrame && !posterOnly ? "opacity-0" : "opacity-100"}`}
-        />
+      {/* Landscape only: the blurred fill behind the 16:9 band — the poster until frames arrive,
+          then the live canvas. Scaled up so the blur's soft edges stay off-screen. */}
+      {landscape && (
+        <div aria-hidden className="absolute inset-0 overflow-hidden">
+          {clip.thumbnail_url && (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={clip.thumbnail_url} alt="" className="absolute inset-0 h-full w-full scale-125 object-cover blur-xl brightness-90" />
+          )}
+          <canvas
+            ref={blurRef}
+            width={BLUR_W}
+            height={BLUR_H}
+            className={`absolute inset-0 h-full w-full scale-125 blur-xl brightness-90 transition-opacity duration-300 ${hasFrame && !posterOnly ? "opacity-100" : "opacity-0"}`}
+          />
+        </div>
       )}
-      {!posterOnly && (
-        <video
-          ref={videoRef}
-          muted
-          playsInline
-          preload="auto"
-          className={`pointer-events-none absolute inset-0 h-full w-full object-cover transition-opacity duration-300 ${hasFrame ? "opacity-100" : "opacity-0"}`}
-        />
-      )}
+      {/* The clip itself: full screen for vertical video, a 16:9 band for landscape. */}
+      <div className={landscape ? "absolute inset-x-0 top-[38cqw] aspect-video overflow-hidden" : "absolute inset-0"}>
+        {clip.thumbnail_url && (
+          // The caption segment's own first frame (Mux thumbnail at its start time).
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            ref={posterRef}
+            src={clip.thumbnail_url}
+            alt=""
+            draggable={false}
+            onLoad={read_poster_aspect}
+            className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-300 ${hasFrame && !posterOnly ? "opacity-0" : "opacity-100"}`}
+          />
+        )}
+        {!posterOnly && (
+          <video
+            ref={videoRef}
+            muted
+            playsInline
+            preload="auto"
+            className={`pointer-events-none absolute inset-0 h-full w-full object-cover transition-opacity duration-300 ${hasFrame ? "opacity-100" : "opacity-0"}`}
+          />
+        )}
+      </div>
 
       {/* Scrims: light at the top for the status bar + title, heavy at the bottom for captions. */}
-      <div className="absolute inset-x-0 top-0 h-[50cqw] bg-gradient-to-b from-black/65 via-black/35 to-transparent" />
-      <div className="absolute inset-x-0 bottom-0 h-[74%] bg-gradient-to-t from-black/95 via-black/65 to-transparent" />
+      {/* Lighter over a landscape clip's blurred fill — there's no sharp detail behind the text
+          to fight, and the full-strength scrim would bury the blur in black. */}
+      <div className={`absolute inset-x-0 top-0 h-[50cqw] bg-gradient-to-b ${landscape ? "from-black/40" : "from-black/65 via-black/35"} to-transparent`} />
+      <div className={`absolute inset-x-0 bottom-0 h-[74%] bg-gradient-to-t ${landscape ? "from-black/60 via-black/20" : "from-black/95 via-black/65"} to-transparent`} />
 
       {/* Lesson title row + progress */}
       <div className="absolute inset-x-0 top-[15.6cqw] px-[6cqw]">
