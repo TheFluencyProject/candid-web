@@ -126,5 +126,12 @@
     "description_3": "We make sure to follow all of YouTube's Community Guidelines and Terms of Service.",
     "loading": "Loading videos...",
     "load_more": "Load More"
+  },
+  "android_waitlist": {
+    "title": "Join the waitlist for Candid Android",
+    "placeholder": "you@email.com",
+    "button": "Join waitlist",
+    "success": "You're on the list! We'll email you when Candid is on Android.",
+    "error": "Something went wrong"
   }
 }
