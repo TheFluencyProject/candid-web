@@ -159,11 +159,12 @@ export default async function TutorPage({ params, searchParams }: Props) {
   const heroName = locale === "ko" ? withKoreanParticle(localizedFirstName) : localizedFirstName;
   const heroTitle = t("hero_tagline_vertical"); // "Less scrolling.\nMore speaking." (two forced lines)
   const heroSubtitle = t("hero_subtitle_alt", { language: langLabel, name: heroName });
-  // The speaking/shadowing app screenshot shown in the hero phone frame. No uploaded screenshot →
-  // draw that screen live from the tutor's starred clips, one after another; the photos are the last fallback.
-  const appShot = tutor.screenshot_shadow_url ?? tutor.screenshot_listen_url;
-  const heroClips = appShot ? [] : clips;
-  const speakingShot = appShot ?? (heroClips.length > 0 ? null : (tutor.web_bg_picture_url ?? tutor.large_profile_picture_url));
+  // The hero phone: the app's shadowing screen drawn live from the tutor's starred clips, one after
+  // another. No starred clips → their uploaded app screenshot; the photos are the last fallback.
+  const heroClips = clips;
+  const speakingShot = heroClips.length > 0
+    ? null
+    : (tutor.screenshot_shadow_url ?? tutor.screenshot_listen_url ?? tutor.web_bg_picture_url ?? tutor.large_profile_picture_url);
 
   // ─── simplified card layout (candidtutors.co + joincandid.co) ───────────
   // Single centered card on the dark page — no navbar, no app screenshots,
