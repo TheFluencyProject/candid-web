@@ -15,7 +15,7 @@ const LABEL_LINE_PX = 24;
 const QR_LABEL_GAP_PX = 14;
 const PAD_PX = (SQUARE_PX - QR_PX - QR_LABEL_GAP_PX - LABEL_LINE_PX) / 2;
 // inline arm: a white QR straight on the dark page, no card.
-const INLINE_QR_PX = 160;
+const INLINE_QR_PX = 140;
 const MORPH_MS = 350;
 
 type Props = {
@@ -72,7 +72,8 @@ export default function DesktopCTA({ href, label, scanLabel, tutorSlug, lessonId
     <>
       {pill("inline-block lg:hidden")}
       {arm === "inline" ? (
-        <div className="hidden lg:inline-flex flex-col items-center align-top">
+        // Nudged in from the tutor hero's text edge; the lesson page centres it, so no offset there.
+        <div className={`hidden lg:inline-flex flex-col items-center align-top ${surface === "tutor" ? "lg:ml-8" : ""}`}>
           <QRCodeSVG value={qrUrl} size={INLINE_QR_PX} fgColor="#FFFFFF" bgColor="transparent" />
           <span aria-hidden className="mt-4 text-xl leading-none">☝️</span>
           <span className="mt-2 text-base font-bold whitespace-nowrap" style={{ color: MINT }}>
