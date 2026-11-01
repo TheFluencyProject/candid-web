@@ -6,8 +6,10 @@ import { notFound } from "next/navigation";
 
 import BlurImage from "@/components/BlurImage";
 import DownloadQRInterceptor from "@/components/DownloadQRInterceptor";
+import DesktopCTA from "@/components/DesktopCTA";
 import { API_BASE_URL, fetchTutor } from "@/lib/api";
 import { pickLocale } from "@/lib/i18n-helpers";
+import { getDesktopCtaVariant, getDistinctId, previewDesktopCtaOverride } from "@/lib/posthog-server";
 import type { Locale } from "@/i18n/routing";
 // import { localizeLanguageName } from "@/lib/i18n-helpers";
 
@@ -26,8 +28,9 @@ const SHARE_DESCRIPTIONS: Record<Locale, string> = {
 
 // This route lives OUTSIDE the [locale] group (excluded from the next-intl matcher),
 // so there's no translation context here — keep the little UI copy in a local map.
-const COPY: Record<Locale, { cta: (name: string) => string; qrTitle: string; privacy: string; terms: string }> = {
-  en: { cta: (name) => `Study with ${name}`, qrTitle: "Download Candid for iOS", privacy: "Privacy", terms: "Terms" },
+// scanLabel is the desktop-cta-qr morph arm's copy; that test is en only, so other locales fall back to en.
+const COPY: Record<Locale, { cta: (name: string) => string; qrTitle: string; scanLabel?: string; privacy: string; terms: string }> = {
+  en: { cta: (name) => `Study with ${name}`, qrTitle: "Download Candid for iOS", scanLabel: "SCAN TO GET STARTED", privacy: "Privacy", terms: "Terms" },
   ko: { cta: (name) => `${name}와 공부하기`, qrTitle: "iOS용 Candid 다운로드", privacy: "개인정보", terms: "이용약관" },
   ja: { cta: (name) => `${name}と勉強する`, qrTitle: "iOS版Candidをダウンロード", privacy: "プライバシー", terms: "利用規約" },
   zh: { cta: (name) => `和${name}一起学习`, qrTitle: "下载 iOS 版 Candid", privacy: "隐私", terms: "条款" },
@@ -116,8 +119,10 @@ export async function generateMetadata({
 
 export default async function LessonPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ id: string }>;
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
   const { id } = await params;
   const headersList = await headers();
@@ -133,6 +138,11 @@ export default async function LessonPage({
     : null;
 
   const copy = COPY[locale];
+  // desktop-cta-qr arm: the same cached evaluation AnonAnalytics bootstraps (en only).
+  const distinctId = await getDistinctId();
+  const desktopCtaVariant =
+    previewDesktopCtaOverride((await searchParams).cta) ??
+    (locale === "en" ? await getDesktopCtaVariant(distinctId) : undefined);
   // orientation is nullable; default to vertical framing (matches shorts-style content).
   const isVertical = lesson.orientation !== "horizontal";
   // Crop height/width. Vertical gets a little more height than width; horizontal is square.
@@ -250,13 +260,18 @@ export default async function LessonPage({
               swallows the click and pops a QR of the equivalent /qr/{slug} link (same
               destination, but scannable without tripping the App Clip card); mobile navigates
               normally. Either way the click is tracked as study_cta_clicked. */}
-          <a
-            href={`/download/${lesson.tutor_slug}?l=${lesson.lesson_id}`}
-            className="mt-5 inline-block px-12 py-3.5 rounded-full text-base font-bold"
-            style={{ backgroundColor: "#89FFB4", color: "#000000" }}
-          >
-            {copy.cta(lesson.tutor_name || "Candid")}
-          </a>
+          <div className="mt-5">
+            <DesktopCTA
+              href={`/download/${lesson.tutor_slug}?l=${lesson.lesson_id}`}
+              label={copy.cta(lesson.tutor_name || "Candid")}
+              scanLabel={copy.scanLabel ?? COPY.en.scanLabel!}
+              tutorSlug={lesson.tutor_slug}
+              lessonId={lesson.lesson_id}
+              surface="lesson"
+              variant={desktopCtaVariant}
+              distinctId={distinctId}
+            />
+          </div>
           <DownloadQRInterceptor label={copy.qrTitle} />
         </section>
       </div>

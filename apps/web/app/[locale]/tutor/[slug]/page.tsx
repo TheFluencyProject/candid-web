@@ -14,10 +14,12 @@ import JoinForFreePill from "@/components/JoinForFree/JoinForFreePill";
 import JoinForFreeSheet from "@/components/JoinForFree/JoinForFreeSheet";
 import MarketingClipMarquee from "@/components/MarketingClipMarquee";
 import PhoneClipHero from "@/components/PhoneClipHero";
+import DesktopCTA from "@/components/DesktopCTA";
 import { localizeLanguageName, localizeMapCountry, capitalize, withKoreanParticle, formatHeroTitle } from "@/lib/i18n-helpers";
 import { type Tutor, type TutorLanguageProficiency, type MarketingClip, fetchTutor, fetchMarketingClips } from "@/lib/api";
 import { isJoinForFreeContext, isCandidtutorsHost } from "@/lib/canonical-hosts";
 import { isLocale, routing, type Locale } from "@/i18n/routing";
+import { getDesktopCtaVariant, getDistinctId, previewDesktopCtaOverride } from "@/lib/posthog-server";
 
 function formatLanguages(languages: TutorLanguageProficiency[]): string {
   return languages
@@ -147,6 +149,12 @@ export default async function TutorPage({ params, searchParams }: Props) {
   // Every tutor's CTA goes through /download/<slug>: the App Clip link carries no slug, so it
   // bypassed middleware and left those installs unattributable.
   const cta_href = `/download/${slug}`;
+
+  // desktop-cta-qr arm for the joincandid hero (en only; same cached call the layout bootstraps).
+  const distinctId = await getDistinctId();
+  const desktopCtaVariant =
+    previewDesktopCtaOverride(sp.cta) ??
+    (!uses_join_sheet && locale === "en" ? await getDesktopCtaVariant(distinctId) : undefined);
 
   const firstName = tutor.name.split(" ")[0];
   const localizedFirstName =
@@ -327,14 +335,15 @@ export default async function TutorPage({ params, searchParams }: Props) {
               </div>
             ) : (
               <div className="hidden lg:block mt-8 animate-fade-in-up-delay-2">
-                <a
+                <DesktopCTA
                   href={cta_href}
-                  data-tutor-name={localizedFirstName}
-                  className="inline-block px-12 py-3.5 rounded-full text-base font-bold"
-                  style={{ backgroundColor: "#89FFB4", color: "#000000" }}
-                >
-                  {t("get_started")}
-                </a>
+                  label={t("get_started")}
+                  scanLabel={t("scan_to_get_started")}
+                  tutorSlug={slug}
+                  surface="tutor"
+                  variant={desktopCtaVariant}
+                  distinctId={distinctId}
+                />
               </div>
             )}
           </div>

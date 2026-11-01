@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import Script from "next/script";
-import { cookies } from "next/headers";
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages, setRequestLocale } from "next-intl/server";
 import { isLocale, routing, type Locale } from "@/i18n/routing";
@@ -8,8 +7,8 @@ import { notFound } from "next/navigation";
 import { PostHogProvider } from "@/components/PostHogProvider";
 import InAppBrowserBlocker from "@/components/InAppBrowserBlocker";
 import DownloadQRInterceptor from "@/components/DownloadQRInterceptor";
-import { CTA_FLAG_KEY } from "@/lib/posthog-config";
-import { getMobileCtaVariant } from "@/lib/posthog-server";
+import { CTA_FLAG_KEY, DESKTOP_CTA_FLAG_KEY } from "@/lib/posthog-config";
+import { getDesktopCtaVariant, getDistinctId, getMobileCtaVariant } from "@/lib/posthog-server";
 
 const OG_LOCALES: Record<Locale, string> = {
   en: "en_US", ko: "ko_KR", ja: "ja_JP", zh: "zh_CN", es: "es_ES",
@@ -73,10 +72,14 @@ export default async function LocaleLayout({ children, params }: Props) {
 
   // Reading cookies opts this layout into dynamic rendering — required so the
   // server-decided variant matches the client SDK's bootstrap on first paint.
-  const cookieStore = await cookies();
-  const distinctId = cookieStore.get("candid_did")?.value ?? crypto.randomUUID();
+  const distinctId = await getDistinctId();
   const bootstrapFlags: Record<string, string | boolean> =
-    locale === "en" ? { [CTA_FLAG_KEY]: await getMobileCtaVariant(distinctId) } : {};
+    locale === "en"
+      ? {
+          [CTA_FLAG_KEY]: await getMobileCtaVariant(distinctId),
+          [DESKTOP_CTA_FLAG_KEY]: await getDesktopCtaVariant(distinctId),
+        }
+      : {};
 
   // Get messages for client components
   const messages = await getMessages();
