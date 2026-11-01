@@ -36,9 +36,13 @@ function progress_for(clip: MarketingClip): number {
   return 20 + (h % 56);
 }
 
-// Some titles arrive with the emoji glued on ("Let's Take a Walk🍁"); space it like the rest.
+// Some titles arrive with the emoji glued on ("Let's Take a Walk🍁"); space it like the rest. The char
+// before must not itself be emoji, or a joined emoji (people holding hands) splits at its first joiner.
 function spaced_title(title: string): string {
-  return title.replace(/(\S)(\p{Extended_Pictographic}[\p{Extended_Pictographic}\u200d\ufe0f]*)$/u, "$1 $2");
+  return title.replace(
+    /([^\s\p{Extended_Pictographic}\p{Emoji_Modifier}\u200d\ufe0f])(\p{Extended_Pictographic}[\p{Extended_Pictographic}\p{Emoji_Modifier}\u200d\ufe0f]*)$/u,
+    "$1 $2",
+  );
 }
 
 // Landscape clips get the app's vertical-format player, ported from iOS
