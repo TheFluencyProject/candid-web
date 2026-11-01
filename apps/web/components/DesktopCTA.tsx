@@ -8,8 +8,12 @@ import { DESKTOP_CTA_FLAG_KEY, type DesktopCtaVariant } from "@/lib/posthog-conf
 import { buildQrUrl } from "@/lib/qr-url";
 
 const MINT = "#89FFB4";
-const SQUARE_PX = 220;
-const QR_PX = 156;
+const SQUARE_PX = 200;
+const QR_PX = 112;
+// QR + gap + one label line, centred as a block so the top and bottom margins match.
+const LABEL_LINE_PX = 24;
+const QR_LABEL_GAP_PX = 14;
+const PAD_PX = (SQUARE_PX - QR_PX - QR_LABEL_GAP_PX - LABEL_LINE_PX) / 2;
 const MORPH_MS = 350;
 
 type Props = {
@@ -83,10 +87,10 @@ export default function DesktopCTA({ href, label, scanLabel, tutorSlug, lessonId
 function QrFace({ url, label }: { url: string; label: string }) {
   return (
     <>
-      <div className="absolute left-1/2 -translate-x-1/2" style={{ top: 18 }}>
+      <div className="absolute left-1/2 -translate-x-1/2" style={{ top: PAD_PX }}>
         <QRCodeSVG value={url} size={QR_PX} fgColor="#000000" bgColor="transparent" />
       </div>
-      <span className="absolute inset-x-0 text-center whitespace-nowrap" style={{ bottom: 14 }}>
+      <span className="absolute inset-x-0 text-center whitespace-nowrap" style={{ bottom: PAD_PX, lineHeight: `${LABEL_LINE_PX}px` }}>
         {label}
       </span>
     </>
@@ -162,7 +166,7 @@ function MorphButton({ label, scanLabel, qrUrl, tutorSlug, lessonId, surface }: 
           <div
             className="absolute left-1/2 -translate-x-1/2"
             style={{
-              top: 18,
+              top: PAD_PX,
               opacity: square ? 1 : 0,
               transition: animate ? `opacity ${MORPH_MS}ms ease-out ${MORPH_MS / 2}ms` : undefined,
             }}
@@ -173,7 +177,8 @@ function MorphButton({ label, scanLabel, qrUrl, tutorSlug, lessonId, surface }: 
           <span
             className="absolute inset-x-0 text-center whitespace-nowrap"
             style={{
-              bottom: square ? 14 : "50%",
+              bottom: square ? PAD_PX : "50%",
+              lineHeight: `${LABEL_LINE_PX}px`,
               transform: square ? undefined : "translateY(50%)",
               transition: animate ? `bottom ${MORPH_MS}ms ease-out, transform ${MORPH_MS}ms ease-out` : undefined,
             }}
