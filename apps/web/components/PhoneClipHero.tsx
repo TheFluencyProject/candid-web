@@ -3,6 +3,7 @@
 import { Fragment, useEffect, useRef, useState } from "react";
 import type { MarketingClip } from "@/lib/api";
 import { isRestrictedInAppBrowser } from "@/lib/platform";
+import { cover_position_x, crop_slice_x } from "@/lib/clip-crop";
 
 // The tutor-page hero for tutors with no uploaded Shadow screenshot: the iOS shadowing screen,
 // drawn live from the tutor's starred clips inside a real iPhone frame. Layout numbers are
@@ -87,14 +88,14 @@ const BANDS = [
   }),
 ];
 
-// Paint the screen's picture — the box (same centre crop as its object-cover) and its outermost 2pt
+// Paint the screen's picture — the box (same crop as its object-cover, centred on crop_center) and its outermost 2pt
 // stretched above and below it — into the strip canvases, and into each band's padded canvases with
 // the side padding clamped to the edge column. Painted from the poster until the video has a frame.
-function paint_edges(src: HTMLVideoElement | HTMLImageElement, top: HTMLCanvasElement | null, bottom: HTMLCanvasElement | null, bands: (HTMLCanvasElement | null)[][]) {
+function paint_edges(src: HTMLVideoElement | HTMLImageElement, top: HTMLCanvasElement | null, bottom: HTMLCanvasElement | null, bands: (HTMLCanvasElement | null)[][], crop_center: number | null | undefined) {
   const [w, h] = src instanceof HTMLVideoElement ? [src.videoWidth, src.videoHeight] : [src.naturalWidth, src.naturalHeight];
   if (!w || !h || (src instanceof HTMLVideoElement && src.readyState < 2)) return;
   const sw = Math.min(w, (h * 100) / EXTEND_BOX_CQW);
-  const sx = (w - sw) / 2;
+  const sx = crop_slice_x(crop_center, w, sw);
   const rows = Math.max(1, (h * STRIP_PT * PT) / EXTEND_BOX_CQW);
   for (const [canvas, sy] of [[top, 0], [bottom, h - rows]] as const) {
     const ctx = canvas?.getContext("2d");
@@ -254,11 +255,13 @@ function ClipLayer({ clip, role, posterOnly, onEnd }: LayerProps) {
   // Wider than tall → the boxed layout. Read off the poster first (same frame, so same aspect, and
   // it's up before the stream), then confirmed by the video's own size.
   const [landscape, setLandscape] = useState(false);
+  const [mediaAspect, setMediaAspect] = useState(16 / 9); // w/h, for the crop_center object-position
   const read_poster_aspect = () => {
     const img = posterRef.current;
     if (!img?.naturalWidth) return;
     setLandscape(img.naturalWidth > img.naturalHeight);
-    if (!hasFrameRef.current) paint_edges(img, topEdgeRef.current, bottomEdgeRef.current, bandRefs.current);
+    setMediaAspect(img.naturalWidth / img.naturalHeight);
+    if (!hasFrameRef.current) paint_edges(img, topEdgeRef.current, bottomEdgeRef.current, bandRefs.current, clip.crop_center);
   };
   // The poster can finish loading before hydration attaches onLoad — read it once on mount too.
   useEffect(read_poster_aspect, []);
@@ -287,7 +290,8 @@ function ClipLayer({ clip, role, posterOnly, onEnd }: LayerProps) {
       if (cancelled) return;
       setHasFrame(true);
       setLandscape(video.videoWidth > video.videoHeight);
-      paint_edges(video, topEdgeRef.current, bottomEdgeRef.current, bandRefs.current);
+      if (video.videoHeight) setMediaAspect(video.videoWidth / video.videoHeight);
+      paint_edges(video, topEdgeRef.current, bottomEdgeRef.current, bandRefs.current, clip.crop_center);
     };
     video.addEventListener("loadeddata", on_frame);
     video.addEventListener("playing", on_frame);
@@ -357,7 +361,7 @@ function ClipLayer({ clip, role, posterOnly, onEnd }: LayerProps) {
       if (video.playbackRate !== PLAYBACK_RATE) video.playbackRate = PLAYBACK_RATE; // hls/seek can reset it
       const t = video.currentTime;
       if (t >= clip.start_time) setPlayhead(t);
-      paint_edges(video, topEdgeRef.current, bottomEdgeRef.current, bandRefs.current);
+      paint_edges(video, topEdgeRef.current, bottomEdgeRef.current, bandRefs.current, clip.crop_center);
       if (t >= clip.end_time) {
         video.pause();
         done = true;
@@ -376,6 +380,8 @@ function ClipLayer({ clip, role, posterOnly, onEnd }: LayerProps) {
 
   const words = clip.word_level_captions;
   const extend = landscape;
+  // The admin-picked framing: the visible slice of the box (landscape) or the screen centres on it.
+  const object_position = `${cover_position_x(clip.crop_center, mediaAspect, 100 / (extend ? EXTEND_BOX_CQW : SCREEN_H_CQW))} 50%`;
 
   return (
     <div
@@ -414,7 +420,7 @@ function ClipLayer({ clip, role, posterOnly, onEnd }: LayerProps) {
         style={extend ? { top: `${EXTEND_TOP_CQW}cqw`, bottom: `${EXTEND_BOTTOM_CQW}cqw` } : { top: 0, bottom: 0 }}
       >
         {clip.thumbnail_url && (
-          // The caption segment's own first frame (Mux thumbnail at its start time).
+          // The clip's poster still (Mux thumbnail at its admin-picked moment, else its start time).
           // eslint-disable-next-line @next/next/no-img-element
           <img
             ref={posterRef}
@@ -423,6 +429,7 @@ function ClipLayer({ clip, role, posterOnly, onEnd }: LayerProps) {
             draggable={false}
             onLoad={read_poster_aspect}
             className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-300 ${hasFrame && !posterOnly ? "opacity-0" : "opacity-100"}`}
+            style={{ objectPosition: object_position }}
           />
         )}
         {!posterOnly && (
@@ -432,6 +439,7 @@ function ClipLayer({ clip, role, posterOnly, onEnd }: LayerProps) {
             playsInline
             preload="auto"
             className={`pointer-events-none absolute inset-0 h-full w-full object-cover transition-opacity duration-300 ${hasFrame ? "opacity-100" : "opacity-0"}`}
+            style={{ objectPosition: object_position }}
           />
         )}
       </div>

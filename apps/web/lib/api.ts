@@ -92,6 +92,8 @@ export interface MarketingClip {
   end_time: number;
   mux_playback_id: string;
   thumbnail_url: string | null;
+  /** 0-1 centre of the visible slice when a horizontal clip is cropped. Optional: absent until the backend ships it; null/absent = centred. */
+  crop_center?: number | null;
   /** A tutor's dashboard-starred pick. Optional: absent until the backend ships it. */
   featured?: boolean;
 }
