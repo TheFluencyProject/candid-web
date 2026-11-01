@@ -2,6 +2,7 @@
 
 import { Fragment, memo, useEffect, useLayoutEffect, useRef, useState } from "react";
 import type { MarketingClip } from "@/lib/api";
+import { cover_position_x } from "@/lib/clip-crop";
 
 // useLayoutEffect warns on the server; fall back to useEffect there (the seed it runs is client-only).
 const useIsomorphicLayoutEffect = typeof window !== "undefined" ? useLayoutEffect : useEffect;
@@ -70,6 +71,7 @@ function MarketingClipCard({ clip, dataKey, isActive, shouldLoad, onSegmentEnd, 
   const [activeWordIdx, setActiveWordIdx] = useState(-1);
   const [ready, setReady] = useState(false); // first frame buffered → fade video over poster
   const [hasFrame, setHasFrame] = useState(false); // a decoded frame is on screen → poster can go
+  const [mediaAspect, setMediaAspect] = useState(16 / 9); // w/h, for the crop_center object-position
   // Live playback position (absolute video time) driving the karaoke reveal. Separate from
   // activeWordIdx so the classic path's frozen captions stay unchanged.
   const [playhead, setPlayhead] = useState(clip.start_time);
@@ -321,6 +323,9 @@ function MarketingClipCard({ clip, dataKey, isActive, shouldLoad, onSegmentEnd, 
 
   const words = clip.word_level_captions;
 
+  // The admin-picked framing of a horizontal clip in the 3:4 card.
+  const object_position = `${cover_position_x(clip.crop_center, mediaAspect, 3 / 4)} 50%`;
+
   return (
     <div
       data-key={dataKey}
@@ -341,7 +346,15 @@ function MarketingClipCard({ clip, dataKey, isActive, shouldLoad, onSegmentEnd, 
           video has a frame: both layers carry the see-through fade mask, so a visible poster would
           ghost through the playing video and halve the fade. */}
       {clip.thumbnail_url && (
-        <img src={poster_url(clip.thumbnail_url)} alt="" draggable={false} decoding="async" className={`absolute inset-0 z-0 h-full w-full object-cover transition-opacity duration-300 ${hasFrame ? "opacity-0" : "opacity-100"}`} style={media_fade(karaoke)} />
+        <img
+          src={poster_url(clip.thumbnail_url)}
+          alt=""
+          draggable={false}
+          decoding="async"
+          onLoad={(e) => { const img = e.currentTarget; if (img.naturalHeight) setMediaAspect(img.naturalWidth / img.naturalHeight); }}
+          className={`absolute inset-0 z-0 h-full w-full object-cover transition-opacity duration-300 ${hasFrame ? "opacity-0" : "opacity-100"}`}
+          style={{ ...media_fade(karaoke), objectPosition: object_position }}
+        />
       )}
       {/* pointer-events-none: the video is purely presentational (no controls; the marquee owns
           dragging) — a tap that reaches a media element makes restricted webviews open the native
@@ -352,7 +365,8 @@ function MarketingClipCard({ clip, dataKey, isActive, shouldLoad, onSegmentEnd, 
           muted={muted || !isActive}
           playsInline
           preload="auto"
-          style={media_fade(karaoke)}
+          onLoadedMetadata={(e) => { const v = e.currentTarget; if (v.videoHeight) setMediaAspect(v.videoWidth / v.videoHeight); }}
+          style={{ ...media_fade(karaoke), objectPosition: object_position }}
           className={`pointer-events-none absolute inset-0 z-0 h-full w-full object-cover transition-opacity duration-300 ${ready ? "opacity-100" : "opacity-0"}`}
         />
       )}
