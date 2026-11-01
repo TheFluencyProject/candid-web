@@ -171,6 +171,8 @@ export default async function middleware(request: NextRequest, event: NextFetchE
         surface: params.get("s") ?? "unknown",
         tutor_slug: slug,
         lesson_id: params.get("l"),
+        // desktop-cta-qr arm that rendered the QR (lib/qr-url), for a readout without person merging.
+        cta_variant: params.get("v"),
         $current_url: request.url,
         // The scanning phone's own request. PostHog's GeoIP and User Agent Populator
         // transformations turn these into $geoip_*, $os, $browser and $device_type.
