@@ -14,6 +14,8 @@ const QR_PX = 112;
 const LABEL_LINE_PX = 24;
 const QR_LABEL_GAP_PX = 14;
 const PAD_PX = (SQUARE_PX - QR_PX - QR_LABEL_GAP_PX - LABEL_LINE_PX) / 2;
+// inline arm: a white QR straight on the dark page, no card.
+const INLINE_QR_PX = 160;
 const MORPH_MS = 350;
 
 type Props = {
@@ -31,8 +33,8 @@ type Props = {
 };
 
 // Desktop hero CTA A/B (desktop-cta-qr): control = the pill whose click the DownloadQRInterceptor
-// turns into a QR modal; morph = the pill grows in place into the QR; inline = the QR from first
-// paint. Below lg (1024px, the interceptor's gate) every arm is the plain /download anchor —
+// turns into a QR modal; morph = the pill grows in place into the QR; inline = a white QR on the
+// page from first paint, with a ☝️ and the label in mint under it. Below lg (1024px, the interceptor's gate) every arm is the plain /download anchor —
 // switched in CSS rather than after a matchMedia effect, so neither side flashes the other's CTA.
 export default function DesktopCTA({ href, label, scanLabel, tutorSlug, lessonId = null, surface, variant, distinctId }: Props) {
   const arm: DesktopCtaVariant = variant ?? "control";
@@ -70,29 +72,16 @@ export default function DesktopCTA({ href, label, scanLabel, tutorSlug, lessonId
     <>
       {pill("inline-block lg:hidden")}
       {arm === "inline" ? (
-        <div
-          className="hidden lg:inline-block align-top relative font-bold text-base"
-          style={{ width: SQUARE_PX, height: SQUARE_PX, borderRadius: 24, backgroundColor: MINT, color: "#000000" }}
-        >
-          <QrFace url={qrUrl} label={label} />
+        <div className="hidden lg:inline-flex flex-col items-center align-top">
+          <QRCodeSVG value={qrUrl} size={INLINE_QR_PX} fgColor="#FFFFFF" bgColor="transparent" />
+          <span aria-hidden className="mt-4 text-xl leading-none">☝️</span>
+          <span className="mt-2 text-base font-bold whitespace-nowrap" style={{ color: MINT }}>
+            {label}
+          </span>
         </div>
       ) : (
         <MorphButton label={label} scanLabel={scanLabel} qrUrl={qrUrl} tutorSlug={tutorSlug} lessonId={lessonId} surface={surface} />
       )}
-    </>
-  );
-}
-
-// QR on top, label along the bottom; absolutely placed inside the square.
-function QrFace({ url, label }: { url: string; label: string }) {
-  return (
-    <>
-      <div className="absolute left-1/2 -translate-x-1/2" style={{ top: PAD_PX }}>
-        <QRCodeSVG value={url} size={QR_PX} fgColor="#000000" bgColor="transparent" />
-      </div>
-      <span className="absolute inset-x-0 text-center whitespace-nowrap" style={{ bottom: PAD_PX, lineHeight: `${LABEL_LINE_PX}px` }}>
-        {label}
-      </span>
     </>
   );
 }
