@@ -66,7 +66,8 @@ interface LessonMeta {
 // (timeout, 5xx, network) THROW so Next.js keeps the previous good cached
 // value instead of caching the failure for the 1-week revalidate window.
 async function fetchLessonMeta(id: string, locale: string): Promise<LessonMeta | null> {
-  const res = await fetch(`${API_BASE_URL}/public/lessons/${id}?locale=${locale}`, {
+  // tv = title version: bump to drop week-old cached titles (2 = titles backfilled in every locale, 11/01).
+  const res = await fetch(`${API_BASE_URL}/public/lessons/${id}?locale=${locale}&tv=2`, {
     next: { revalidate: 604800 },
   });
   if (res.status === 404) return null;
