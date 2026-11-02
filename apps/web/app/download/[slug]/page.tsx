@@ -32,6 +32,8 @@ const COPY: Record<Locale, { hint: string; alt: string }> = {
   vi: { hint: "Chạm vào biểu ngữ phía trên để bắt đầu ngay, hoặc tải ứng dụng đầy đủ.", alt: "Tải về trên App Store" },
   th: { hint: "แตะแบนเนอร์ด้านบนเพื่อเริ่มทันที หรือดาวน์โหลดแอปเต็ม", alt: "ดาวน์โหลดบน App Store" },
   id: { hint: "Ketuk banner di atas untuk langsung mulai, atau unduh aplikasi lengkapnya.", alt: "Unduh di App Store" },
+  de: { hint: "Tippe oben auf das Banner, um sofort loszulegen, oder lade die vollständige App.", alt: "Laden im App Store" },
+  it: { hint: "Tocca il banner qui sopra per iniziare subito, oppure scarica l’app completa.", alt: "Scarica su App Store" },
 };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {

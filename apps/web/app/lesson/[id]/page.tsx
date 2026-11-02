@@ -22,6 +22,8 @@ const SHARE_DESCRIPTIONS: Record<Locale, string> = {
   vi: "Candid giúp bạn học ngôn ngữ nói thực tế qua cuộc sống thật của gia sư tại đất nước của họ.",
   th: "Candid คือไกด์ที่พาคุณเรียนภาษาพูดจริงผ่านชีวิตจริงของติวเตอร์ในประเทศของเขา",
   id: "Candid adalah panduanmu menuju bahasa lisan yang nyata lewat kehidupan nyata seorang tutor di negaranya.",
+  de: "Candid ist dein Weg zur echten, gesprochenen Sprache – durch das echte Leben eines Tutors in seinem Land.",
+  it: "Candid è la tua guida alla lingua parlata vera, attraverso la vita reale di un tutor nel suo paese.",
 };
 
 // This route lives OUTSIDE the [locale] group (excluded from the next-intl matcher),
@@ -37,6 +39,8 @@ const COPY: Record<Locale, { cta: (name: string) => string; qrTitle: string; pri
   vi: { cta: (name) => `Học cùng ${name}`, qrTitle: "Tải Candid cho iOS", privacy: "Quyền riêng tư", terms: "Điều khoản" },
   th: { cta: (name) => `เรียนกับ ${name}`, qrTitle: "ดาวน์โหลด Candid สำหรับ iOS", privacy: "ความเป็นส่วนตัว", terms: "ข้อกำหนด" },
   id: { cta: (name) => `Belajar bareng ${name}`, qrTitle: "Unduh Candid untuk iOS", privacy: "Privasi", terms: "Ketentuan" },
+  de: { cta: (name) => `Lerne mit ${name}`, qrTitle: "Candid für iOS laden", privacy: "Datenschutz", terms: "Bedingungen" },
+  it: { cta: (name) => `Studia con ${name}`, qrTitle: "Scarica Candid per iOS", privacy: "Privacy", terms: "Termini" },
 };
 
 // Band labels match the app's feed filter + dashboard wording.
