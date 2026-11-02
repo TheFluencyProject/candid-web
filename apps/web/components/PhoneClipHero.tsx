@@ -55,9 +55,11 @@ const PT = 100 / 393; // cqw per iOS point (393pt-wide iPhone)
 const SCREEN_H_CQW = 216.7; // the screen cut-out is 1795:3889
 const EXTEND_TOP_CQW = 28; // iOS headerBottom: just under the title row's progress bar
 const EXTEND_BOTTOM_CQW = (113 + 2) * PT; // WatchStretchBarBottomPadding + StretchProgressBar.barHeight
-// Portrait clips fill the screen but sit this far up — the face clears the caption — with the gap
-// left at the bottom filled the same way: the picture's bottom rows stretched under the heavy blur.
-const PORTRAIT_SHIFT_CQW = 20;
+// Portrait clips fit from the screen top down to this far above its bottom — the face clears the
+// caption — with the gap filled the same way: the picture's bottom rows stretched under the heavy
+// blur, which eases in over a shorter ramp than landscape's.
+const PORTRAIT_BOTTOM_CQW = 12;
+const PORTRAIT_RAMP_PT = 30;
 const STRIP_PT = 2; // VerticalFormatEdgeExtend.stripHeight
 // VerticalFormatBandTuning defaults, in pt — except the ramps, which start further inside the box
 // (iOS: rampAbove 25, topRamp 0) so the picture eases out of focus more gradually.
@@ -77,17 +79,17 @@ const BAND_PX = 4; // band canvas px per cqw
 type Band = { edge: "top" | "bottom"; top: number; height: number; ramp: number; blur: number; dim: number; pad: number };
 const band = (b: Omit<Band, "pad">): Band => ({ ...b, pad: Math.ceil(3 * b.blur) });
 // None rampAbove over the box's bottom edge, full fullBelow under it.
-const bottom_band = (bottom: number) => band({
+const bottom_band = (bottom: number, rampAbove: number = BAND.rampAbove) => band({
   edge: "bottom",
-  top: SCREEN_H_CQW - bottom - BAND.rampAbove * PT,
-  height: bottom + BAND.rampAbove * PT,
-  ramp: BAND.rampAbove * PT + Math.min(BAND.fullBelow * PT, bottom),
+  top: SCREEN_H_CQW - bottom - rampAbove * PT,
+  height: bottom + rampAbove * PT,
+  ramp: rampAbove * PT + Math.min(BAND.fullBelow * PT, bottom),
   blur: BAND.bottomBlur * PT,
   dim: BAND.bottomDim,
 });
 
-// Where a layout's sharp box sits (cqw in from the screen's top and bottom; a negative top runs
-// off the screen) and the blur bands at its ends.
+// Where a layout's sharp box sits (cqw in from the screen's top and bottom) and the blur bands at
+// its ends.
 type Frame = { top: number; bottom: number; bands: Band[] };
 const LANDSCAPE: Frame = {
   top: EXTEND_TOP_CQW,
@@ -98,7 +100,7 @@ const LANDSCAPE: Frame = {
     bottom_band(EXTEND_BOTTOM_CQW),
   ],
 };
-const PORTRAIT: Frame = { top: -PORTRAIT_SHIFT_CQW, bottom: PORTRAIT_SHIFT_CQW, bands: [bottom_band(PORTRAIT_SHIFT_CQW)] };
+const PORTRAIT: Frame = { top: 0, bottom: PORTRAIT_BOTTOM_CQW, bands: [bottom_band(PORTRAIT_BOTTOM_CQW, PORTRAIT_RAMP_PT)] };
 const frame_for = (landscape: boolean) => (landscape ? LANDSCAPE : PORTRAIT);
 const box_h = (f: Frame) => SCREEN_H_CQW - f.top - f.bottom;
 
@@ -440,7 +442,7 @@ function ClipLayer({ clip, role, posterOnly, onEnd }: LayerProps) {
         <canvas ref={bottomEdgeRef} width={400} height={4} className="absolute inset-x-0 bottom-0 w-full" style={{ height: `${frame.bottom}cqw` }} />
       </div>
 
-      {/* The clip: for vertical video, full height shifted up; for landscape, the zoomed centre in its box. */}
+      {/* The clip: for vertical video, fit above the bottom blur; for landscape, the zoomed centre in its box. */}
       <div className="absolute inset-x-0 overflow-hidden" style={{ top: `${frame.top}cqw`, bottom: `${frame.bottom}cqw` }}>
         {clip.thumbnail_url && (
           // The clip's poster still (Mux thumbnail at its admin-picked moment, else its start time).
