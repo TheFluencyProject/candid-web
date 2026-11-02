@@ -28,9 +28,9 @@ const SHARE_DESCRIPTIONS: Record<Locale, string> = {
 
 // This route lives OUTSIDE the [locale] group (excluded from the next-intl matcher),
 // so there's no translation context here — keep the little UI copy in a local map.
-// scanLabel is the desktop-cta-qr morph arm's copy; that test is en only, so other locales fall back to en.
-const COPY: Record<Locale, { cta: (name: string) => string; qrTitle: string; scanLabel?: string; privacy: string; terms: string }> = {
-  en: { cta: (name) => `Study with ${name}`, qrTitle: "Download Candid for iOS", scanLabel: "SCAN TO GET STARTED", privacy: "Privacy", terms: "Terms" },
+// scanLabel/inlineLabel are the desktop-cta-qr morph/inline arms' copy; that test is en only, so other locales fall back to en.
+const COPY: Record<Locale, { cta: (name: string) => string; qrTitle: string; scanLabel?: string; inlineLabel?: string; privacy: string; terms: string }> = {
+  en: { cta: (name) => `Study with ${name}`, qrTitle: "Download Candid for iOS", scanLabel: "SCAN TO GET STARTED", inlineLabel: "Scan to study for free", privacy: "Privacy", terms: "Terms" },
   ko: { cta: (name) => `${name}와 공부하기`, qrTitle: "iOS용 Candid 다운로드", privacy: "개인정보", terms: "이용약관" },
   ja: { cta: (name) => `${name}と勉強する`, qrTitle: "iOS版Candidをダウンロード", privacy: "プライバシー", terms: "利用規約" },
   zh: { cta: (name) => `和${name}一起学习`, qrTitle: "下载 iOS 版 Candid", privacy: "隐私", terms: "条款" },
@@ -43,10 +43,10 @@ const COPY: Record<Locale, { cta: (name: string) => string; qrTitle: string; sca
 };
 
 // Band labels match the app's feed filter + dashboard wording.
-// const BAND_LABELS: Record<"en" | "ko", Record<string, string>> = {
-//   en: { upper_beginner: "Upper Beginner", lower_intermediate: "Lower Intermediate", intermediate: "Intermediate" },
-//   ko: { upper_beginner: "초중급", lower_intermediate: "중하급", intermediate: "중급" },
-// };
+const BAND_LABELS: Record<"en" | "ko", Record<string, string>> = {
+  en: { upper_beginner: "Upper Beginner", lower_intermediate: "Lower Intermediate", intermediate: "Intermediate" },
+  ko: { upper_beginner: "초중급", lower_intermediate: "중하급", intermediate: "중급" },
+};
 
 interface LessonMeta {
   lesson_id: string;
@@ -153,15 +153,23 @@ export default async function LessonPage({
   // row, CTA. Measured off the rendered page at the longest title we ship, not guessed. The frame
   // gets what's left, so on a short screen it shrinks instead of pushing the CTA below the fold.
   const RESERVED_PX = 300;
+  // lg+: title/tutor/CTA sit beside the frame, so only the header and padding come off the height.
+  const RESERVED_LG_PX = 160;
   const frameStyle = {
     aspectRatio: `1 / ${frameRatio}`,
-    width: `min(300px, calc((100svh - ${RESERVED_PX}px) / ${frameRatio}))`,
-  };
+    "--frame-w": `min(300px, calc((100svh - ${RESERVED_PX}px) / ${frameRatio}))`,
+    "--frame-w-lg": `min(440px, calc((100svh - ${RESERVED_LG_PX}px) / ${frameRatio}))`,
+  } as React.CSSProperties;
+  const frameWidth = "w-[var(--frame-w)] lg:w-[var(--frame-w-lg)]";
   // Focus only ever describes a vertical source; clamp like FocusFilledWebImage does on iOS.
   const focusY =
     isVertical && typeof lesson.thumbnail_focus_y === "number"
       ? Math.min(Math.max(lesson.thumbnail_focus_y, 0), 1)
       : null;
+  // Desktop tutor row only ("Grace · Lower Intermediate"); locales without labels fall back to en.
+  const bandLabel = lesson.difficulty_band
+    ? (BAND_LABELS[locale as "en" | "ko"] ?? BAND_LABELS.en)[lesson.difficulty_band] ?? null
+    : null;
   const tutorPhoto = tutor?.large_profile_picture_url ?? tutor?.profile_picture_url ?? null;
 
   // Level subtitle ("Upper Beginner Korean") hidden for now — see the JSX below.
@@ -188,10 +196,10 @@ export default async function LessonPage({
           </Link>
         </header>
 
-        <section className="flex-1 flex flex-col items-center justify-center px-5 py-4 text-center">
+        <section className="flex-1 flex flex-col lg:flex-row items-center justify-center lg:gap-14 px-5 py-4 text-center">
           {lesson.thumbnail_url ? (
             <div
-              className="relative max-w-full overflow-hidden rounded-[1.75rem] shadow-2xl"
+              className={`relative shrink-0 max-w-full overflow-hidden rounded-[1.75rem] shadow-2xl ${frameWidth}`}
               style={
                 focusY != null
                   ? {
@@ -233,12 +241,14 @@ export default async function LessonPage({
             </div>
           ) : (
             <div
-              className="max-w-full rounded-[1.75rem]"
+              className={`shrink-0 max-w-full rounded-[1.75rem] ${frameWidth}`}
               style={{ ...frameStyle, background: "linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%)" }}
             />
           )}
 
-          <h1 className="mt-5 text-2xl md:text-3xl font-semibold max-w-xl leading-snug">
+          {/* lg+: beside the frame, left-aligned. */}
+          <div className="flex flex-col items-center lg:items-start lg:text-left">
+          <h1 className="mt-5 lg:mt-3 text-2xl md:text-3xl font-semibold max-w-xl lg:max-w-md leading-snug">
             {lesson.localized_title}
           </h1>
           {/* Hidden for now. Title → tutor row falls back to mt-6, the same layout this had
@@ -247,30 +257,38 @@ export default async function LessonPage({
             {levelSubtitle}
           </p> */}
 
-          <div className="mt-4 inline-flex items-center gap-3">
+          {/* lg+: above the title. */}
+          <div className="mt-4 lg:mt-0 lg:order-first inline-flex items-center gap-3">
             {tutorPhoto && (
               // Plain <img> direct from S3 — bypasses the /_next/image transcode hop.
               // eslint-disable-next-line @next/next/no-img-element
-              <img src={tutorPhoto} alt={lesson.tutor_name} className="w-9 h-9 rounded-full object-cover" />
+              <img src={tutorPhoto} alt={lesson.tutor_name} className="w-9 h-9 lg:w-7 lg:h-7 rounded-full object-cover" />
             )}
-            <span className="text-base font-medium">{lesson.tutor_name}</span>
+            <span className="text-base font-medium lg:font-normal">
+              {lesson.tutor_name}
+              {bandLabel && (
+                <span className="hidden lg:inline"> · {bandLabel}</span>
+              )}
+            </span>
           </div>
 
           {/* /download/{slug} = this tutor's App Store link. On desktop the interceptor below
               swallows the click and pops a QR of the equivalent /qr/{slug} link (same
               destination, but scannable without tripping the App Clip card); mobile navigates
               normally. Either way the click is tracked as study_cta_clicked. */}
-          <div className="mt-5">
+          <div className="mt-5 lg:mt-10">
             <DesktopCTA
               href={`/download/${lesson.tutor_slug}?l=${lesson.lesson_id}`}
               label={copy.cta(lesson.tutor_name || "Candid")}
               scanLabel={copy.scanLabel ?? COPY.en.scanLabel!}
+              inlineLabel={copy.inlineLabel ?? COPY.en.inlineLabel!}
               tutorSlug={lesson.tutor_slug}
               lessonId={lesson.lesson_id}
               surface="lesson"
               variant={desktopCtaVariant}
               distinctId={distinctId}
             />
+          </div>
           </div>
           <DownloadQRInterceptor label={copy.qrTitle} />
         </section>

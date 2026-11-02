@@ -339,6 +339,7 @@ export default async function TutorPage({ params, searchParams }: Props) {
                   href={cta_href}
                   label={t("get_started")}
                   scanLabel={t("scan_to_get_started")}
+                  inlineLabel={t("scan_to_study_free")}
                   tutorSlug={slug}
                   surface="tutor"
                   variant={desktopCtaVariant}

@@ -22,6 +22,8 @@ type Props = {
   href: string;
   label: string;
   scanLabel: string;
+  // inline arm's mint line under the ☝️.
+  inlineLabel: string;
   tutorSlug: string;
   lessonId?: string | null;
   surface: AndroidWaitlistSurface;
@@ -36,7 +38,7 @@ type Props = {
 // turns into a QR modal; morph = the pill grows in place into the QR; inline = a white QR on the
 // page from first paint, with a ☝️ and the label in mint under it. Below lg (1024px, the interceptor's gate) every arm is the plain /download anchor —
 // switched in CSS rather than after a matchMedia effect, so neither side flashes the other's CTA.
-export default function DesktopCTA({ href, label, scanLabel, tutorSlug, lessonId = null, surface, variant, distinctId }: Props) {
+export default function DesktopCTA({ href, label, scanLabel, inlineLabel, tutorSlug, lessonId = null, surface, variant, distinctId }: Props) {
   const arm: DesktopCtaVariant = variant ?? "control";
   const qrUrl = buildQrUrl({ tutor_slug: tutorSlug, surface, sid: distinctId, lesson_id: lessonId, variant: arm });
   const exposed = useRef(false);
@@ -72,12 +74,12 @@ export default function DesktopCTA({ href, label, scanLabel, tutorSlug, lessonId
     <>
       {pill("inline-block lg:hidden")}
       {arm === "inline" ? (
-        // Nudged in from the tutor hero's text edge; the lesson page centres it, so no offset there.
-        <div className={`hidden lg:inline-flex flex-col items-center align-top ${surface === "tutor" ? "lg:ml-8" : ""}`}>
+        // Nudged in from the text edge above it (both heroes are left-aligned on desktop).
+        <div className="hidden lg:inline-flex flex-col items-center align-top lg:ml-8">
           <QRCodeSVG value={qrUrl} size={INLINE_QR_PX} fgColor="#FFFFFF" bgColor="transparent" />
           <span aria-hidden className="mt-4 text-xl leading-none">☝️</span>
           <span className="mt-2 text-base font-bold whitespace-nowrap" style={{ color: MINT }}>
-            {label}
+            {inlineLabel}
           </span>
         </div>
       ) : (
