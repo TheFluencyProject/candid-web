@@ -486,10 +486,10 @@ function ClipLayer({ clip, role, posterOnly, onEnd }: LayerProps) {
         </div>
       </div>
 
-      {/* Speak now + caption + translation — top-anchored: Speak now sits just under the screen's
-          middle (the screen is ~217cqw tall) and longer captions grow down toward the speed button. */}
-      <div className="absolute inset-x-0 top-[114cqw] z-[2] px-[6.2cqw]">
-        <div className="mb-[6.6cqw] flex justify-center">
+      {/* Speak now + caption + translation — bottom-anchored just above the speed button (its top is
+          27.5cqw up), so short captions sit low and longer ones grow up the screen. */}
+      <div className="absolute inset-x-0 bottom-[30.5cqw] z-[2] px-[6.2cqw]">
+        <div className="mb-[3.6cqw] flex justify-center">
           <span className="rounded-[2.8cqw] px-[4.6cqw] py-[2.6cqw] text-[4.8cqw] font-semibold leading-none text-black" style={{ backgroundColor: ACCENT }}>
             Speak now
           </span>
