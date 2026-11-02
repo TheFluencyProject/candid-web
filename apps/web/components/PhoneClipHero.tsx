@@ -55,7 +55,9 @@ const PT = 100 / 393; // cqw per iOS point (393pt-wide iPhone)
 const SCREEN_H_CQW = 216.7; // the screen cut-out is 1795:3889
 const EXTEND_TOP_CQW = 28; // iOS headerBottom: just under the title row's progress bar
 const EXTEND_BOTTOM_CQW = (113 + 2) * PT; // WatchStretchBarBottomPadding + StretchProgressBar.barHeight
-const EXTEND_BOX_CQW = SCREEN_H_CQW - EXTEND_TOP_CQW - EXTEND_BOTTOM_CQW;
+// Portrait clips fill the screen but sit this far up — the face clears the caption — with the gap
+// left at the bottom filled the same way: the picture's bottom rows stretched under the heavy blur.
+const PORTRAIT_SHIFT_CQW = 20;
 const STRIP_PT = 2; // VerticalFormatEdgeExtend.stripHeight
 // VerticalFormatBandTuning defaults, in pt — except the ramps, which start further inside the box
 // (iOS: rampAbove 25, topRamp 0) so the picture eases out of focus more gradually.
@@ -74,35 +76,52 @@ const BAND_PX = 4; // band canvas px per cqw
 // padding (3σ) that keeps its blur fed with picture at every edge.
 type Band = { edge: "top" | "bottom"; top: number; height: number; ramp: number; blur: number; dim: number; pad: number };
 const band = (b: Omit<Band, "pad">): Band => ({ ...b, pad: Math.ceil(3 * b.blur) });
-const BANDS = [
-  // Full only at the screen top, none topRamp into the box.
-  band({ edge: "top", top: 0, height: EXTEND_TOP_CQW + BAND.topRamp * PT, ramp: EXTEND_TOP_CQW + BAND.topRamp * PT, blur: BAND.topBlur * PT, dim: BAND.topDim }),
-  // None rampAbove over the bar, full fullBelow under it.
-  band({
-    edge: "bottom",
-    top: SCREEN_H_CQW - EXTEND_BOTTOM_CQW - BAND.rampAbove * PT,
-    height: EXTEND_BOTTOM_CQW + BAND.rampAbove * PT,
-    ramp: BAND.rampAbove * PT + Math.min(BAND.fullBelow * PT, EXTEND_BOTTOM_CQW),
-    blur: BAND.bottomBlur * PT,
-    dim: BAND.bottomDim,
-  }),
-];
+// None rampAbove over the box's bottom edge, full fullBelow under it.
+const bottom_band = (bottom: number) => band({
+  edge: "bottom",
+  top: SCREEN_H_CQW - bottom - BAND.rampAbove * PT,
+  height: bottom + BAND.rampAbove * PT,
+  ramp: BAND.rampAbove * PT + Math.min(BAND.fullBelow * PT, bottom),
+  blur: BAND.bottomBlur * PT,
+  dim: BAND.bottomDim,
+});
+
+// Where a layout's sharp box sits (cqw in from the screen's top and bottom; a negative top runs
+// off the screen) and the blur bands at its ends.
+type Frame = { top: number; bottom: number; bands: Band[] };
+const LANDSCAPE: Frame = {
+  top: EXTEND_TOP_CQW,
+  bottom: EXTEND_BOTTOM_CQW,
+  bands: [
+    // Full only at the screen top, none topRamp into the box.
+    band({ edge: "top", top: 0, height: EXTEND_TOP_CQW + BAND.topRamp * PT, ramp: EXTEND_TOP_CQW + BAND.topRamp * PT, blur: BAND.topBlur * PT, dim: BAND.topDim }),
+    bottom_band(EXTEND_BOTTOM_CQW),
+  ],
+};
+const PORTRAIT: Frame = { top: -PORTRAIT_SHIFT_CQW, bottom: PORTRAIT_SHIFT_CQW, bands: [bottom_band(PORTRAIT_SHIFT_CQW)] };
+const frame_for = (landscape: boolean) => (landscape ? LANDSCAPE : PORTRAIT);
+const box_h = (f: Frame) => SCREEN_H_CQW - f.top - f.bottom;
 
 // Paint the screen's picture — the box (same crop as its object-cover, centred on crop_center) and its outermost 2pt
 // stretched above and below it — into the strip canvases, and into each band's padded canvases with
 // the side padding clamped to the edge column. Painted from the poster until the video has a frame.
+// The layout comes from the picture's own shape, the same way the layer picks it.
 function paint_edges(src: HTMLVideoElement | HTMLImageElement, top: HTMLCanvasElement | null, bottom: HTMLCanvasElement | null, bands: (HTMLCanvasElement | null)[][], crop_center: number | null | undefined) {
   const [w, h] = src instanceof HTMLVideoElement ? [src.videoWidth, src.videoHeight] : [src.naturalWidth, src.naturalHeight];
   if (!w || !h || (src instanceof HTMLVideoElement && src.readyState < 2)) return;
-  const sw = Math.min(w, (h * 100) / EXTEND_BOX_CQW);
+  const f = frame_for(w > h);
+  const box = box_h(f);
+  const sw = Math.min(w, (h * 100) / box);
+  const sh = Math.min(h, (w * box) / 100);
   const sx = crop_slice_x(crop_center, w, sw);
-  const rows = Math.max(1, (h * STRIP_PT * PT) / EXTEND_BOX_CQW);
-  for (const [canvas, sy] of [[top, 0], [bottom, h - rows]] as const) {
+  const sy0 = (h - sh) / 2;
+  const rows = Math.max(1, (sh * STRIP_PT * PT) / box);
+  for (const [canvas, sy] of [[top, sy0], [bottom, sy0 + sh - rows]] as const) {
     const ctx = canvas?.getContext("2d");
     if (canvas && ctx) ctx.drawImage(src, sx, sy, sw, rows, 0, 0, canvas.width, canvas.height);
   }
-  const box_bottom = EXTEND_TOP_CQW + EXTEND_BOX_CQW;
-  BANDS.forEach((b, i) => {
+  const box_bottom = f.top + box;
+  f.bands.forEach((b, i) => {
     const [first, ...copies] = bands[i];
     const ctx = first?.getContext("2d");
     if (!first || !ctx) return;
@@ -112,11 +131,11 @@ function paint_edges(src: HTMLVideoElement | HTMLImageElement, top: HTMLCanvasEl
     const draw = (a: number, z: number, sy: number, sh: number) => {
       if (z > a) ctx.drawImage(src, sx, sy, sw, sh, pad_px, (a - y0) * BAND_PX, 100 * BAND_PX, (z - a) * BAND_PX);
     };
-    draw(y0, Math.min(y1, EXTEND_TOP_CQW), 0, rows); // above the box: its top rows, stretched
-    const a = Math.max(y0, EXTEND_TOP_CQW);
+    draw(y0, Math.min(y1, f.top), sy0, rows); // above the box: its top rows, stretched
+    const a = Math.max(y0, f.top);
     const z = Math.min(y1, box_bottom);
-    draw(a, z, ((a - EXTEND_TOP_CQW) / EXTEND_BOX_CQW) * h, ((z - a) / EXTEND_BOX_CQW) * h); // the box
-    draw(Math.max(y0, box_bottom), y1, h - rows, rows); // below the box: its bottom rows, stretched
+    draw(a, z, sy0 + ((a - f.top) / box) * sh, ((z - a) / box) * sh); // the box
+    draw(Math.max(y0, box_bottom), y1, sy0 + sh - rows, rows); // below the box: its bottom rows, stretched
     ctx.drawImage(first, pad_px, 0, 1, first.height, 0, 0, pad_px, first.height);
     ctx.drawImage(first, first.width - pad_px - 1, 0, 1, first.height, first.width - pad_px, 0, pad_px, first.height);
     for (const c of copies) c?.getContext("2d")?.drawImage(first, 0, 0);
@@ -248,7 +267,7 @@ function ClipLayer({ clip, role, posterOnly, onEnd }: LayerProps) {
   const posterRef = useRef<HTMLImageElement | null>(null);
   const topEdgeRef = useRef<HTMLCanvasElement | null>(null);
   const bottomEdgeRef = useRef<HTMLCanvasElement | null>(null);
-  const bandRefs = useRef<(HTMLCanvasElement | null)[][]>(BANDS.map(() => []));
+  const bandRefs = useRef<(HTMLCanvasElement | null)[][]>(LANDSCAPE.bands.map(() => []));
   const [hasFrame, setHasFrame] = useState(false); // a decoded frame is up → poster can go
   const hasFrameRef = useRef(false);
   hasFrameRef.current = hasFrame;
@@ -378,10 +397,17 @@ function ClipLayer({ clip, role, posterOnly, onEnd }: LayerProps) {
     };
   }, [role, ready, clip]);
 
+  // The layout flipped → its bands are fresh canvases; repaint them from whatever is up.
+  useEffect(() => {
+    const src = hasFrameRef.current ? videoRef.current : posterRef.current;
+    if (src) paint_edges(src, topEdgeRef.current, bottomEdgeRef.current, bandRefs.current, clip.crop_center);
+  }, [landscape, clip.crop_center]);
+
   const words = clip.word_level_captions;
   const extend = landscape;
-  // The admin-picked framing: the visible slice of the box (landscape) or the screen centres on it.
-  const object_position = `${cover_position_x(clip.crop_center, mediaAspect, 100 / (extend ? EXTEND_BOX_CQW : SCREEN_H_CQW))} 50%`;
+  const frame = frame_for(landscape);
+  // The admin-picked framing: the visible slice of the box centres on it.
+  const object_position = `${cover_position_x(clip.crop_center, mediaAspect, 100 / box_h(frame))} 50%`;
 
   return (
     <div
@@ -408,17 +434,14 @@ function ClipLayer({ clip, role, posterOnly, onEnd }: LayerProps) {
       )}
 
       {/* Edge-extend strips (mounted always so the poster can paint into them before the layout
-          knows it's landscape; shown only for the extend layout). */}
-      <div aria-hidden className={extend ? "" : "hidden"}>
-        <canvas ref={topEdgeRef} width={400} height={4} className="absolute inset-x-0 top-0 w-full" style={{ height: `${EXTEND_TOP_CQW}cqw` }} />
-        <canvas ref={bottomEdgeRef} width={400} height={4} className="absolute inset-x-0 bottom-0 w-full" style={{ height: `${EXTEND_BOTTOM_CQW}cqw` }} />
+          is known). Portrait's box runs off the top, so only its bottom strip shows. */}
+      <div aria-hidden>
+        <canvas ref={topEdgeRef} width={400} height={4} className={`absolute inset-x-0 top-0 w-full ${extend ? "" : "hidden"}`} style={{ height: `${EXTEND_TOP_CQW}cqw` }} />
+        <canvas ref={bottomEdgeRef} width={400} height={4} className="absolute inset-x-0 bottom-0 w-full" style={{ height: `${frame.bottom}cqw` }} />
       </div>
 
-      {/* The clip: full screen for vertical video; for landscape, the zoomed centre in its box. */}
-      <div
-        className="absolute inset-x-0 overflow-hidden"
-        style={extend ? { top: `${EXTEND_TOP_CQW}cqw`, bottom: `${EXTEND_BOTTOM_CQW}cqw` } : { top: 0, bottom: 0 }}
-      >
+      {/* The clip: for vertical video, full height shifted up; for landscape, the zoomed centre in its box. */}
+      <div className="absolute inset-x-0 overflow-hidden" style={{ top: `${frame.top}cqw`, bottom: `${frame.bottom}cqw` }}>
         {clip.thumbnail_url && (
           // The clip's poster still (Mux thumbnail at its admin-picked moment, else its start time).
           // eslint-disable-next-line @next/next/no-img-element
@@ -444,11 +467,8 @@ function ClipLayer({ clip, role, posterOnly, onEnd }: LayerProps) {
         )}
       </div>
 
-      {/* iOS VerticalFormatBandBlur, under the scrims. Mounted always, like the strips, so the poster
-          can paint into it before the layout knows it's landscape. */}
-      <div className={extend ? "" : "hidden"}>
-        {BANDS.map((b, i) => <BandBlur key={b.edge} b={b} canvases={bandRefs.current[i]} />)}
-      </div>
+      {/* iOS VerticalFormatBandBlur, under the scrims. */}
+      {frame.bands.map((b, i) => <BandBlur key={`${extend}-${b.edge}`} b={b} canvases={bandRefs.current[i]} />)}
 
       {/* Lesson title row + progress */}
       <div className="absolute inset-x-0 top-[15.6cqw] z-[2] px-[6cqw]">
@@ -464,9 +484,9 @@ function ClipLayer({ clip, role, posterOnly, onEnd }: LayerProps) {
         </div>
       </div>
 
-      {/* Speak now + caption + translation — top-anchored: Speak now sits at the screen's middle
-          (the screen is ~217cqw tall) and longer captions grow down toward the speed button. */}
-      <div className="absolute inset-x-0 top-[104cqw] z-[2] px-[6.2cqw]">
+      {/* Speak now + caption + translation — top-anchored: Speak now sits just under the screen's
+          middle (the screen is ~217cqw tall) and longer captions grow down toward the speed button. */}
+      <div className="absolute inset-x-0 top-[114cqw] z-[2] px-[6.2cqw]">
         <div className="mb-[6.6cqw] flex justify-center">
           <span className="rounded-[2.8cqw] px-[4.6cqw] py-[2.6cqw] text-[4.8cqw] font-semibold leading-none text-black" style={{ backgroundColor: ACCENT }}>
             Speak now
