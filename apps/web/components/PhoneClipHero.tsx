@@ -57,9 +57,10 @@ const EXTEND_TOP_CQW = 28; // iOS headerBottom: just under the title row's progr
 const EXTEND_BOTTOM_CQW = (113 + 2) * PT; // WatchStretchBarBottomPadding + StretchProgressBar.barHeight
 // Portrait clips fit from the screen top down to this far above its bottom — the face clears the
 // caption — with the gap filled the same way: the picture's bottom rows stretched under the heavy
-// blur, which eases in over a shorter ramp than landscape's.
+// blur — eased in over a shorter ramp than landscape's, but in finer steps so it reads as a gradient.
 const PORTRAIT_BOTTOM_CQW = 12;
-const PORTRAIT_RAMP_PT = 30;
+const PORTRAIT_RAMP_PT = 55;
+const PORTRAIT_BLUR_LAYERS = 8;
 const STRIP_PT = 2; // VerticalFormatEdgeExtend.stripHeight
 // VerticalFormatBandTuning defaults, in pt — except the ramps, which start further inside the box
 // (iOS: rampAbove 25, topRamp 0) so the picture eases out of focus more gradually.
@@ -74,18 +75,19 @@ const BLUR_LAYERS = 3;
 const EASE_IN = [[0, 0], [0.25, 0.1], [0.5, 0.35], [0.75, 0.7], [1, 1]] as const;
 const BAND_PX = 4; // band canvas px per cqw
 
-// A band in screen cqw: where it sits, how far its blur ramps in from the box end, and the canvas
-// padding (3σ) that keeps its blur fed with picture at every edge.
-type Band = { edge: "top" | "bottom"; top: number; height: number; ramp: number; blur: number; dim: number; pad: number };
-const band = (b: Omit<Band, "pad">): Band => ({ ...b, pad: Math.ceil(3 * b.blur) });
+// A band in screen cqw: where it sits, how far its blur ramps in from the box end, how many blur
+// steps it ramps in by, and the canvas padding (3σ) that keeps its blur fed with picture at every edge.
+type Band = { edge: "top" | "bottom"; top: number; height: number; ramp: number; blur: number; dim: number; layers: number; pad: number };
+const band = (b: Omit<Band, "pad" | "layers"> & { layers?: number }): Band => ({ layers: BLUR_LAYERS, ...b, pad: Math.ceil(3 * b.blur) });
 // None rampAbove over the box's bottom edge, full fullBelow under it.
-const bottom_band = (bottom: number, rampAbove: number = BAND.rampAbove) => band({
+const bottom_band = (bottom: number, rampAbove: number = BAND.rampAbove, layers: number = BLUR_LAYERS) => band({
   edge: "bottom",
   top: SCREEN_H_CQW - bottom - rampAbove * PT,
   height: bottom + rampAbove * PT,
   ramp: rampAbove * PT + Math.min(BAND.fullBelow * PT, bottom),
   blur: BAND.bottomBlur * PT,
   dim: BAND.bottomDim,
+  layers,
 });
 
 // Where a layout's sharp box sits (cqw in from the screen's top and bottom) and the blur bands at
@@ -100,7 +102,7 @@ const LANDSCAPE: Frame = {
     bottom_band(EXTEND_BOTTOM_CQW),
   ],
 };
-const PORTRAIT: Frame = { top: 0, bottom: PORTRAIT_BOTTOM_CQW, bands: [bottom_band(PORTRAIT_BOTTOM_CQW, PORTRAIT_RAMP_PT)] };
+const PORTRAIT: Frame = { top: 0, bottom: PORTRAIT_BOTTOM_CQW, bands: [bottom_band(PORTRAIT_BOTTOM_CQW, PORTRAIT_RAMP_PT, PORTRAIT_BLUR_LAYERS)] };
 const frame_for = (landscape: boolean) => (landscape ? LANDSCAPE : PORTRAIT);
 const box_h = (f: Frame) => SCREEN_H_CQW - f.top - f.bottom;
 
@@ -151,8 +153,8 @@ function BandBlur({ b, canvases }: { b: Band; canvases: (HTMLCanvasElement | nul
   const dir = b.edge === "top" ? "to top" : "to bottom"; // from the box end out to the screen edge
   return (
     <div aria-hidden className="absolute inset-x-0 overflow-hidden" style={{ top: `${b.top}cqw`, height: `${b.height}cqw` }}>
-      {Array.from({ length: BLUR_LAYERS }, (_, k) => {
-        const mask = `linear-gradient(${dir}, transparent ${(ramp * k) / BLUR_LAYERS}%, black ${(ramp * (k + 1)) / BLUR_LAYERS}%)`;
+      {Array.from({ length: b.layers }, (_, k) => {
+        const mask = `linear-gradient(${dir}, transparent ${(ramp * k) / b.layers}%, black ${(ramp * (k + 1)) / b.layers}%)`;
         return (
           <div key={k} className="absolute inset-0" style={{ maskImage: mask, WebkitMaskImage: mask }}>
             <canvas
@@ -165,7 +167,7 @@ function BandBlur({ b, canvases }: { b: Band; canvases: (HTMLCanvasElement | nul
                 top: `${-b.pad}cqw`,
                 width: `${100 + 2 * b.pad}cqw`,
                 height: `${b.height + 2 * b.pad}cqw`,
-                filter: `blur(${(b.blur * (k + 1)) / BLUR_LAYERS}cqw)`,
+                filter: `blur(${(b.blur * (k + 1)) / b.layers}cqw)`,
               }}
             />
           </div>
@@ -486,9 +488,9 @@ function ClipLayer({ clip, role, posterOnly, onEnd }: LayerProps) {
         </div>
       </div>
 
-      {/* Speak now + caption + translation — bottom-anchored just above the speed button (its top is
-          27.5cqw up), so short captions sit low and longer ones grow up the screen. */}
-      <div className="absolute inset-x-0 bottom-[30.5cqw] z-[2] px-[6.2cqw]">
+      {/* Speak now + caption + translation — top-anchored: Speak now sits a bit past the screen's
+          middle (the screen is ~217cqw tall) and longer captions grow down toward the speed button. */}
+      <div className="absolute inset-x-0 top-[120cqw] z-[2] px-[6.2cqw]">
         <div className="mb-[3.6cqw] flex justify-center">
           <span className="rounded-[2.8cqw] px-[4.6cqw] py-[2.6cqw] text-[4.8cqw] font-semibold leading-none text-black" style={{ backgroundColor: ACCENT }}>
             Speak now
