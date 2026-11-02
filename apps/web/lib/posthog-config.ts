@@ -25,3 +25,8 @@ export const POSTHOG_UI_HOST = "https://us.posthog.com";
 export const CTA_FLAG_KEY = "mobile-cta-copy";
 
 export type MobileCtaVariant = "control" | "download_app";
+
+// Desktop hero CTA on tutor + lesson pages: plan desktop-cta-qr-ab-test-2026-11-01.
+export const DESKTOP_CTA_FLAG_KEY = "desktop-cta-qr";
+
+export type DesktopCtaVariant = "control" | "morph" | "inline";

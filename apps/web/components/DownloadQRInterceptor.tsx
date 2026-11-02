@@ -7,8 +7,8 @@ import ResponsiveOverlay from "@/components/ResponsiveOverlay";
 import AndroidWaitlistOverlay, { type AndroidWaitlistTarget } from "@/components/AndroidWaitlistOverlay";
 import type { AndroidWaitlistSurface } from "@/lib/api";
 import { isAndroid } from "@/lib/in-app-browser";
-
-const BASE_URL = "https://joincandid.co";
+import { buildQrUrl } from "@/lib/qr-url";
+import type { DesktopCtaVariant } from "@/lib/posthog-config";
 
 // Which page the click happened on, for the funnel. Custom-domain tutor pages rewrite server-side
 // so their pathname is "/" — they render join-sheet buttons, not /download anchors, so they never
@@ -25,10 +25,7 @@ function describePage(pathname: string): { surface: AndroidWaitlistSurface; less
 // install it either, so Android taps (any width) get the waitlist overlay instead. iPhone/iPad
 // clicks fall through and navigate normally.
 //
-// The QR encodes /qr/<slug>, NOT the /download link itself — /download is a registered App Clip
-// Experience, so scanning it pops the clip card before the redirect can run. /qr is unregistered
-// (goes straight to the tutor's App Store page) and lets middleware record the scan.
-// The App Clip funnel used `${BASE_URL}${href}` here; restore that if it's ever re-enabled.
+// The QR encodes /qr/<slug>, NOT the /download link itself (see lib/qr-url).
 //
 // Capture-phase document listener mirrors InAppBrowserBlocker; the two never overlap — that one only
 // runs in restricted in-app browsers, this one only on desktop (≥1024px). Click tracking happens
@@ -74,14 +71,11 @@ export default function DownloadQRInterceptor({ label }: { label: string }) {
     e.preventDefault();
     e.stopPropagation();
 
-    // Undefined before posthog.init resolves — omit rather than bake "undefined" into the QR.
+    // Undefined before posthog.init resolves — buildQrUrl omits it rather than baking "undefined" in.
     const sid = posthog.get_distinct_id();
-    const params = new URLSearchParams({ s: surface });
-    if (sid) params.set("sid", sid);
-    if (lesson_id) params.set("l", lesson_id);
-    // No trailing slash on the bare form — Next 308s "/qr/" to "/qr" before middleware runs.
-    const path = tutor_slug ? `/qr/${tutor_slug}` : "/qr";
-    setTarget({ url: `${BASE_URL}${path}?${params}` });
+    // DesktopCTA's control arm marks its anchor so the modal's scans carry the arm too.
+    const variant = (anchor?.dataset.ctaVariant as DesktopCtaVariant | undefined) ?? null;
+    setTarget({ url: buildQrUrl({ tutor_slug, surface, sid, lesson_id, variant }) });
   }, []);
 
   useEffect(() => {
