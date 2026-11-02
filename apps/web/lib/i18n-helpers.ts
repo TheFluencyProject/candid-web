@@ -21,7 +21,7 @@ export function pickLocale(acceptLanguage: string | null, country?: string | nul
   // is from Korea — e.g. a local whose phone UI is set to English.
   if (country?.toUpperCase() === "KR" && (!primary || tags.includes("ko"))) return "ko";
   if (primary === "en") return "en";
-  // Primary language isn't one we serve (say de): take the first one listed that we do.
+  // Primary language isn't one we serve (say pl): take the first one listed that we do.
   return tags.find(isLocale) ?? "en";
 }
 
@@ -35,6 +35,8 @@ const LANG_NAMES: Partial<Record<Locale, Record<string, string>>> = {
   vi: { english: "tiếng Anh", korean: "tiếng Hàn" },
   th: { english: "ภาษาอังกฤษ", korean: "ภาษาเกาหลี" },
   id: { english: "bahasa Inggris", korean: "bahasa Korea" },
+  de: { english: "Englisch", korean: "Koreanisch" },
+  it: { english: "inglese", korean: "coreano" },
 };
 
 export function localizeLanguageName(lang: string, locale: string): string {
@@ -52,6 +54,8 @@ const MAP_COUNTRIES: Partial<Record<Locale, Record<string, string>>> = {
   vi: { english: "Mỹ", korean: "Hàn Quốc" },
   th: { english: "อเมริกา", korean: "เกาหลี" },
   id: { english: "Amerika", korean: "Korea" },
+  de: { english: "Amerika", korean: "Korea" },
+  it: { english: "l’America", korean: "la Corea" },
 };
 
 export function localizeMapCountry(teachingLanguage: string, locale: string): string {

@@ -66,6 +66,18 @@ const COPY: Record<Locale, { title: string; intro: string; button: string; hint:
     button: "Unduh untuk Mac",
     hint: "Butuh macOS 26 atau lebih baru · Gratis · Update otomatis",
   },
+  de: {
+    title: "Candid für Mac",
+    intro: "Lerne auf dem großen Bildschirm. Lektionen, Videos und Sprechtraining – direkt auf deinem Computer.",
+    button: "Für Mac laden",
+    hint: "Erfordert macOS 26 oder neuer · Kostenlos · Automatische Updates",
+  },
+  it: {
+    title: "Candid per Mac",
+    intro: "Esercitati sul grande schermo. Lezioni, video e pratica di parlato, direttamente sul tuo computer.",
+    button: "Scarica per Mac",
+    hint: "Richiede macOS 26 o successivo · Gratis · Aggiornamenti automatici",
+  },
 };
 
 export async function generateMetadata(): Promise<Metadata> {
