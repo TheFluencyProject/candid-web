@@ -30,6 +30,17 @@ export function PostHogProvider({ children, distinctId, bootstrapFlags }: Props)
       // first-load capture was dropped. That silently cost us every single-page session (web
       // analytics read 1 visitor/week).
       capture_pageview: "history_change",
+      // Stamps the tutor on page views so a per-tutor funnel can start at the view (lesson URLs
+      // are /lesson/<uuid>). Read from the DOM at send time rather than register/unregister: a
+      // page's effect runs before this init, and a super property sticks until something clears
+      // it. Next commits the new page before it pushes history, so a history_change pageview
+      // already sees the new page's marker; pages without one get nothing.
+      before_send: (event) => {
+        if (event?.event !== "$pageview") return event;
+        const tutorSlug = document.querySelector("[data-tutor-slug]")?.getAttribute("data-tutor-slug");
+        if (tutorSlug) event.properties.tutor_slug = tutorSlug;
+        return event;
+      },
       bootstrap: {
         distinctID: distinctId,
         isIdentifiedID: false,

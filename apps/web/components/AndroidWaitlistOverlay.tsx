@@ -93,16 +93,17 @@ export default function AndroidWaitlistOverlay({
       onClose={onClose}
       keyboardInset={kbdInset}
       blurBackdrop
-      panelBackground="#FFFFFF"
+      panelBackground="#18181C"
       desktopMaxWidthClass="max-w-[400px]"
     >
       {copy && (state === "done" ? (
         <div className="px-8 py-10 text-center">
-          <p className="text-lg font-semibold" style={{ color: "#18181C" }}>{copy.success}</p>
+          <p className="text-lg text-white">{copy.success}</p>
         </div>
       ) : (
         <form onSubmit={submit} className="px-8 py-8 flex flex-col gap-4 text-center">
-          <h2 className="text-xl font-semibold" style={{ color: "#18181C" }}>{copy.title}</h2>
+          {/* Site theme: dark panel, light-weight white type, mint pill CTA (matches the hero). */}
+          <h2 className="text-2xl font-normal tracking-tight text-white">{copy.title}</h2>
           <input
             type="email"
             name="email"
@@ -115,19 +116,17 @@ export default function AndroidWaitlistOverlay({
             placeholder={copy.placeholder}
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="w-full px-4 py-3 rounded-2xl text-base outline-none border"
-            style={{ backgroundColor: "transparent", color: "#18181C", borderColor: "rgba(0,0,0,0.12)" }}
+            className="w-full px-5 py-3.5 rounded-full text-base text-white placeholder:text-gray-500 bg-white/5 border border-white/15 outline-none focus:border-[#89FFB4]/60"
           />
           <button
             type="submit"
             disabled={state === "sending"}
-            className="w-full py-4 rounded-full text-base font-semibold transition-opacity disabled:opacity-40"
-            style={{ backgroundColor: "#18181C", color: "#FFFFFF" }}
+            className="w-full py-3.5 rounded-full bg-[#89FFB4] text-base font-semibold text-[#18181C] hover:opacity-90 transition-opacity disabled:opacity-40"
           >
             {copy.button}
           </button>
           {state === "error" && (
-            <p className="text-sm" style={{ color: "#B42318" }}>{copy.error}</p>
+            <p className="text-sm text-[#FF8A8A]">{copy.error}</p>
           )}
         </form>
       ))}
