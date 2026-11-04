@@ -48,10 +48,21 @@ const COPY: Record<Locale, { cta: (name: string) => string; qrTitle: string; sca
   it: { cta: (name) => `Studia con ${name}`, qrTitle: "Scarica Candid per iOS", privacy: "Privacy", terms: "Termini" },
 };
 
-// Band labels match the app's feed filter + dashboard wording.
-const BAND_LABELS: Record<"en" | "ko", Record<string, string>> = {
-  en: { upper_beginner: "Upper Beginner", lower_intermediate: "Lower Intermediate", intermediate: "Intermediate" },
-  ko: { upper_beginner: "초중급", lower_intermediate: "중하급", intermediate: "중급" },
+// Band labels match the app's Answers.xcstrings wording, in every site locale.
+const BAND_LABELS: Record<Locale, Record<string, string>> = {
+  en: { beginner: "Beginner", upper_beginner: "Upper Beginner", lower_intermediate: "Lower Intermediate", intermediate: "Intermediate" },
+  ko: { beginner: "초급", upper_beginner: "초중급", lower_intermediate: "중하급", intermediate: "중급" },
+  ja: { beginner: "初級", upper_beginner: "初級の上", lower_intermediate: "中級の下", intermediate: "中級" },
+  zh: { beginner: "初级", upper_beginner: "初级偏上", lower_intermediate: "中级偏下", intermediate: "中级" },
+  "zh-Hant": { beginner: "初級", upper_beginner: "初級偏上", lower_intermediate: "中級偏下", intermediate: "中級" },
+  es: { beginner: "Principiante", upper_beginner: "Principiante alto", lower_intermediate: "Intermedio bajo", intermediate: "Intermedio" },
+  ru: { beginner: "Начальный", upper_beginner: "Продвинутый начинающий", lower_intermediate: "Ниже среднего", intermediate: "Средний" },
+  fr: { beginner: "Débutant", upper_beginner: "Débutant avancé", lower_intermediate: "Intermédiaire inférieur", intermediate: "Intermédiaire" },
+  vi: { beginner: "Sơ cấp", upper_beginner: "Sơ cấp cao", lower_intermediate: "Trung cấp thấp", intermediate: "Trung cấp" },
+  th: { beginner: "ระดับต้น", upper_beginner: "ระดับต้นสูง", lower_intermediate: "ระดับกลางต้น", intermediate: "ระดับกลาง" },
+  id: { beginner: "Pemula", upper_beginner: "Pemula atas", lower_intermediate: "Menengah bawah", intermediate: "Menengah" },
+  de: { beginner: "Anfänger", upper_beginner: "Fortgeschrittener Anfänger", lower_intermediate: "Untere Mittelstufe", intermediate: "Mittelstufe" },
+  it: { beginner: "Principiante", upper_beginner: "Principiante avanzato", lower_intermediate: "Intermedio basso", intermediate: "Intermedio" },
 };
 
 interface LessonMeta {
@@ -173,10 +184,8 @@ export default async function LessonPage({
     isVertical && typeof lesson.thumbnail_focus_y === "number"
       ? Math.min(Math.max(lesson.thumbnail_focus_y, 0), 1)
       : null;
-  // Desktop tutor row only ("Grace · Lower Intermediate"); locales without labels fall back to en.
-  const bandLabel = lesson.difficulty_band
-    ? (BAND_LABELS[locale as "en" | "ko"] ?? BAND_LABELS.en)[lesson.difficulty_band] ?? null
-    : null;
+  // Desktop tutor row only ("Grace · Lower Intermediate").
+  const bandLabel = lesson.difficulty_band ? BAND_LABELS[locale][lesson.difficulty_band] ?? null : null;
   const tutorPhoto = tutor?.large_profile_picture_url ?? tutor?.profile_picture_url ?? null;
 
   // Level subtitle ("Upper Beginner Korean") hidden for now — see the JSX below.
