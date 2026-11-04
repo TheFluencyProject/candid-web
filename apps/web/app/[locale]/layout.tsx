@@ -11,7 +11,7 @@ import { CTA_FLAG_KEY, DESKTOP_CTA_FLAG_KEY } from "@/lib/posthog-config";
 import { getDesktopCtaVariant, getDistinctId, getMobileCtaVariant } from "@/lib/posthog-server";
 
 const OG_LOCALES: Record<Locale, string> = {
-  en: "en_US", ko: "ko_KR", ja: "ja_JP", zh: "zh_CN", es: "es_ES",
+  en: "en_US", ko: "ko_KR", ja: "ja_JP", zh: "zh_CN", "zh-Hant": "zh_TW", es: "es_ES",
   ru: "ru_RU", fr: "fr_FR", vi: "vi_VN", th: "th_TH", id: "id_ID",
   de: "de_DE", it: "it_IT",
 };

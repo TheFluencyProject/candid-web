@@ -26,6 +26,7 @@ const COPY: Record<Locale, { hint: string; alt: string }> = {
   ko: { hint: "위 배너를 눌러 바로 시작하거나, 앱을 다운로드하세요.", alt: "App Store에서 다운로드" },
   ja: { hint: "上のバナーをタップしてすぐに始めるか、アプリをダウンロードしてください。", alt: "App Storeからダウンロード" },
   zh: { hint: "点击上方横幅立即开始，或下载完整应用。", alt: "在 App Store 下载" },
+  "zh-Hant": { hint: "點一下上方橫幅立即開始，或下載完整 App。", alt: "在 App Store 下載" },
   es: { hint: "Toca el banner de arriba para empezar al instante, o descarga la app completa.", alt: "Descargar en el App Store" },
   ru: { hint: "Нажмите на баннер выше, чтобы начать сразу, или скачайте полное приложение.", alt: "Загрузить в App Store" },
   fr: { hint: "Touche la bannière ci-dessus pour commencer tout de suite, ou télécharge l’app complète.", alt: "Télécharger dans l’App Store" },

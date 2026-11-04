@@ -30,6 +30,12 @@ const COPY: Record<Locale, { title: string; intro: string; button: string; hint:
     button: "下载 Mac 版",
     hint: "需要 macOS 26 或更高版本 · 免费 · 自动更新",
   },
+  "zh-Hant": {
+    title: "Mac 版 Candid",
+    intro: "在大螢幕上練習。課程、影片和口說練習，直接在桌機上進行。",
+    button: "下載 Mac 版",
+    hint: "需要 macOS 26 或更新版本 · 免費 · 自動更新",
+  },
   es: {
     title: "Candid para Mac",
     intro: "Practica en la pantalla grande. Tus lecciones, videos y práctica oral, directo en tu escritorio.",

@@ -2,9 +2,10 @@
 
 import { useEffect, useState } from "react";
 import ResponsiveOverlay from "@/components/ResponsiveOverlay";
-import { isLocale, routing, type Locale } from "@/i18n/routing";
+import { routing, type Locale } from "@/i18n/routing";
 import { submit_android_waitlist, type AndroidWaitlistSurface } from "@/lib/api";
 import { isAndroid } from "@/lib/in-app-browser";
+import { siteLocaleForTag } from "@/lib/i18n-helpers";
 
 // Candid is iOS-only, so an Android Download tap would land on an App Store page it can't
 // install from. DownloadQRInterceptor opens this instead: one email field, then a thank-you.
@@ -15,10 +16,9 @@ import { isAndroid } from "@/lib/in-app-browser";
 // English for everyone. Loaded once on Android only, long before anyone taps Download.
 type Copy = { title: string; placeholder: string; button: string; success: string; error: string };
 
-// "ko-KR" → ko, "zh-Hans-CN" → zh; anything the site doesn't speak falls back to English.
+// "ko-KR" → ko, "zh-TW" → zh-Hant; anything the site doesn't speak falls back to English.
 function phoneLocale(): Locale {
-  const lang = (typeof navigator === "undefined" ? "" : navigator.language).toLowerCase().split("-")[0];
-  return isLocale(lang) ? lang : routing.defaultLocale;
+  return siteLocaleForTag(typeof navigator === "undefined" ? "" : navigator.language) ?? routing.defaultLocale;
 }
 
 function useWaitlistCopy(): Copy | null {
