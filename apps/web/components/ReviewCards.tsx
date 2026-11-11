@@ -1,11 +1,11 @@
 import { getTranslations } from "next-intl/server";
-import ReviewRotator from "@/components/ReviewRotator";
+import ReviewSlider from "@/components/ReviewSlider";
 
 // Real learner reviews (App Store + in-app support chat), same card as the iOS paywall's
 // Reviews stage (PaywallReviewCards.swift). Quotes live in messages under home.reviews.<id>,
 // translated per locale; <b>…</b> is the bold part. Names are first names only, never localized.
 // ORDER = SHOW ORDER: strongest sell first (beats named competitors → "favorite way to learn"
-// → concrete features → general love). The rotator starts at the top of this list.
+// → concrete features → general love). The slider starts at the top of this list.
 const REVIEWS = [
   { id: "luke", name: "Luke" }, // best Korean app, better than Duolingo + Memrise
   { id: "madina_new", name: "Madina" }, // my favorite way to learn Korean
@@ -29,30 +29,34 @@ function Stars() {
   );
 }
 
-export default async function ReviewCards() {
+async function reviewCards() {
   const t = await getTranslations("home");
-
-  const cards = REVIEWS.map((r) => (
+  // Solid gray, not white/60: an alpha color fades emoji too. #A7A7A9 is what white/60
+  // rendered as on this card (white/5 over #18181C), so the text itself looks the same.
+  return REVIEWS.map((r) => (
     <figure
       key={r.id}
       className="flex h-full flex-col rounded-[18px] border border-white/[0.08] bg-white/[0.05] p-[18px]"
     >
       <Stars />
-      <blockquote className="mt-2 text-base leading-snug text-white/60">
+      <blockquote className="mt-2 text-base leading-snug text-[#A7A7A9]">
         {t.rich(`reviews.${r.id}`, {
           b: (chunks) => <strong className="font-bold text-white">{chunks}</strong>,
         })}
       </blockquote>
-      <figcaption className="mt-auto pt-2 text-right text-base leading-snug text-white/60">{r.name}</figcaption>
+      <figcaption className="mt-auto pt-2 text-right text-base leading-snug text-[#A7A7A9]">{r.name}</figcaption>
     </figure>
   ));
+}
 
+export default async function ReviewCards() {
+  const t = await getTranslations("home");
   return (
     <section className="pt-4 pb-16 md:pt-12 md:pb-24">
       <h2 className="px-4 text-2xl md:text-4xl font-normal tracking-tight text-center mb-8 md:mb-10">
         {t("reviews_title")}
       </h2>
-      <ReviewRotator cards={cards} />
+      <ReviewSlider cards={await reviewCards()} />
     </section>
   );
 }
