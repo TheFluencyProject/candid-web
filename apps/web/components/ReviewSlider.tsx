@@ -64,7 +64,7 @@ function ProgressDots({
  * dimmed on both sides (tap one to jump to it), and every 5s the row slides one card left.
  * Swipe (touch), drag (mouse) or two-finger scroll (trackpad) moves by hand; a far drag
  * can skip several cards. Runs only while on screen, so visitors arriving from the hero
- * start on the first (strongest) review, and pauses on hover and mid-drag.
+ * start on the first (strongest) review, and pauses only mid-drag (never on hover).
  *
  * Loop: cards are rendered 3× and we start on the middle copy. When a slide lands outside
  * the middle copy, the position snaps back by one copy with transitions off — same card,
@@ -75,7 +75,6 @@ export default function ReviewSlider({ cards }: { cards: ReactNode[] }) {
   const [pos, setPos] = useState(n);
   const [instant, setInstant] = useState(false);
   const [offset, setOffset] = useState(0);
-  const [hovered, setHovered] = useState(false);
   const [dragDx, setDragDx] = useState<number | null>(null); // null = not dragging
   const wrap = useRef<HTMLDivElement>(null);
   const track = useRef<HTMLDivElement>(null);
@@ -159,7 +158,7 @@ export default function ReviewSlider({ cards }: { cards: ReactNode[] }) {
   };
 
   return (
-    <div ref={wrap} onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)}>
+    <div ref={wrap}>
       <div className="overflow-hidden">
         <div
           ref={track}
@@ -194,7 +193,7 @@ export default function ReviewSlider({ cards }: { cards: ReactNode[] }) {
       </div>
       <ProgressDots
         step={pos % n}
-        running={onScreen && !hovered && dragDx === null}
+        running={onScreen && dragDx === null}
         onPrev={() => move(-1)}
         onNext={() => move(1)}
       />
