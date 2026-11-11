@@ -4,17 +4,14 @@ import ReviewSlider from "@/components/ReviewSlider";
 // Real learner reviews (App Store + in-app support chat), same card as the iOS paywall's
 // Reviews stage (PaywallReviewCards.swift). Quotes live in messages under home.reviews.<id>,
 // translated per locale; <b>…</b> is the bold part. Names are first names only, never localized.
-// ORDER = SHOW ORDER: strongest sell first (beats named competitors → "favorite way to learn"
-// → concrete features → general love). The slider starts at the top of this list.
+// ORDER = SHOW ORDER, strongest sell first. The slider starts at the top of this list.
 const REVIEWS = [
+  { id: "madina_new", name: "Madina" }, // my favorite way to learn Korean — always first
   { id: "luke", name: "Luke" }, // best Korean app, better than Duolingo + Memrise
-  { id: "madina_new", name: "Madina" }, // my favorite way to learn Korean
   { id: "moi", name: "Moi" }, // stands out vs bunpo + TTMIK
   { id: "camille", name: "Camille" }, // Korean Mode lock = accountability
   { id: "madina", name: "Madina" }, // natural and enjoyable
   { id: "trinity", name: "Trinity" }, // love the app, relatable videos
-  { id: "maddie", name: "Maddie" }, // consistent every day
-  { id: "chara", name: "Chara" }, // something special
 ] as const;
 
 function Stars() {
