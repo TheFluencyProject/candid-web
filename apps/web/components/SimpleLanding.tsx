@@ -5,6 +5,7 @@ import SiteFooter from "@/components/SiteFooter";
 import ScreenshotMarquee from "@/components/ScreenshotMarquee";
 import MarketingClipMarquee from "@/components/MarketingClipMarquee";
 import ReviewCards from "@/components/ReviewCards";
+import ScrollNav from "@/components/ScrollNav";
 import { type Tutor, type MarketingClip, fetchTutor, fetchMarketingClips } from "@/lib/api";
 
 // Active/featured tutors. The public tutor API exposes no active flag, so the
@@ -105,6 +106,7 @@ export default async function SimpleLanding({ locale, karaoke = true }: Props) {
 
   return (
     <main className="text-white" style={{ backgroundColor: "#18181C" }}>
+      <ScrollNav ctaLabel={t("cta_learn")} tracking={tracking} />
       {/* No min-h-screen: the reviews below now keep the footer off the first screen, and
           forcing full height left a big empty gap between the clips and the reviews. */}
       <section className="flex flex-col">
@@ -139,6 +141,7 @@ export default async function SimpleLanding({ locale, karaoke = true }: Props) {
                   Plain <a>, not next-intl Link: /download is a middleware redirect that only
                   matches unprefixed, so a /ko/download href would 404. */}
               <a
+                id="hero-cta"
                 href="/download"
                 className={`inline-block rounded-full bg-[#89FFB4] px-8 py-2.5 md:py-3 text-base font-semibold ${tracking} text-[#18181C] hover:opacity-90 transition-opacity`}
               >
