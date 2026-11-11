@@ -51,7 +51,7 @@ export default async function ReviewCards() {
   );
 
   return (
-    <section className="pt-4 pb-16 md:pt-16 md:pb-24 md:px-8">
+    <section className="pt-4 pb-16 md:pt-12 md:pb-24 md:px-8">
       <h2 className="px-4 text-2xl md:text-4xl font-normal tracking-tight text-center mb-8 md:mb-12">
         {t("reviews_title")}
       </h2>
