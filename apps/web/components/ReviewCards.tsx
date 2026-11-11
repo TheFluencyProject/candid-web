@@ -38,7 +38,7 @@ async function reviewCards() {
       <Stars />
       <blockquote className="mt-2 text-base leading-snug text-[#A7A7A9]">
         {t.rich(`reviews.${r.id}`, {
-          b: (chunks) => <strong className="font-bold text-white">{chunks}</strong>,
+          b: (chunks) => <strong className="font-medium text-white">{chunks}</strong>,
         })}
       </blockquote>
       <figcaption className="mt-auto pt-2 text-right text-base leading-snug text-[#A7A7A9]">{r.name}</figcaption>

@@ -5,13 +5,20 @@ import { useEffect, useLayoutEffect, useRef, useState, type ReactNode, type RefO
 const INTERVAL_MS = 5000;
 const GAP = 16;
 
-/** True while ≥60% of the element is on screen. */
+/**
+ * True only while the WHOLE element (cards + dots) is in view, so the slider never starts
+ * until the full row is on screen and the first card is guaranteed to be the one seen.
+ * The top 64px don't count: the fixed ScrollNav bar covers them.
+ */
 function useOnScreen(ref: RefObject<HTMLElement | null>) {
   const [onScreen, setOnScreen] = useState(false);
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
-    const obs = new IntersectionObserver(([e]) => setOnScreen(e.isIntersecting), { threshold: 0.6 });
+    const obs = new IntersectionObserver(([e]) => setOnScreen(e.intersectionRatio >= 0.99), {
+      threshold: [0, 0.5, 0.99, 1],
+      rootMargin: "-64px 0px 0px 0px",
+    });
     obs.observe(el);
     return () => obs.disconnect();
   }, [ref]);
