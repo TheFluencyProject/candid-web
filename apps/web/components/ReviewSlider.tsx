@@ -135,12 +135,18 @@ export default function ReviewSlider({ cards }: { cards: ReactNode[] }) {
     const onWheel = (e: WheelEvent) => {
       if (Math.abs(e.deltaX) <= Math.abs(e.deltaY)) return;
       e.preventDefault();
-      if (Date.now() < wheelLock.current) return;
+      const now = Date.now();
+      // macOS keeps firing momentum events for 1–2s after the fingers lift. They're the same
+      // swipe, so each one pushes the lock out; it only opens after 200ms of quiet.
+      if (now < wheelLock.current) {
+        wheelLock.current = Math.max(wheelLock.current, now + 200);
+        return;
+      }
       wheelAcc.current += e.deltaX;
       if (Math.abs(wheelAcc.current) > 40) {
         move(wheelAcc.current > 0 ? 1 : -1);
         wheelAcc.current = 0;
-        wheelLock.current = Date.now() + 750;
+        wheelLock.current = now + 750;
       }
     };
     el.addEventListener("wheel", onWheel, { passive: false });
