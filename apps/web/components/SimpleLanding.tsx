@@ -4,6 +4,8 @@ import { getTranslations } from "next-intl/server";
 import SiteFooter from "@/components/SiteFooter";
 import ScreenshotMarquee from "@/components/ScreenshotMarquee";
 import MarketingClipMarquee from "@/components/MarketingClipMarquee";
+import ReviewCards from "@/components/ReviewCards";
+import ScrollNav from "@/components/ScrollNav";
 import { type Tutor, type MarketingClip, fetchTutor, fetchMarketingClips } from "@/lib/api";
 
 // Active/featured tutors. The public tutor API exposes no active flag, so the
@@ -104,10 +106,10 @@ export default async function SimpleLanding({ locale, karaoke = true }: Props) {
 
   return (
     <main className="text-white" style={{ backgroundColor: "#18181C" }}>
-      {/* min-h-screen keeps the footer below the fold everywhere. Desktop also centers
-          the hero/row; mobile stays top-flowed (no justify-center) so the spacing isn't
-          stretched — any leftover height is just slack above the footer. */}
-      <section className="min-h-screen flex flex-col">
+      <ScrollNav ctaLabel={t("cta_learn")} tracking={tracking} />
+      {/* No min-h-screen: the reviews below now keep the footer off the first screen, and
+          forcing full height left a big empty gap between the clips and the reviews. */}
+      <section className="flex flex-col">
         {/* Wordmark only; the App Store badge now lives in the footer. Padding
             matches the original TutorNavbar (px-4 md:px-8) so it isn't too wide. */}
         <header className="flex items-center px-4 md:px-8 pt-5">
@@ -123,10 +125,9 @@ export default async function SimpleLanding({ locale, karaoke = true }: Props) {
           </a>
         </header>
 
-        {/* Desktop centers the hero in the min-h-screen viewport; mobile flows naturally
-            from the top (md:justify-center only) with real breathing room above the title. */}
-        <div className="flex flex-1 flex-col md:justify-center">
-          <div className="px-6 text-center pt-12 md:pt-0">
+        {/* Flows from the top with real breathing room above the title. */}
+        <div className="flex flex-col">
+          <div className="px-6 text-center pt-12 md:pt-20">
             {/* Title \n breaks on mobile only; the subtitle's \n breaks on desktop only. */}
             <h1 className="text-4xl md:text-6xl font-normal tracking-tight leading-[1.1] mb-5 whitespace-pre-line md:whitespace-normal">
               {t("hero_title")}
@@ -140,6 +141,7 @@ export default async function SimpleLanding({ locale, karaoke = true }: Props) {
                   Plain <a>, not next-intl Link: /download is a middleware redirect that only
                   matches unprefixed, so a /ko/download href would 404. */}
               <a
+                id="hero-cta"
                 href="/download"
                 className={`inline-block rounded-full bg-[#89FFB4] px-8 py-2.5 md:py-3 text-base font-semibold ${tracking} text-[#18181C] hover:opacity-90 transition-opacity`}
               >
@@ -167,6 +169,8 @@ export default async function SimpleLanding({ locale, karaoke = true }: Props) {
           </div>
         </div>
       </section>
+
+      <ReviewCards />
 
       <SiteFooter appStoreBadge />
     </main>

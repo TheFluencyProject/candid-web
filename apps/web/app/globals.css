@@ -184,3 +184,9 @@ html {
      drift (iOS "Reduce Motion" would otherwise freeze it on many phones). */
   animation: marquee 90s linear infinite;
 }
+
+/* ReviewRotator: the current dot's fill; its animationend advances the card. */
+@keyframes review-progress {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}

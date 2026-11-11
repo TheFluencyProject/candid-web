@@ -10,7 +10,16 @@
     "cta_learn": "免费试用",
     "cta_teach": "成为 Candid 创作者",
     "tap_to_unmute": "点按取消静音",
-    "tap_to_mute": "点按静音"
+    "tap_to_mute": "点按静音",
+    "reviews_title": "听听学员怎么说",
+    "reviews": {
+      "luke": "最近更新的功能，真的让我觉得这就是<b>最好的韩语学习 App</b>，比多邻国和 Memrise 都强",
+      "madina": "我真的超爱 Candid！🥹 用它学习感觉<b>特别自然，也很有趣</b>。",
+      "moi": "跟我用过的其他语言 App（bunpo 和 ttmik）比起来，<b>它真的很出众</b>，我就喜欢这样，让我一直很投入！",
+      "trinity": "<b>我真的很喜欢这个 App。</b>视频很有意思，也很容易产生共鸣。",
+      "madina_new": "你们的 App 已经成了<b>我最喜欢的学韩语方式</b>。我超爱这种学习形式，尤其是播客风格的课程和 Vlog。",
+      "camille": "我真的很喜欢用这个 App！屏幕使用时间的“韩语模式”锁<b>特别能督促自己坚持</b>。"
+    }
   },
   "teach": {
     "title": "成为 Candid 创作者",

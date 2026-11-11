@@ -10,7 +10,16 @@
     "cta_learn": "DÙNG THỬ MIỄN PHÍ",
     "cta_teach": "DẠY TRÊN CANDID",
     "tap_to_unmute": "Chạm để bật tiếng",
-    "tap_to_mute": "Chạm để tắt tiếng"
+    "tap_to_mute": "Chạm để tắt tiếng",
+    "reviews_title": "Học viên nói gì về Candid",
+    "reviews": {
+      "luke": "Mấy tính năng mới làm mình thấy đây đúng là <b>ứng dụng học tiếng Hàn tốt nhất</b>, hơn cả Duolingo và Memrise",
+      "madina": "Mình thật sự rất thích Candid! 🥹 Việc học trở nên <b>rất tự nhiên và thú vị</b>.",
+      "moi": "<b>Thật sự nổi bật</b> so với mấy ứng dụng học ngoại ngữ khác mình từng dùng (bunpo và ttmik), và mình thích vậy, giúp mình luôn hứng thú học!",
+      "trinity": "<b>Mình thật sự rất thích app này.</b> Các video thú vị và dễ đồng cảm.",
+      "madina_new": "App của các bạn đã trở thành <b>cách học tiếng Hàn mình thích nhất</b>. Mình cực kỳ thích cách học này, nhất là các bài học kiểu podcast và vlog.",
+      "camille": "Mình đang rất thích app này! Khóa thời gian sử dụng “Chế độ tiếng Hàn” <b>tuyệt vời để giữ kỷ luật</b>."
+    }
   },
   "teach": {
     "title": "Trở thành Creator của Candid",
