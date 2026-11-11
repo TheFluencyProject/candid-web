@@ -49,7 +49,7 @@ async function reviewCards() {
 export default async function ReviewCards() {
   const t = await getTranslations("home");
   return (
-    <section className="pt-10 pb-24 md:pt-20 md:pb-36">
+    <section className="pt-16 pb-32 md:pt-32 md:pb-48">
       <h2 className="px-4 text-2xl md:text-4xl font-normal tracking-tight text-center mb-8 md:mb-10">
         {t("reviews_title")}
       </h2>
