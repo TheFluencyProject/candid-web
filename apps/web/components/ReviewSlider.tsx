@@ -80,7 +80,10 @@ function ProgressDots({
 export default function ReviewSlider({ cards }: { cards: ReactNode[] }) {
   const n = cards.length;
   const [pos, setPos] = useState(n);
-  const [instant, setInstant] = useState(false);
+  // Starts instant + hidden: the server can't know the row's width, so the first measure
+  // must place it without animating (otherwise it slides across the whole row on load).
+  const [instant, setInstant] = useState(true);
+  const [ready, setReady] = useState(false);
   const [offset, setOffset] = useState(0);
   const [dragDx, setDragDx] = useState<number | null>(null); // null = not dragging
   const wrap = useRef<HTMLDivElement>(null);
@@ -151,9 +154,21 @@ export default function ReviewSlider({ cards }: { cards: ReactNode[] }) {
       const cw = (track.current?.firstElementChild as HTMLElement | null)?.offsetWidth ?? 0;
       setOffset(w / 2 - (pos * (cw + GAP) + cw / 2));
     };
-    measure();
-    window.addEventListener("resize", measure);
-    return () => window.removeEventListener("resize", measure);
+    // Turn transitions back on two frames later, once the instant placement has painted.
+    const snap = () => {
+      setInstant(true);
+      measure();
+      requestAnimationFrame(() => requestAnimationFrame(() => setInstant(false)));
+    };
+    if (!ready) {
+      snap();
+      setReady(true);
+    } else {
+      measure();
+    }
+    window.addEventListener("resize", snap);
+    return () => window.removeEventListener("resize", snap);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pos]);
 
   const settle = () => {
@@ -165,7 +180,7 @@ export default function ReviewSlider({ cards }: { cards: ReactNode[] }) {
   };
 
   return (
-    <div ref={wrap}>
+    <div ref={wrap} className={ready ? "" : "invisible"}>
       <div className="overflow-hidden">
         <div
           ref={track}
