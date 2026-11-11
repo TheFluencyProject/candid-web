@@ -10,7 +10,18 @@
     "cta_learn": "ESSAIE GRATUITEMENT",
     "cta_teach": "ENSEIGNE SUR CANDID",
     "tap_to_unmute": "Appuie pour activer le son",
-    "tap_to_mute": "Appuie pour couper le son"
+    "tap_to_mute": "Appuie pour couper le son",
+    "reviews_title": "Ce qu'en disent nos apprenants",
+    "reviews": {
+      "luke": "Avec les dernières nouveautés, on a vraiment l'impression que c'est <b>la meilleure appli pour apprendre le coréen</b>, devant Duolingo et Memrise",
+      "madina": "J'adore Candid ! 🥹 On apprend de façon <b>vraiment naturelle et agréable</b>.",
+      "moi": "<b>Elle sort vraiment du lot</b> par rapport aux autres applis de langues que j'utilise (bunpo et ttmik)",
+      "trinity": "<b>J'adore vraiment l'appli.</b> Les vidéos sont intéressantes et on s'y retrouve facilement.",
+      "madina_new": "Votre appli est devenue <b>ma façon préférée d'apprendre le coréen</b>. La dernière mise à jour a nettement amélioré l'interface : elle est superbe et incroyablement simple à utiliser.",
+      "camille": "J'aime vraiment beaucoup cette appli ! Le verrou de temps d'écran « Mode coréen » est <b>génial pour rester régulière</b>.",
+      "chara": "<b>Vous tenez quelque chose de spécial</b>, continuez comme ça !",
+      "maddie": "le mode coréen <b>m'aide vraiment à être régulière tous les jours !</b> 🫡😂"
+    }
   },
   "teach": {
     "title": "Deviens créateur Candid",

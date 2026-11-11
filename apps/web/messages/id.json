@@ -10,7 +10,18 @@
     "cta_learn": "COBA GRATIS",
     "cta_teach": "MENGAJAR DI CANDID",
     "tap_to_unmute": "Ketuk untuk nyalakan suara",
-    "tap_to_mute": "Ketuk untuk matikan suara"
+    "tap_to_mute": "Ketuk untuk matikan suara",
+    "reviews_title": "Apa kata para pelajar kami",
+    "reviews": {
+      "luke": "Berkat fitur-fitur terbarunya, rasanya ini benar-benar <b>aplikasi belajar bahasa Korea terbaik</b>, lebih bagus dari Duolingo dan Memrise",
+      "madina": "Aku suka banget sama Candid! 🥹 Belajar jadi terasa <b>natural dan menyenangkan banget</b>.",
+      "moi": "<b>Benar-benar menonjol</b> dibanding aplikasi bahasa lain yang pernah aku pakai (bunpo dan ttmik)",
+      "trinity": "<b>Aku suka banget sama aplikasinya.</b> Videonya menarik dan relate banget.",
+      "madina_new": "Aplikasi kalian jadi <b>cara favoritku belajar bahasa Korea</b>. Update terbaru bikin tampilannya jauh lebih bagus — kelihatan keren dan gampang banget dipakai.",
+      "camille": "Aku benar-benar menikmati aplikasi ini! Kunci screen time “Mode Korea” <b>keren banget buat tetap konsisten</b>.",
+      "chara": "<b>Kalian punya sesuatu yang spesial di sini</b>, terus semangat!",
+      "maddie": "mode Korea <b>bikin aku konsisten tiap hari!</b> 🫡😂"
+    }
   },
   "teach": {
     "title": "Jadi Kreator Candid",

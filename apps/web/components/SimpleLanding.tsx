@@ -4,6 +4,7 @@ import { getTranslations } from "next-intl/server";
 import SiteFooter from "@/components/SiteFooter";
 import ScreenshotMarquee from "@/components/ScreenshotMarquee";
 import MarketingClipMarquee from "@/components/MarketingClipMarquee";
+import ReviewCards from "@/components/ReviewCards";
 import { type Tutor, type MarketingClip, fetchTutor, fetchMarketingClips } from "@/lib/api";
 
 // Active/featured tutors. The public tutor API exposes no active flag, so the
@@ -167,6 +168,8 @@ export default async function SimpleLanding({ locale, karaoke = true }: Props) {
           </div>
         </div>
       </section>
+
+      <ReviewCards />
 
       <SiteFooter appStoreBadge />
     </main>
