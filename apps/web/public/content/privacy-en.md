@@ -25,6 +25,10 @@ When you use our Services for language learning, we may collect information abou
 
 If you include personal information in any text or other learning interactions, we will collect that information, and it may be used to personalize your learning experience.
 
+**Voice Recordings.**
+
+When you use speaking or pronunciation features, we record and store your voice to give you feedback. We may also use these recordings to train and improve our speech and artificial intelligence models. If you don't want your voice collected, you can choose not to use the speaking features.
+
 **Communications.**
 
 If you contact us directly, we may receive personal information about you. For example, when you contact us for customer support purposes, we may receive your name, email address, the contents of a message or attachments that you may send to us, and other information you choose to provide. When you communicate with us, third-party vendors may receive and store these communications on our behalf.
