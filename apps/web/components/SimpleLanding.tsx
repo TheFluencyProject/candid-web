@@ -202,13 +202,14 @@ export default async function SimpleLanding({ locale }: Props) {
         </div>
       </section>
 
-      <TutorRoster title={t("roster_title")} subtitle={t("roster_subtitle")} tutors={korean_tutors} />
+      {/* Section order (Adam 11/17): content → steps → listening → speaking → students → creators → garden → stickers.
+          The listening (comprehensible input) section goes between the path and ShadowDeck once it's built. */}
       <LessonLadder locale={locale} tutors={korean_tutors} />
-      <ShadowDeck title={t("shadow_title")} subtitle={t("shadow_subtitle")} clips={shadow_clips} />
       {path_lessons.length > 0 && <LessonPath title={t("path_title")} subtitle={t("path_subtitle")} ctaLabel={t("cta_learn")} tracking={tracking} lessons={path_lessons} />}
-      <GardenGrow title={t("garden_title")} units={Array.from({ length: 30 }, (_, i) => t("garden_unit", { count: i + 1 }))} />
-
+      <ShadowDeck title={t("shadow_title")} subtitle={t("shadow_subtitle")} clips={shadow_clips} />
       <ReviewCards />
+      <TutorRoster title={t("roster_title")} subtitle={t("roster_subtitle")} tutors={korean_tutors} />
+      <GardenGrow title={t("garden_title")} units={Array.from({ length: 30 }, (_, i) => t("garden_unit", { count: i + 1 }))} />
       <PageEnding />
 
       <SiteFooter appStoreBadge />
