@@ -294,15 +294,13 @@ export default async function LessonPage({
           only shows once the visitor scrolls. Their buttons keep this lesson's download link. */}
       {tHome && (
         <>
-          {/* A small white caps label between two hairlines (Adam 11/17), so it reads as a break, not a second title. */}
-          <div className="mx-auto flex w-full max-w-[1040px] items-center gap-3.5 px-6 pt-16 pb-12">
-            <div className="h-px flex-1 bg-[#4B4B50]" />
-            <h2 className={`text-[13px] font-bold uppercase whitespace-nowrap ${locale === "ko" ? "" : "tracking-[0.14em]"}`}>
+          {/* Option 6 (Adam 11/17): the page turns a lighter gray from a hairline down, with the caps label under the line. */}
+          <div id="how-it-works" className="mt-16 border-t border-[#4B4B50]" style={{ backgroundColor: "#202026" }}>
+            <h2 className={`px-6 pt-10 pb-2 text-center text-[13px] font-bold uppercase ${locale === "ko" ? "" : "tracking-[0.14em]"}`}>
               {tHome("how_it_works")}
             </h2>
-            <div className="h-px flex-1 bg-[#4B4B50]" />
+            <LandingSections locale={locale} ctaHref={downloadHref} />
           </div>
-          <LandingSections locale={locale} ctaHref={downloadHref} />
         </>
       )}
       <FlagExposure flag={LESSON_SECTIONS_FLAG_KEY} variant={sectionsVariant} />
