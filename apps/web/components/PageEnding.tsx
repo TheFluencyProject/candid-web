@@ -1,5 +1,6 @@
 import { getTranslations } from "next-intl/server";
 import { lobster } from "@/lib/lobster";
+import DownloadCta from "@/components/DownloadCta";
 
 // The page's closing line (mockup E1, approved 11/11) with one real-photo sticker per tutor floating in a fixed
 // circle round it (Adam 11/17: never Tina's drawings, Didi always 054). Outlines are pre-recolored in the files.
@@ -16,19 +17,23 @@ const STICKERS: [string, number, number, number, number, number][] = [
   ["end-ellie-05-c2dd94", 7.7, 10.0, 109, -2, 3.1],
 ];
 
-export default async function PageEnding() {
+export default async function PageEnding({ tracking, ctaHref }: { tracking: string; ctaHref?: string }) {
   const t = await getTranslations("home");
   return (
     // One screen under the top bar, the line centered (Adam 11/17).
     <section className="flex min-h-[calc(100svh-61px)] flex-col justify-center overflow-hidden py-16">
       <div className="pe-bomb">
-        <h2 className="pe-head">
-          {t.rich("ending_line", {
-            cool: (chunks) => <span className={`pe-cool ${lobster.className}`}>{chunks}</span>,
-            br: () => <br />,
-            wm: () => <img className="pe-wm" src="/wordmark-white.svg" alt="Candid" />,
-          })}
-        </h2>
+        {/* the line + "Try for free" under it, centered inside the sticker circle (Adam 11/17) */}
+        <div className="pe-mid">
+          <h2 className="pe-head">
+            {t.rich("ending_line", {
+              cool: (chunks) => <span className={`pe-cool ${lobster.className}`}>{chunks}</span>,
+              br: () => <br />,
+              wm: () => <img className="pe-wm" src="/wordmark-white.svg" alt="Candid" />,
+            })}
+          </h2>
+          <DownloadCta label={t("cta_learn")} tracking={tracking} className="mt-6 cta-cycle" href={ctaHref} />
+        </div>
         {STICKERS.map(([file, x, y, h, r, d]) => (
           <div key={file} className="pe-p" style={{ left: `${x}%`, top: `${y}%` }}>
             <img

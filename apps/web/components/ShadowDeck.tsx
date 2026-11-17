@@ -6,6 +6,7 @@ import type { MarketingClip } from "@/lib/api";
 import { isRestrictedInAppBrowser } from "@/lib/platform";
 import { cover_position_x } from "@/lib/clip-crop";
 import { ACCENT, SCREEN_STYLE, StatusIcons } from "@/components/PhoneClipHero";
+import DownloadCta from "@/components/DownloadCta";
 
 // Home "Speak Korean like a native would": App Store screenshot 4 brought to life (mockup
 // tmp/tutor-roster-mockups/section-shadow.html, plan plans/landing-shadow-section-2026-11-17.md).
@@ -152,9 +153,9 @@ async function run_line(card: Card, use_video: boolean, alive: () => boolean) {
   if (use_video) video.pause();
 }
 
-type Props = { tag: string; title: string; subtitle: string; clips: MarketingClip[] };
+type Props = { tag: string; title: string; subtitle: string; clips: MarketingClip[]; ctaLabel: string; ctaHref?: string; tracking: string };
 
-export default function ShadowDeck({ tag, title, subtitle, clips }: Props) {
+export default function ShadowDeck({ tag, title, subtitle, clips, ctaLabel, ctaHref, tracking }: Props) {
   const sectionRef = useRef<HTMLElement>(null);
   const cardEls = useRef<(HTMLDivElement | null)[]>([]);
   const recRef = useRef<HTMLDivElement>(null);
@@ -271,6 +272,8 @@ export default function ShadowDeck({ tag, title, subtitle, clips }: Props) {
         </span>
         <h2>{title}</h2>
         <p className="sd-sub">{subtitle}</p>
+        {/* Adam 11/17: a Try button here too, mint */}
+        <DownloadCta label={ctaLabel} tracking={tracking} className="mt-6" href={ctaHref} />
       </div>
       <div className="sd-phone-wrap">
         <div className="sd-phone" role="img" aria-label={`${title}. ${subtitle}`}>

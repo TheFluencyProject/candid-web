@@ -34,6 +34,12 @@ body {
    the ladder's is blue, the path's follows its current lesson and eases between them). */
 .cta-3d { background-color: var(--cta, #89FFB4); box-shadow: 0 4px 0 color-mix(in srgb, var(--cta, #89FFB4) 58%, #000); transition: opacity .15s ease, transform .08s ease, background-color .3s ease, box-shadow .3s ease; }
 .cta-3d:active { transform: translateY(4px); box-shadow: 0 0 0 transparent; transition-duration: .08s; }
+/* --cta is a registered color so it can blend: the sticker-circle button (and the top bar while it's the one on screen)
+   drifts through the 5 sticker outline colors, going round the circle, 6s each (Adam 11/17: "quite a slow animation").
+   ScrollNav locks the top bar's run to the sticker button's, so the two are the same color every frame. */
+@property --cta { syntax: "<color>"; inherits: true; initial-value: #89FFB4; }
+@keyframes cta-cycle { 0%, 100% { --cta: #FFBFB8; } 20% { --cta: #A4D8FE; } 40% { --cta: #E5D183; } 60% { --cta: #C2DD94; } 80% { --cta: #C9B8FF; } }
+.cta-cycle { animation: cta-cycle 30s linear infinite; }
 
 /* Hide scrollbar for horizontal language selector */
 .scrollbar-hide {
@@ -266,8 +272,10 @@ html {
 .gg-bed { width: min(560px, calc(100% - 32px)); margin: 6px auto 0; }
 
 /* ── Home: the closing line with the tutors' stickers floating round it (PageEnding; mockup E1) ── */
-.pe-bomb { position: relative; height: 430px; width: 100%; max-width: 860px; margin: 0 auto; }
-.pe-head { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); width: min(640px, 80%); z-index: 2; margin: 0; text-align: center; font-size: clamp(32px, 5vw, 56px); font-weight: 500; letter-spacing: -0.02em; line-height: 1.15; }
+/* 560 / 470px tall (was 430 / 380): room above and below the line + Try button (Adam 11/17: stickers too close vertically) */
+.pe-bomb { position: relative; height: 560px; width: 100%; max-width: 860px; margin: 0 auto; }
+.pe-mid { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); width: min(640px, 80%); z-index: 2; text-align: center; }
+.pe-head { margin: 0; font-size: clamp(32px, 5vw, 56px); font-weight: 500; letter-spacing: -0.02em; line-height: 1.15; }
 /* "Candid" = the real wordmark, sized to the line */
 .pe-wm { display: inline-block; height: 0.776em; width: auto; vertical-align: -0.02em; margin-left: 0.06em; }
 .pe-cool { font-style: italic; font-weight: 700; font-size: 0.97em; line-height: 1; padding-right: 0.04em; }
@@ -277,7 +285,7 @@ html {
 .pe-p img { display: block; height: var(--h); width: auto; max-width: none; transform: rotate(var(--r)); filter: drop-shadow(0 8px 14px rgba(0,0,0,.45)); animation: pe-bob var(--d) ease-in-out infinite alternate; }
 @keyframes pe-bob { to { transform: rotate(calc(var(--r) + 4deg)) translateY(-8px); } }
 @media (max-width: 600px) {
-  .pe-bomb { height: 380px; }
+  .pe-bomb { height: 470px; }
   .pe-p img { height: calc(var(--h) * .6); }
 }
 

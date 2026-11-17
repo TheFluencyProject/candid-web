@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import type Hls from "hls.js";
 import { isRestrictedInAppBrowser } from "@/lib/platform";
 import { SCREEN_STYLE, StatusIcons, spaced_title } from "@/components/PhoneClipHero";
+import DownloadCta from "@/components/DownloadCta";
 
 // Home "Learn Korean through / Comprehensible Input" (mockup tmp/tutor-roster-mockups/section-ci.html,
 // plan plans/landing-ci-section-2026-11-17.md). One iPhone loops a Watch moment, a different real lesson
@@ -49,9 +50,12 @@ type Props = {
   seeMore: string;
   clips: InputPhoneClip[];
   seed: [string, string]; // the deck's front card before anything is saved
+  ctaLabel: string;
+  ctaHref?: string;
+  tracking: string;
 };
 
-export default function InputPhone({ lead, title, subtitle, seeMore, clips, seed }: Props) {
+export default function InputPhone({ lead, title, subtitle, seeMore, clips, seed, ctaLabel, ctaHref, tracking }: Props) {
   const sectionRef = useRef<HTMLElement>(null);
   const screenRef = useRef<HTMLDivElement>(null);
   const popRef = useRef<HTMLDivElement>(null);
@@ -457,6 +461,8 @@ export default function InputPhone({ lead, title, subtitle, seeMore, clips, seed
             {title}
           </h2>
           <p className="ci-sub">{subtitle}</p>
+          {/* Adam 11/17: a Try button here too, mint */}
+          <DownloadCta label={ctaLabel} tracking={tracking} className="mt-6" href={ctaHref} />
         </div>
         <div className="ci-right">
           <div className="ci-phone" role="img" aria-label={`${lead} ${title}. ${subtitle}`}>
