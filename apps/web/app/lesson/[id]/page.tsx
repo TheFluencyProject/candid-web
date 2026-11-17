@@ -294,9 +294,14 @@ export default async function LessonPage({
           only shows once the visitor scrolls. Their buttons keep this lesson's download link. */}
       {tHome && (
         <>
-          <h2 className="px-6 pt-16 text-center text-[30px] font-medium leading-[1.08] tracking-[-0.03em] [text-wrap:balance] [word-break:keep-all] min-[860px]:text-[clamp(36px,4vw,54px)]">
-            {tHome("how_it_works")}
-          </h2>
+          {/* A small white caps label between two hairlines (Adam 11/17), so it reads as a break, not a second title. */}
+          <div className="mx-auto flex w-full max-w-[1040px] items-center gap-3.5 px-6 pt-16 pb-12">
+            <div className="h-px flex-1 bg-gradient-to-r from-transparent to-[#3a3a42]" />
+            <h2 className={`text-[13px] font-bold uppercase whitespace-nowrap ${locale === "ko" ? "" : "tracking-[0.14em]"}`}>
+              {tHome("how_it_works")}
+            </h2>
+            <div className="h-px flex-1 bg-gradient-to-l from-transparent to-[#3a3a42]" />
+          </div>
           <LandingSections locale={locale} ctaHref={downloadHref} />
         </>
       )}
