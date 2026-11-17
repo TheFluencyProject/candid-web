@@ -116,7 +116,7 @@ export default function MobileCTABar({ downloadUrl, ctaLabel, ctaSubtext, ctaVar
           <button
             type="button"
             onClick={handleClick}
-            className="w-full max-w-sm py-4 rounded-full text-center text-lg font-bold tracking-wide block"
+            className="w-full max-w-sm py-4 rounded-full text-center text-lg font-bold tracking-wide block cta-3d"
             style={{ backgroundColor: "#89FFB4", color: "#000000" }}
           >
             {resolvedLabel}
@@ -125,7 +125,7 @@ export default function MobileCTABar({ downloadUrl, ctaLabel, ctaSubtext, ctaVar
           <a
             href={href}
             onClick={handleClick}
-            className="w-full max-w-sm py-4 rounded-full text-center text-lg font-bold tracking-wide block"
+            className="w-full max-w-sm py-4 rounded-full text-center text-lg font-bold tracking-wide block cta-3d"
             style={{ backgroundColor: "#89FFB4", color: "#000000" }}
           >
             {resolvedLabel}

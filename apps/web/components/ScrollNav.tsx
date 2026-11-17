@@ -12,7 +12,7 @@ export default function ScrollNav({ ctaLabel, tracking }: { ctaLabel: string; tr
         {/* Plain <a> to /download, same as the hero CTA (middleware redirect, unprefixed only). */}
         <a
           href="/download"
-          className={`rounded-full bg-[#89FFB4] px-5 py-2 text-sm font-semibold ${tracking} text-[#18181C] hover:opacity-90 transition-opacity`}
+          className={`rounded-full bg-[#89FFB4] px-5 py-2 text-sm font-semibold ${tracking} text-[#18181C] hover:opacity-90 cta-3d`}
         >
           {ctaLabel}
         </a>

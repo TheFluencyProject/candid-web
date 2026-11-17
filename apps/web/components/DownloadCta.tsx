@@ -4,7 +4,7 @@ export default function DownloadCta({ label, tracking, className = "" }: { label
   return (
     <a
       href="/download"
-      className={`inline-block rounded-full bg-[#89FFB4] px-8 py-2.5 md:py-3 text-base font-semibold ${tracking} text-[#18181C] hover:opacity-90 transition-opacity ${className}`}
+      className={`inline-block rounded-full bg-[#89FFB4] px-8 py-2.5 md:py-3 text-base font-semibold ${tracking} text-[#18181C] hover:opacity-90 cta-3d ${className}`}
     >
       {label}
     </a>

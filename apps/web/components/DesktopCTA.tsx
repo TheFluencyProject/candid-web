@@ -61,7 +61,7 @@ export default function DesktopCTA({ href, label, scanLabel, inlineLabel, tutorS
     <a
       href={href}
       data-cta-variant={ctaVariant}
-      className={`${className} px-12 py-3.5 rounded-full text-base font-bold`}
+      className={`${className} px-12 py-3.5 rounded-full text-base font-bold cta-3d`}
       style={{ backgroundColor: MINT, color: "#000000" }}
     >
       {label}
