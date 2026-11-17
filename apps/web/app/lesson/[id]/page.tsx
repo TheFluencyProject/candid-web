@@ -3,13 +3,17 @@ import Image from "next/image";
 import Link from "next/link";
 import { headers } from "next/headers";
 import { notFound } from "next/navigation";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 
 import BlurImage from "@/components/BlurImage";
 import DownloadQRInterceptor from "@/components/DownloadQRInterceptor";
 import DesktopCTA from "@/components/DesktopCTA";
+import FlagExposure from "@/components/FlagExposure";
+import LandingSections from "@/components/LandingSections";
 import { fetchLessonMeta, fetchTutor, type LessonMeta } from "@/lib/api";
 import { pickLocale } from "@/lib/i18n-helpers";
-import { getDesktopCtaVariant, getDistinctId, previewDesktopCtaOverride } from "@/lib/posthog-server";
+import { getDesktopCtaVariant, getDistinctId, getLessonSectionsVariant, previewDesktopCtaOverride, previewLessonSectionsOverride } from "@/lib/posthog-server";
+import { LESSON_SECTIONS_FLAG_KEY } from "@/lib/posthog-config";
 import type { Locale } from "@/i18n/routing";
 // import { localizeLanguageName } from "@/lib/i18n-helpers";
 
@@ -113,6 +117,9 @@ export default async function LessonPage({
   const { id } = await params;
   const headersList = await headers();
   const locale = pickLocale(headersList.get("accept-language"));
+  // This route is outside [locale], so next-intl has no request locale: set it, or the home sections
+  // below (getTranslations("home")) would all render in English.
+  setRequestLocale(locale);
 
   const lesson = await fetchLessonMeta(id, locale);
   if (!lesson) notFound();
@@ -126,9 +133,14 @@ export default async function LessonPage({
   const copy = COPY[locale];
   // desktop-cta-qr arm: the same cached evaluation AnonAnalytics bootstraps (en only).
   const distinctId = await getDistinctId();
+  const query = await searchParams;
   const desktopCtaVariant =
-    previewDesktopCtaOverride((await searchParams).cta) ??
+    previewDesktopCtaOverride(query.cta) ??
     (locale === "en" ? await getDesktopCtaVariant(distinctId) : undefined);
+  // lesson-page-sections arm (every locale): the same cached evaluation AnonAnalytics bootstraps.
+  const sectionsVariant = previewLessonSectionsOverride(query.sections) ?? (await getLessonSectionsVariant(distinctId));
+  const downloadHref = `/download/${lesson.tutor_slug}?l=${lesson.lesson_id}`;
+  const tHome = sectionsVariant === "sections" ? await getTranslations("home") : null;
   // orientation is nullable; default to vertical framing (matches shorts-style content).
   const isVertical = lesson.orientation !== "horizontal";
   // Crop height/width. Vertical gets a little more height than width; horizontal is square.
@@ -262,7 +274,7 @@ export default async function LessonPage({
               normally. Either way the click is tracked as study_cta_clicked. */}
           <div className="mt-5 lg:mt-10">
             <DesktopCTA
-              href={`/download/${lesson.tutor_slug}?l=${lesson.lesson_id}`}
+              href={downloadHref}
               label={copy.cta(lesson.tutor_name || "Candid")}
               scanLabel={copy.scanLabel ?? COPY.en.scanLabel!}
               inlineLabel={copy.inlineLabel ?? COPY.en.inlineLabel!}
@@ -277,6 +289,18 @@ export default async function LessonPage({
           <DownloadQRInterceptor label={copy.qrTitle} />
         </section>
       </div>
+
+      {/* lesson-page-sections test arm: the home page's sections under the first screen, so the heading
+          only shows once the visitor scrolls. Their buttons keep this lesson's download link. */}
+      {tHome && (
+        <>
+          <h2 className="px-6 pt-16 text-center text-[30px] font-medium leading-[1.08] tracking-[-0.03em] [text-wrap:balance] [word-break:keep-all] min-[860px]:text-[clamp(36px,4vw,54px)]">
+            {tHome("how_it_works")}
+          </h2>
+          <LandingSections locale={locale} ctaHref={downloadHref} />
+        </>
+      )}
+      <FlagExposure flag={LESSON_SECTIONS_FLAG_KEY} variant={sectionsVariant} />
 
       <footer
         className="px-5 py-6 flex items-center justify-between flex-wrap gap-4 text-sm"

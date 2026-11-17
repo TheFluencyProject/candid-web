@@ -1,11 +1,12 @@
 "use client";
 
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
 import posthog from "posthog-js";
 import { QRCodeSVG } from "qrcode.react";
 import type { AndroidWaitlistSurface } from "@/lib/api";
 import { DESKTOP_CTA_FLAG_KEY, type DesktopCtaVariant } from "@/lib/posthog-config";
 import { buildQrUrl } from "@/lib/qr-url";
+import { useFlagExposure } from "@/components/FlagExposure";
 
 const MINT = "#89FFB4";
 const SQUARE_PX = 200;
@@ -41,21 +42,9 @@ type Props = {
 export default function DesktopCTA({ href, label, scanLabel, inlineLabel, tutorSlug, lessonId = null, surface, variant, distinctId }: Props) {
   const arm: DesktopCtaVariant = variant ?? "control";
   const qrUrl = buildQrUrl({ tutor_slug: tutorSlug, surface, sid: distinctId, lesson_id: lessonId, variant: arm });
-  const exposed = useRef(false);
 
-  // Manual exposure: server-decide + client bootstrap skip the SDK's auto-tracking (see
-  // MobileCTABar). Desktop only — mobile never sees the arms. Deferred one task: this child effect
-  // runs before PostHogProvider's posthog.init effect, and a capture before init is dropped.
-  useEffect(() => {
-    if (!variant || exposed.current || !window.matchMedia("(min-width: 1024px)").matches) return;
-    exposed.current = true;
-    setTimeout(() => {
-      posthog.capture("$feature_flag_called", {
-        $feature_flag: DESKTOP_CTA_FLAG_KEY,
-        $feature_flag_response: variant,
-      });
-    }, 0);
-  }, [variant]);
+  // Desktop only — mobile never sees the arms.
+  useFlagExposure(DESKTOP_CTA_FLAG_KEY, variant, () => window.matchMedia("(min-width: 1024px)").matches);
 
   const pill = (className: string, ctaVariant?: DesktopCtaVariant) => (
     <a

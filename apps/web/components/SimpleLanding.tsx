@@ -4,54 +4,14 @@ import SiteFooter from "@/components/SiteFooter";
 import ScreenshotMarquee from "@/components/ScreenshotMarquee";
 import PhoneClipHero from "@/components/PhoneClipHero";
 import { lobster } from "@/lib/lobster";
-import TutorRoster from "@/components/TutorRoster";
-import LessonLadder from "@/components/LessonLadder";
-import LessonPath, { type PathLesson } from "@/components/LessonPath";
-import GardenGrow from "@/components/GardenGrow";
-import PageEnding from "@/components/PageEnding";
-import ShadowDeck from "@/components/ShadowDeck";
-import InputPhone, { type InputPhoneClip } from "@/components/InputPhone";
-import { INPUT_CLIPS, DECK_SEED, text_in } from "@/lib/input-clips";
-import ReviewCards from "@/components/ReviewCards";
+import LandingSections, { loadLandingClips, shuffle } from "@/components/LandingSections";
 import ScrollNav from "@/components/ScrollNav";
-import { type Tutor, type MarketingClip, type LessonMeta, fetchTutor, fetchMarketingClips, fetchLessonMeta } from "@/lib/api";
-import { cover_position_x } from "@/lib/clip-crop";
-
-// object-position for a square cover-fit thumbnail: horizontal (16:9) ones centre on the saved focus x, vertical
-// (9:16) ones on the tutor's framed focus y.
-function square_thumb_position(l: LessonMeta): string {
-  if (l.orientation === "horizontal") return `${cover_position_x(l.thumbnail_focus_x, 16 / 9, 1)} 50%`;
-  const visible = 9 / 16, fy = l.thumbnail_focus_y;
-  if (fy == null) return "50% 50%";
-  return `50% ${Math.min(1, Math.max(0, (fy - visible / 2) / (1 - visible))) * 100}%`;
-}
+import { type Tutor, fetchTutor } from "@/lib/api";
 
 // Active/featured tutors. The public tutor API exposes no active flag, so the
 // set is listed here (matches the old home); korean-chan has a profile page but
 // is inactive, so it's excluded. Each tutor contributes its app screenshots.
 const TUTOR_SLUGS = ["korean-mia", "english-adam"];
-
-// The Korean creators in the people row under the hero (and the lessons ladder's avatars), in the
-// mockup's order. korean-jinnny is the real slug (three n's).
-const KOREAN_TUTOR_SLUGS = [
-  "korean-mia",
-  "korean-hansoo",
-  "korean-grace",
-  "korean-sol",
-  "korean-hayden",
-  "korean-jinnny",
-  "korean-ellie",
-  "korean-tina",
-  "korean-didi",
-];
-
-// The path section's three real lessons (Didi, Mia, Hayden), each in its own accent with one of its own
-// stickers beside its indent coin (public/landing/path-<id>-{locked,accent}.webp, w × h).
-const PATH_LESSONS: { lesson_id: string; accent: string; sticker: PathLesson["sticker"] }[] = [
-  { lesson_id: "f06bb7cb-b337-4fcf-8ddb-f30df8279237", accent: "#3ADAFF", sticker: { id: "053", w: 220, h: 280 } }, // Didi's late-night show, the mic
-  { lesson_id: "51c0eff3-4a92-4b07-8e41-a859b36dd44a", accent: "#F6B8BB", sticker: { id: "025", w: 167, h: 280 } }, // Mia's music box collection
-  { lesson_id: "87641d82-ac46-48e5-8de1-1ed0b3e6edac", accent: "#C8C5F0", sticker: { id: "033", w: 280, h: 243 } }, // Hayden's home tour
-];
 
 const SCREENSHOT_KEYS = [
   "screenshot_listen_url",
@@ -62,17 +22,6 @@ const SCREENSHOT_KEYS = [
   "screenshot_intro_url",
   "screenshot_learn_url",
 ] as const;
-
-// Fisher–Yates. Runs server-side (the route is dynamic — page.tsx reads
-// headers()), so the order is fixed before hydration — no SSR/client mismatch.
-function shuffle<T>(arr: T[]): T[] {
-  const a = [...arr];
-  for (let i = a.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [a[i], a[j]] = [a[j], a[i]];
-  }
-  return a;
-}
 
 // Round-robin across tutors so adjacent items are different tutors
 // ("alternating randomly" — same alternation idea as the old home's i % len).
@@ -87,25 +36,6 @@ function interleave<T>(lists: T[][]): T[] {
   return out;
 }
 
-// Spread each tutor's items evenly across the whole row: item i of a tutor with n items
-// sits at (i + offset) / n, with a random per-tutor offset. Round-robin instead bunches a
-// heavy tutor's extras at the tail (e.g. 6 Mia vs 1 Jinny → Mia, Mia, Mia in a row).
-// Then, wherever two neighbors share a tutor, pull the next different tutor forward.
-function spread<T>(lists: T[][]): T[] {
-  const out = lists
-    .flatMap((list, tutor) => {
-      const offset = Math.random();
-      return list.map((item, i) => ({ item, tutor, at: (i + offset) / list.length }));
-    })
-    .sort((a, b) => a.at - b.at);
-  for (let i = 1; i < out.length; i++) {
-    if (out[i].tutor !== out[i - 1].tutor) continue;
-    const j = out.findIndex((x, k) => k > i && x.tutor !== out[i - 1].tutor);
-    if (j !== -1) out.splice(i, 0, ...out.splice(j, 1));
-  }
-  return out.map((x) => x.item);
-}
-
 type Props = { locale: string };
 
 export default async function SimpleLanding({ locale }: Props) {
@@ -118,76 +48,15 @@ export default async function SimpleLanding({ locale }: Props) {
   const tutors = (
     await Promise.all(TUTOR_SLUGS.map((slug) => fetchTutor(slug, locale)))
   ).filter((t): t is Tutor => t !== null);
-  const korean_tutors = (
-    await Promise.all(KOREAN_TUTOR_SLUGS.map((slug) => fetchTutor(slug, locale)))
-  ).filter((t): t is Tutor => t !== null);
-
-  // Localized lesson titles; a failed fetch drops that lesson from the path, none left hides the section.
-  const by_slug = new Map(korean_tutors.map((tu) => [tu.slug, tu]));
-  const path_lessons = (
-    await Promise.all(
-      PATH_LESSONS.map(async ({ lesson_id, accent, sticker }): Promise<PathLesson | null> => {
-        const l = await fetchLessonMeta(lesson_id, locale).catch(() => null);
-        if (!l) return null;
-        const tutor = by_slug.get(l.tutor_slug);
-        return { tutor_name: tutor?.name ?? l.tutor_name, avatar: tutor?.profile_picture_url ?? null, thumb: l.thumbnail_url ? { url: l.thumbnail_url, pos: square_thumb_position(l) } : null, title: l.localized_title.replace(/\s*\n\s*/g, " "), accent, sticker };
-      })
-    )
-  ).filter((l): l is PathLesson => l !== null);
-
   const screenshots = interleave(
     tutors.map((t) =>
       shuffle(SCREENSHOT_KEYS.map((k) => t[k]).filter((u): u is string => !!u))
     )
   );
 
-  // Live hero clips. A throw (backend hiccup, or the endpoint not deployed yet)
-  // falls back to the static screenshot marquee below — the hero is never blank.
-  let clips: MarketingClip[] = [];
-  try {
-    // Home markets Korean — show only Korean creators' clips, not English tutors'.
-    // Starred clips only: unstarred recency fill never reaches the landing page (none
-    // starred → [] → the static screenshot marquee below). Group by tutor and spread
-    // each tutor evenly so names stay balanced along the row; shuffle for per-load variety.
-    const by_tutor = new Map<string, MarketingClip[]>();
-    for (const clip of await fetchMarketingClips(locale, { language: "korean" })) {
-      const list = by_tutor.get(clip.tutor_name) ?? [];
-      list.push(clip);
-      by_tutor.set(clip.tutor_name, list);
-    }
-    clips = spread([...by_tutor.values()].map((l) => shuffle(l)));
-  } catch {
-    clips = [];
-  }
-
-  // The shadowing section's cards: the same starred clips, starting halfway through so its phone
-  // never opens on the hero's clip. Only lines with word timings (karaoke + the hidden word) that fit
-  // the card in two rows; a handful is plenty for the loop. Fewer than 2 hides the section.
-  const SHADOW_MAX_CHARS = 15; // Korean characters, spaces not counted: 17 already wraps to 3 rows
-  const shadow_clips = [...clips.slice(Math.floor(clips.length / 2)), ...clips.slice(0, Math.floor(clips.length / 2))]
-    .filter((c) => (c.word_level_captions?.length ?? 0) > 0 && c.text.replace(/\s/g, "").length <= SHADOW_MAX_CHARS)
-    .slice(0, 5);
-
-  // The comprehensible-input section's four lines, in the page's language. Titles are fetched live (cached
-  // a week, like the path's); a failed fetch keeps the English title.
-  const input_clips: InputPhoneClip[] = await Promise.all(
-    INPUT_CLIPS.map(async (c) => {
-      const meta = await fetchLessonMeta(c.lesson_id, locale).catch(() => null);
-      return {
-        title: meta?.localized_title.replace(/\s*\n\s*/g, " ") || c.title,
-        mux_playback_id: c.mux_playback_id,
-        start: c.start,
-        end: c.end,
-        avatar: c.avatar,
-        bars: c.bars,
-        chips: c.chips,
-        star: c.star,
-        bubble: [c.bubble[0], text_in(c.bubble[1], locale)],
-        peek: [c.peek[0], c.peek[1], text_in(c.peek[2], locale)],
-        translation: text_in(c.translation, locale),
-      };
-    })
-  );
+  // Live hero clips, shared with the sections below. None (a throw, or nothing starred) falls back
+  // to the static screenshot marquee — the hero is never blank.
+  const clips = await loadLandingClips(locale);
 
   return (
     <main className="text-white" style={{ backgroundColor: "#18181C" }}>
@@ -235,16 +104,7 @@ export default async function SimpleLanding({ locale }: Props) {
         </div>
       </section>
 
-      {/* Section order (Adam 11/17): content → steps → listening → speaking → students → creators → garden → stickers.
-          The listening (comprehensible input) section sits between the path and ShadowDeck. */}
-      <LessonLadder locale={locale} tutors={korean_tutors} />
-      {path_lessons.length > 0 && <LessonPath title={t("path_title")} subtitle={t("path_subtitle")} ctaLabel={t("cta_learn")} tracking={tracking} lessons={path_lessons} />}
-      <InputPhone lead={t("input_lead")} title={t("input_title")} subtitle={t("input_subtitle")} seeMore={t("input_see_more")} clips={input_clips} seed={[DECK_SEED[0], text_in(DECK_SEED[1], locale)]} />
-      <ShadowDeck tag={t("shadow_tag")} title={t("shadow_title")} subtitle={t("shadow_subtitle")} clips={shadow_clips} />
-      <ReviewCards />
-      <TutorRoster title={t("roster_title")} subtitle={t("roster_subtitle")} tutors={korean_tutors} />
-      <GardenGrow title={t("garden_title")} units={Array.from({ length: 30 }, (_, i) => t("garden_unit", { count: i + 1 }))} />
-      <PageEnding />
+      <LandingSections locale={locale} clips={clips} />
 
       <SiteFooter appStoreBadge />
     </main>

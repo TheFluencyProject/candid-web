@@ -74,7 +74,7 @@ function LessonCard({ lesson, level, tutor, label }: Card & { tutor: Tutor | und
   );
 }
 
-export default async function LessonLadder({ locale, tutors }: { locale: string; tutors: Tutor[] }) {
+export default async function LessonLadder({ locale, tutors, ctaHref }: { locale: string; tutors: Tutor[]; ctaHref?: string }) {
   const t = await getTranslations("home");
   // A failed fetch drops that card (a hiccup here shouldn't take the home page down with it).
   const cards = (
@@ -117,7 +117,7 @@ export default async function LessonLadder({ locale, tutors }: { locale: string;
             {t("lessons_title")}
           </h2>
           <p className="mt-4 text-base leading-normal text-gray-300 [text-wrap:pretty] min-[860px]:text-[19px]">{t("lessons_subtitle")}</p>
-          <DownloadCta label={t("cta_learn")} tracking={locale === "ko" ? "" : "tracking-wide"} className="mt-6" color={LEVEL_COLOR.lower_intermediate} />
+          <DownloadCta label={t("cta_learn")} tracking={locale === "ko" ? "" : "tracking-wide"} className="mt-6" color={LEVEL_COLOR.lower_intermediate} href={ctaHref} />
         </div>
       </div>
     </section>

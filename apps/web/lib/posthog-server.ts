@@ -5,9 +5,11 @@ import { cache } from "react";
 import {
   CTA_FLAG_KEY,
   DESKTOP_CTA_FLAG_KEY,
+  LESSON_SECTIONS_FLAG_KEY,
   POSTHOG_HOST,
   POSTHOG_KEY,
   type DesktopCtaVariant,
+  type LessonSectionsVariant,
   type MobileCtaVariant,
 } from "./posthog-config";
 
@@ -62,4 +64,22 @@ export const getDesktopCtaVariant = cache(
 export function previewDesktopCtaOverride(param: string | string[] | undefined): DesktopCtaVariant | null {
   if (process.env.VERCEL_ENV === "production") return null;
   return param === "control" || param === "morph" || param === "inline" ? param : null;
+}
+
+// Same read-only getAllFlags as above: the exposure is the client's (FlagExposure on the lesson page).
+export const getLessonSectionsVariant = cache(
+  async (distinctId: string): Promise<LessonSectionsVariant> => {
+    try {
+      const flags = await getClient().getAllFlags(distinctId, { flagKeys: [LESSON_SECTIONS_FLAG_KEY] });
+      return flags[LESSON_SECTIONS_FLAG_KEY] === "sections" ? "sections" : "control";
+    } catch {
+      return "control";
+    }
+  },
+);
+
+// ?sections=control|sections, local + previews only — same rule as ?cta= above.
+export function previewLessonSectionsOverride(param: string | string[] | undefined): LessonSectionsVariant | null {
+  if (process.env.VERCEL_ENV === "production") return null;
+  return param === "control" || param === "sections" ? param : null;
 }
