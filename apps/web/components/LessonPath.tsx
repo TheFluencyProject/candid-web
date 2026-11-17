@@ -6,7 +6,7 @@ import DownloadCta from "@/components/DownloadCta";
 // "Your path to conversational fluency" (mockup P1, Adam 11/11–11/17): the app's own lesson path (LessonHubPath:
 // coins with a 3D lip on the wave, a sticker beside each indent, gray until earned) for three real lessons. The
 // heading pins while the path scrolls up past it with the page, and a coin flips to its lesson's color the moment
-// its centre passes a line a bit below mid-screen (its sticker colors in with it). Scrolling back up never un-lights one.
+// its centre passes a line a bit below mid-screen (a lesson's sticker colors in with its Play coin). Scrolling back up never un-lights one.
 // No pulse, no labels, no transitions.
 
 export type PathLesson = {
@@ -60,9 +60,11 @@ function layout(lessons: PathLesson[]) {
   let y = 0, g = 0;
   const heads: { top: number; lesson: PathLesson }[] = [];
   const coins: { kind: Kind; left: number; top: number; accent: string }[] = [];
-  const stickers: { node: number; left: number; top: number; w: number; h: number; r: number; lesson: PathLesson }[] = [];
+  // `first` = the lesson's Play coin: its sticker colors in with that one (Adam 11/17), not with its own indent coin.
+  const stickers: { node: number; first: number; left: number; top: number; w: number; h: number; r: number; lesson: PathLesson }[] = [];
   const nodes: number[] = [];
   lessons.forEach((L, li) => {
+    const first = g;
     heads.push({ top: y, lesson: L });
     y += HEAD_H;
     const order = ORDERS[li % ORDERS.length];
@@ -74,7 +76,7 @@ function layout(lessons: PathLesson[]) {
         const side = x > 0 ? -1 : 1;
         const edge = W / 2 + x + side * (COIN / 2 + 14), cx = (edge + (side < 0 ? 0 : W)) / 2;
         const ar = L.sticker.w / L.sticker.h;
-        stickers.push({ node: g, left: cx, top: cy, w: ar >= 1 ? BOX : BOX * ar, h: ar >= 1 ? BOX / ar : BOX, r: side < 0 ? 5 : -5, lesson: L });
+        stickers.push({ node: g, first, left: cx, top: cy, w: ar >= 1 ? BOX : BOX * ar, h: ar >= 1 ? BOX / ar : BOX, r: side < 0 ? 5 : -5, lesson: L });
       }
       nodes.push(cy);
       y += rowH;
@@ -140,7 +142,7 @@ export default function LessonPath({ title, subtitle, ctaLabel, ctaHref, trackin
         if (next === best) return;
         best = next;
         coins.forEach((c, i) => c.classList.toggle("lp-done", i < best));
-        stks.forEach((st) => st.classList.toggle("lp-on", Number(st.dataset.node) < best));
+        stks.forEach((st) => st.classList.toggle("lp-on", Number(st.dataset.first) < best));
       },
       { rootMargin: `0px 0px -${Math.round((1 - LIGHT_AT) * 100)}% 0px` },
     );
@@ -187,7 +189,7 @@ export default function LessonPath({ title, subtitle, ctaLabel, ctaHref, trackin
               <div
                 key={`s${st.node}`}
                 className="lp-pst"
-                data-node={st.node}
+                data-first={st.first}
                 style={{ ["--r" as string]: `${st.r}deg`, left: st.left, top: st.top, width: st.w, height: st.h }}
               >
                 <img className="lp-gray" src={`/landing/path-${st.lesson.sticker.id}-locked.webp`} alt="" />
