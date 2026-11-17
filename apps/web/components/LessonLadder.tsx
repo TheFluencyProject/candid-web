@@ -9,8 +9,11 @@ import DownloadCta from "@/components/DownloadCta";
 // sixth entry here once one exists. Levels are fixed here (Jinny's lesson is difficulty_level
 // upper_intermediate, though its public band reads intermediate).
 type Level = "beginner" | "upper_beginner" | "lower_intermediate" | "intermediate" | "upper_intermediate" | "advanced";
-const LADDER: { lesson_id: string; level: Level }[] = [
-  { lesson_id: "97c601b9-8aef-4bac-9660-255e4be267c2", level: "beginner" }, // Hayden, Let's Take a Walk
+// `thumb` swaps in a site-only image for a lesson whose own thumbnail doesn't suit the card (same focus math applies).
+const LADDER: { lesson_id: string; level: Level; thumb?: string }[] = [
+  // Hayden, Let's Take a Walk. Its thumbnail is the clip's first frame, with "Slow Korean Vlog" over it; this is
+  // a clean frame ~2 s in, Hayden facing the camera (Adam 11/17).
+  { lesson_id: "97c601b9-8aef-4bac-9660-255e4be267c2", level: "beginner", thumb: "/landing/ladder-hayden-walk.webp" },
   { lesson_id: "3db9ba64-ef93-4303-bd7c-da4a942dfea2", level: "upper_beginner" }, // Hansoo, Catching Up at a Cafe
   { lesson_id: "44a2d5ab-2a1e-4632-9422-200540b4dd89", level: "lower_intermediate" }, // Mia, Rainy Day in Hanok
   { lesson_id: "af576996-875e-44b0-b082-a1ed3f23ef4f", level: "intermediate" }, // Didi, Welcome to the Late-Night Show
@@ -76,9 +79,9 @@ export default async function LessonLadder({ locale, tutors }: { locale: string;
   // A failed fetch drops that card (a hiccup here shouldn't take the home page down with it).
   const cards = (
     await Promise.all(
-      LADDER.map(async ({ lesson_id, level }) => {
+      LADDER.map(async ({ lesson_id, level, thumb }) => {
         const lesson = await fetchLessonMeta(lesson_id, locale).catch(() => null);
-        return lesson ? { lesson, level } : null;
+        return lesson ? { lesson: thumb ? { ...lesson, thumbnail_url: thumb } : lesson, level } : null;
       })
     )
   ).filter((c): c is Card => c !== null);
