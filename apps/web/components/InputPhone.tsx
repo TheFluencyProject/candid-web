@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import type Hls from "hls.js";
 import { isRestrictedInAppBrowser } from "@/lib/platform";
-import { SCREEN_STYLE, StatusIcons, spaced_title } from "@/components/PhoneClipHero";
+import { ACCENT, SCREEN_STYLE, StatusIcons, spaced_title } from "@/components/PhoneClipHero";
 import DownloadCta from "@/components/DownloadCta";
 
 // Home "Learn Korean through / Comprehensible Input" (mockup tmp/tutor-roster-mockups/section-ci.html,
@@ -44,7 +44,7 @@ const STAR =
 const poster_url = (c: InputPhoneClip) => `https://image.mux.com/${c.mux_playback_id}/thumbnail.jpg?time=${c.start}&width=800`;
 
 type Props = {
-  lead: string;
+  tag: string;
   title: string;
   subtitle: string;
   seeMore: string;
@@ -55,7 +55,7 @@ type Props = {
   tracking: string;
 };
 
-export default function InputPhone({ lead, title, subtitle, seeMore, clips, seed, ctaLabel, ctaHref, tracking }: Props) {
+export default function InputPhone({ tag, title, subtitle, seeMore, clips, seed, ctaLabel, ctaHref, tracking }: Props) {
   const sectionRef = useRef<HTMLElement>(null);
   const screenRef = useRef<HTMLDivElement>(null);
   const popRef = useRef<HTMLDivElement>(null);
@@ -139,6 +139,7 @@ export default function InputPhone({ lead, title, subtitle, seeMore, clips, seed
     let tapV = 0;
     const rel = (r: DOMRect, p: DOMRect) => ({ l: r.left - p.left, t: r.top - p.top, w: r.width });
     const measure = () => {
+      if (!chips.length) return; // fonts.ready / resize can land before the first clip's chips exist
       const p = pop.getBoundingClientRect();
       const pt = p.width / 393;
       const c = rel(cap.getBoundingClientRect(), p);
@@ -456,16 +457,21 @@ export default function InputPhone({ lead, title, subtitle, seeMore, clips, seed
     <section ref={sectionRef} className="ci-sec">
       <div className="ci-grid">
         <div className="ci-copy">
-          <h2>
-            <span className="ci-pre">{lead}</span>
-            {title}
-          </h2>
+          {/* Adam 11/17: the term becomes a tag like Shadowing's; the title says what you get */}
+          <span className="sd-tag" style={{ ["--a" as string]: ACCENT }}>
+            {/* Phosphor headphones (fill), same as the path's listen coin */}
+            <svg viewBox="0 0 256 256" aria-hidden>
+              <path d="M232,128v56a24,24,0,0,1-24,24H192a24,24,0,0,1-24-24V144a24,24,0,0,1,24-24h23.65a87.71,87.71,0,0,0-87-80H128a88,88,0,0,0-87.64,80H64a24,24,0,0,1,24,24v40a24,24,0,0,1-24,24H48a24,24,0,0,1-24-24V128A104.11,104.11,0,0,1,201.89,54.66,103.41,103.41,0,0,1,232,128Z" />
+            </svg>
+            {tag}
+          </span>
+          <h2>{title}</h2>
           <p className="ci-sub">{subtitle}</p>
           {/* Adam 11/17: a Try button here too, mint */}
           <DownloadCta label={ctaLabel} tracking={tracking} className="mt-6" href={ctaHref} />
         </div>
         <div className="ci-right">
-          <div className="ci-phone" role="img" aria-label={`${lead} ${title}. ${subtitle}`}>
+          <div className="ci-phone" role="img" aria-label={`${tag}: ${title}. ${subtitle}`}>
             <div ref={screenRef} className="ci-screen" style={SCREEN_STYLE}>
               <div className="ci-vids">
                 {clips.map((c) => (
