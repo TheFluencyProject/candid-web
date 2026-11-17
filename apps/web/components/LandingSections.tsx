@@ -39,9 +39,10 @@ const KOREAN_TUTOR_SLUGS = [
 
 // The path section's three real lessons (Didi, Hayden, Grace: Adam's picks 11/17), each in its own lesson accent
 // with one of its own stickers beside its indent coin (public/landing/path-<id>-{locked,accent}.webp, w × h).
-const PATH_LESSONS: { lesson_id: string; accent: string; sticker: PathLesson["sticker"] }[] = [
-  { lesson_id: "b66d4cb2-701f-43fb-b9b4-a10ec5ffa75e", accent: "#3ADAFF", sticker: { id: "didi-scary", w: 280, h: 205 } }, // Didi, 무서운 이야기 Part 7
-  { lesson_id: "9a2983f0-f768-49d7-8bce-7a73b92bcecc", accent: "#C8C5F0", sticker: { id: "hayden-home1", w: 280, h: 218 } }, // Hayden, Tour my Home Part 1
+// `title_id`: a part of a split video shows its full lesson's title, not the part's (Adam 11/18).
+const PATH_LESSONS: { lesson_id: string; title_id?: string; accent: string; sticker: PathLesson["sticker"] }[] = [
+  { lesson_id: "b66d4cb2-701f-43fb-b9b4-a10ec5ffa75e", title_id: "976b8bd3-087c-43bf-9e37-376f71dee399", accent: "#3ADAFF", sticker: { id: "didi-scary", w: 280, h: 205 } }, // Didi, 무서운 이야기 Part 7 (Korean Urban Legends and Superstitions)
+  { lesson_id: "9a2983f0-f768-49d7-8bce-7a73b92bcecc", title_id: "87641d82-ac46-48e5-8de1-1ed0b3e6edac", accent: "#C8C5F0", sticker: { id: "hayden-home1", w: 280, h: 218 } }, // Hayden, Tour my Home Part 1
   { lesson_id: "09f99480-beb1-4269-8bf1-208f8d340dd0", accent: "#FDC39C", sticker: { id: "grace-kimchi", w: 173, h: 280 } }, // Grace, Making Kimchi
 ];
 
@@ -115,11 +116,14 @@ export default async function LandingSections({ locale, clips, ctaHref }: Props)
   const by_slug = new Map(korean_tutors.map((tu) => [tu.slug, tu]));
   const path_lessons = (
     await Promise.all(
-      PATH_LESSONS.map(async ({ lesson_id, accent, sticker }): Promise<PathLesson | null> => {
-        const l = await fetchLessonMeta(lesson_id, locale).catch(() => null);
+      PATH_LESSONS.map(async ({ lesson_id, title_id, accent, sticker }): Promise<PathLesson | null> => {
+        const [l, full] = await Promise.all([
+          fetchLessonMeta(lesson_id, locale).catch(() => null),
+          title_id ? fetchLessonMeta(title_id, locale).catch(() => null) : null,
+        ]);
         if (!l) return null;
         const tutor = by_slug.get(l.tutor_slug);
-        return { tutor_name: tutor?.name ?? l.tutor_name, avatar: tutor?.profile_picture_url ?? null, thumb: l.thumbnail_url ? { url: l.thumbnail_url, pos: square_thumb_position(l) } : null, title: l.localized_title.replace(/\s*\n\s*/g, " "), accent, sticker };
+        return { tutor_name: tutor?.name ?? l.tutor_name, avatar: tutor?.profile_picture_url ?? null, thumb: l.thumbnail_url ? { url: l.thumbnail_url, pos: square_thumb_position(l) } : null, title: (full ?? l).localized_title.replace(/\s*\n\s*/g, " "), accent, sticker };
       })
     )
   ).filter((l): l is PathLesson => l !== null);

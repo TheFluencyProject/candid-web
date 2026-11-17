@@ -33,6 +33,9 @@ body {
    below). Pressing sinks the button onto its lip. --cta sets the color, fill and lip together (mint by default;
    the ladder's is blue, the path's follows its current lesson and eases between them). */
 .cta-3d { background-color: var(--cta, #89FFB4); box-shadow: 0 4px 0 color-mix(in srgb, var(--cta, #89FFB4) 58%, #000); transition: opacity .15s ease, transform .08s ease, background-color .3s ease, box-shadow .3s ease; }
+/* Top bar's Try button on phones (Adam 11/18): hidden at the top, fades in once the hero's button has gone under the bar (ScrollNav adds .nav-pill-on). */
+.nav-pill { transition: opacity .25s ease, visibility .25s; }
+@media (max-width: 859px) { .nav-pill:not(.nav-pill-on) { opacity: 0; visibility: hidden; } }
 .cta-3d:active { transform: translateY(4px); box-shadow: 0 0 0 transparent; transition-duration: .08s; }
 /* --cta is a registered color so it can blend: the sticker-circle button (and the top bar while it's the one on screen)
    drifts through the 5 sticker outline colors, going round the circle, 6s each (Adam 11/17: "quite a slow animation").
