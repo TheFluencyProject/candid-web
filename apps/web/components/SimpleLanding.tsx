@@ -45,13 +45,12 @@ const KOREAN_TUTOR_SLUGS = [
   "korean-didi",
 ];
 
-// The path section's three real lessons (Didi, Mia, Hayden), each in its own accent with one of its own
-// stickers beside its indent coin (public/landing/path-<id>-{locked,accent}.webp, w × h).
+// The path section's three real lessons (Didi, Hayden, Grace: Adam's picks 11/17), each in its own lesson accent
+// with one of its own stickers beside its indent coin (public/landing/path-<id>-{locked,accent}.webp, w × h).
 const PATH_LESSONS: { lesson_id: string; accent: string; sticker: PathLesson["sticker"] }[] = [
-  { lesson_id: "f06bb7cb-b337-4fcf-8ddb-f30df8279237", accent: "#3ADAFF", sticker: { id: "053", w: 220, h: 280 } }, // Didi's late-night show, the mic
-  { lesson_id: "87641d82-ac46-48e5-8de1-1ed0b3e6edac", accent: "#C8C5F0", sticker: { id: "033", w: 280, h: 243 } }, // Hayden's home tour
-  // Grace's kimchi lesson replaces Mia's music box; Didi → Hayden → Grace (Adam 11/17).
-  { lesson_id: "09f99480-beb1-4269-8bf1-208f8d340dd0", accent: "#F6B8BB", sticker: { id: "grace-kimchi", w: 173, h: 280 } }, // Grace, Making Kimchi
+  { lesson_id: "b66d4cb2-701f-43fb-b9b4-a10ec5ffa75e", accent: "#3ADAFF", sticker: { id: "didi-scary", w: 280, h: 205 } }, // Didi, 무서운 이야기 Part 7
+  { lesson_id: "9a2983f0-f768-49d7-8bce-7a73b92bcecc", accent: "#C8C5F0", sticker: { id: "hayden-home1", w: 280, h: 218 } }, // Hayden, Tour my Home Part 1
+  { lesson_id: "09f99480-beb1-4269-8bf1-208f8d340dd0", accent: "#FDC39C", sticker: { id: "grace-kimchi", w: 173, h: 280 } }, // Grace, Making Kimchi
 ];
 
 const SCREENSHOT_KEYS = [
