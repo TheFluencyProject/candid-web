@@ -21,6 +21,11 @@
       "upper_intermediate": "Obere Mittelstufe",
       "advanced": "Fortgeschritten"
     },
+    "path_title": "Dein Weg zu fließenden Gesprächen",
+    "path_subtitle": "Mach jeden Tag Fortschritte beim Hören, Sprechen & Wortschatz",
+    "garden_title": "Sieh zu, wie dein Koreanisch wächst",
+    "garden_unit": "{count, plural, one {Tag} other {Tage}}",
+    "ending_line": "Lerne Koreanisch <cool>aus dem echten Leben</cool><br></br>mit <wm></wm>",
     "reviews": {
       "luke": "Durch die neuen Funktionen fühlt es sich wirklich wie <b>die beste App zum Koreanischlernen</b> an, besser als Duolingo und Memrise",
       "madina": "Ich liebe Candid! 🥹 Das Lernen fühlt sich damit <b>ganz natürlich an und macht richtig Spaß</b>.",

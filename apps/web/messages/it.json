@@ -21,6 +21,11 @@
       "upper_intermediate": "Intermedio alto",
       "advanced": "Avanzato"
     },
+    "path_title": "Il tuo percorso verso la conversazione fluida",
+    "path_subtitle": "Fai progressi ogni giorno in ascolto, parlato e vocabolario",
+    "garden_title": "Guarda il tuo coreano crescere",
+    "garden_unit": "{count, plural, one {giorno} other {giorni}}",
+    "ending_line": "Impara il coreano <cool>della vita reale</cool><br></br>con <wm></wm>",
     "reviews": {
       "luke": "Con le ultime novità sembra davvero <b>la migliore app per imparare il coreano</b>, meglio di Duolingo e Memrise",
       "madina": "Adoro Candid! 🥹 Rende lo studio <b>davvero naturale e piacevole</b>.",

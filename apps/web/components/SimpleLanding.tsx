@@ -5,9 +5,12 @@ import ScreenshotMarquee from "@/components/ScreenshotMarquee";
 import PhoneClipHero from "@/components/PhoneClipHero";
 import TutorRoster from "@/components/TutorRoster";
 import LessonLadder from "@/components/LessonLadder";
+import LessonPath, { type PathLesson } from "@/components/LessonPath";
+import GardenGrow from "@/components/GardenGrow";
+import PageEnding from "@/components/PageEnding";
 import ReviewCards from "@/components/ReviewCards";
 import ScrollNav from "@/components/ScrollNav";
-import { type Tutor, type MarketingClip, fetchTutor, fetchMarketingClips } from "@/lib/api";
+import { type Tutor, type MarketingClip, fetchTutor, fetchMarketingClips, fetchLessonMeta } from "@/lib/api";
 
 // Active/featured tutors. The public tutor API exposes no active flag, so the
 // set is listed here (matches the old home); korean-chan has a profile page but
@@ -26,6 +29,14 @@ const KOREAN_TUTOR_SLUGS = [
   "korean-ellie",
   "korean-tina",
   "korean-didi",
+];
+
+// The path section's three real lessons (Didi, Mia, Hayden), each in its own accent with one of its own
+// stickers beside its indent coin (public/landing/path-<id>-{locked,accent}.webp, w × h).
+const PATH_LESSONS: { lesson_id: string; accent: string; sticker: PathLesson["sticker"] }[] = [
+  { lesson_id: "f06bb7cb-b337-4fcf-8ddb-f30df8279237", accent: "#3ADAFF", sticker: { id: "053", w: 220, h: 280 } }, // Didi's late-night show, the mic
+  { lesson_id: "51c0eff3-4a92-4b07-8e41-a859b36dd44a", accent: "#F6B8BB", sticker: { id: "025", w: 167, h: 280 } }, // Mia's music box collection
+  { lesson_id: "87641d82-ac46-48e5-8de1-1ed0b3e6edac", accent: "#C8C5F0", sticker: { id: "033", w: 280, h: 243 } }, // Hayden's home tour
 ];
 
 const SCREENSHOT_KEYS = [
@@ -96,6 +107,19 @@ export default async function SimpleLanding({ locale }: Props) {
   const korean_tutors = (
     await Promise.all(KOREAN_TUTOR_SLUGS.map((slug) => fetchTutor(slug, locale)))
   ).filter((t): t is Tutor => t !== null);
+
+  // Localized lesson titles; a failed fetch drops that lesson from the path, none left hides the section.
+  const by_slug = new Map(korean_tutors.map((tu) => [tu.slug, tu]));
+  const path_lessons = (
+    await Promise.all(
+      PATH_LESSONS.map(async ({ lesson_id, accent, sticker }): Promise<PathLesson | null> => {
+        const l = await fetchLessonMeta(lesson_id, locale).catch(() => null);
+        if (!l) return null;
+        const tutor = by_slug.get(l.tutor_slug);
+        return { tutor_name: tutor?.name ?? l.tutor_name, avatar: tutor?.profile_picture_url ?? null, title: l.localized_title.replace(/\s*\n\s*/g, " "), accent, sticker };
+      })
+    )
+  ).filter((l): l is PathLesson => l !== null);
 
   const screenshots = interleave(
     tutors.map((t) =>
@@ -172,8 +196,11 @@ export default async function SimpleLanding({ locale }: Props) {
           one (plan Q2). */}
       <TutorRoster tutors={korean_tutors} />
       <LessonLadder locale={locale} tutors={korean_tutors} />
+      {path_lessons.length > 0 && <LessonPath title={t("path_title")} subtitle={t("path_subtitle")} lessons={path_lessons} />}
+      <GardenGrow title={t("garden_title")} units={Array.from({ length: 30 }, (_, i) => t("garden_unit", { count: i + 1 }))} />
 
       <ReviewCards />
+      <PageEnding />
 
       <SiteFooter appStoreBadge />
     </main>
