@@ -273,3 +273,66 @@ html {
   .pe-bomb { height: 380px; }
   .pe-p img { height: calc(var(--h) * .6); }
 }
+
+/* ── Home: "Speak Korean like a native would" (ShadowDeck; mockup section-shadow.html) ── */
+/* Grid + type follow LessonPath. Inside the phone, cqw = 1% of the phone's width. */
+.sd-sec { min-height: calc(100svh - 61px); display: grid; grid-template-columns: 1fr 330px; align-items: center; gap: 64px; max-width: 1040px; margin: 0 auto; padding: 72px 32px; }
+.sd-copy h2 { margin: 0; font-size: clamp(34px, 4.4vw, 54px); font-weight: 500; letter-spacing: -0.03em; line-height: 1.08; }
+.sd-sub { margin: 16px 0 0; color: #d1d5db; font-size: 19px; line-height: 1.45; max-width: 26em; }
+.sd-phone-wrap { width: 330px; justify-self: center; }
+.sd-phone { position: relative; width: 100%; aspect-ratio: 1000 / 2034; container-type: inline-size; user-select: none; text-align: left; }
+.sd-screen { position: absolute; overflow: hidden; background: #2b2928; isolation: isolate; }
+.sd-frame { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 3; max-width: none; }
+/* the drill screen's backdrop: the clip itself, blurred and dimmed */
+.sd-backdrop { position: absolute; inset: -12%; background-size: cover; background-position: center; filter: blur(9cqw) brightness(.42) saturate(.8); opacity: 0; transition: opacity .7s ease; }
+.sd-backdrop.sd-on { opacity: 1; }
+.sd-status { position: absolute; inset: 0 0 auto 0; z-index: 2; display: flex; justify-content: space-between; align-items: center; padding: 2.4cqw 8cqw 0 7.8cqw; font-size: 3.5cqw; font-weight: 600; line-height: 1; color: #fff; }
+.sd-status svg { height: 2.3cqw; }
+.sd-bar { position: absolute; z-index: 2; left: 12cqw; right: 12cqw; top: 13cqw; height: 1.4cqw; border-radius: 1cqw; background: rgba(255,255,255,.18); overflow: hidden; }
+.sd-bar i { display: block; height: 100%; width: var(--w, 40%); background: #62B984; border-radius: inherit; transition: width .6s ease; }
+.sd-home { position: absolute; z-index: 2; left: 50%; bottom: 1.6cqw; width: 30cqw; height: 1cqw; transform: translateX(-50%); border-radius: 1cqw; background: rgba(255,255,255,.55); }
+/* replay + record under the card */
+.sd-controls { position: absolute; z-index: 2; left: 0; right: 0; top: 165cqw; display: flex; justify-content: center; align-items: center; gap: 6cqw; transform: translateX(-4.5cqw); }
+.sd-replay { width: 12.4cqw; height: 12.4cqw; border-radius: 50%; background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.06); display: grid; place-items: center; }
+.sd-replay svg { width: 5.2cqw; stroke: rgba(255,255,255,.55); }
+.sd-rec { position: relative; width: 17.5cqw; height: 17.5cqw; border-radius: 50%; background: #62B984; display: grid; place-items: center; }
+.sd-sq { width: 4.6cqw; height: 4.6cqw; border-radius: .9cqw; background: #141414; transform: scale(0); transition: transform .25s ease; }
+.sd-mic { position: absolute; width: 6.6cqw; fill: #141414; transition: opacity .2s ease, transform .25s ease; }
+.sd-rec.sd-rec-on .sd-sq { transform: scale(1); }
+.sd-rec.sd-rec-on .sd-mic { opacity: 0; transform: scale(.4); }
+.sd-rec::before, .sd-rec::after { content: ""; position: absolute; inset: 0; border-radius: 50%; border: .7cqw solid #62B984; opacity: 0; }
+.sd-rec.sd-rec-on::before { animation: sd-ring 2.8s ease-out infinite; }
+.sd-rec.sd-rec-on::after { animation: sd-ring 2.8s ease-out 1.4s infinite; }
+@keyframes sd-ring { from { transform: scale(1); opacity: .7; } to { transform: scale(1.55); opacity: 0; } }
+/* The card: wider than the phone, over its frame. Radius = SpeakingFlashcardView.cornerRadius 34pt.
+   A two-card deck: the front card, and one peeking under it (narrower, a touch darker on the same
+   shadow). The front leaves, the one behind moves up, a fresh one grows in behind. */
+.sd-cards { position: absolute; z-index: 4; left: -4.5cqw; width: 109cqw; top: 25cqw; height: 131cqw; }
+.sd-card { position: absolute; inset: 0; border-radius: 7.8cqw; overflow: hidden; background: #222; box-shadow: 0 6cqw 14cqw rgba(0,0,0,.55), 0 1.5cqw 4cqw rgba(0,0,0,.35);
+  transform-origin: 50% 100%; z-index: 1; opacity: 0; transform: translateY(8cqw) scale(.84); filter: brightness(.4);
+  transition: opacity .55s ease, transform .7s cubic-bezier(.2,.8,.2,1), filter .7s ease; }
+.sd-card.sd-back { z-index: 2; opacity: 1; transform: translateY(5.5cqw) scale(.92); filter: brightness(.82); }
+.sd-card.sd-front { z-index: 3; opacity: 1; transform: none; filter: none; }
+.sd-card.sd-out { z-index: 4; opacity: 0; transform: translateX(-16cqw) scale(.96) rotate(-2deg); filter: none; }
+.sd-card video, .sd-poster { position: absolute; inset: 0; width: 100%; height: 100%; max-width: none; object-fit: cover; }
+.sd-poster { transition: opacity .3s ease; }
+.sd-card.sd-has-frame .sd-poster { opacity: 0; }
+.sd-scrim { position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(0,0,0,.18), transparent 22%, transparent 38%, rgba(0,0,0,.4) 55%, rgba(0,0,0,.72) 78%, rgba(0,0,0,.75)); }
+.sd-pill { position: absolute; top: 4.5cqw; left: 50%; transform: translateX(-50%); opacity: 0; transition: opacity .35s ease; color: #000; font-weight: 600; font-size: 5.2cqw; line-height: 1; padding: 3cqw 5cqw; border-radius: 3cqw; white-space: nowrap; }
+.sd-card.sd-speak .sd-pill { opacity: 1; }
+.sd-cap { position: absolute; left: 6cqw; right: 6cqw; bottom: 8cqw; text-align: center; color: #fff; }
+.sd-ko { margin: 0; font-size: 12cqw; font-weight: 700; line-height: 1.12; letter-spacing: -.01em; word-break: keep-all; }
+.sd-w { position: relative; display: inline-block; }
+.sd-dim { color: #89FFB4; opacity: .5; }
+.sd-lit { position: absolute; inset: 0; color: #89FFB4; clip-path: inset(0 calc((1 - var(--f, 0)) * 100%) 0 0); }
+/* the app's hidden-word cover (WordFlowView: BlurView, blur 14pt, corner 6pt), accent-tinted: snaps on,
+   fades off in 0.25s once the tutor reaches the word (never fades in: a part-opaque blur shows the word) */
+.sd-cover { position: absolute; inset: -.2cqw -.9cqw; border-radius: 1.5cqw; background: rgba(137,255,180,.35); -webkit-backdrop-filter: blur(3.4cqw); backdrop-filter: blur(3.4cqw); }
+.sd-cover.sd-off { opacity: 0; transition: opacity .25s ease-out; }
+.sd-en { margin: 3.4cqw 0 0; font-size: 5cqw; line-height: 1.3; color: rgba(255,255,255,.82); }
+@media (max-width: 859px) {
+  .sd-sec { grid-template-columns: 1fr; gap: 40px; padding: 48px 16px 64px; text-align: center; justify-items: center; }
+  .sd-copy h2 { font-size: 30px; }
+  .sd-sub { font-size: 16px; margin: 10px auto 0; }
+  .sd-phone-wrap { width: min(290px, 74vw); }
+}

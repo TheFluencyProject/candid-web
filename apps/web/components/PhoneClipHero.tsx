@@ -11,7 +11,7 @@ import { cover_position_x, crop_slice_x } from "@/lib/clip-crop";
 // percent of the screen's width — so the whole screen scales as one picture.
 
 // iOS AccentColor (display-p3 0x89/0xFF/0xB4) — karaoke sweep, Speak-now pill, progress bar.
-const ACCENT = "#89FFB4";
+export const ACCENT = "#89FFB4";
 // The app's slowed shadowing speed; shown on the speed button.
 const PLAYBACK_RATE = 0.8;
 // The crossfade between clips (Adam 11/17): it starts only once the current clip's line is done, and both
@@ -21,7 +21,7 @@ const FADE_MS = 700;
 
 // /iphone-frame.png is 1000x2034 with a transparent screen cut out at (101,84)-(1896,3973),
 // corner radius 250, on its 2000x4068 source. These place the live screen under that hole.
-const SCREEN_STYLE = {
+export const SCREEN_STYLE = {
   left: "5.05%",
   top: "2.065%",
   width: "89.75%",
@@ -182,7 +182,7 @@ function BandBlur({ b, canvases }: { b: Band; canvases: (HTMLCanvasElement | nul
   );
 }
 
-function StatusIcons() {
+export function StatusIcons() {
   return (
     <div className="flex items-center gap-[1.4cqw]">
       {/* cellular */}
