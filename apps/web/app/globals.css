@@ -289,16 +289,20 @@ html {
   .pe-p img { height: calc(var(--h) * .6); }
 }
 
+/* Home phones (hero, listening, shadowing) on desktop: 88% of the screen under the top bar tall (Adam 11/17: "take up a
+   larger % of the viewport"), never smaller than the old 340px wide, at most 460px. 2.034 = the frame's height/width. */
+:root { --home-phone: clamp(340px, calc((100svh - 61px) * .88 / 2.034), 460px); }
+
 /* ── Home: "Speak Korean like a native would" (ShadowDeck; mockup section-shadow.html) ── */
 /* Grid + type follow LessonPath. Inside the phone, cqw = 1% of the phone's width. */
 /* desktop: phone on the left, copy on the right (Adam 11/17: flipped from the input section above it) */
-.sd-sec { min-height: calc(100svh - 61px); display: grid; grid-template-columns: 330px 1fr; align-items: center; gap: 64px; max-width: 1040px; margin: 0 auto; padding: 72px 32px; }
+.sd-sec { min-height: calc(100svh - 61px); display: grid; grid-template-columns: var(--home-phone) 1fr; align-items: center; gap: 112px; max-width: 1160px; margin: 0 auto; padding: 56px 32px; }
 .sd-tag svg { width: 16px; height: 16px; fill: currentColor; }
 .sd-tag { display: inline-flex; align-items: center; gap: 6px; margin-bottom: 16px; padding: 7px 12px 7px 10px; border-radius: 9px; color: var(--a); background: color-mix(in srgb, var(--a) 16%, transparent); font-size: 15px; font-weight: 600; line-height: 1; }
 /* balance: "native would" wraps to a second line instead of one wide line (Adam 11/17) */
 .sd-copy h2 { margin: 0; font-size: clamp(34px, 4.4vw, 54px); font-weight: 500; letter-spacing: -0.03em; line-height: 1.08; text-wrap: balance; max-width: 9.5em; }
 .sd-sub { margin: 16px 0 0; color: #d1d5db; font-size: 19px; line-height: 1.45; max-width: 26em; }
-.sd-phone-wrap { width: 330px; justify-self: center; order: -1; }
+.sd-phone-wrap { width: var(--home-phone); justify-self: center; order: -1; }
 .sd-phone { position: relative; width: 100%; aspect-ratio: 1000 / 2034; container-type: inline-size; user-select: none; text-align: left; }
 .sd-screen { position: absolute; overflow: hidden; background: #2b2928; isolation: isolate; }
 .sd-frame { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 3; max-width: none; }
@@ -359,14 +363,14 @@ html {
 /* ── Home: "Learn Korean through / Comprehensible Input" (InputPhone; mockup section-ci.html) ── */
 /* The screen and the pop layer above the frame are containers: --pt = one iOS point of a 393pt iPhone. */
 .ci-sec { min-height: calc(100svh - 61px); display: flex; align-items: center; overflow-x: clip; }
-.ci-grid { margin: 0 auto; width: 100%; max-width: 1240px; padding: 72px 32px; display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 56px; }
+.ci-grid { margin: 0 auto; width: 100%; max-width: 1240px; padding: 56px 32px; display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 56px; }
 .ci-copy h2 { margin: 0; font-size: clamp(40px, 5vw, 64px); font-weight: 500; letter-spacing: -0.03em; line-height: 1.08; word-break: keep-all; }
 /* the lead-in sits above the term, smaller, same white */
 .ci-pre { display: block; margin-bottom: 8px; font-size: clamp(19px, 1.8vw, 24px); letter-spacing: -0.02em; }
 .ci-sub { margin: 16px 0 0; max-width: 31em; color: #d1d5db; font-size: 19px; font-weight: 300; line-height: 1.45; text-wrap: pretty; word-break: keep-all; }
 /* room past the frame for the word deck */
 .ci-right { padding-right: 96px; }
-.ci-phone { position: relative; width: 340px; aspect-ratio: 1000 / 2034; user-select: none; text-align: left; }
+.ci-phone { position: relative; width: var(--home-phone); aspect-ratio: 1000 / 2034; user-select: none; text-align: left; }
 .ci-screen, .ci-pop { position: absolute; container-type: inline-size; }
 .ci-screen { overflow: hidden; background: #000; isolation: isolate; }
 .ci-pop { left: 5.05%; top: 2.065%; width: 89.75%; height: 95.6%; z-index: 6; pointer-events: none; }
