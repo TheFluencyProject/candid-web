@@ -5,8 +5,8 @@ import Image from "next/image";
 
 // Fixed top bar (wordmark + Try for free), visible from the first frame (Adam 11/17: it used to slide in only
 // once the hero's own CTA had scrolled off), so a download button is always one tap away.
-// Its button takes the color of whichever of the page's Try buttons ([data-primary-cta]) is on screen, the one
-// nearest the middle if two are; mint when none is (Adam 11/17). The sticker-circle button cycles colors
+// Its button takes the color of whichever of the page's Try buttons ([data-primary-cta]) is on screen, the upper
+// one if two are, so it only switches once that one has gone under the bar; mint when none is (Adam 11/17). The sticker-circle button cycles colors
 // (.cta-cycle): the bar's button runs the same animation, locked to its clock, so they match every frame.
 export default function ScrollNav({ ctaLabel, tracking }: { ctaLabel: string; tracking: string }) {
   const pillRef = useRef<HTMLAnchorElement>(null);
@@ -17,13 +17,11 @@ export default function ScrollNav({ ctaLabel, tracking }: { ctaLabel: string; tr
     const visible = new Set<HTMLElement>();
     const cycle = (el: Element) => el.getAnimations().find((a) => (a as CSSAnimation).animationName === "cta-cycle");
     const apply = () => {
-      const mid = innerHeight / 2;
       let best: HTMLElement | null = null;
-      let best_d = Infinity;
+      let best_top = Infinity;
       for (const el of visible) {
-        const r = el.getBoundingClientRect();
-        const d = Math.abs((r.top + r.bottom) / 2 - mid);
-        if (d < best_d) { best_d = d; best = el; }
+        const top = el.getBoundingClientRect().top;
+        if (top < best_top) { best_top = top; best = el; }
       }
       const cycling = !!best?.classList.contains("cta-cycle");
       if (cycling) {
@@ -49,18 +47,10 @@ export default function ScrollNav({ ctaLabel, tracking }: { ctaLabel: string; tr
       { rootMargin: "-61px 0px 0px 0px" },
     );
     document.querySelectorAll<HTMLElement>("[data-primary-cta]").forEach((el) => io.observe(el));
-    // Two on screen: which is nearer the middle changes as you scroll. The path's button changes color in place.
-    let queued = false;
-    const onScroll = () => {
-      if (visible.size < 2 || queued) return;
-      queued = true;
-      requestAnimationFrame(() => { queued = false; apply(); });
-    };
-    addEventListener("scroll", onScroll, { passive: true });
+    // The path's button changes color in place.
     addEventListener("cta-tint", apply);
     return () => {
       io.disconnect();
-      removeEventListener("scroll", onScroll);
       removeEventListener("cta-tint", apply);
     };
   }, []);
