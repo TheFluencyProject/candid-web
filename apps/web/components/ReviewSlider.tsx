@@ -186,8 +186,10 @@ export default function ReviewSlider({ cards }: { cards: ReactNode[] }) {
   };
 
   return (
-    <div ref={wrap} className={ready ? "" : "invisible"}>
-      <div className="overflow-hidden">
+    // Capped at ~3 cards wide so a wide screen shows only the current card + its two
+    // neighbours; on md+ the row's edges fade out instead of cutting off hard.
+    <div ref={wrap} className={`mx-auto max-w-[1480px] ${ready ? "" : "invisible"}`}>
+      <div className="overflow-hidden md:[mask-image:linear-gradient(to_right,transparent,#000_12%,#000_88%,transparent)]">
         <div
           ref={track}
           className={`flex items-stretch touch-pan-y select-none cursor-grab active:cursor-grabbing ${
