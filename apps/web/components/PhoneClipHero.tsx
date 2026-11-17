@@ -14,11 +14,10 @@ import { cover_position_x, crop_slice_x } from "@/lib/clip-crop";
 const ACCENT = "#89FFB4";
 // The app's slowed shadowing speed; shown on the speed button.
 const PLAYBACK_RATE = 0.8;
-// The crossfade between clips (Adam 11/17): the next clip plays as it fades in, over the current one,
-// which keeps playing as it fades out and reaches its end just as the fade finishes. No hold, no still frames.
+// The crossfade between clips (Adam 11/17): it starts only once the current clip's line is done, and both
+// keep moving through it: the outgoing clip plays on past its end (caption fully lit) as it fades out, and
+// the next one plays from the moment it starts fading in. No hold, no still frames, no early cut.
 const FADE_MS = 700;
-// The fade starts this much clip time before the end, so the outgoing clip plays to its last frame through it.
-const FADE_LEAD_S = (FADE_MS / 1000) * PLAYBACK_RATE;
 
 // /iphone-frame.png is 1000x2034 with a transparent screen cut out at (101,84)-(1896,3973),
 // corner radius 250, on its 2000x4068 source. These place the live screen under that hole.
@@ -262,13 +261,15 @@ type LayerProps = {
   // "next" preloads hidden underneath; "active" plays on top, fading in over "prev", which keeps
   // playing beneath it until the fade completes.
   role: LayerRole;
+  // More than one clip: at its end this clip hands off and plays on under the fade. A lone clip stops there.
+  handsOff: boolean;
   posterOnly: boolean;
   onEnd: () => void;
 };
 
 // One clip's whole screen — video, scrims, title row, Speak now + caption — so a clip change
 // crossfades everything together.
-function ClipLayer({ clip, role, posterOnly, onEnd }: LayerProps) {
+function ClipLayer({ clip, role, handsOff, posterOnly, onEnd }: LayerProps) {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const posterRef = useRef<HTMLImageElement | null>(null);
   const topEdgeRef = useRef<HTMLCanvasElement | null>(null);
@@ -379,13 +380,12 @@ function ClipLayer({ clip, role, posterOnly, onEnd }: LayerProps) {
     };
   }, [role, ready, clip]);
 
-  // Play once while active: sweep the caption and hand off to the next clip FADE_LEAD_S before the end,
-  // still playing (the "prev" effect above carries it through the fade). A lone clip stops on its last frame.
+  // Play once while active: sweep the caption, and at the end hand off to the next clip while still
+  // playing (the "prev" effect above carries it through the fade). A lone clip stops on its last frame.
   useEffect(() => {
     const video = videoRef.current;
     if (role !== "active" || !ready || !video) return;
     let raf = 0;
-    let handed_off = false;
     try { video.currentTime = clip.start_time; } catch { /* not seekable yet */ }
     video.defaultPlaybackRate = PLAYBACK_RATE;
     video.playbackRate = PLAYBACK_RATE;
@@ -405,12 +405,9 @@ function ClipLayer({ clip, role, posterOnly, onEnd }: LayerProps) {
       const t = video.currentTime;
       if (t >= clip.start_time) setPlayhead(t);
       paint_edges(video, topEdgeRef.current, bottomEdgeRef.current, bandRefs.current, clip.crop_center);
-      if (!handed_off && t >= clip.end_time - FADE_LEAD_S) {
-        handed_off = true;
-        onEndRef.current();
-      }
       if (t >= clip.end_time) {
-        video.pause();
+        if (!handsOff) video.pause();
+        onEndRef.current();
         return;
       }
       raf = requestAnimationFrame(tick);
@@ -418,7 +415,7 @@ function ClipLayer({ clip, role, posterOnly, onEnd }: LayerProps) {
     // Starts right away, so a clip that's fading in is already moving.
     start();
     return () => cancelAnimationFrame(raf); // no pause: going "prev", it plays on through the fade
-  }, [role, ready, clip]);
+  }, [role, ready, clip, handsOff]);
 
   // The layout flipped → its bands are fresh canvases; repaint them from whatever is up.
   useEffect(() => {
@@ -571,7 +568,7 @@ export default function PhoneClipHero({ clips, alt }: Props) {
     };
   }, []);
 
-  // A clip is nearly done → the next one starts fading in over it right away (both playing).
+  // A clip's line is done → the next one starts fading in over it right away (both playing).
   useEffect(() => {
     if (endedSeq !== seq || clips.length < 2) return;
     setSeq(seq + 1);
@@ -591,6 +588,7 @@ export default function PhoneClipHero({ clips, alt }: Props) {
             key={s}
             clip={clips[s % clips.length]}
             role={s < seq ? "prev" : s === seq ? "active" : "next"}
+            handsOff={clips.length > 1}
             posterOnly={posterOnly}
             onEnd={() => setEndedSeq(s)}
           />
