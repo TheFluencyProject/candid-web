@@ -196,10 +196,10 @@ export default function ShadowDeck({ tag, title, subtitle, clips, ctaLabel, ctaH
         // Deck: the front card leaves, the one behind moves up to the front, a fresh one grows in behind.
         paint(card, -1);
         if (prev !== card) {
-          prev.el.classList.remove("sd-front", "sd-speak");
+          prev.el.classList.remove("sd-front"); // keeps its ✓ pill up while it slides out and fades
           prev.el.classList.add("sd-out");
         }
-        card.el.classList.remove("sd-back", "sd-out");
+        card.el.classList.remove("sd-back", "sd-out", "sd-speak", "sd-done");
         card.el.classList.add("sd-front");
         if (next !== prev) {
           next.el.classList.remove("sd-out");
@@ -207,7 +207,7 @@ export default function ShadowDeck({ tag, title, subtitle, clips, ctaLabel, ctaH
           if (use_video) attach(next);
         }
         setTimeout(() => {
-          prev.el.classList.remove("sd-out");
+          prev.el.classList.remove("sd-out", "sd-speak", "sd-done"); // invisible now: back to "Speak now"
           if (next === prev) prev.el.classList.add("sd-back"); // a 2-card deck: the one that left comes back behind
           else if (use_video) detach(prev);
           if (use_video) {
@@ -228,6 +228,7 @@ export default function ShadowDeck({ tag, title, subtitle, clips, ctaLabel, ctaH
         if (!alive()) return;
         await wait(STOP_AFTER_MS);
         rec.classList.remove("sd-rec-on");
+        card.el.classList.add("sd-done"); // spoken: "Speak now" → ✓, like the app (Adam 11/17)
         await wait(HOLD_MS);
         if (!alive()) return;
         idx = (idx + 1) % n;
@@ -328,7 +329,13 @@ export default function ShadowDeck({ tag, title, subtitle, clips, ctaLabel, ctaH
                   />
                   <video muted playsInline preload="none" />
                   <div className="sd-scrim" />
-                  <div className="sd-pill" style={{ backgroundColor: ACCENT }}>Speak now</div>
+                  <div className="sd-pill" style={{ backgroundColor: ACCENT }}>
+                    <span className="sd-pill-txt">Speak now</span>
+                    {/* the app's LessonModeTopPill .success: bold black checkmark, same pill height */}
+                    <svg className="sd-pill-chk" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                      <path d="M4.5 12.5l5 5L19.5 7" />
+                    </svg>
+                  </div>
                   <div className="sd-cap">
                     <p className="sd-ko">
                       {words.map((w, k) => (
