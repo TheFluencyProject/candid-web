@@ -6,7 +6,7 @@ import DownloadCta from "@/components/DownloadCta";
 // "Your path to conversational fluency" (mockup P1, Adam 11/11–11/17): the app's own lesson path (LessonHubPath:
 // coins with a 3D lip on the wave, a sticker beside each indent, gray until earned) for three real lessons. The
 // heading pins while the path scrolls up past it with the page, and a coin flips to its lesson's color the moment
-// its centre reaches the middle of the screen (its sticker colors in with it). Scrolling back up never un-lights one.
+// its centre passes a line a bit below mid-screen (its sticker colors in with it). Scrolling back up never un-lights one.
 // No pulse, no labels, no transitions.
 
 export type PathLesson = {
@@ -29,6 +29,8 @@ const ORDERS: Kind[][] = [
 // The app's wave at 4 circles per indent (LessonHubPath.wave).
 const WAVE = [0, 40, 56, 40, 0, -40, -56, -40];
 // Desktop geometry (the mockup's P1): wider swing at the indents (Adam 11/11), scaled to fit, at most 1.2×.
+// A coin lights when its centre passes this far down the screen: a bit below the middle (Adam 11/17: "a tad" sooner).
+const LIGHT_AT = 0.6;
 const W = 440, ZIG = 86, COIN = 70, GAP = 28, BOX = 170, HEAD_H = 72, MAX_SCALE = 1.2;
 
 // The app's section icons (LessonSectionType.rowIcon): Phosphor play / microphone / headphones (fill), and
@@ -110,8 +112,8 @@ export default function LessonPath({ title, subtitle, ctaLabel, tracking, lesson
     return () => ro.disconnect();
   }, [P, nodes]);
 
-  // A coin lights once its centre passes the screen's middle line: each coin's centre dot is watched against the
-  // top half of the screen. Lit = every coin up to the furthest one passed (scrolling back up never un-lights).
+  // A coin lights once its centre passes the LIGHT_AT line: each coin's centre dot is watched against the screen
+  // above that line. Lit = every coin up to the furthest one passed (scrolling back up never un-lights).
   useEffect(() => {
     const track = trackRef.current;
     if (!track) return;
@@ -122,14 +124,14 @@ export default function LessonPath({ title, subtitle, ctaLabel, tracking, lesson
       (entries) => {
         let next = best;
         for (const e of entries) {
-          if (e.boundingClientRect.top <= innerHeight / 2) next = Math.max(next, Number((e.target as HTMLElement).dataset.i) + 1);
+          if (e.boundingClientRect.top <= innerHeight * LIGHT_AT) next = Math.max(next, Number((e.target as HTMLElement).dataset.i) + 1);
         }
         if (next === best) return;
         best = next;
         coins.forEach((c, i) => c.classList.toggle("lp-done", i < best));
         stks.forEach((st) => st.classList.toggle("lp-on", Number(st.dataset.node) < best));
       },
-      { rootMargin: "0px 0px -50% 0px" },
+      { rootMargin: `0px 0px -${Math.round((1 - LIGHT_AT) * 100)}% 0px` },
     );
     track.querySelectorAll(".lp-mid").forEach((m) => io.observe(m));
     return () => io.disconnect();
