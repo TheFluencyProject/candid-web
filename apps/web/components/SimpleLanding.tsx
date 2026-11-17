@@ -14,7 +14,17 @@ import InputPhone, { type InputPhoneClip } from "@/components/InputPhone";
 import { INPUT_CLIPS, DECK_SEED, text_in } from "@/lib/input-clips";
 import ReviewCards from "@/components/ReviewCards";
 import ScrollNav from "@/components/ScrollNav";
-import { type Tutor, type MarketingClip, fetchTutor, fetchMarketingClips, fetchLessonMeta } from "@/lib/api";
+import { type Tutor, type MarketingClip, type LessonMeta, fetchTutor, fetchMarketingClips, fetchLessonMeta } from "@/lib/api";
+import { cover_position_x } from "@/lib/clip-crop";
+
+// object-position for a square cover-fit thumbnail: horizontal (16:9) ones centre on the saved focus x, vertical
+// (9:16) ones on the tutor's framed focus y.
+function square_thumb_position(l: LessonMeta): string {
+  if (l.orientation === "horizontal") return `${cover_position_x(l.thumbnail_focus_x, 16 / 9, 1)} 50%`;
+  const visible = 9 / 16, fy = l.thumbnail_focus_y;
+  if (fy == null) return "50% 50%";
+  return `50% ${Math.min(1, Math.max(0, (fy - visible / 2) / (1 - visible))) * 100}%`;
+}
 
 // Active/featured tutors. The public tutor API exposes no active flag, so the
 // set is listed here (matches the old home); korean-chan has a profile page but
@@ -120,7 +130,7 @@ export default async function SimpleLanding({ locale }: Props) {
         const l = await fetchLessonMeta(lesson_id, locale).catch(() => null);
         if (!l) return null;
         const tutor = by_slug.get(l.tutor_slug);
-        return { tutor_name: tutor?.name ?? l.tutor_name, avatar: tutor?.profile_picture_url ?? null, title: l.localized_title.replace(/\s*\n\s*/g, " "), accent, sticker };
+        return { tutor_name: tutor?.name ?? l.tutor_name, avatar: tutor?.profile_picture_url ?? null, thumb: l.thumbnail_url ? { url: l.thumbnail_url, pos: square_thumb_position(l) } : null, title: l.localized_title.replace(/\s*\n\s*/g, " "), accent, sticker };
       })
     )
   ).filter((l): l is PathLesson => l !== null);
@@ -230,7 +240,7 @@ export default async function SimpleLanding({ locale }: Props) {
       <LessonLadder locale={locale} tutors={korean_tutors} />
       {path_lessons.length > 0 && <LessonPath title={t("path_title")} subtitle={t("path_subtitle")} ctaLabel={t("cta_learn")} tracking={tracking} lessons={path_lessons} />}
       <InputPhone lead={t("input_lead")} title={t("input_title")} subtitle={t("input_subtitle")} seeMore={t("input_see_more")} clips={input_clips} seed={[DECK_SEED[0], text_in(DECK_SEED[1], locale)]} />
-      <ShadowDeck title={t("shadow_title")} subtitle={t("shadow_subtitle")} clips={shadow_clips} />
+      <ShadowDeck tag={t("shadow_tag")} title={t("shadow_title")} subtitle={t("shadow_subtitle")} clips={shadow_clips} />
       <ReviewCards />
       <TutorRoster title={t("roster_title")} subtitle={t("roster_subtitle")} tutors={korean_tutors} />
       <GardenGrow title={t("garden_title")} units={Array.from({ length: 30 }, (_, i) => t("garden_unit", { count: i + 1 }))} />

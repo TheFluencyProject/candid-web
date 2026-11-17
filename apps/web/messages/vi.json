@@ -15,7 +15,7 @@
     "tap_to_mute": "Chạm để tắt tiếng",
     "reviews_title": "Học viên nói gì về Candid",
     "lessons_title": "Nội dung chất lượng cao cho người học tiếng Hàn",
-    "lessons_subtitle": "Candid tuyển chọn nội dung tiếng Hàn hay nhất cho mọi trình độ",
+    "lessons_subtitle": "Candid tuyển chọn những video tiếng Hàn hay nhất & biến chúng thành các bài học hằng ngày có hệ thống",
     "levels": {
       "beginner": "Sơ cấp",
       "upper_beginner": "Sơ cấp cao",
@@ -25,9 +25,10 @@
       "advanced": "Nâng cao"
     },
     "path_title": "Bước nhỏ. Tiến bộ thật.",
-    "path_subtitle": "Luyện tai, mở rộng vốn từ và nói thành tiếng với tiếng Hàn đời thực.",
+    "path_subtitle": "Luyện tai, mở rộng vốn từ và nói tự tin hơn chỉ với 10 phút mỗi ngày.",
+    "shadow_tag": "Shadowing",
     "shadow_title": "Nói tiếng Hàn như người bản xứ",
-    "shadow_subtitle": "Cải thiện ngữ điệu, phát âm & sự tự tin qua shadowing",
+    "shadow_subtitle": "Cải thiện ngữ điệu, phát âm & sự tự tin bằng cách shadowing cách người Hàn thực sự nói",
     "input_lead": "Học tiếng Hàn qua",
     "input_title": "đầu vào dễ hiểu",
     "input_subtitle": "Dựa trên Giả thuyết Đầu vào của nhà ngôn ngữ học Stephen Krashen: nghe nội dung cao hơn trình độ của bạn một chút là nền tảng để học một ngôn ngữ.",

@@ -15,7 +15,7 @@
     "tap_to_mute": "Toca para silenciar",
     "reviews_title": "Lo que dicen nuestros estudiantes",
     "lessons_title": "Contenido de alta calidad para estudiantes de coreano",
-    "lessons_subtitle": "Candid selecciona el mejor contenido en coreano para cada nivel",
+    "lessons_subtitle": "Candid selecciona los mejores videos en coreano y los convierte en lecciones diarias y estructuradas",
     "levels": {
       "beginner": "Principiante",
       "upper_beginner": "Principiante alto",
@@ -25,9 +25,10 @@
       "advanced": "Avanzado"
     },
     "path_title": "Pasos pequeños. Progreso real.",
-    "path_subtitle": "Entrena el oído, amplía tu vocabulario y habla en voz alta con coreano real.",
+    "path_subtitle": "Entrena el oído, amplía tu vocabulario y habla con más confianza en solo 10 minutos al día.",
+    "shadow_tag": "Shadowing",
     "shadow_title": "Habla coreano como un nativo",
-    "shadow_subtitle": "Mejora tu entonación, tu acento y tu confianza con el shadowing",
+    "shadow_subtitle": "Mejora tu entonación, tu acento y tu confianza haciendo shadowing de cómo hablan de verdad los coreanos",
     "input_lead": "Aprende coreano con",
     "input_title": "input comprensible",
     "input_subtitle": "Basado en la hipótesis del input del lingüista Stephen Krashen: escuchar contenido justo por encima de tu nivel es la base para aprender un idioma.",

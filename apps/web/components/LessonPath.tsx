@@ -12,6 +12,8 @@ import DownloadCta from "@/components/DownloadCta";
 export type PathLesson = {
   tutor_name: string;
   avatar: string | null;
+  // The lesson's own thumbnail, cover-fit into a square at `pos` (object-position).
+  thumb: { url: string; pos: string } | null;
   title: string;
   accent: string;
   // The indent sticker: /landing/path-<id>-locked.webp (gray) and -accent.webp, w × h.
@@ -156,7 +158,11 @@ export default function LessonPath({ title, subtitle, ctaLabel, tracking, lesson
           <div ref={trackRef} className="lp-track" style={{ width: W, height: P.H }}>
             {P.heads.map(({ top, lesson }) => (
               <div key={`h${top}`} className="lp-sec" style={{ top, height: HEAD_H }}>
-                {lesson.avatar && <img src={lesson.avatar} alt="" />}
+                {lesson.thumb ? (
+                  <img className="lp-thumb" src={lesson.thumb.url} alt="" style={{ objectPosition: lesson.thumb.pos }} />
+                ) : (
+                  lesson.avatar && <img src={lesson.avatar} alt="" />
+                )}
                 <span>
                   <i>{lesson.tutor_name}</i>
                   {lesson.title}
