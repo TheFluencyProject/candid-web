@@ -158,7 +158,7 @@ export default async function SimpleLanding({ locale }: Props) {
           <div>
             {/* "Learn real-life Korean" with the script word in Lobster, like the closing line (Adam 11/17). */}
             <h1 className="text-4xl min-[860px]:text-[clamp(40px,5.4vw,64px)] font-normal tracking-[-0.03em] leading-[1.05] [word-break:keep-all] [text-wrap:balance]">
-              {t.rich("hero_title", { cool: (chunks) => <span className={`pe-cool ${lobster.className}`}>{chunks}</span> })}
+              {t.rich("hero_title", { cool: (chunks) => <span className={`pe-cool !font-normal ${lobster.className}`}>{chunks}</span> })}
             </h1>
             <p className="mt-5 max-w-[30em] mx-auto min-[860px]:mx-0 text-base min-[860px]:text-[19px] leading-normal text-gray-300 [word-break:keep-all] [text-wrap:balance]">
               {t("hero_subtitle")}

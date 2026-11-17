@@ -1,5 +1,7 @@
 import type { Tutor } from "@/lib/api";
 
+const handle_of = (t: Tutor) => t.instagram_handle || t.youtube_handle || t.tiktok_handle;
+
 // The people row under the hero (mockup C2, Adam 11/11–11/17): the Korean creators' faces drifting by,
 // 7:8 cards with the name over a bottom gradient. Never all tutors at once as a list or grid, no count:
 // just a row that keeps moving. Pure CSS loop like ScreenshotMarquee: the group is rendered twice and the
@@ -22,9 +24,11 @@ export default function TutorRoster({ title, subtitle, tutors }: { title: string
             draggable={false}
             className="h-full w-full object-cover object-[center_25%] select-none"
           />
-          <div aria-hidden className="absolute inset-x-0 bottom-0 h-[42%] bg-gradient-to-b from-transparent to-black/60" />
-          <span className="absolute left-[11px] bottom-[9px] min-[600px]:left-4 min-[600px]:bottom-[13px] text-base min-[600px]:text-xl font-medium">
-            {t.name}
+          <div aria-hidden className="absolute inset-x-0 bottom-0 h-[50%] bg-gradient-to-b from-transparent to-black/75" />
+          <span className="absolute inset-x-[11px] bottom-[9px] min-[600px]:inset-x-4 min-[600px]:bottom-[13px] flex flex-col">
+            <span className="text-base min-[600px]:text-xl font-medium leading-tight">{t.name}</span>
+            {/* Their @ (Adam 11/17): Instagram first, then YouTube, then TikTok; none set = name only. */}
+            {handle_of(t) && <span className="truncate text-xs min-[600px]:text-sm leading-tight text-white/75">@{handle_of(t)}</span>}
           </span>
         </div>
       ))}
