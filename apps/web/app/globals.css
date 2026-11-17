@@ -203,10 +203,10 @@ html {
 
 /* ── Home: "Your path to conversational fluency" (LessonPath; mockup P1) ── */
 /* The path scrolls natively; only the heading pins (CSS sticky). --lp-trophy (the trophy's centre, from the grid's
-   top), --lp-h (the scaled path's height) and --lp-copy-h come from LessonPath on resize. The grid runs half a
-   screen past the trophy, so the next section comes in from the bottom as the trophy reaches mid-screen; the
-   heading's rail ends so it lets go at that same moment. */
-.lp-grid { position: relative; display: grid; grid-template-columns: 1fr 528px; gap: 40px; max-width: 1040px; margin: 0 auto; padding: 0 32px; height: calc(var(--lp-trophy, 1600px) + 50svh); }
+   top), --lp-h (the scaled path's height) and --lp-copy-h come from LessonPath on resize. The heading's rail ends
+   so it lets go as the trophy reaches mid-screen; the grid ends just past the trophy (Adam 11/17: the old half-screen
+   gap after it was too big), or at the rail's end if that's lower. */
+.lp-grid { position: relative; display: grid; grid-template-columns: 1fr 528px; gap: 40px; max-width: 1040px; margin: 0 auto; padding: 0 32px; height: max(calc(var(--lp-trophy, 1600px) + 120px), calc(var(--lp-trophy, 1600px) + 61px + var(--lp-copy-h, 0px) - 50svh)); }
 .lp-rail { align-self: start; height: max(var(--lp-copy-h, 0px), calc(var(--lp-trophy, 1600px) + 61px + var(--lp-copy-h, 0px) - 50svh)); }
 /* top-aligned at the lessons heading's screen height (top bar + 24px + 14vh), left-aligned (Adam 11/17) */
 .lp-copy { position: sticky; top: 61px; padding-top: calc(24px + 14vh); word-break: keep-all; }
