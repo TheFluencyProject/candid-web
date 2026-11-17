@@ -308,15 +308,30 @@ export default function InputPhone({ tag, title, subtitle, seeMore, clips, seed,
       vid.playbackRate = 1;
       vid.play().catch(() => {});
     };
+    // A screen before the section scrolls in (Adam 11/17: it sat black at the edge): attach and park the first
+    // clip (and the next), poster up, no black cover, so it plays the moment its edge shows.
+    let prepped = false;
+    const prep = () => {
+      if (prepped || !first) return;
+      prepped = true;
+      load(0, false);
+      black.style.opacity = "0";
+    };
     const begin = () => {
       videoStarted = false;
       wallClock = false;
       morphed = false;
       if (first) {
         first = false;
-        phase = "intro";
         phaseAt = performance.now();
-        load(0, false);
+        if (prepped) {
+          // Already parked on its start: no black rewind to hide.
+          phase = "play";
+          play();
+        } else {
+          phase = "intro";
+          load(0, false);
+        }
         return;
       }
       // Copy the outgoing screen's overlays into ghosts that fade out while the next clip, already
@@ -429,9 +444,15 @@ export default function InputPhone({ tag, title, subtitle, seeMore, clips, seed,
       vids.forEach((v) => v.pause());
     };
 
-    // Only while the section is on screen, so the hero's video and this one never both stream.
-    const io = new IntersectionObserver(([entry]) => (entry.isIntersecting ? start() : stop()), { threshold: 0.25 });
+    // Plays while any of the section is on screen (from its first edge); paused off screen.
+    const io = new IntersectionObserver(([entry]) => (entry.isIntersecting ? start() : stop()), { threshold: 0 });
     io.observe(section);
+    const prepIo = new IntersectionObserver(([entry]) => {
+      if (!entry.isIntersecting) return;
+      prep();
+      prepIo.disconnect();
+    }, { rootMargin: "0px 0px 100% 0px" });
+    prepIo.observe(section);
     const onResize = () => {
       measure();
       lay();
@@ -441,6 +462,7 @@ export default function InputPhone({ tag, title, subtitle, seeMore, clips, seed,
     return () => {
       stop();
       io.disconnect();
+      prepIo.disconnect();
       clearInterval(nudge);
       timers.forEach(clearTimeout);
       window.removeEventListener("resize", onResize);

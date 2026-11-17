@@ -10,6 +10,19 @@ import Image from "next/image";
 // (.cta-cycle): the bar's button runs the same animation, locked to its clock, so they match every frame.
 export default function ScrollNav({ ctaLabel, tracking }: { ctaLabel: string; tracking: string }) {
   const pillRef = useRef<HTMLAnchorElement>(null);
+  const bgRef = useRef<HTMLDivElement>(null);
+
+  // At the very top the bar has no background or divider; both fade in over the first FADE_PX of scroll
+  // (Adam 11/17).
+  useEffect(() => {
+    const bg = bgRef.current;
+    if (!bg) return;
+    const FADE_PX = 40;
+    const set = () => { bg.style.opacity = String(Math.min(1, Math.max(0, scrollY / FADE_PX))); };
+    set();
+    addEventListener("scroll", set, { passive: true });
+    return () => removeEventListener("scroll", set);
+  }, []);
 
   useEffect(() => {
     const pill = pillRef.current;
@@ -56,8 +69,9 @@ export default function ScrollNav({ ctaLabel, tracking }: { ctaLabel: string; tr
   }, []);
 
   return (
-    <div className="fixed inset-x-0 top-0 z-30 border-b border-white/[0.06] bg-[#18181C]/80 backdrop-blur-xl">
-      <div className="flex items-center justify-between px-4 md:px-8 py-3">
+    <div className="fixed inset-x-0 top-0 z-30">
+      <div ref={bgRef} aria-hidden className="absolute inset-0 border-b border-white/[0.06] bg-[#18181C]/80 opacity-0 backdrop-blur-xl" />
+      <div className="relative flex items-center justify-between px-4 md:px-8 py-3">
         <a href="/" className="hover:opacity-80 transition-opacity">
           <Image src="/wordmark-white.svg" alt="Candid" width={80} height={21} priority />
         </a>
