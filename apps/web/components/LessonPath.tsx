@@ -116,10 +116,14 @@ export default function LessonPath({ title, subtitle, ctaLabel, tracking, lesson
   // above that line. Lit = every coin up to the furthest one passed (scrolling back up never un-lights).
   useEffect(() => {
     const track = trackRef.current;
-    if (!track) return;
+    const copy = copyRef.current;
+    if (!track || !copy) return;
     const coins = [...track.querySelectorAll<HTMLElement>(".lp-pn")];
     const stks = [...track.querySelectorAll<HTMLElement>(".lp-pst")];
     let best = 0;
+    // The Try button takes the current lesson's color: the furthest lit coin's accent (the first lesson's before any).
+    const tint = () => copy.style.setProperty("--cta", coins[Math.max(0, best - 1)]?.style.getPropertyValue("--a") ?? "");
+    tint();
     const io = new IntersectionObserver(
       (entries) => {
         let next = best;
@@ -130,6 +134,7 @@ export default function LessonPath({ title, subtitle, ctaLabel, tracking, lesson
         best = next;
         coins.forEach((c, i) => c.classList.toggle("lp-done", i < best));
         stks.forEach((st) => st.classList.toggle("lp-on", Number(st.dataset.node) < best));
+        tint();
       },
       { rootMargin: `0px 0px -${Math.round((1 - LIGHT_AT) * 100)}% 0px` },
     );
