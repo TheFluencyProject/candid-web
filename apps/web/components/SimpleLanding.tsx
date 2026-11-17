@@ -49,8 +49,9 @@ const KOREAN_TUTOR_SLUGS = [
 // stickers beside its indent coin (public/landing/path-<id>-{locked,accent}.webp, w × h).
 const PATH_LESSONS: { lesson_id: string; accent: string; sticker: PathLesson["sticker"] }[] = [
   { lesson_id: "f06bb7cb-b337-4fcf-8ddb-f30df8279237", accent: "#3ADAFF", sticker: { id: "053", w: 220, h: 280 } }, // Didi's late-night show, the mic
-  { lesson_id: "51c0eff3-4a92-4b07-8e41-a859b36dd44a", accent: "#F6B8BB", sticker: { id: "025", w: 167, h: 280 } }, // Mia's music box collection
   { lesson_id: "87641d82-ac46-48e5-8de1-1ed0b3e6edac", accent: "#C8C5F0", sticker: { id: "033", w: 280, h: 243 } }, // Hayden's home tour
+  // Grace's kimchi lesson replaces Mia's music box; Didi → Hayden → Grace (Adam 11/17).
+  { lesson_id: "09f99480-beb1-4269-8bf1-208f8d340dd0", accent: "#F6B8BB", sticker: { id: "grace-kimchi", w: 173, h: 280 } }, // Grace, Making Kimchi
 ];
 
 const SCREENSHOT_KEYS = [
