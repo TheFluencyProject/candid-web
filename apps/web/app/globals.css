@@ -272,8 +272,9 @@ html {
 .gg-bed { width: min(560px, calc(100% - 32px)); margin: 6px auto 0; }
 
 /* ── Home: the closing line with the tutors' stickers floating round it (PageEnding; mockup E1) ── */
-/* 560 / 470px tall (was 430 / 380): room above and below the line + Try button (Adam 11/17: stickers too close vertically) */
-.pe-bomb { position: relative; height: 560px; width: 100%; max-width: 860px; margin: 0 auto; }
+/* 480 / 420px tall, 760px wide: room for the line + Try button without the stickers drifting off (Adam 11/17: 430 was
+   too close, 560 × 860 too far) */
+.pe-bomb { position: relative; height: 480px; width: 100%; max-width: 760px; margin: 0 auto; }
 .pe-mid { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); width: min(640px, 80%); z-index: 2; text-align: center; }
 .pe-head { margin: 0; font-size: clamp(32px, 5vw, 56px); font-weight: 500; letter-spacing: -0.02em; line-height: 1.15; }
 /* "Candid" = the real wordmark, sized to the line */
@@ -285,7 +286,7 @@ html {
 .pe-p img { display: block; height: var(--h); width: auto; max-width: none; transform: rotate(var(--r)); filter: drop-shadow(0 8px 14px rgba(0,0,0,.45)); animation: pe-bob var(--d) ease-in-out infinite alternate; }
 @keyframes pe-bob { to { transform: rotate(calc(var(--r) + 4deg)) translateY(-8px); } }
 @media (max-width: 600px) {
-  .pe-bomb { height: 470px; }
+  .pe-bomb { height: 420px; }
   .pe-p img { height: calc(var(--h) * .6); }
 }
 
