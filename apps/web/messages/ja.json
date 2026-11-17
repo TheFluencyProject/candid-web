@@ -12,6 +12,15 @@
     "tap_to_unmute": "タップでミュート解除",
     "tap_to_mute": "タップでミュート",
     "reviews_title": "学習者の声",
+    "lessons_title": "どのレベルにも合う韓国語レッスン",
+    "levels": {
+      "beginner": "初級",
+      "upper_beginner": "初級の上",
+      "lower_intermediate": "中級の下",
+      "intermediate": "中級",
+      "upper_intermediate": "中級の上",
+      "advanced": "上級"
+    },
     "reviews": {
       "luke": "最近の新機能で、本当に<b>最高の韓国語学習アプリ</b>だと感じるようになりました。DuolingoやMemriseより良いです",
       "madina": "Candidが本当に大好きです！🥹 <b>すごく自然で楽しく</b>学べます。",

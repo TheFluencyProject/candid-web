@@ -184,6 +184,10 @@ html {
      drift (iOS "Reduce Motion" would otherwise freeze it on many phones). */
   animation: marquee 90s linear infinite;
 }
+/* Home people row (TutorRoster): same seamless loop, a little quicker. Never pauses on hover. */
+.animate-drift {
+  animation: marquee 70s linear infinite;
+}
 
 /* ReviewRotator: the current dot's fill; its animationend advances the card. */
 @keyframes review-progress {

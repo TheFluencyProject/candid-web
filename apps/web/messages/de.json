@@ -12,6 +12,15 @@
     "tap_to_unmute": "Tippen für Ton",
     "tap_to_mute": "Tippen zum Stummschalten",
     "reviews_title": "Das sagen unsere Lernenden",
+    "lessons_title": "Koreanischlektionen für jedes Niveau",
+    "levels": {
+      "beginner": "Anfänger",
+      "upper_beginner": "Fortgeschrittener Anfänger",
+      "lower_intermediate": "Untere Mittelstufe",
+      "intermediate": "Mittelstufe",
+      "upper_intermediate": "Obere Mittelstufe",
+      "advanced": "Fortgeschritten"
+    },
     "reviews": {
       "luke": "Durch die neuen Funktionen fühlt es sich wirklich wie <b>die beste App zum Koreanischlernen</b> an, besser als Duolingo und Memrise",
       "madina": "Ich liebe Candid! 🥹 Das Lernen fühlt sich damit <b>ganz natürlich an und macht richtig Spaß</b>.",

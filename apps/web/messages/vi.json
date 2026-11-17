@@ -12,6 +12,15 @@
     "tap_to_unmute": "Chạm để bật tiếng",
     "tap_to_mute": "Chạm để tắt tiếng",
     "reviews_title": "Học viên nói gì về Candid",
+    "lessons_title": "Bài học tiếng Hàn cho mọi trình độ",
+    "levels": {
+      "beginner": "Sơ cấp",
+      "upper_beginner": "Sơ cấp cao",
+      "lower_intermediate": "Trung cấp thấp",
+      "intermediate": "Trung cấp",
+      "upper_intermediate": "Trung cấp cao",
+      "advanced": "Nâng cao"
+    },
     "reviews": {
       "luke": "Mấy tính năng mới làm mình thấy đây đúng là <b>ứng dụng học tiếng Hàn tốt nhất</b>, hơn cả Duolingo và Memrise",
       "madina": "Mình thật sự rất thích Candid! 🥹 Việc học trở nên <b>rất tự nhiên và thú vị</b>.",

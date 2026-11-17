@@ -3,7 +3,9 @@ import { getTranslations } from "next-intl/server";
 // import { Link } from "@/i18n/routing"; // only used by the hidden teach CTA below
 import SiteFooter from "@/components/SiteFooter";
 import ScreenshotMarquee from "@/components/ScreenshotMarquee";
-import MarketingClipMarquee from "@/components/MarketingClipMarquee";
+import PhoneClipHero from "@/components/PhoneClipHero";
+import TutorRoster from "@/components/TutorRoster";
+import LessonLadder from "@/components/LessonLadder";
 import ReviewCards from "@/components/ReviewCards";
 import ScrollNav from "@/components/ScrollNav";
 import { type Tutor, type MarketingClip, fetchTutor, fetchMarketingClips } from "@/lib/api";
@@ -12,6 +14,20 @@ import { type Tutor, type MarketingClip, fetchTutor, fetchMarketingClips } from 
 // set is listed here (matches the old home); korean-chan has a profile page but
 // is inactive, so it's excluded. Each tutor contributes its app screenshots.
 const TUTOR_SLUGS = ["korean-mia", "english-adam"];
+
+// The Korean creators in the people row under the hero (and the lessons ladder's avatars), in the
+// mockup's order. korean-jinnny is the real slug (three n's).
+const KOREAN_TUTOR_SLUGS = [
+  "korean-mia",
+  "korean-hansoo",
+  "korean-grace",
+  "korean-sol",
+  "korean-hayden",
+  "korean-jinnny",
+  "korean-ellie",
+  "korean-tina",
+  "korean-didi",
+];
 
 const SCREENSHOT_KEYS = [
   "screenshot_listen_url",
@@ -66,9 +82,9 @@ function spread<T>(lists: T[][]): T[] {
   return out.map((x) => x.item);
 }
 
-type Props = { locale: string; karaoke?: boolean };
+type Props = { locale: string };
 
-export default async function SimpleLanding({ locale, karaoke = true }: Props) {
+export default async function SimpleLanding({ locale }: Props) {
   const t = await getTranslations("home");
   // tracking-wide was tuned for the uppercase Latin labels; it just looks loose on Hangul.
   const tracking = locale === "ko" ? "" : "tracking-wide";
@@ -77,6 +93,9 @@ export default async function SimpleLanding({ locale, karaoke = true }: Props) {
   // the last cached render (see fetchTutor) instead of a blank row.
   const tutors = (
     await Promise.all(TUTOR_SLUGS.map((slug) => fetchTutor(slug, locale)))
+  ).filter((t): t is Tutor => t !== null);
+  const korean_tutors = (
+    await Promise.all(KOREAN_TUTOR_SLUGS.map((slug) => fetchTutor(slug, locale)))
   ).filter((t): t is Tutor => t !== null);
 
   const screenshots = interleave(
@@ -107,8 +126,6 @@ export default async function SimpleLanding({ locale, karaoke = true }: Props) {
   return (
     <main className="text-white" style={{ backgroundColor: "#18181C" }}>
       <ScrollNav ctaLabel={t("cta_learn")} tracking={tracking} />
-      {/* No min-h-screen: the reviews below now keep the footer off the first screen, and
-          forcing full height left a big empty gap between the clips and the reviews. */}
       <section className="flex flex-col">
         {/* Wordmark only; the App Store badge now lives in the footer. Padding
             matches the original TutorNavbar (px-4 md:px-8) so it isn't too wide. */}
@@ -125,21 +142,22 @@ export default async function SimpleLanding({ locale, karaoke = true }: Props) {
           </a>
         </header>
 
-        {/* Flows from the top with real breathing room above the title. */}
-        <div className="flex flex-col">
-          <div className="px-6 text-center pt-12 md:pt-20">
-            {/* Title \n breaks on mobile only; the subtitle's \n breaks on desktop only. */}
-            <h1 className="text-4xl md:text-6xl font-normal tracking-tight leading-[1.1] mb-5 whitespace-pre-line md:whitespace-normal">
+        {/* One screen under the top bar (Adam 11/17): copy on the left, one phone on the right playing the
+            starred clips one at a time (the tutor-page PhoneClipHero). Phones: copy, then the phone under it. */}
+        <div className="mx-auto grid w-full max-w-[1080px] min-[860px]:min-h-[calc(100svh-61px)] grid-cols-1 items-center justify-items-center gap-9 px-6 pt-12 pb-16 text-center min-[860px]:grid-cols-[1fr_auto] min-[860px]:justify-items-stretch min-[860px]:gap-14 min-[860px]:pt-6 min-[860px]:pb-10 min-[860px]:text-left">
+          <div>
+            {/* Title \n breaks on mobile only. */}
+            <h1 className="text-4xl min-[860px]:text-[clamp(40px,5.4vw,64px)] font-normal tracking-[-0.03em] leading-[1.05] whitespace-pre-line min-[860px]:whitespace-normal">
               {t("hero_title")}
             </h1>
-            <p className="max-w-2xl mx-auto text-base md:text-xl leading-relaxed text-gray-300 md:whitespace-pre-line">
-              {t("hero_subtitle")}
+            <p className="mt-5 max-w-[30em] mx-auto min-[860px]:mx-0 text-base min-[860px]:text-[19px] leading-normal text-gray-300">
+              {t("hero_subtitle").replace(/\s*\n\s*/g, " ")}
             </p>
-            <div className="mt-6 md:mt-8 flex flex-col sm:flex-row items-center justify-center gap-2.5 sm:gap-3">
+            <div className="mt-6 min-[860px]:mt-[30px]">
               {/* App Store download. App Clip funnel is disabled for now — this points at the
                   /download App Store redirect, not the App Clip link.
                   Plain <a>, not next-intl Link: /download is a middleware redirect that only
-                  matches unprefixed, so a /ko/download href would 404. */}
+                  matches unprefixed, so a /ko/download href would 404. ScrollNav watches #hero-cta. */}
               <a
                 id="hero-cta"
                 href="/download"
@@ -148,27 +166,27 @@ export default async function SimpleLanding({ locale, karaoke = true }: Props) {
                 {t("cta_learn")}
               </a>
               {/* Secondary — teach (become a creator). Hidden for now; /teach and the
-                  cta_teach strings still exist, so this is a one-line restore. */}
-              {/* <Link
-                href="/teach"
-                className={`inline-block rounded-full bg-white/10 px-8 py-2.5 md:py-3 text-base font-semibold ${tracking} text-white hover:bg-white/20 transition-colors`}
-              >
-                {t("cta_teach")}
-              </Link> */}
+                  cta_teach strings still exist, so this is a one-line restore:
+                  <Link href="/teach" className={`inline-block rounded-full bg-white/10 px-8 py-2.5 md:py-3 text-base font-semibold ${tracking} text-white hover:bg-white/20 transition-colors`}>{t("cta_teach")}</Link> */}
             </div>
           </div>
 
-          {/* Normal gap above the row — matches the rest of the hero spacing. On mobile,
-              mb-8 below ≈ the pt-12 above the title (the marquee's own py-4 adds ~16px). */}
-          <div className="mt-6 md:mt-8 mb-8 md:mb-0">
-            {clips.length > 0 ? (
-              <MarketingClipMarquee clips={clips} karaoke={karaoke} />
-            ) : (
+          {clips.length > 0 ? (
+            <div className="w-[min(300px,78vw)] min-[860px]:w-[340px]">
+              <PhoneClipHero clips={clips} alt={t("hero_subtitle").replace(/\s*\n\s*/g, " ")} />
+            </div>
+          ) : (
+            <div className="w-full min-[860px]:w-[420px] overflow-hidden">
               <ScreenshotMarquee urls={screenshots} />
-            )}
-          </div>
+            </div>
+          )}
         </div>
       </section>
+
+      {/* "Not another AI tutor." stays the hero's line; the people row has no heading until Adam picks
+          one (plan Q2). */}
+      <TutorRoster tutors={korean_tutors} />
+      <LessonLadder locale={locale} tutors={korean_tutors} />
 
       <ReviewCards />
 

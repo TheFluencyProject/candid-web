@@ -70,6 +70,42 @@ export async function fetchTutor(
   return res.json();
 }
 
+// ── Public lessons (share page + home lessons ladder) ───────────────
+
+export interface LessonMeta {
+  lesson_id: string;
+  source_id: string | null;
+  source_type: string;
+  orientation: "vertical" | "horizontal" | null;
+  title: string;
+  thumbnail_url: string;
+  // Centre of the full-width square the tutor framed, 0-1 of image height. Optional so the page
+  // keeps working against an API that predates the field; null/absent = plain centring.
+  thumbnail_focus_y?: number | null;
+  // Horizontal thumbnails: 0-1 centre of the slice a tall crop should show. null/absent = centred.
+  thumbnail_focus_x?: number | null;
+  localized_title: string;
+  tutor_name: string;
+  tutor_slug: string;
+  teaching_language: string;
+  difficulty_band: string | null;
+}
+
+// Returns null only for genuine 404 ("no such lesson"). Transient failures
+// (timeout, 5xx, network) THROW so Next.js keeps the previous good cached
+// value instead of caching the failure for the 1-week revalidate window.
+export async function fetchLessonMeta(id: string, locale: string): Promise<LessonMeta | null> {
+  // tv = title version: bump to drop week-old cached titles (2 = titles backfilled in every locale, 11/01).
+  const res = await fetch(`${API_BASE_URL}/public/lessons/${id}?locale=${locale}&tv=2`, {
+    next: { revalidate: 604800 },
+  });
+  if (res.status === 404) return null;
+  if (!res.ok) {
+    throw new Error(`fetchLessonMeta(${id}, ${locale}): HTTP ${res.status}`);
+  }
+  return res.json();
+}
+
 // ── Marketing clips (joincandid.co hero) ─────────────────────────────
 
 export interface WordLevelCaption {
