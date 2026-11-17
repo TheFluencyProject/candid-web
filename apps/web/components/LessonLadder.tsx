@@ -113,7 +113,7 @@ export default async function LessonLadder({ locale, tutors }: { locale: string;
           <h2 className="text-[30px] font-medium leading-[1.08] tracking-[-0.03em] [text-wrap:balance] min-[860px]:text-[clamp(36px,4vw,54px)]">
             {t("lessons_title")}
           </h2>
-          <p className="mt-4 text-base leading-normal text-gray-300 [text-wrap:balance] min-[860px]:text-[19px]">{t("lessons_subtitle")}</p>
+          <p className="mt-4 text-base leading-normal text-gray-300 [text-wrap:pretty] min-[860px]:text-[19px]">{t("lessons_subtitle")}</p>
           <DownloadCta label={t("cta_learn")} tracking={locale === "ko" ? "" : "tracking-wide"} className="mt-6" color={LEVEL_COLOR.lower_intermediate} />
         </div>
       </div>

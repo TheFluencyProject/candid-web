@@ -152,9 +152,9 @@ async function run_line(card: Card, use_video: boolean, alive: () => boolean) {
   if (use_video) video.pause();
 }
 
-type Props = { title: string; subtitle: string; clips: MarketingClip[] };
+type Props = { tag: string; title: string; subtitle: string; clips: MarketingClip[] };
 
-export default function ShadowDeck({ title, subtitle, clips }: Props) {
+export default function ShadowDeck({ tag, title, subtitle, clips }: Props) {
   const sectionRef = useRef<HTMLElement>(null);
   const cardEls = useRef<(HTMLDivElement | null)[]>([]);
   const recRef = useRef<HTMLDivElement>(null);
@@ -261,6 +261,14 @@ export default function ShadowDeck({ title, subtitle, clips }: Props) {
   return (
     <section ref={sectionRef} className="sd-sec">
       <div className="sd-copy">
+        {/* Adam 11/17: a small tag naming the feature: accent text on a faint accent fill. */}
+        <span className="sd-tag" style={{ ["--a" as string]: ACCENT }}>
+          {/* Phosphor microphone (fill), same as the path's speak coin */}
+          <svg viewBox="0 0 256 256" aria-hidden>
+            <path d="M80,128V64a48,48,0,0,1,96,0v64a48,48,0,0,1-96,0Zm128,0a8,8,0,0,0-16,0,64,64,0,0,1-128,0,8,8,0,0,0-16,0,80.11,80.11,0,0,0,72,79.6V240a8,8,0,0,0,16,0V207.6A80.11,80.11,0,0,0,208,128Z" />
+          </svg>
+          {tag}
+        </span>
         <h2>{title}</h2>
         <p className="sd-sub">{subtitle}</p>
       </div>

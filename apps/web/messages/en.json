@@ -14,8 +14,8 @@
     "tap_to_unmute": "Tap to unmute",
     "tap_to_mute": "Tap to mute",
     "reviews_title": "Hear from our students",
-    "lessons_title": "High-quality content for Korean learners",
-    "lessons_subtitle": "Candid curates the best Korean content for every level",
+    "lessons_title": "High-quality content for every level",
+    "lessons_subtitle": "Candid curates the best Korean videos & turns them into structured, daily lessons",
     "levels": {
       "beginner": "Beginner",
       "upper_beginner": "Upper Beginner",
@@ -25,9 +25,10 @@
       "advanced": "Advanced"
     },
     "path_title": "Small steps. Real progress.",
-    "path_subtitle": "Train your ear, grow your vocab, and speak out loud with real Korean.",
+    "path_subtitle": "Train your ear, grow your vocab, and speak more confidently in just 10 minutes a day.",
+    "shadow_tag": "Shadowing",
     "shadow_title": "Speak Korean like a native would",
-    "shadow_subtitle": "Improve your intonation, accent & confidence through shadowing",
+    "shadow_subtitle": "Improve your intonation, accent & confidence by shadowing how Koreans really speak",
     "input_lead": "Learn Korean through",
     "input_title": "Comprehensible Input",
     "input_subtitle": "Based on linguist Stephen Krashen’s Input Hypothesis: listening to content just above your level is the foundation of learning a language.",

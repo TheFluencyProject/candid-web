@@ -14,8 +14,8 @@
     "tap_to_unmute": "タップでミュート解除",
     "tap_to_mute": "タップでミュート",
     "reviews_title": "学習者の声",
-    "lessons_title": "韓国語学習者のための、質の高いコンテンツ",
-    "lessons_subtitle": "Candidが、どのレベルにも最高の韓国語コンテンツを厳選します",
+    "lessons_title": "どのレベルにも、質の高いコンテンツを",
+    "lessons_subtitle": "Candidが最高の韓国語動画を厳選し、毎日続けられる体系的なレッスンにします",
     "levels": {
       "beginner": "初級",
       "upper_beginner": "初級の上",
@@ -25,9 +25,10 @@
       "advanced": "上級"
     },
     "path_title": "小さな一歩が、確かな上達に。",
-    "path_subtitle": "リアルな韓国語で、耳を鍛えて、語彙を増やして、声に出して話そう。",
+    "path_subtitle": "1日たった10分で、耳を鍛えて、語彙を増やして、もっと自信を持って話そう。",
+    "shadow_tag": "シャドーイング",
     "shadow_title": "ネイティブのように韓国語を話そう",
-    "shadow_subtitle": "シャドーイングで、イントネーション・発音・自信を磨こう",
+    "shadow_subtitle": "韓国人のリアルな話し方をシャドーイングして、イントネーション・発音・自信を磨こう",
     "input_lead": "韓国語を学ぶカギは",
     "input_title": "理解可能なインプット",
     "input_subtitle": "言語学者スティーブン・クラッシェンのインプット仮説に基づいています：自分のレベルより少し上のコンテンツを聞くことが、言語学習の土台です。",

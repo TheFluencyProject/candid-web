@@ -14,8 +14,8 @@
     "tap_to_unmute": "點按取消靜音",
     "tap_to_mute": "點按靜音",
     "reviews_title": "聽聽學員怎麼說",
-    "lessons_title": "為韓語學習者打造的優質內容",
-    "lessons_subtitle": "Candid 為每個程度精選最好的韓語內容",
+    "lessons_title": "每個程度都有優質內容",
+    "lessons_subtitle": "Candid 精選最好的韓語影片，做成系統化的每日課程",
     "levels": {
       "beginner": "初級",
       "upper_beginner": "初級偏上",
@@ -25,9 +25,10 @@
       "advanced": "高級"
     },
     "path_title": "小小一步，真實進步。",
-    "path_subtitle": "用真實韓語練耳力、累積詞彙、開口說。",
+    "path_subtitle": "每天只要 10 分鐘，練耳力、累積詞彙、更自信地開口說。",
+    "shadow_tag": "跟讀",
     "shadow_title": "像母語者一樣說韓語",
-    "shadow_subtitle": "透過跟讀，提升語調、口音和自信",
+    "shadow_subtitle": "跟讀韓國人真實的說話方式，提升語調、口音和自信",
     "input_lead": "學韓語的關鍵：",
     "input_title": "可理解性輸入",
     "input_subtitle": "基於語言學家史蒂芬·克拉申的輸入假說：聽略高於自己程度的內容，是學習一門語言的基礎。",

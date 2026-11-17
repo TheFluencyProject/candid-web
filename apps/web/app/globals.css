@@ -218,6 +218,7 @@ html {
 .lp-track { position: absolute; left: 0; top: calc(24px + 14vh); transform-origin: 0 0; }
 .lp-sec { position: absolute; left: 0; right: 0; display: flex; align-items: center; justify-content: center; gap: 10px; padding-bottom: 8px; }
 .lp-sec img { width: 30px; height: 30px; border-radius: 50%; object-fit: cover; }
+.lp-sec img.lp-thumb { width: 38px; height: 38px; border-radius: 8px; }
 .lp-sec span { display: grid; font-size: 15px; font-weight: 600; line-height: 1.25; }
 .lp-sec i { font-style: normal; font-weight: 400; font-size: 12px; color: #A7A7A9; }
 .lp-pn { position: absolute; width: 70px; height: 70px; transform: translateX(-50%); }
@@ -283,7 +284,10 @@ html {
 /* ── Home: "Speak Korean like a native would" (ShadowDeck; mockup section-shadow.html) ── */
 /* Grid + type follow LessonPath. Inside the phone, cqw = 1% of the phone's width. */
 .sd-sec { min-height: calc(100svh - 61px); display: grid; grid-template-columns: 1fr 330px; align-items: center; gap: 64px; max-width: 1040px; margin: 0 auto; padding: 72px 32px; }
-.sd-copy h2 { margin: 0; font-size: clamp(34px, 4.4vw, 54px); font-weight: 500; letter-spacing: -0.03em; line-height: 1.08; }
+.sd-tag svg { width: 16px; height: 16px; fill: currentColor; }
+.sd-tag { display: inline-flex; align-items: center; gap: 6px; margin-bottom: 16px; padding: 7px 12px 7px 10px; border-radius: 9px; color: var(--a); background: color-mix(in srgb, var(--a) 16%, transparent); font-size: 15px; font-weight: 600; line-height: 1; }
+/* balance: "native would" wraps to a second line instead of one wide line (Adam 11/17) */
+.sd-copy h2 { margin: 0; font-size: clamp(34px, 4.4vw, 54px); font-weight: 500; letter-spacing: -0.03em; line-height: 1.08; text-wrap: balance; max-width: 9.5em; }
 .sd-sub { margin: 16px 0 0; color: #d1d5db; font-size: 19px; line-height: 1.45; max-width: 26em; }
 .sd-phone-wrap { width: 330px; justify-self: center; }
 .sd-phone { position: relative; width: 100%; aspect-ratio: 1000 / 2034; container-type: inline-size; user-select: none; text-align: left; }
@@ -338,7 +342,7 @@ html {
 .sd-en { margin: 3.4cqw 0 0; font-size: 5cqw; line-height: 1.3; color: rgba(255,255,255,.82); }
 @media (max-width: 859px) {
   .sd-sec { grid-template-columns: 1fr; gap: 40px; padding: 48px 16px 64px; text-align: center; justify-items: center; }
-  .sd-copy h2 { font-size: 30px; }
+  .sd-copy h2 { font-size: 30px; margin-inline: auto; }
   .sd-sub { font-size: 16px; margin: 10px auto 0; }
   .sd-phone-wrap { width: min(290px, 74vw); }
 }

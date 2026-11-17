@@ -14,8 +14,8 @@
     "tap_to_unmute": "点按取消静音",
     "tap_to_mute": "点按静音",
     "reviews_title": "听听学员怎么说",
-    "lessons_title": "为韩语学习者打造的优质内容",
-    "lessons_subtitle": "Candid 为每个级别精选最好的韩语内容",
+    "lessons_title": "每个级别都有优质内容",
+    "lessons_subtitle": "Candid 精选最好的韩语视频，做成系统化的每日课程",
     "levels": {
       "beginner": "初级",
       "upper_beginner": "初级偏上",
@@ -25,9 +25,10 @@
       "advanced": "高级"
     },
     "path_title": "小小一步，真实进步。",
-    "path_subtitle": "用真实韩语练听力、积累词汇、开口说。",
+    "path_subtitle": "每天只要 10 分钟，练听力、积累词汇、更自信地开口说。",
+    "shadow_tag": "跟读",
     "shadow_title": "像母语者一样说韩语",
-    "shadow_subtitle": "通过跟读，提升语调、口音和自信",
+    "shadow_subtitle": "跟读韩国人真实的说话方式，提升语调、口音和自信",
     "input_lead": "学韩语的关键：",
     "input_title": "可理解性输入",
     "input_subtitle": "基于语言学家斯蒂芬·克拉申的输入假说：听略高于自己水平的内容，是学习一门语言的基础。",
