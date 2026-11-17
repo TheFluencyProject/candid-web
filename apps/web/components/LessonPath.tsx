@@ -130,6 +130,7 @@ export default function LessonPath({ title, subtitle, ctaLabel, ctaHref, trackin
     const tint = () => {
       const cur = above.lastIndexOf(true);
       copy.style.setProperty("--cta", coins[Math.max(0, cur)]?.style.getPropertyValue("--a") ?? "");
+      window.dispatchEvent(new Event("cta-tint")); // the top bar's button re-reads the color (ScrollNav)
     };
     tint();
     const io = new IntersectionObserver(
