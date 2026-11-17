@@ -30,9 +30,10 @@ body {
 }
 
 /* The green "Try for free" buttons: the path coins' 3D lip (.lp-face: the color mixed 58% with black, dropped
-   below). Pressing sinks the button onto its lip. */
-.cta-3d { box-shadow: 0 4px 0 color-mix(in srgb, #89FFB4 58%, #000); transition: opacity .15s ease, transform .08s ease, box-shadow .08s ease; }
-.cta-3d:active { transform: translateY(4px); box-shadow: 0 0 0 color-mix(in srgb, #89FFB4 58%, #000); }
+   below). Pressing sinks the button onto its lip. --cta sets the color, fill and lip together (mint by default;
+   the ladder's is blue, the path's follows its current lesson and eases between them). */
+.cta-3d { background-color: var(--cta, #89FFB4); box-shadow: 0 4px 0 color-mix(in srgb, var(--cta, #89FFB4) 58%, #000); transition: opacity .15s ease, transform .08s ease, background-color .3s ease, box-shadow .3s ease; }
+.cta-3d:active { transform: translateY(4px); box-shadow: 0 0 0 transparent; transition-duration: .08s; }
 
 /* Hide scrollbar for horizontal language selector */
 .scrollbar-hide {
