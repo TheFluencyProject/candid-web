@@ -39,10 +39,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-export default async function Home({ params, searchParams }: Props) {
+export default async function Home({ params }: Props) {
   const { locale } = await params;
   setRequestLocale(locale);
-  const sp = await searchParams;
 
   // Host-conditional: candidtutors.co/ keeps its stripped landing; joincandid.co
   // (+ previews + localhost) get the new simple landing. The old carousel lives
@@ -52,5 +51,5 @@ export default async function Home({ params, searchParams }: Props) {
     return <CandidtutorsLanding />;
   }
 
-  return <SimpleLanding locale={locale} karaoke={sp.karaoke !== "0"} />;
+  return <SimpleLanding locale={locale} />;
 }

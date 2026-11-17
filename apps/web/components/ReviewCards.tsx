@@ -49,7 +49,9 @@ async function reviewCards() {
 export default async function ReviewCards() {
   const t = await getTranslations("home");
   return (
-    <section className="pt-16 pb-32 md:pt-32 md:pb-48">
+    // One screen under the top bar, centered (Adam 11/17: every home section, one at a time). [&>*]:w-full:
+    // a flex column shrinks the slider's auto-margined box to its content otherwise.
+    <section className="flex min-h-[calc(100svh-61px)] flex-col justify-center py-16 [&>*]:w-full">
       <h2 className="px-4 text-2xl md:text-4xl font-normal tracking-tight text-center mb-8 md:mb-10">
         {t("reviews_title")}
       </h2>

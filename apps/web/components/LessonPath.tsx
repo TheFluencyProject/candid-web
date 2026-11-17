@@ -1,0 +1,168 @@
+"use client";
+
+import { useEffect, useMemo, useRef } from "react";
+import { on_scroll_frame, pin_progress } from "@/lib/pin-scroll";
+
+// "Your path to conversational fluency" (mockup P1, Adam 11/11–11/17): the app's own lesson path (LessonHubPath:
+// coins with a 3D lip on the wave, a sticker beside each indent, gray until earned) for three real lessons. The
+// section pins; the path glides up 1:1 with the scroll, and a coin flips to its lesson's color the moment its
+// centre reaches the middle of the screen (its sticker colors in with it). Scrolling back up never un-lights one.
+// No pulse, no labels, no transitions.
+
+export type PathLesson = {
+  tutor_name: string;
+  avatar: string | null;
+  title: string;
+  accent: string;
+  // The indent sticker: /landing/path-<id>-locked.webp (gray) and -accent.webp, w × h.
+  sticker: { id: string; w: number; h: number };
+};
+
+type Kind = "watch" | "speak" | "vocab" | "listen" | "trophy";
+// Adam 11/17: vary the speaking / vocab / listening order per lesson. Watch stays first (a lesson opens on its
+// video), no lesson's order repeats, and no lesson's 2nd coin matches the one before it. 4 coins (Q6).
+const ORDERS: Kind[][] = [
+  ["watch", "speak", "vocab", "listen"],
+  ["watch", "listen", "speak", "vocab"],
+  ["watch", "vocab", "listen", "speak"],
+];
+// The app's wave at 4 circles per indent (LessonHubPath.wave).
+const WAVE = [0, 40, 56, 40, 0, -40, -56, -40];
+// Desktop geometry (the mockup's P1): wider swing at the indents (Adam 11/11), scaled to fit, at most 1.2×.
+const W = 440, ZIG = 86, COIN = 70, GAP = 28, BOX = 170, HEAD_H = 72, MAX_SCALE = 1.2;
+
+// The app's section icons (LessonSectionType.rowIcon): Phosphor play / microphone / headphones (fill), and
+// SF Symbols dumbbell.fill (Vocab) + trophy.fill (the final coin) as masks so they take the color.
+function Icon({ kind }: { kind: Kind }) {
+  if (kind === "vocab") return <i className="lp-db" />;
+  if (kind === "trophy") return <i className="lp-tr" />;
+  const d = {
+    watch: "M240,128a15.74,15.74,0,0,1-7.6,13.51L88.32,229.65a16,16,0,0,1-16.2.3A15.86,15.86,0,0,1,64,216.13V39.87a15.86,15.86,0,0,1,8.12-13.82,16,16,0,0,1,16.2.3L232.4,114.49A15.74,15.74,0,0,1,240,128Z",
+    speak: "M80,128V64a48,48,0,0,1,96,0v64a48,48,0,0,1-96,0Zm128,0a8,8,0,0,0-16,0,64,64,0,0,1-128,0,8,8,0,0,0-16,0,80.11,80.11,0,0,0,72,79.6V240a8,8,0,0,0,16,0V207.6A80.11,80.11,0,0,0,208,128Z",
+    listen: "M232,128v56a24,24,0,0,1-24,24H192a24,24,0,0,1-24-24V144a24,24,0,0,1,24-24h23.65a87.71,87.71,0,0,0-87-80H128a88,88,0,0,0-87.64,80H64a24,24,0,0,1,24,24v40a24,24,0,0,1-24,24H48a24,24,0,0,1-24-24V128A104.11,104.11,0,0,1,201.89,54.66,103.41,103.41,0,0,1,232,128Z",
+  }[kind];
+  return (
+    <svg viewBox="0 0 256 256" aria-hidden>
+      <path d={d} />
+    </svg>
+  );
+}
+
+// Lays the path out once: each lesson = a header row (tutor + title), then its coins on the wave (which runs on
+// across lessons); the indent coin's sticker sits in the free space on the side its coin swung away from,
+// leaning a few degrees toward the path. The last lesson ends on the trophy.
+function layout(lessons: PathLesson[]) {
+  const k = ZIG / 56, rowH = COIN + GAP;
+  let y = 0, g = 0;
+  const heads: { top: number; lesson: PathLesson }[] = [];
+  const coins: { kind: Kind; left: number; top: number; accent: string }[] = [];
+  const stickers: { node: number; left: number; top: number; w: number; h: number; r: number; lesson: PathLesson }[] = [];
+  const nodes: number[] = [];
+  lessons.forEach((L, li) => {
+    heads.push({ top: y, lesson: L });
+    y += HEAD_H;
+    const order = ORDERS[li % ORDERS.length];
+    const kinds: Kind[] = li === lessons.length - 1 ? [...order, "trophy"] : order;
+    for (const kind of kinds) {
+      const x = WAVE[g % 8] * k, cy = y + COIN / 2;
+      coins.push({ kind, left: W / 2 + x, top: y, accent: L.accent });
+      if (Math.abs(WAVE[g % 8]) === 56) {
+        const side = x > 0 ? -1 : 1;
+        const edge = W / 2 + x + side * (COIN / 2 + 14), cx = (edge + (side < 0 ? 0 : W)) / 2;
+        const ar = L.sticker.w / L.sticker.h;
+        stickers.push({ node: g, left: cx, top: cy, w: ar >= 1 ? BOX : BOX * ar, h: ar >= 1 ? BOX / ar : BOX, r: side < 0 ? 5 : -5, lesson: L });
+      }
+      nodes.push(cy);
+      y += rowH;
+      g++;
+    }
+    y += 10;
+  });
+  return { heads, coins, stickers, nodes, H: y };
+}
+
+export default function LessonPath({ title, subtitle, lessons }: { title: string; subtitle: string; lessons: PathLesson[] }) {
+  const wrapRef = useRef<HTMLDivElement | null>(null);
+  const pinRef = useRef<HTMLDivElement | null>(null);
+  const pvRef = useRef<HTMLDivElement | null>(null);
+  const trackRef = useRef<HTMLDivElement | null>(null);
+  const headRef = useRef<HTMLHeadingElement | null>(null);
+  const P = useMemo(() => layout(lessons), [lessons]);
+  const nodes = P.nodes;
+
+  useEffect(() => {
+    const wrap = wrapRef.current, pin = pinRef.current, pv = pvRef.current, track = trackRef.current;
+    if (!wrap || !pin || !pv || !track) return;
+    const coins = [...track.querySelectorAll<HTMLElement>(".lp-pn")];
+    const stks = [...track.querySelectorAll<HTMLElement>(".lp-pst")];
+    const N = coins.length;
+    let best = 0, lastLit = -1; // best = furthest reached: scrolling back up never un-lights a coin (Adam 11/11)
+    return on_scroll_frame(() => {
+      const f = pin_progress(wrap, pin) * N;
+      const s = Math.min(MAX_SCALE, pv.clientWidth / W);
+      // The path starts top-aligned with the heading beside it, then glides until the trophy sits at mid-height.
+      // On phones the heading is above the path, so the path starts near the top of its own box.
+      const pvR = pv.getBoundingClientRect(), hR = headRef.current?.getBoundingClientRect();
+      const beside = hR && hR.bottom > pvR.top;
+      // The end puts the trophy on the screen's middle line (not the box's, which sits under the top bar), so
+      // it lights on the last step.
+      const mid = window.innerHeight / 2 - pvR.top;
+      const ty0 = beside ? hR.top - pvR.top : 16, ty1 = mid - nodes[N - 1] * s;
+      const ty = ty0 + (ty1 - ty0) * (f / N);
+      track.style.transform = `translate(${((pv.clientWidth - W * s) / 2).toFixed(1)}px, ${ty.toFixed(1)}px) scale(${s})`;
+      // Lit = coins whose centre is at or above the screen's middle line, from their real on-screen position
+      // (Adam 11/17: progress-based lighting flipped them too late).
+      best = Math.max(best, nodes.filter((y) => ty + y * s <= mid + 0.5).length);
+      if (best === lastLit) return;
+      lastLit = best;
+      coins.forEach((c, i) => c.classList.toggle("lp-done", i < best));
+      stks.forEach((st) => st.classList.toggle("lp-on", Number(st.dataset.node) < best));
+    });
+  }, [nodes]);
+
+  return (
+    <section>
+      <div ref={wrapRef} className="lp-pin-wrap">
+        <div ref={pinRef} className="lp-pin">
+          <div className="lp-copy">
+            <h2 ref={headRef}>{title}</h2>
+            <p className="lp-sub">{subtitle}</p>
+          </div>
+          <div ref={pvRef} className="lp-pv">
+            <div ref={trackRef} className="lp-track" style={{ width: W, height: P.H }}>
+              {P.heads.map(({ top, lesson }) => (
+                <div key={`h${top}`} className="lp-sec" style={{ top, height: HEAD_H }}>
+                  {lesson.avatar && <img src={lesson.avatar} alt="" />}
+                  <span>
+                    <i>{lesson.tutor_name}</i>
+                    {lesson.title}
+                  </span>
+                </div>
+              ))}
+              {P.coins.map((c, i) => (
+                <div key={`c${i}`} className="lp-pn" style={{ ["--a" as string]: c.accent, left: c.left, top: c.top }}>
+                  <div className="lp-face">
+                    <span className="lp-g">
+                      <Icon kind={c.kind} />
+                    </span>
+                  </div>
+                </div>
+              ))}
+              {P.stickers.map((st) => (
+                <div
+                  key={`s${st.node}`}
+                  className="lp-pst"
+                  data-node={st.node}
+                  style={{ ["--r" as string]: `${st.r}deg`, left: st.left, top: st.top, width: st.w, height: st.h }}
+                >
+                  <img className="lp-gray" src={`/landing/path-${st.lesson.sticker.id}-locked.webp`} alt="" />
+                  <img className="lp-col" src={`/landing/path-${st.lesson.sticker.id}-accent.webp`} alt="" />
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
