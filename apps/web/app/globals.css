@@ -387,9 +387,6 @@ html {
 .ci-sec { min-height: calc(100svh - 61px); display: flex; align-items: center; overflow-x: clip; }
 .ci-grid { margin: 0 auto; width: 100%; max-width: 1240px; padding: 56px 32px; display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 56px; }
 .ci-copy h2 { margin: 0; font-size: clamp(34px, 4.4vw, 54px); font-weight: 500; letter-spacing: -0.03em; line-height: 1.08; text-wrap: balance; word-break: keep-all; }
-/* ko's old heading (Adam 11/18): small lead line over the big term, at the pre-#102 sizes */
-.ci-copy h2.ci-h-lead { font-size: clamp(40px, 5vw, 64px); }
-.ci-pre { display: block; margin-bottom: 8px; font-size: clamp(19px, 1.8vw, 24px); letter-spacing: -0.02em; }
 /* the lead-in sits above the term, smaller, same white */
 .ci-sub { margin: 16px 0 0; max-width: 31em; color: #d1d5db; font-size: 19px; font-weight: 300; line-height: 1.45; text-wrap: pretty; word-break: keep-all; }
 /* room past the frame for the word deck */
@@ -471,8 +468,7 @@ html {
 .ci-morph .ci-card { box-shadow: none; background: transparent; transition: none; opacity: 0; }
 @media (max-width: 859px) {
   .ci-grid { grid-template-columns: 1fr; justify-items: center; gap: 44px; padding: 56px 16px 64px; text-align: center; }
-  .ci-copy h2, .ci-copy h2.ci-h-lead { font-size: 34px; }
-  .ci-pre { margin-bottom: 6px; font-size: 18px; }
+  .ci-copy h2 { font-size: 34px; }
   .ci-sub { margin: 10px auto 0; max-width: 26em; font-size: 16px; }
   .ci-right { padding-right: 64px; }
   .ci-phone { width: min(280px, 66vw); }

@@ -67,8 +67,9 @@ export default async function SimpleLanding({ locale }: Props) {
             starred clips one at a time (the tutor-page PhoneClipHero). Phones: copy, then the phone under it. */}
         <div className="mx-auto grid w-full max-w-[1080px] min-[860px]:min-h-[calc(100svh-61px)] grid-cols-1 items-center justify-items-center gap-9 px-6 pt-12 pb-16 text-center min-[860px]:grid-cols-[1fr_auto] min-[860px]:justify-items-stretch min-[860px]:gap-14 min-[860px]:pt-6 min-[860px]:pb-10 min-[860px]:text-left">
           <div>
-            {/* "Learn real-life Korean" with the script word in Lobster, like the closing line (Adam 11/17). */}
-            <h1 className="text-4xl min-[860px]:text-[clamp(40px,5.4vw,64px)] font-normal tracking-[-0.03em] leading-[1.05] [word-break:keep-all] [text-wrap:balance]">
+            {/* "Learn real-life Korean" with the script word in Lobster, like the closing line (Adam 11/17).
+                ko is back to "리얼 라이프가 담긴\n리얼 언어" (Adam 11/18); its \n breaks the line at every width (the desktop column is too narrow for one line). */}
+            <h1 className="text-4xl min-[860px]:text-[clamp(40px,5.4vw,64px)] font-normal tracking-[-0.03em] leading-[1.05] [word-break:keep-all] [text-wrap:balance] whitespace-pre-line">
               {t.rich("hero_title", { cool: (chunks) => <span className={`pe-cool !font-normal ${lobster.className}`}>{chunks}</span> })}
             </h1>
             <p className="mt-5 max-w-[30em] mx-auto min-[860px]:mx-0 text-base min-[860px]:text-[19px] leading-normal text-gray-300 [word-break:keep-all] [text-wrap:balance]">
