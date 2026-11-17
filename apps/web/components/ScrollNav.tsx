@@ -71,7 +71,9 @@ export default function ScrollNav({ ctaLabel, tracking }: { ctaLabel: string; tr
   return (
     <div className="fixed inset-x-0 top-0 z-30">
       <div ref={bgRef} aria-hidden className="absolute inset-0 border-b border-white/[0.06] bg-[#18181C]/80 opacity-0 backdrop-blur-xl" />
-      <div className="relative flex items-center justify-between px-4 md:px-8 py-3">
+      {/* 61px tall, always: the pinned headings sit at top: 61px (the divider no longer adds its 1px since it moved
+          to the fading layer; a 60px bar left a 1px slit the page showed through, Adam 11/18). */}
+      <div className="relative flex min-h-[61px] items-center justify-between px-4 md:px-8 py-3">
         <a href="/" className="hover:opacity-80 transition-opacity">
           <Image src="/wordmark-white.svg" alt="Candid" width={80} height={21} priority />
         </a>
