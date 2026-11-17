@@ -94,7 +94,7 @@ export default async function SimpleLanding({ locale }: Props) {
           </div>
 
           {clips.length > 0 ? (
-            <div className="w-[min(300px,78vw)] min-[860px]:w-[340px]">
+            <div className="w-[min(300px,78vw)] min-[860px]:w-[var(--home-phone)]">
               <PhoneClipHero clips={clips} alt={`${t.raw("hero_title").replace(/<\/?cool>/g, "")} ${t("hero_subtitle")}`} />
             </div>
           ) : (
