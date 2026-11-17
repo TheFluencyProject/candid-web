@@ -264,12 +264,14 @@ type LayerProps = {
   // More than one clip: at its end this clip hands off and plays on under the fade. A lone clip stops there.
   handsOff: boolean;
   posterOnly: boolean;
+  // The phone is on screen. Off screen the active clip pauses: no video decode, stream, sweep or band repaint.
+  onScreen: boolean;
   onEnd: () => void;
 };
 
 // One clip's whole screen — video, scrims, title row, Speak now + caption — so a clip change
 // crossfades everything together.
-function ClipLayer({ clip, role, handsOff, posterOnly, onEnd }: LayerProps) {
+function ClipLayer({ clip, role, handsOff, posterOnly, onScreen, onEnd }: LayerProps) {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const posterRef = useRef<HTMLImageElement | null>(null);
   const topEdgeRef = useRef<HTMLCanvasElement | null>(null);
@@ -385,6 +387,12 @@ function ClipLayer({ clip, role, handsOff, posterOnly, onEnd }: LayerProps) {
   useEffect(() => {
     const video = videoRef.current;
     if (role !== "active" || !ready || !video) return;
+    // Off screen: hold still (it repaints 20+ blurred canvases every frame, which starves the page's own
+    // painting; scrolling back up showed a blank screen for seconds). Back on screen, the line plays from its start.
+    if (!onScreen) {
+      video.pause();
+      return;
+    }
     let raf = 0;
     try { video.currentTime = clip.start_time; } catch { /* not seekable yet */ }
     video.defaultPlaybackRate = PLAYBACK_RATE;
@@ -415,7 +423,7 @@ function ClipLayer({ clip, role, handsOff, posterOnly, onEnd }: LayerProps) {
     // Starts right away, so a clip that's fading in is already moving.
     start();
     return () => cancelAnimationFrame(raf); // no pause: going "prev", it plays on through the fade
-  }, [role, ready, clip, handsOff]);
+  }, [role, ready, clip, handsOff, onScreen]);
 
   // The layout flipped → its bands are fresh canvases; repaint them from whatever is up.
   useEffect(() => {
@@ -557,6 +565,15 @@ export default function PhoneClipHero({ clips, alt }: Props) {
   // UA-sniffed after mount (SSR-safe), and flipped at runtime by the same window events the
   // marquee further down this page uses.
   const [posterOnly, setPosterOnly] = useState(false);
+  const rootRef = useRef<HTMLDivElement | null>(null);
+  const [onScreen, setOnScreen] = useState(true);
+  useEffect(() => {
+    const el = rootRef.current;
+    if (!el) return;
+    const io = new IntersectionObserver(([e]) => setOnScreen(e.isIntersecting));
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
   useEffect(() => {
     setPosterOnly(isRestrictedInAppBrowser());
     const on_blocked = () => setPosterOnly(true);
@@ -577,7 +594,7 @@ export default function PhoneClipHero({ clips, alt }: Props) {
   const seqs = clips.length > 1 && !posterOnly ? [seq - 1, seq, seq + 1].filter((s) => s >= 0) : [seq];
 
   return (
-    <div className="relative w-full aspect-[1000/2034] select-none text-left" role="img" aria-label={alt}>
+    <div ref={rootRef} className="relative w-full aspect-[1000/2034] select-none text-left" role="img" aria-label={alt}>
       {/* Live screen, under the frame's transparent cut-out. Its own black bg fills any sliver. */}
       <div
         className="absolute isolate overflow-hidden bg-black [container-type:inline-size]"
@@ -590,6 +607,7 @@ export default function PhoneClipHero({ clips, alt }: Props) {
             role={s < seq ? "prev" : s === seq ? "active" : "next"}
             handsOff={clips.length > 1}
             posterOnly={posterOnly}
+            onScreen={onScreen}
             onEnd={() => setEndedSeq(s)}
           />
         ))}
