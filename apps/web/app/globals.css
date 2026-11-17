@@ -243,6 +243,7 @@ html {
 .lp-col { opacity: 0; filter: drop-shadow(0 10px 16px rgba(0,0,0,.45)); }
 .lp-pst.lp-on .lp-col { opacity: 1; }
 .lp-pst.lp-on .lp-gray { opacity: 0; }
+.lp-cta-m { display: none; }
 @media (max-width: 859px) {
   /* Phones: heading over the path in one column; it pins under the top bar on the page color and the path
      scrolls up under it, fading out at its bottom edge. */
@@ -251,10 +252,20 @@ html {
   .lp-rail { position: relative; z-index: 1; }
   .lp-copy { padding: 28px 0 8px; background: #18181C; text-align: center; }
   .lp-copy::after { content: ""; position: absolute; left: 0; right: 0; top: 100%; height: 28px; background: linear-gradient(#18181C, rgba(24, 24, 28, 0)); }
-  .lp-pv { padding-top: calc(var(--lp-copy-h, 0px) + 8px); }
-  .lp-track { top: calc(var(--lp-copy-h, 0px) + 8px); }
+  .lp-pv { padding-top: calc(var(--lp-copy-h, 0px) + 8px + var(--lp-cta-m)); }
+  .lp-track { top: calc(var(--lp-copy-h, 0px) + 8px + var(--lp-cta-m)); }
   .lp-copy h2 { text-align: center; font-size: 30px; }
   .lp-sub { text-align: center; font-size: 16px; margin-top: 10px; }
+  /* The button sits in the path column right under the pinned heading and scrolls up under it; the path starts
+     --lp-cta-m lower (button + ~56px of room under it; Adam 11/17: a bit more space under the button). */
+  .lp-grid { --lp-cta-m: 112px; }
+  .lp-cta-d { display: none; }
+  /* The path is scaled to ~0.78× on a phone, so its lesson rows grow ~25% to read at desktop size (Adam 11/17). */
+  .lp-sec { gap: 12px; }
+  .lp-sec img.lp-thumb { width: 48px; height: 48px; border-radius: 10px; }
+  .lp-sec span { font-size: 19px; }
+  .lp-sec i { font-size: 15px; }
+  .lp-cta-m { display: flex; justify-content: center; position: absolute; left: 0; right: 0; top: calc(var(--lp-copy-h, 0px) + 20px); }
 }
 
 /* ── Home: "Watch your Korean grow" (GardenGrow; mockup G1 on the app's night sky) ── */
