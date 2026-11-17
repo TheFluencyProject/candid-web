@@ -283,13 +283,14 @@ html {
 
 /* ── Home: "Speak Korean like a native would" (ShadowDeck; mockup section-shadow.html) ── */
 /* Grid + type follow LessonPath. Inside the phone, cqw = 1% of the phone's width. */
-.sd-sec { min-height: calc(100svh - 61px); display: grid; grid-template-columns: 1fr 330px; align-items: center; gap: 64px; max-width: 1040px; margin: 0 auto; padding: 72px 32px; }
+/* desktop: phone on the left, copy on the right (Adam 11/17: flipped from the input section above it) */
+.sd-sec { min-height: calc(100svh - 61px); display: grid; grid-template-columns: 330px 1fr; align-items: center; gap: 64px; max-width: 1040px; margin: 0 auto; padding: 72px 32px; }
 .sd-tag svg { width: 16px; height: 16px; fill: currentColor; }
 .sd-tag { display: inline-flex; align-items: center; gap: 6px; margin-bottom: 16px; padding: 7px 12px 7px 10px; border-radius: 9px; color: var(--a); background: color-mix(in srgb, var(--a) 16%, transparent); font-size: 15px; font-weight: 600; line-height: 1; }
 /* balance: "native would" wraps to a second line instead of one wide line (Adam 11/17) */
 .sd-copy h2 { margin: 0; font-size: clamp(34px, 4.4vw, 54px); font-weight: 500; letter-spacing: -0.03em; line-height: 1.08; text-wrap: balance; max-width: 9.5em; }
 .sd-sub { margin: 16px 0 0; color: #d1d5db; font-size: 19px; line-height: 1.45; max-width: 26em; }
-.sd-phone-wrap { width: 330px; justify-self: center; }
+.sd-phone-wrap { width: 330px; justify-self: center; order: -1; }
 .sd-phone { position: relative; width: 100%; aspect-ratio: 1000 / 2034; container-type: inline-size; user-select: none; text-align: left; }
 .sd-screen { position: absolute; overflow: hidden; background: #2b2928; isolation: isolate; }
 .sd-frame { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 3; max-width: none; }
@@ -344,7 +345,7 @@ html {
   .sd-sec { grid-template-columns: 1fr; gap: 40px; padding: 48px 16px 64px; text-align: center; justify-items: center; }
   .sd-copy h2 { font-size: 30px; margin-inline: auto; }
   .sd-sub { font-size: 16px; margin: 10px auto 0; }
-  .sd-phone-wrap { width: min(290px, 74vw); }
+  .sd-phone-wrap { width: min(290px, 74vw); order: 0; }
 }
 
 /* ── Home: "Learn Korean through / Comprehensible Input" (InputPhone; mockup section-ci.html) ── */
