@@ -180,7 +180,7 @@ export default async function SimpleLanding({ locale }: Props) {
               <a
                 id="hero-cta"
                 href="/download"
-                className={`inline-block rounded-full bg-[#89FFB4] px-8 py-2.5 md:py-3 text-base font-semibold ${tracking} text-[#18181C] hover:opacity-90 transition-opacity`}
+                className={`inline-block rounded-full bg-[#89FFB4] px-8 py-2.5 md:py-3 text-base font-semibold ${tracking} text-[#18181C] hover:opacity-90 cta-3d`}
               >
                 {t("cta_learn")}
               </a>

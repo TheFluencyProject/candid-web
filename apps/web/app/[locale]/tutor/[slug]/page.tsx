@@ -301,7 +301,7 @@ export default async function TutorPage({ params, searchParams }: Props) {
             <a
               href={cta_href}
               data-tutor-name={localizedFirstName}
-              className="hidden lg:inline-block px-5 py-2 rounded-full text-sm font-bold"
+              className="hidden lg:inline-block px-5 py-2 rounded-full text-sm font-bold cta-3d"
               style={{ backgroundColor: "#89FFB4", color: "#000000" }}
             >
               {t("get_started")}

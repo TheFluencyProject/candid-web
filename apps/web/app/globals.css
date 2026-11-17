@@ -29,6 +29,11 @@ body {
   background-color: #18181C;
 }
 
+/* The green "Try for free" buttons: the path coins' 3D lip (.lp-face: the color mixed 58% with black, dropped
+   below). Pressing sinks the button onto its lip. */
+.cta-3d { box-shadow: 0 4px 0 color-mix(in srgb, #89FFB4 58%, #000); transition: opacity .15s ease, transform .08s ease, box-shadow .08s ease; }
+.cta-3d:active { transform: translateY(4px); box-shadow: 0 0 0 color-mix(in srgb, #89FFB4 58%, #000); }
+
 /* Hide scrollbar for horizontal language selector */
 .scrollbar-hide {
   -ms-overflow-style: none; /* IE and Edge */
