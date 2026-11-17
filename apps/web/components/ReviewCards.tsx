@@ -50,10 +50,11 @@ export default async function ReviewCards() {
   const t = await getTranslations("home");
   return (
     // Content height, not a full screen: next to the creators row, two short centered screens left ~500px
-    // of empty page between them (Adam 11/17). [&>*]:w-full: a flex column shrinks the slider's
-    // auto-margined box to its content otherwise.
-    <section className="flex flex-col py-20 [&>*]:w-full">
-      <h2 className="px-4 text-2xl md:text-4xl font-normal tracking-tight text-center mb-8 md:mb-10">
+    // of empty page between them (Adam 11/17). Then: at least 75% of a screen, centered (Adam 11/17: "more of it,
+    // like 75%"). [&>*]:w-full: a flex column shrinks the slider's auto-margined box to its content otherwise.
+    <section className="flex min-h-[75svh] flex-col justify-center py-20 [&>*]:w-full">
+      {/* same heading size as the other sections (Adam 11/17: "clearly isn't tall enough") */}
+      <h2 className="px-6 text-[30px] font-medium leading-[1.08] tracking-[-0.03em] text-center [text-wrap:balance] mb-8 min-[860px]:text-[clamp(36px,4vw,54px)] min-[860px]:mb-12">
         {t("reviews_title")}
       </h2>
       <ReviewSlider cards={await reviewCards()} />

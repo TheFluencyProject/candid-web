@@ -37,8 +37,8 @@ export default function TutorRoster({ title, subtitle, tutors }: { title: string
 
   return (
     // Content height, not a full screen: after the reviews, two short centered screens left ~500px of empty
-    // page above the heading (Adam 11/17).
-    <section className="overflow-hidden py-20">
+    // page above the heading (Adam 11/17). Then: at least 75% of a screen, centered (Adam 11/17).
+    <section className="flex min-h-[75svh] flex-col justify-center overflow-hidden py-20">
       {/* "Not another AI tutor" moved here from the hero (Adam 11/17). */}
       <div className="mx-auto mb-10 max-w-[760px] px-6 text-center [word-break:keep-all] min-[860px]:mb-14">
         <h2 className="text-[30px] font-medium leading-[1.08] tracking-[-0.03em] [text-wrap:balance] min-[860px]:text-[clamp(36px,4vw,54px)]">{title}</h2>
