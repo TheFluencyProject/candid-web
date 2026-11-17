@@ -123,20 +123,24 @@ export default function LessonPath({ title, subtitle, ctaLabel, tracking, lesson
     const coins = [...track.querySelectorAll<HTMLElement>(".lp-pn")];
     const stks = [...track.querySelectorAll<HTMLElement>(".lp-pst")];
     let best = 0;
-    // The Try button takes the current lesson's color: the furthest lit coin's accent (the first lesson's before any).
-    const tint = () => copy.style.setProperty("--cta", coins[Math.max(0, best - 1)]?.style.getPropertyValue("--a") ?? "");
+    // Which coins sit above the line right now. Lighting only ever grows (best), but the Try button follows where
+    // you are: the color of the last coin above the line, going back up too (Adam 11/17: it stuck on the last
+    // lesson's color). The first lesson's color before any.
+    const above = coins.map(() => false);
+    const tint = () => {
+      const cur = above.lastIndexOf(true);
+      copy.style.setProperty("--cta", coins[Math.max(0, cur)]?.style.getPropertyValue("--a") ?? "");
+    };
     tint();
     const io = new IntersectionObserver(
       (entries) => {
-        let next = best;
-        for (const e of entries) {
-          if (e.boundingClientRect.top <= innerHeight * LIGHT_AT) next = Math.max(next, Number((e.target as HTMLElement).dataset.i) + 1);
-        }
+        for (const e of entries) above[Number((e.target as HTMLElement).dataset.i)] = e.boundingClientRect.top <= innerHeight * LIGHT_AT;
+        tint();
+        const next = Math.max(best, above.lastIndexOf(true) + 1);
         if (next === best) return;
         best = next;
         coins.forEach((c, i) => c.classList.toggle("lp-done", i < best));
         stks.forEach((st) => st.classList.toggle("lp-on", Number(st.dataset.node) < best));
-        tint();
       },
       { rootMargin: `0px 0px -${Math.round((1 - LIGHT_AT) * 100)}% 0px` },
     );
