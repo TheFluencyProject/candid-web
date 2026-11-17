@@ -5,14 +5,17 @@
   },
   "home": {
     "download_alt": "App Storeでダウンロード",
-    "hero_title": "AI講師じゃない、リアルな学び。",
-    "hero_subtitle": "お気に入りのクリエイターと毎日リスニング＆スピーキング。\nリアルな韓国語を身につけよう。",
+    "hero_title": "<cool>リアル</cool>な韓国語を学ぼう",
+    "hero_subtitle": "お気に入りのクリエイターと毎日リスニング＆スピーキング",
+    "roster_title": "AI講師じゃない、リアルな学び",
+    "roster_subtitle": "YouTube・Instagram・TikTokのトップクリエイターと学べるのは、Candidだけ。",
     "cta_learn": "無料で始める",
     "cta_teach": "Candidで教える",
     "tap_to_unmute": "タップでミュート解除",
     "tap_to_mute": "タップでミュート",
     "reviews_title": "学習者の声",
-    "lessons_title": "どのレベルにも合う韓国語レッスン",
+    "lessons_title": "どのレベルにも、質の高いコンテンツ",
+    "lessons_subtitle": "Candidは韓国語学習者のために最高のコンテンツを厳選し、あなたのレベルに合わせて届けます",
     "levels": {
       "beginner": "初級",
       "upper_beginner": "初級の上",
@@ -21,9 +24,9 @@
       "upper_intermediate": "中級の上",
       "advanced": "上級"
     },
-    "path_title": "会話力への道のり",
-    "path_subtitle": "リスニング、スピーキング、単語を毎日少しずつ",
-    "garden_title": "韓国語が育っていくのを見よう",
+    "path_title": "毎日の韓国語をひとさじ",
+    "path_subtitle": "リアルな韓国語コンテンツで、リスニング・スピーキング・単語を練習",
+    "garden_title": "韓国語が育っていくのを見よう、毎日少しずつ",
     "garden_unit": "日",
     "ending_line": "<cool>リアル</cool>な韓国語を<br></br><wm></wm>で学ぼう",
     "reviews": {

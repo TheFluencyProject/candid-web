@@ -1,6 +1,7 @@
 import { getTranslations } from "next-intl/server";
 import { type LessonMeta, type Tutor, fetchLessonMeta } from "@/lib/api";
 import { cover_position_x } from "@/lib/clip-crop";
+import DownloadCta from "@/components/DownloadCta";
 
 // "Korean lessons for every level" (mockup C2, Adam 11/11–11/17): one real lesson per level, Beginner →
 // Upper Intermediate, read left to right down two staggered columns, with the heading beside them.
@@ -108,9 +109,13 @@ export default async function LessonLadder({ locale, tutors }: { locale: string;
         </div>
         {/* Phones: heading first, centered. Desktop: on the right, left-aligned, level with the first card's
             top, then held at the top bar + 24px + 14vh while the cards scroll (Adam 11/17). */}
-        <h2 className="order-first text-center text-[30px] font-medium leading-[1.08] tracking-[-0.03em] [text-wrap:balance] min-[860px]:order-none min-[860px]:sticky min-[860px]:top-[calc(61px+24px+14vh)] min-[860px]:text-left min-[860px]:text-[clamp(36px,4vw,54px)]">
-          {t("lessons_title")}
-        </h2>
+        <div className="order-first text-center [word-break:keep-all] min-[860px]:order-none min-[860px]:sticky min-[860px]:top-[calc(61px+24px+14vh)] min-[860px]:text-left">
+          <h2 className="text-[30px] font-medium leading-[1.08] tracking-[-0.03em] [text-wrap:balance] min-[860px]:text-[clamp(36px,4vw,54px)]">
+            {t("lessons_title")}
+          </h2>
+          <p className="mt-4 text-base leading-normal text-gray-300 [text-wrap:balance] min-[860px]:text-[19px]">{t("lessons_subtitle")}</p>
+          <DownloadCta label={t("cta_learn")} tracking={locale === "ko" ? "" : "tracking-wide"} className="mt-6" />
+        </div>
       </div>
     </section>
   );

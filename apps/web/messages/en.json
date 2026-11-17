@@ -5,14 +5,17 @@
   },
   "home": {
     "download_alt": "Download on the App Store",
-    "hero_title": "Not another AI tutor.",
-    "hero_subtitle": "Learn real-life Korean with daily listening & speaking practice\nfrom your favorite creators.",
+    "hero_title": "Learn <cool>real-life</cool> Korean",
+    "hero_subtitle": "with daily listening & speaking practice from your favorite creators",
+    "roster_title": "Not another AI tutor",
+    "roster_subtitle": "Study with the top creators on YouTube, Instagram & TikTok, exclusively on Candid.",
     "cta_learn": "TRY FOR FREE",
     "cta_teach": "TEACH ON CANDID",
     "tap_to_unmute": "Tap to unmute",
     "tap_to_mute": "Tap to mute",
     "reviews_title": "Hear from our students",
-    "lessons_title": "Korean lessons for every level",
+    "lessons_title": "High-quality content for every level",
+    "lessons_subtitle": "Candid curates the best content for Korean learners & matches it to you based on your level",
     "levels": {
       "beginner": "Beginner",
       "upper_beginner": "Upper Beginner",
@@ -21,9 +24,9 @@
       "upper_intermediate": "Upper Intermediate",
       "advanced": "Advanced"
     },
-    "path_title": "Your path to conversational fluency",
-    "path_subtitle": "Make daily progress on listening, speaking & vocab",
-    "garden_title": "Watch your Korean grow",
+    "path_title": "Your daily dose of Korean",
+    "path_subtitle": "Practice listening, speaking & vocab with real-life Korean content",
+    "garden_title": "Watch your Korean grow, a little each day",
     "garden_unit": "{count, plural, one {day} other {days}}",
     "ending_line": "Learn <cool>real-life</cool> Korean<br></br>with <wm></wm>",
     "reviews": {

@@ -5,14 +5,17 @@
   },
   "home": {
     "download_alt": "在 App Store 下载",
-    "hero_title": "不是又一个 AI 老师。",
-    "hero_subtitle": "和你喜爱的创作者一起，每天练听力、练口语，\n学会真实生活里的韩语。",
+    "hero_title": "学习<cool>真实生活</cool>中的韩语",
+    "hero_subtitle": "和你喜爱的创作者一起，每天练听力、练口语",
+    "roster_title": "不是又一个 AI 老师",
+    "roster_subtitle": "和 YouTube、Instagram、TikTok 上的顶尖创作者一起学习，只在 Candid。",
     "cta_learn": "免费试用",
     "cta_teach": "成为 Candid 创作者",
     "tap_to_unmute": "点按取消静音",
     "tap_to_mute": "点按静音",
     "reviews_title": "听听学员怎么说",
-    "lessons_title": "适合各个级别的韩语课程",
+    "lessons_title": "适合各个级别的优质内容",
+    "lessons_subtitle": "Candid 为韩语学习者精选最好的内容，并根据你的级别为你匹配",
     "levels": {
       "beginner": "初级",
       "upper_beginner": "初级偏上",
@@ -21,9 +24,9 @@
       "upper_intermediate": "中级偏上",
       "advanced": "高级"
     },
-    "path_title": "通往流利对话之路",
-    "path_subtitle": "每天在听力、口语和词汇上进步一点",
-    "garden_title": "看着你的韩语一点点成长",
+    "path_title": "你的每日韩语补给",
+    "path_subtitle": "用真实生活的韩语内容练习听力、口语和词汇",
+    "garden_title": "看着你的韩语每天成长一点点",
     "garden_unit": "天",
     "ending_line": "在<wm></wm>学习<br></br><cool>真实生活</cool>中的韩语",
     "reviews": {

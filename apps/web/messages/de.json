@@ -5,14 +5,17 @@
   },
   "home": {
     "download_alt": "Laden im App Store",
-    "hero_title": "Nicht noch ein KI-Tutor.",
-    "hero_subtitle": "Lerne Koreanisch aus dem echten Leben mit täglichem Hör- und Sprechtraining\nvon deinen Lieblings-Creators.",
+    "hero_title": "Lerne Koreanisch <cool>aus dem echten Leben</cool>",
+    "hero_subtitle": "mit täglichem Hör- und Sprechtraining von deinen Lieblings-Creators",
+    "roster_title": "Nicht noch ein KI-Tutor",
+    "roster_subtitle": "Lerne mit den Top-Creators von YouTube, Instagram & TikTok – exklusiv auf Candid.",
     "cta_learn": "KOSTENLOS TESTEN",
     "cta_teach": "AUF CANDID UNTERRICHTEN",
     "tap_to_unmute": "Tippen für Ton",
     "tap_to_mute": "Tippen zum Stummschalten",
     "reviews_title": "Das sagen unsere Lernenden",
-    "lessons_title": "Koreanischlektionen für jedes Niveau",
+    "lessons_title": "Hochwertige Inhalte für jedes Niveau",
+    "lessons_subtitle": "Candid wählt die besten Inhalte für Koreanischlernende aus und passt sie an dein Niveau an",
     "levels": {
       "beginner": "Anfänger",
       "upper_beginner": "Fortgeschrittener Anfänger",
@@ -21,9 +24,9 @@
       "upper_intermediate": "Obere Mittelstufe",
       "advanced": "Fortgeschritten"
     },
-    "path_title": "Dein Weg zu fließenden Gesprächen",
-    "path_subtitle": "Mach jeden Tag Fortschritte beim Hören, Sprechen & Wortschatz",
-    "garden_title": "Sieh zu, wie dein Koreanisch wächst",
+    "path_title": "Deine tägliche Dosis Koreanisch",
+    "path_subtitle": "Übe Hören, Sprechen & Wortschatz mit Koreanisch aus dem echten Leben",
+    "garden_title": "Sieh zu, wie dein Koreanisch wächst – jeden Tag ein bisschen",
     "garden_unit": "{count, plural, one {Tag} other {Tage}}",
     "ending_line": "Lerne Koreanisch <cool>aus dem echten Leben</cool><br></br>mit <wm></wm>",
     "reviews": {

@@ -1,12 +1,12 @@
 "use client";
 
 import { useEffect, useMemo, useRef } from "react";
-import { on_scroll_frame, pin_progress } from "@/lib/pin-scroll";
+import DownloadCta from "@/components/DownloadCta";
 
 // "Your path to conversational fluency" (mockup P1, Adam 11/11–11/17): the app's own lesson path (LessonHubPath:
 // coins with a 3D lip on the wave, a sticker beside each indent, gray until earned) for three real lessons. The
-// section pins; the path glides up 1:1 with the scroll, and a coin flips to its lesson's color the moment its
-// centre reaches the middle of the screen (its sticker colors in with it). Scrolling back up never un-lights one.
+// heading pins while the path scrolls up past it with the page, and a coin flips to its lesson's color the moment
+// its centre reaches the middle of the screen (its sticker colors in with it). Scrolling back up never un-lights one.
 // No pulse, no labels, no transitions.
 
 export type PathLesson = {
@@ -81,85 +81,102 @@ function layout(lessons: PathLesson[]) {
   return { heads, coins, stickers, nodes, H: y };
 }
 
-export default function LessonPath({ title, subtitle, lessons }: { title: string; subtitle: string; lessons: PathLesson[] }) {
-  const wrapRef = useRef<HTMLDivElement | null>(null);
-  const pinRef = useRef<HTMLDivElement | null>(null);
+type Props = { title: string; subtitle: string; ctaLabel: string; tracking: string; lessons: PathLesson[] };
+
+export default function LessonPath({ title, subtitle, ctaLabel, tracking, lessons }: Props) {
+  const gridRef = useRef<HTMLDivElement | null>(null);
+  const copyRef = useRef<HTMLDivElement | null>(null);
   const pvRef = useRef<HTMLDivElement | null>(null);
   const trackRef = useRef<HTMLDivElement | null>(null);
-  const headRef = useRef<HTMLHeadingElement | null>(null);
   const P = useMemo(() => layout(lessons), [lessons]);
   const nodes = P.nodes;
 
+  // Sizes only (never on scroll): the path scrolls natively, so it can't lag behind the page (Adam 11/17: "super
+  // laggy"). Scale to the column; the heading's rail ends so it lets go just as the trophy reaches mid-screen.
   useEffect(() => {
-    const wrap = wrapRef.current, pin = pinRef.current, pv = pvRef.current, track = trackRef.current;
-    if (!wrap || !pin || !pv || !track) return;
+    const grid = gridRef.current, copy = copyRef.current, pv = pvRef.current, track = trackRef.current;
+    if (!grid || !copy || !pv || !track) return;
+    const size = () => {
+      const s = Math.min(MAX_SCALE, pv.clientWidth / W);
+      track.style.transform = `translateX(${((pv.clientWidth - W * s) / 2).toFixed(1)}px) scale(${s})`;
+      grid.style.setProperty("--lp-h", `${(P.H * s).toFixed(1)}px`);
+      grid.style.setProperty("--lp-trophy", `${(track.offsetTop + nodes[nodes.length - 1] * s).toFixed(1)}px`);
+      grid.style.setProperty("--lp-copy-h", `${copy.offsetHeight}px`);
+    };
+    const ro = new ResizeObserver(size);
+    ro.observe(pv);
+    ro.observe(copy);
+    size();
+    return () => ro.disconnect();
+  }, [P, nodes]);
+
+  // A coin lights once its centre passes the screen's middle line: each coin's centre dot is watched against the
+  // top half of the screen. Lit = every coin up to the furthest one passed (scrolling back up never un-lights).
+  useEffect(() => {
+    const track = trackRef.current;
+    if (!track) return;
     const coins = [...track.querySelectorAll<HTMLElement>(".lp-pn")];
     const stks = [...track.querySelectorAll<HTMLElement>(".lp-pst")];
-    const N = coins.length;
-    let best = 0, lastLit = -1; // best = furthest reached: scrolling back up never un-lights a coin (Adam 11/11)
-    return on_scroll_frame(() => {
-      const f = pin_progress(wrap, pin) * N;
-      const s = Math.min(MAX_SCALE, pv.clientWidth / W);
-      // The path starts top-aligned with the heading beside it, then glides until the trophy sits at mid-height.
-      // On phones the heading is above the path, so the path starts near the top of its own box.
-      const pvR = pv.getBoundingClientRect(), hR = headRef.current?.getBoundingClientRect();
-      const beside = hR && hR.bottom > pvR.top;
-      // The end puts the trophy on the screen's middle line (not the box's, which sits under the top bar), so
-      // it lights on the last step.
-      const mid = window.innerHeight / 2 - pvR.top;
-      const ty0 = beside ? hR.top - pvR.top : 16, ty1 = mid - nodes[N - 1] * s;
-      const ty = ty0 + (ty1 - ty0) * (f / N);
-      track.style.transform = `translate(${((pv.clientWidth - W * s) / 2).toFixed(1)}px, ${ty.toFixed(1)}px) scale(${s})`;
-      // Lit = coins whose centre is at or above the screen's middle line, from their real on-screen position
-      // (Adam 11/17: progress-based lighting flipped them too late).
-      best = Math.max(best, nodes.filter((y) => ty + y * s <= mid + 0.5).length);
-      if (best === lastLit) return;
-      lastLit = best;
-      coins.forEach((c, i) => c.classList.toggle("lp-done", i < best));
-      stks.forEach((st) => st.classList.toggle("lp-on", Number(st.dataset.node) < best));
-    });
+    let best = 0;
+    const io = new IntersectionObserver(
+      (entries) => {
+        let next = best;
+        for (const e of entries) {
+          if (e.boundingClientRect.top <= innerHeight / 2) next = Math.max(next, Number((e.target as HTMLElement).dataset.i) + 1);
+        }
+        if (next === best) return;
+        best = next;
+        coins.forEach((c, i) => c.classList.toggle("lp-done", i < best));
+        stks.forEach((st) => st.classList.toggle("lp-on", Number(st.dataset.node) < best));
+      },
+      { rootMargin: "0px 0px -50% 0px" },
+    );
+    track.querySelectorAll(".lp-mid").forEach((m) => io.observe(m));
+    return () => io.disconnect();
   }, [nodes]);
 
   return (
     <section>
-      <div ref={wrapRef} className="lp-pin-wrap">
-        <div ref={pinRef} className="lp-pin">
-          <div className="lp-copy">
-            <h2 ref={headRef}>{title}</h2>
+      <div ref={gridRef} className="lp-grid">
+        <div className="lp-rail">
+          <div ref={copyRef} className="lp-copy">
+            <h2>{title}</h2>
             <p className="lp-sub">{subtitle}</p>
+            <DownloadCta label={ctaLabel} tracking={tracking} className="mt-6" />
           </div>
-          <div ref={pvRef} className="lp-pv">
-            <div ref={trackRef} className="lp-track" style={{ width: W, height: P.H }}>
-              {P.heads.map(({ top, lesson }) => (
-                <div key={`h${top}`} className="lp-sec" style={{ top, height: HEAD_H }}>
-                  {lesson.avatar && <img src={lesson.avatar} alt="" />}
-                  <span>
-                    <i>{lesson.tutor_name}</i>
-                    {lesson.title}
+        </div>
+        <div ref={pvRef} className="lp-pv">
+          <div ref={trackRef} className="lp-track" style={{ width: W, height: P.H }}>
+            {P.heads.map(({ top, lesson }) => (
+              <div key={`h${top}`} className="lp-sec" style={{ top, height: HEAD_H }}>
+                {lesson.avatar && <img src={lesson.avatar} alt="" />}
+                <span>
+                  <i>{lesson.tutor_name}</i>
+                  {lesson.title}
+                </span>
+              </div>
+            ))}
+            {P.coins.map((c, i) => (
+              <div key={`c${i}`} className="lp-pn" style={{ ["--a" as string]: c.accent, left: c.left, top: c.top }}>
+                <div className="lp-face">
+                  <span className="lp-g">
+                    <Icon kind={c.kind} />
                   </span>
                 </div>
-              ))}
-              {P.coins.map((c, i) => (
-                <div key={`c${i}`} className="lp-pn" style={{ ["--a" as string]: c.accent, left: c.left, top: c.top }}>
-                  <div className="lp-face">
-                    <span className="lp-g">
-                      <Icon kind={c.kind} />
-                    </span>
-                  </div>
-                </div>
-              ))}
-              {P.stickers.map((st) => (
-                <div
-                  key={`s${st.node}`}
-                  className="lp-pst"
-                  data-node={st.node}
-                  style={{ ["--r" as string]: `${st.r}deg`, left: st.left, top: st.top, width: st.w, height: st.h }}
-                >
-                  <img className="lp-gray" src={`/landing/path-${st.lesson.sticker.id}-locked.webp`} alt="" />
-                  <img className="lp-col" src={`/landing/path-${st.lesson.sticker.id}-accent.webp`} alt="" />
-                </div>
-              ))}
-            </div>
+                <i className="lp-mid" data-i={i} />
+              </div>
+            ))}
+            {P.stickers.map((st) => (
+              <div
+                key={`s${st.node}`}
+                className="lp-pst"
+                data-node={st.node}
+                style={{ ["--r" as string]: `${st.r}deg`, left: st.left, top: st.top, width: st.w, height: st.h }}
+              >
+                <img className="lp-gray" src={`/landing/path-${st.lesson.sticker.id}-locked.webp`} alt="" />
+                <img className="lp-col" src={`/landing/path-${st.lesson.sticker.id}-accent.webp`} alt="" />
+              </div>
+            ))}
           </div>
         </div>
       </div>

@@ -5,14 +5,17 @@
   },
   "home": {
     "download_alt": "Descárgalo en el App Store",
-    "hero_title": "No es otro tutor de IA.",
-    "hero_subtitle": "Aprende el coreano de la vida real escuchando y hablando cada día\ncon tus creadores favoritos.",
+    "hero_title": "Aprende coreano <cool>de la vida real</cool>",
+    "hero_subtitle": "escuchando y hablando cada día con tus creadores favoritos",
+    "roster_title": "No es otro tutor de IA",
+    "roster_subtitle": "Estudia con los mejores creadores de YouTube, Instagram y TikTok, solo en Candid.",
     "cta_learn": "PRUEBA GRATIS",
     "cta_teach": "ENSEÑA EN CANDID",
     "tap_to_unmute": "Toca para activar el sonido",
     "tap_to_mute": "Toca para silenciar",
     "reviews_title": "Lo que dicen nuestros estudiantes",
-    "lessons_title": "Clases de coreano para todos los niveles",
+    "lessons_title": "Contenido de alta calidad para todos los niveles",
+    "lessons_subtitle": "Candid selecciona el mejor contenido para estudiantes de coreano y lo adapta a tu nivel",
     "levels": {
       "beginner": "Principiante",
       "upper_beginner": "Principiante alto",
@@ -21,9 +24,9 @@
       "upper_intermediate": "Intermedio alto",
       "advanced": "Avanzado"
     },
-    "path_title": "Tu camino hacia la fluidez conversacional",
-    "path_subtitle": "Avanza cada día en comprensión, expresión oral y vocabulario",
-    "garden_title": "Mira cómo crece tu coreano",
+    "path_title": "Tu dosis diaria de coreano",
+    "path_subtitle": "Practica comprensión, expresión oral y vocabulario con contenido coreano de la vida real",
+    "garden_title": "Mira cómo crece tu coreano, un poco cada día",
     "garden_unit": "{count, plural, one {día} other {días}}",
     "ending_line": "Aprende coreano <cool>de la vida real</cool><br></br>con <wm></wm>",
     "reviews": {

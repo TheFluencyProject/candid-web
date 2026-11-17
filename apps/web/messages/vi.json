@@ -5,14 +5,17 @@
   },
   "home": {
     "download_alt": "Tải về trên App Store",
-    "hero_title": "Không phải gia sư AI.",
-    "hero_subtitle": "Học tiếng Hàn đời thực qua bài luyện nghe & nói mỗi ngày\ncùng những nhà sáng tạo nội dung bạn yêu thích.",
+    "hero_title": "Học tiếng Hàn <cool>đời thực</cool>",
+    "hero_subtitle": "qua bài luyện nghe & nói mỗi ngày cùng những nhà sáng tạo nội dung bạn yêu thích",
+    "roster_title": "Không phải gia sư AI",
+    "roster_subtitle": "Học cùng những nhà sáng tạo hàng đầu trên YouTube, Instagram & TikTok, chỉ có trên Candid.",
     "cta_learn": "DÙNG THỬ MIỄN PHÍ",
     "cta_teach": "DẠY TRÊN CANDID",
     "tap_to_unmute": "Chạm để bật tiếng",
     "tap_to_mute": "Chạm để tắt tiếng",
     "reviews_title": "Học viên nói gì về Candid",
-    "lessons_title": "Bài học tiếng Hàn cho mọi trình độ",
+    "lessons_title": "Nội dung chất lượng cao cho mọi trình độ",
+    "lessons_subtitle": "Candid tuyển chọn nội dung hay nhất cho người học tiếng Hàn & gợi ý theo trình độ của bạn",
     "levels": {
       "beginner": "Sơ cấp",
       "upper_beginner": "Sơ cấp cao",
@@ -21,9 +24,9 @@
       "upper_intermediate": "Trung cấp cao",
       "advanced": "Nâng cao"
     },
-    "path_title": "Hành trình đến giao tiếp trôi chảy",
-    "path_subtitle": "Tiến bộ mỗi ngày ở nghe, nói và từ vựng",
-    "garden_title": "Ngắm tiếng Hàn của bạn lớn lên",
+    "path_title": "Liều tiếng Hàn mỗi ngày của bạn",
+    "path_subtitle": "Luyện nghe, nói & từ vựng với nội dung tiếng Hàn đời thực",
+    "garden_title": "Ngắm tiếng Hàn của bạn lớn lên, mỗi ngày một chút",
     "garden_unit": "ngày",
     "ending_line": "Học tiếng Hàn <cool>đời thực</cool><br></br>cùng <wm></wm>",
     "reviews": {
