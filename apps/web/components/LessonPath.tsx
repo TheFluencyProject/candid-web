@@ -120,8 +120,8 @@ export default function LessonPath({ title, subtitle, ctaLabel, ctaHref, trackin
   // above that line. Lit = every coin up to the furthest one passed (scrolling back up never un-lights).
   useEffect(() => {
     const track = trackRef.current;
-    const copy = copyRef.current;
-    if (!track || !copy) return;
+    const grid = gridRef.current;
+    if (!track || !grid) return;
     const coins = [...track.querySelectorAll<HTMLElement>(".lp-pn")];
     const stks = [...track.querySelectorAll<HTMLElement>(".lp-pst")];
     let best = 0;
@@ -131,7 +131,8 @@ export default function LessonPath({ title, subtitle, ctaLabel, ctaHref, trackin
     const above = coins.map(() => false);
     const tint = () => {
       const cur = above.lastIndexOf(true);
-      copy.style.setProperty("--cta", coins[Math.max(0, cur)]?.style.getPropertyValue("--a") ?? "");
+      // On the grid, so both Try buttons (desktop's in the heading, phones' in the path column) inherit it.
+      grid.style.setProperty("--cta", coins[Math.max(0, cur)]?.style.getPropertyValue("--a") ?? "");
       window.dispatchEvent(new Event("cta-tint")); // the top bar's button re-reads the color (ScrollNav)
     };
     tint();
@@ -158,10 +159,14 @@ export default function LessonPath({ title, subtitle, ctaLabel, ctaHref, trackin
           <div ref={copyRef} className="lp-copy">
             <h2>{title}</h2>
             <p className="lp-sub">{subtitle}</p>
-            <DownloadCta label={ctaLabel} tracking={tracking} className="mt-6" href={ctaHref} />
+            <DownloadCta label={ctaLabel} tracking={tracking} className="mt-6 lp-cta-d" href={ctaHref} />
           </div>
         </div>
         <div ref={pvRef} className="lp-pv">
+          {/* Phones: the button isn't pinned with the heading; it scrolls up under it with the path (Adam 11/17). */}
+          <div className="lp-cta-m">
+            <DownloadCta label={ctaLabel} tracking={tracking} href={ctaHref} />
+          </div>
           <div ref={trackRef} className="lp-track" style={{ width: W, height: P.H }}>
             {P.heads.map(({ top, lesson }) => (
               <div key={`h${top}`} className="lp-sec" style={{ top, height: HEAD_H }}>
