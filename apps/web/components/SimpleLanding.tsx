@@ -9,6 +9,7 @@ import LessonLadder from "@/components/LessonLadder";
 import LessonPath, { type PathLesson } from "@/components/LessonPath";
 import GardenGrow from "@/components/GardenGrow";
 import PageEnding from "@/components/PageEnding";
+import ShadowDeck from "@/components/ShadowDeck";
 import ReviewCards from "@/components/ReviewCards";
 import ScrollNav from "@/components/ScrollNav";
 import { type Tutor, type MarketingClip, fetchTutor, fetchMarketingClips, fetchLessonMeta } from "@/lib/api";
@@ -147,6 +148,14 @@ export default async function SimpleLanding({ locale }: Props) {
     clips = [];
   }
 
+  // The shadowing section's cards: the same starred clips, starting halfway through so its phone
+  // never opens on the hero's clip. Only lines with word timings (karaoke + the hidden word) that fit
+  // the card in two rows; a handful is plenty for the loop. Fewer than 2 hides the section.
+  const SHADOW_MAX_CHARS = 15; // Korean characters, spaces not counted: 17 already wraps to 3 rows
+  const shadow_clips = [...clips.slice(Math.floor(clips.length / 2)), ...clips.slice(0, Math.floor(clips.length / 2))]
+    .filter((c) => (c.word_level_captions?.length ?? 0) > 0 && c.text.replace(/\s/g, "").length <= SHADOW_MAX_CHARS)
+    .slice(0, 5);
+
   return (
     <main className="text-white" style={{ backgroundColor: "#18181C" }}>
       <ScrollNav ctaLabel={t("cta_learn")} tracking={tracking} />
@@ -195,6 +204,7 @@ export default async function SimpleLanding({ locale }: Props) {
 
       <TutorRoster title={t("roster_title")} subtitle={t("roster_subtitle")} tutors={korean_tutors} />
       <LessonLadder locale={locale} tutors={korean_tutors} />
+      <ShadowDeck title={t("shadow_title")} subtitle={t("shadow_subtitle")} clips={shadow_clips} />
       {path_lessons.length > 0 && <LessonPath title={t("path_title")} subtitle={t("path_subtitle")} ctaLabel={t("cta_learn")} tracking={tracking} lessons={path_lessons} />}
       <GardenGrow title={t("garden_title")} units={Array.from({ length: 30 }, (_, i) => t("garden_unit", { count: i + 1 }))} />
 
