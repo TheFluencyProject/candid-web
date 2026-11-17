@@ -159,7 +159,7 @@ export default async function LandingSections({ locale, clips, ctaHref }: Props)
           The listening (comprehensible input) section sits between the path and ShadowDeck. */}
       <LessonLadder locale={locale} tutors={korean_tutors} ctaHref={ctaHref} />
       {path_lessons.length > 0 && <LessonPath title={t("path_title")} subtitle={t("path_subtitle")} ctaLabel={t("cta_learn")} ctaHref={ctaHref} tracking={tracking} lessons={path_lessons} />}
-      <InputPhone ctaLabel={t("cta_learn")} ctaHref={ctaHref} tracking={tracking} tag={t("input_tag")} title={t("input_title")} subtitle={t("input_subtitle")} seeMore={t("input_see_more")} clips={input_clips} seed={[DECK_SEED[0], text_in(DECK_SEED[1], locale)]} />
+      <InputPhone ctaLabel={t("cta_learn")} ctaHref={ctaHref} tracking={tracking} tag={t("input_tag")} lead={t.has("input_lead") ? t("input_lead") : undefined} title={t("input_title")} subtitle={t("input_subtitle")} seeMore={t("input_see_more")} clips={input_clips} seed={[DECK_SEED[0], text_in(DECK_SEED[1], locale)]} />
       <ShadowDeck ctaLabel={t("cta_learn")} ctaHref={ctaHref} tracking={tracking} tag={t("shadow_tag")} title={t("shadow_title")} subtitle={t("shadow_subtitle")} clips={shadow_clips} />
       <ReviewCards />
       <TutorRoster title={t("roster_title")} subtitle={t("roster_subtitle")} tutors={korean_tutors} />

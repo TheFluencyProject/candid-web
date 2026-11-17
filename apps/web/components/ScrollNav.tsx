@@ -4,13 +4,15 @@ import { useEffect, useRef } from "react";
 import Image from "next/image";
 
 // Fixed top bar (wordmark + Try for free), visible from the first frame (Adam 11/17: it used to slide in only
-// once the hero's own CTA had scrolled off), so a download button is always one tap away.
+// once the hero's own CTA had scrolled off), so a download button is always one tap away. Phones hide its button until the
+// hero's has scrolled under the bar (Adam 11/18, below).
 // Its button takes the color of whichever of the page's Try buttons ([data-primary-cta]) is on screen, the upper
 // one if two are, so it only switches once that one has gone under the bar; mint when none is (Adam 11/17). The sticker-circle button cycles colors
 // (.cta-cycle): the bar's button runs the same animation, locked to its clock, so they match every frame.
 export default function ScrollNav({ ctaLabel, tracking }: { ctaLabel: string; tracking: string }) {
   const pillRef = useRef<HTMLAnchorElement>(null);
   const bgRef = useRef<HTMLDivElement>(null);
+  const wrapRef = useRef<HTMLSpanElement>(null);
 
   // At the very top the bar has no background or divider; both fade in over the first FADE_PX of scroll
   // (Adam 11/17).
@@ -22,6 +24,21 @@ export default function ScrollNav({ ctaLabel, tracking }: { ctaLabel: string; tr
     set();
     addEventListener("scroll", set, { passive: true });
     return () => removeEventListener("scroll", set);
+  }, []);
+
+  // Phones (Adam 11/18): the button stays hidden (CSS, .nav-pill) while the hero's own button is on screen or
+  // below it, and fades in once that one has scrolled under this bar. Desktop always shows it.
+  useEffect(() => {
+    const wrap = wrapRef.current;
+    const hero = document.getElementById("hero-cta");
+    if (!wrap) return;
+    if (!hero) { wrap.classList.add("nav-pill-on"); return; }
+    const io = new IntersectionObserver(
+      ([e]) => wrap.classList.toggle("nav-pill-on", !e.isIntersecting && e.boundingClientRect.top < 61),
+      { rootMargin: "-61px 0px 0px 0px" },
+    );
+    io.observe(hero);
+    return () => io.disconnect();
   }, []);
 
   useEffect(() => {
@@ -76,13 +93,15 @@ export default function ScrollNav({ ctaLabel, tracking }: { ctaLabel: string; tr
           <Image src="/wordmark-white.svg" alt="Candid" width={80} height={21} priority />
         </a>
         {/* Plain <a> to /download, same as the hero CTA (middleware redirect, unprefixed only). */}
-        <a
-          ref={pillRef}
-          href="/download"
-          className={`rounded-full bg-[#89FFB4] px-5 py-2 text-sm font-semibold ${tracking} text-[#18181C] hover:opacity-90 cta-3d`}
-        >
-          {ctaLabel}
-        </a>
+        <span ref={wrapRef} className="nav-pill flex">
+          <a
+            ref={pillRef}
+            href="/download"
+            className={`rounded-full bg-[#89FFB4] px-5 py-2 text-sm font-semibold ${tracking} text-[#18181C] hover:opacity-90 cta-3d`}
+          >
+            {ctaLabel}
+          </a>
+        </span>
       </div>
     </div>
   );
