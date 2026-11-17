@@ -10,6 +10,8 @@ import LessonPath, { type PathLesson } from "@/components/LessonPath";
 import GardenGrow from "@/components/GardenGrow";
 import PageEnding from "@/components/PageEnding";
 import ShadowDeck from "@/components/ShadowDeck";
+import InputPhone, { type InputPhoneClip } from "@/components/InputPhone";
+import { INPUT_CLIPS, DECK_SEED, text_in } from "@/lib/input-clips";
 import ReviewCards from "@/components/ReviewCards";
 import ScrollNav from "@/components/ScrollNav";
 import { type Tutor, type MarketingClip, fetchTutor, fetchMarketingClips, fetchLessonMeta } from "@/lib/api";
@@ -156,6 +158,27 @@ export default async function SimpleLanding({ locale }: Props) {
     .filter((c) => (c.word_level_captions?.length ?? 0) > 0 && c.text.replace(/\s/g, "").length <= SHADOW_MAX_CHARS)
     .slice(0, 5);
 
+  // The comprehensible-input section's four lines, in the page's language. Titles are fetched live (cached
+  // a week, like the path's); a failed fetch keeps the English title.
+  const input_clips: InputPhoneClip[] = await Promise.all(
+    INPUT_CLIPS.map(async (c) => {
+      const meta = await fetchLessonMeta(c.lesson_id, locale).catch(() => null);
+      return {
+        title: meta?.localized_title.replace(/\s*\n\s*/g, " ") || c.title,
+        mux_playback_id: c.mux_playback_id,
+        start: c.start,
+        end: c.end,
+        avatar: c.avatar,
+        bars: c.bars,
+        chips: c.chips,
+        star: c.star,
+        bubble: [c.bubble[0], text_in(c.bubble[1], locale)],
+        peek: [c.peek[0], c.peek[1], text_in(c.peek[2], locale)],
+        translation: text_in(c.translation, locale),
+      };
+    })
+  );
+
   return (
     <main className="text-white" style={{ backgroundColor: "#18181C" }}>
       <ScrollNav ctaLabel={t("cta_learn")} tracking={tracking} />
@@ -203,9 +226,10 @@ export default async function SimpleLanding({ locale }: Props) {
       </section>
 
       {/* Section order (Adam 11/17): content → steps → listening → speaking → students → creators → garden → stickers.
-          The listening (comprehensible input) section goes between the path and ShadowDeck once it's built. */}
+          The listening (comprehensible input) section sits between the path and ShadowDeck. */}
       <LessonLadder locale={locale} tutors={korean_tutors} />
       {path_lessons.length > 0 && <LessonPath title={t("path_title")} subtitle={t("path_subtitle")} ctaLabel={t("cta_learn")} tracking={tracking} lessons={path_lessons} />}
+      <InputPhone lead={t("input_lead")} title={t("input_title")} subtitle={t("input_subtitle")} seeMore={t("input_see_more")} clips={input_clips} seed={[DECK_SEED[0], text_in(DECK_SEED[1], locale)]} />
       <ShadowDeck title={t("shadow_title")} subtitle={t("shadow_subtitle")} clips={shadow_clips} />
       <ReviewCards />
       <TutorRoster title={t("roster_title")} subtitle={t("roster_subtitle")} tutors={korean_tutors} />

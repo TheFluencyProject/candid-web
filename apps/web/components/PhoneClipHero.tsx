@@ -39,7 +39,7 @@ function progress_for(clip: MarketingClip): number {
 
 // Some titles arrive with the emoji glued on ("Let's Take a Walk🍁"); space it like the rest. The char
 // before must not itself be emoji, or a joined emoji (people holding hands) splits at its first joiner.
-function spaced_title(title: string): string {
+export function spaced_title(title: string): string {
   return title.replace(
     /([^\s\p{Extended_Pictographic}\p{Emoji_Modifier}\u200d\ufe0f])(\p{Extended_Pictographic}[\p{Extended_Pictographic}\p{Emoji_Modifier}\u200d\ufe0f]*)$/u,
     "$1 $2",

@@ -342,3 +342,97 @@ html {
   .sd-sub { font-size: 16px; margin: 10px auto 0; }
   .sd-phone-wrap { width: min(290px, 74vw); }
 }
+
+/* ── Home: "Learn Korean through / Comprehensible Input" (InputPhone; mockup section-ci.html) ── */
+/* The screen and the pop layer above the frame are containers: --pt = one iOS point of a 393pt iPhone. */
+.ci-sec { min-height: calc(100svh - 61px); display: flex; align-items: center; overflow-x: clip; }
+.ci-grid { margin: 0 auto; width: 100%; max-width: 1240px; padding: 72px 32px; display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 56px; }
+.ci-copy h2 { margin: 0; font-size: clamp(40px, 5vw, 64px); font-weight: 500; letter-spacing: -0.03em; line-height: 1.08; word-break: keep-all; }
+/* the lead-in sits above the term, smaller, same white */
+.ci-pre { display: block; margin-bottom: 8px; font-size: clamp(19px, 1.8vw, 24px); letter-spacing: -0.02em; }
+.ci-sub { margin: 16px 0 0; max-width: 31em; color: #d1d5db; font-size: 19px; font-weight: 300; line-height: 1.45; text-wrap: pretty; word-break: keep-all; }
+/* room past the frame for the word deck */
+.ci-right { padding-right: 96px; }
+.ci-phone { position: relative; width: 340px; aspect-ratio: 1000 / 2034; user-select: none; text-align: left; }
+.ci-screen, .ci-pop { position: absolute; container-type: inline-size; }
+.ci-screen { overflow: hidden; background: #000; isolation: isolate; }
+.ci-pop { left: 5.05%; top: 2.065%; width: 89.75%; height: 95.6%; z-index: 6; pointer-events: none; }
+.ci-screen *, .ci-pop * { --pt: calc(100cqw / 393); }
+.ci-frame { position: absolute; inset: 0; width: 100%; height: 100%; max-width: none; pointer-events: none; z-index: 5; }
+/* own stacking layer, so the incoming clip's z-index stays under the fades */
+.ci-vids { position: absolute; inset: 0; z-index: 0; }
+.ci-vid { position: absolute; inset: 0; width: 100%; height: 100%; max-width: none; object-fit: cover; opacity: 0; transition: opacity .5s ease; }
+.ci-vid.ci-on { opacity: 1; }
+.ci-vid.ci-top { z-index: 1; }
+/* clip switch = one crossfade: the outgoing overlays are copied into ghosts that fade out */
+.ci-line, .ci-title { transition: opacity .5s ease; }
+.ci-ghosts { position: absolute; inset: 0; z-index: 3; pointer-events: none; }
+.ci-ghost { position: absolute; inset: 0; transition: opacity .5s ease; }
+.ci-fresh { opacity: 0 !important; transition: none !important; }
+.ci-scrim-top { position: absolute; inset: 0 0 auto 0; height: 45cqw; background: linear-gradient(to bottom, rgba(0,0,0,.55), rgba(0,0,0,.2), transparent); }
+/* the app's CaptionPlateauScrim alone (428pt + 34pt safe area: eases to .6 black over its first 30%, then holds) */
+.ci-scrim-cap { position: absolute; inset: auto 0 0 0; height: calc(462 * var(--pt)); background: linear-gradient(to bottom, transparent, rgba(0,0,0,.6) 30%, rgba(0,0,0,.6)); }
+.ci-dim { position: absolute; inset: 0; z-index: 2; background: #000; opacity: 0; transition: opacity .2s; }
+.ci-black { position: absolute; inset: 0; z-index: 4; background: #000; transition: opacity .35s; }
+.ci-status { position: absolute; inset: 2.6cqw 0 auto 0; z-index: 3; display: flex; justify-content: space-between; align-items: center; padding: 0 8.6cqw 0 8.8cqw; font-size: 3.9cqw; font-weight: 600; line-height: 1; letter-spacing: -0.01em; color: #fff; }
+/* title row + the part's segment bars */
+.ci-title { position: absolute; z-index: 3; top: calc(56 * var(--pt)); left: calc(22 * var(--pt)); right: calc(22 * var(--pt)); color: #fff; }
+.ci-row { display: flex; align-items: center; gap: calc(10 * var(--pt)); }
+.ci-name { flex: 1; min-width: 0; font-size: calc(19 * var(--pt)); font-weight: 600; letter-spacing: -0.02em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-shadow: 0 1px 3px rgba(0,0,0,.35); }
+.ci-switch { height: calc(21 * var(--pt)); width: auto; }
+.ci-bars { margin-top: calc(10 * var(--pt)); display: flex; gap: calc(10 * var(--pt)); }
+.ci-bars i { flex: 1; height: calc(4.5 * var(--pt)); border-radius: 99px; background: rgba(255,255,255,.35); overflow: hidden; }
+.ci-bars b { display: block; height: 100%; background: #fff; border-radius: 99px; }
+/* the line: chips, then the translation (iOS GuidedInputDuringOverlayScrollView, Small mode, no controls row) */
+.ci-line { position: absolute; z-index: 3; left: calc(15 * var(--pt)); right: calc(15 * var(--pt)); bottom: calc(109 * var(--pt)); color: #fff; }
+.ci-cap { position: relative; display: flex; flex-wrap: wrap; gap: calc(6 * var(--pt)); }
+/* iOS chip at 23pt instead of 19: padding .55 × the font size (+2pt sideways) */
+.ci-w { position: relative; font-size: calc(23 * var(--pt)); line-height: 1.2; white-space: nowrap; padding: calc(12.6 * var(--pt)) calc(14.6 * var(--pt)); border-radius: calc(14 * var(--pt));
+  background: rgba(43,41,39,.8); border: calc(.5 * var(--pt)) solid rgba(255,255,255,.07); -webkit-backdrop-filter: blur(calc(25 * var(--pt))); backdrop-filter: blur(calc(25 * var(--pt))); }
+.ci-w::before { content: ""; position: absolute; inset: 0; border-radius: inherit; background: rgba(137,255,180,.15); opacity: 0; }
+.ci-w.ci-lit { color: #89FFB4; }
+.ci-w.ci-lit::before { opacity: 1; }
+/* star.circle.fill, centred 4.5pt in from the chip's top-right corner */
+.ci-star { position: absolute; z-index: 1; top: calc(-3.5 * var(--pt)); right: calc(-3.5 * var(--pt)); width: calc(17 * var(--pt)); height: calc(17 * var(--pt)); }
+.ci-tr { padding: calc(20 * var(--pt)) 0 calc(5 * var(--pt)); font-size: calc(19 * var(--pt)); line-height: 1.22; }
+.ci-home { position: absolute; z-index: 3; bottom: calc(8 * var(--pt)); left: 50%; width: calc(134 * var(--pt)); height: calc(5 * var(--pt)); transform: translateX(-50%); border-radius: 99px; background: rgba(255,255,255,.6); }
+/* the tutor's floating key-term bubble (iOS FloatingDiscussionBubble) at ~1.25× the app's size */
+.ci-tutor { position: absolute; display: flex; flex-direction: column; align-items: flex-start; opacity: 0; transform: translateY(calc(5 * var(--pt))); transition: opacity .25s, transform .35s cubic-bezier(.3,1.45,.5,1); }
+.ci-tutor.ci-show { opacity: 1; transform: none; }
+.ci-av { width: calc(62 * var(--pt)); height: calc(62 * var(--pt)); max-width: none; border-radius: 50%; object-fit: cover; }
+.ci-bub { position: relative; z-index: 1; margin: 0 0 calc(-12 * var(--pt)) calc(27 * var(--pt)); white-space: nowrap; }
+.ci-bub > div { display: flex; flex-direction: column; gap: calc(2 * var(--pt)); padding: calc(9 * var(--pt)) calc(13 * var(--pt)); border-radius: calc(11 * var(--pt)); background: #F7F7F6; color: #000; }
+.ci-bw { font-size: calc(19 * var(--pt)); font-weight: 600; line-height: 1.2; }
+.ci-bg { font-size: calc(17 * var(--pt)); line-height: 1.2; color: rgba(0,0,0,.6); }
+.ci-bub::after { content: ""; position: absolute; left: calc(8 * var(--pt)); bottom: calc(-5 * var(--pt)); border-left: calc(8.5 * var(--pt)) solid transparent; border-right: calc(8.5 * var(--pt)) solid transparent; border-top: calc(7 * var(--pt)) solid #F7F7F6; }
+/* the word peek (iOS WordPeekBubble) over the tapped chip; it grows from its tail */
+.ci-peek { position: absolute; width: calc(252 * var(--pt)); border-radius: calc(12 * var(--pt)); background: #F7F7F6; color: #000; opacity: 0; transform: scale(1.12) translateY(calc(6 * var(--pt)));
+  transition: opacity .5s ease, transform .5s cubic-bezier(.3,1.3,.5,1); filter: drop-shadow(0 14px 28px rgba(0,0,0,.5)); }
+.ci-peek.ci-show { opacity: 1; transform: scale(1.22); }
+.ci-prow { display: flex; align-items: center; padding: calc(9 * var(--pt)) 0 calc(9 * var(--pt)) calc(14 * var(--pt)); }
+.ci-pw { margin-right: calc(18 * var(--pt)); font-size: calc(16 * var(--pt)); font-weight: 600; white-space: nowrap; }
+.ci-pg { flex: 1; font-size: calc(14 * var(--pt)); line-height: 1.25; }
+/* bookmark → bookmark.fill, same glyph and size, no bounce */
+.ci-bm { width: calc(40 * var(--pt)); display: flex; justify-content: center; }
+.ci-bm svg { width: calc(15 * var(--pt)); height: calc(18 * var(--pt)); }
+.ci-bm-fill, .ci-peek.ci-saved .ci-bm-empty { display: none; }
+.ci-peek.ci-saved .ci-bm-fill { display: block; }
+.ci-more { display: flex; align-items: center; justify-content: center; height: calc(37 * var(--pt)); border-top: calc(.5 * var(--pt)) solid rgba(0,0,0,.12); font-size: calc(11 * var(--pt)); font-weight: 500; color: #22A05A; }
+.ci-peek::after { content: ""; position: absolute; left: var(--tail, 30px); bottom: calc(-4 * var(--pt)); border-left: calc(7 * var(--pt)) solid transparent; border-right: calc(7 * var(--pt)) solid transparent; border-top: calc(4 * var(--pt)) solid #F7F7F6; }
+/* the saved-words deck (the onboarding Vocab screen's): white cards over the phone's right edge at mid-height */
+.ci-deck { position: absolute; left: calc(323 * var(--pt)); top: calc(290 * var(--pt)); width: calc(170 * var(--pt)); height: calc(204 * var(--pt)); }
+.ci-card { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; border-radius: calc(24 * var(--pt)); background: #F7F7F6; color: #000;
+  box-shadow: 0 8px 18px rgba(0,0,0,.35); transition: transform .5s cubic-bezier(.3,1.2,.5,1), background-color .5s, opacity .5s; }
+.ci-k { padding: 0 calc(10 * var(--pt)); font-size: calc(31 * var(--pt)); font-weight: 800; line-height: 1.15; transition: opacity .3s; }
+.ci-g { margin-top: calc(8 * var(--pt)); padding: 0 calc(12 * var(--pt)); font-size: calc(18.5 * var(--pt)); color: rgba(0,0,0,.7); transition: opacity .3s; }
+.ci-card.ci-back .ci-k, .ci-card.ci-back .ci-g { opacity: 0; }
+.ci-morph { position: absolute; z-index: 20; overflow: hidden; background: #F7F7F6; box-shadow: 0 10px 22px rgba(0,0,0,.45); }
+.ci-morph .ci-card { box-shadow: none; background: transparent; transition: none; opacity: 0; }
+@media (max-width: 859px) {
+  .ci-grid { grid-template-columns: 1fr; justify-items: center; gap: 44px; padding: 56px 16px 64px; text-align: center; }
+  .ci-copy h2 { font-size: 34px; }
+  .ci-pre { margin-bottom: 6px; font-size: 18px; }
+  .ci-sub { margin: 10px auto 0; max-width: 26em; font-size: 16px; }
+  .ci-right { padding-right: 64px; }
+  .ci-phone { width: min(280px, 66vw); }
+}
