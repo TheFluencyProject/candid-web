@@ -30,3 +30,8 @@ export type MobileCtaVariant = "control" | "download_app";
 export const DESKTOP_CTA_FLAG_KEY = "desktop-cta-qr";
 
 export type DesktopCtaVariant = "control" | "morph" | "inline";
+
+// Lesson share page: the home page's sections under the first screen. Plan lesson-page-landing-sections-2026-11-17.
+export const LESSON_SECTIONS_FLAG_KEY = "lesson-page-sections";
+
+export type LessonSectionsVariant = "control" | "sections";

@@ -85,9 +85,9 @@ function layout(lessons: PathLesson[]) {
   return { heads, coins, stickers, nodes, H: y };
 }
 
-type Props = { title: string; subtitle: string; ctaLabel: string; tracking: string; lessons: PathLesson[] };
+type Props = { title: string; subtitle: string; ctaLabel: string; ctaHref?: string; tracking: string; lessons: PathLesson[] };
 
-export default function LessonPath({ title, subtitle, ctaLabel, tracking, lessons }: Props) {
+export default function LessonPath({ title, subtitle, ctaLabel, ctaHref, tracking, lessons }: Props) {
   const gridRef = useRef<HTMLDivElement | null>(null);
   const copyRef = useRef<HTMLDivElement | null>(null);
   const pvRef = useRef<HTMLDivElement | null>(null);
@@ -155,7 +155,7 @@ export default function LessonPath({ title, subtitle, ctaLabel, tracking, lesson
           <div ref={copyRef} className="lp-copy">
             <h2>{title}</h2>
             <p className="lp-sub">{subtitle}</p>
-            <DownloadCta label={ctaLabel} tracking={tracking} className="mt-6" />
+            <DownloadCta label={ctaLabel} tracking={tracking} className="mt-6" href={ctaHref} />
           </div>
         </div>
         <div ref={pvRef} className="lp-pv">
