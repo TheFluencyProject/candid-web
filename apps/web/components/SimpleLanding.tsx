@@ -1,4 +1,3 @@
-import Image from "next/image";
 import { getTranslations } from "next-intl/server";
 // import { Link } from "@/i18n/routing"; // only used by the hidden teach CTA below
 import SiteFooter from "@/components/SiteFooter";
@@ -126,22 +125,8 @@ export default async function SimpleLanding({ locale }: Props) {
   return (
     <main className="text-white" style={{ backgroundColor: "#18181C" }}>
       <ScrollNav ctaLabel={t("cta_learn")} tracking={tracking} />
-      <section className="flex flex-col">
-        {/* Wordmark only; the App Store badge now lives in the footer. Padding
-            matches the original TutorNavbar (px-4 md:px-8) so it isn't too wide. */}
-        <header className="flex items-center px-4 md:px-8 pt-5">
-          <a href="/" className="inline-block">
-            <Image
-              src="/wordmark-white.svg"
-              alt="Candid"
-              width={80}
-              height={21}
-              priority
-              className="hover:opacity-80 transition-opacity"
-            />
-          </a>
-        </header>
-
+      {/* pt-[61px]: clears the fixed top bar, which now shows from the start and carries the wordmark. */}
+      <section className="flex flex-col pt-[61px]">
         {/* One screen under the top bar (Adam 11/17): copy on the left, one phone on the right playing the
             starred clips one at a time (the tutor-page PhoneClipHero). Phones: copy, then the phone under it. */}
         <div className="mx-auto grid w-full max-w-[1080px] min-[860px]:min-h-[calc(100svh-61px)] grid-cols-1 items-center justify-items-center gap-9 px-6 pt-12 pb-16 text-center min-[860px]:grid-cols-[1fr_auto] min-[860px]:justify-items-stretch min-[860px]:gap-14 min-[860px]:pt-6 min-[860px]:pb-10 min-[860px]:text-left">
@@ -157,7 +142,7 @@ export default async function SimpleLanding({ locale }: Props) {
               {/* App Store download. App Clip funnel is disabled for now — this points at the
                   /download App Store redirect, not the App Clip link.
                   Plain <a>, not next-intl Link: /download is a middleware redirect that only
-                  matches unprefixed, so a /ko/download href would 404. ScrollNav watches #hero-cta. */}
+                  matches unprefixed, so a /ko/download href would 404. */}
               <a
                 id="hero-cta"
                 href="/download"
