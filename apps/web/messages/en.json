@@ -5,8 +5,10 @@
   },
   "home": {
     "download_alt": "Download on the App Store",
-    "hero_title": "Not another AI tutor.",
-    "hero_subtitle": "Learn real-life Korean with daily listening & speaking practice\nfrom your favorite creators.",
+    "hero_title": "Learn <cool>real-life</cool> Korean",
+    "hero_subtitle": "with daily listening & speaking practice from your favorite creators",
+    "roster_title": "Not another AI tutor",
+    "roster_subtitle": "Study with the top creators on YouTube, Instagram & TikTok, exclusively on Candid.",
     "cta_learn": "TRY FOR FREE",
     "cta_teach": "TEACH ON CANDID",
     "tap_to_unmute": "Tap to unmute",

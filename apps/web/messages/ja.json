@@ -5,8 +5,10 @@
   },
   "home": {
     "download_alt": "App Storeでダウンロード",
-    "hero_title": "AI講師じゃない、リアルな学び。",
-    "hero_subtitle": "お気に入りのクリエイターと毎日リスニング＆スピーキング。\nリアルな韓国語を身につけよう。",
+    "hero_title": "<cool>リアル</cool>な韓国語を学ぼう",
+    "hero_subtitle": "お気に入りのクリエイターと毎日リスニング＆スピーキング",
+    "roster_title": "AI講師じゃない、リアルな学び",
+    "roster_subtitle": "YouTube・Instagram・TikTokのトップクリエイターと学べるのは、Candidだけ。",
     "cta_learn": "無料で始める",
     "cta_teach": "Candidで教える",
     "tap_to_unmute": "タップでミュート解除",

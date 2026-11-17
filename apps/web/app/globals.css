@@ -196,20 +196,27 @@ html {
 }
 
 /* ── Home: "Your path to conversational fluency" (LessonPath; mockup P1) ── */
-.lp-pin-wrap { position: relative; height: 280vh; }
-.lp-pin { position: sticky; top: 61px; height: calc(100svh - 61px); overflow: hidden; display: grid; grid-template-columns: 1fr 528px; align-items: center; gap: 40px; max-width: 1040px; margin: 0 auto; padding: 0 32px; }
+/* The path scrolls natively; only the heading pins (CSS sticky). --lp-trophy (the trophy's centre, from the grid's
+   top), --lp-h (the scaled path's height) and --lp-copy-h come from LessonPath on resize. The grid runs half a
+   screen past the trophy, so the next section comes in from the bottom as the trophy reaches mid-screen; the
+   heading's rail ends so it lets go at that same moment. */
+.lp-grid { position: relative; display: grid; grid-template-columns: 1fr 528px; gap: 40px; max-width: 1040px; margin: 0 auto; padding: 0 32px; height: calc(var(--lp-trophy, 1600px) + 50svh); }
+.lp-rail { align-self: start; height: max(var(--lp-copy-h, 0px), calc(var(--lp-trophy, 1600px) + 61px + var(--lp-copy-h, 0px) - 50svh)); }
 /* top-aligned at the lessons heading's screen height (top bar + 24px + 14vh), left-aligned (Adam 11/17) */
-.lp-copy { align-self: start; padding-top: calc(24px + 14vh); }
+.lp-copy { position: sticky; top: 61px; padding-top: calc(24px + 14vh); }
 .lp-copy h2 { margin: 0; text-align: left; font-size: clamp(34px, 4.4vw, 54px); font-weight: 500; letter-spacing: -0.03em; line-height: 1.08; }
 .lp-sub { margin: 16px 0 0; color: #d1d5db; font-size: 19px; line-height: 1.45; }
-.lp-pv { position: relative; height: 100%; overflow: hidden; -webkit-mask-image: linear-gradient(transparent, #000 8%, #000 92%, transparent); mask-image: linear-gradient(transparent, #000 8%, #000 92%, transparent); }
-.lp-track { position: absolute; left: 0; top: 0; transform-origin: 0 0; will-change: transform; }
+/* the path's first lesson row starts level with the heading */
+.lp-pv { position: relative; padding-top: calc(24px + 14vh); }
+.lp-pv::after { content: ""; display: block; height: var(--lp-h, 0px); }
+.lp-track { position: absolute; left: 0; top: calc(24px + 14vh); transform-origin: 0 0; }
 .lp-sec { position: absolute; left: 0; right: 0; display: flex; align-items: center; justify-content: center; gap: 10px; padding-bottom: 8px; }
 .lp-sec img { width: 30px; height: 30px; border-radius: 50%; object-fit: cover; }
 .lp-sec span { display: grid; font-size: 15px; font-weight: 600; line-height: 1.25; }
 .lp-sec i { font-style: normal; font-weight: 400; font-size: 12px; color: #A7A7A9; }
 .lp-pn { position: absolute; width: 70px; height: 70px; transform: translateX(-50%); }
-/* No transitions on purpose: the path glides with the scroll, and a coin's color is the one thing that flips. */
+.lp-mid { position: absolute; left: 50%; top: 50%; width: 1px; height: 1px; }
+/* No transitions on purpose: a coin's color is the one thing that flips. */
 .lp-face { position: absolute; inset: 0; border-radius: 50%; display: grid; place-items: center; background: #393436; box-shadow: 0 6px 0 #262224; color: rgba(255,255,255,.32); }
 .lp-g { display: grid; place-items: center; }
 .lp-pn svg { width: 33px; height: 33px; fill: currentColor; }
@@ -224,19 +231,28 @@ html {
 .lp-pst.lp-on .lp-col { opacity: 1; }
 .lp-pst.lp-on .lp-gray { opacity: 0; }
 @media (max-width: 859px) {
-  .lp-pin { grid-template-columns: 1fr; grid-template-rows: auto 1fr; gap: 8px; padding: 28px 16px 0; align-items: stretch; }
-  .lp-copy { padding-top: 0; }
+  /* Phones: heading over the path in one column; it pins under the top bar on the page color and the path
+     scrolls up under it, fading out at its bottom edge. */
+  .lp-grid { grid-template-columns: 1fr; padding: 0 16px; }
+  .lp-rail, .lp-pv { grid-area: 1 / 1; }
+  .lp-rail { position: relative; z-index: 1; }
+  .lp-copy { padding: 28px 0 8px; background: #18181C; }
+  .lp-copy::after { content: ""; position: absolute; left: 0; right: 0; top: 100%; height: 28px; background: linear-gradient(#18181C, rgba(24, 24, 28, 0)); }
+  .lp-pv { padding-top: calc(var(--lp-copy-h, 0px) + 8px); }
+  .lp-track { top: calc(var(--lp-copy-h, 0px) + 8px); }
   .lp-copy h2 { text-align: center; font-size: 30px; }
   .lp-sub { text-align: center; font-size: 16px; margin-top: 10px; }
 }
 
 /* ── Home: "Watch your Korean grow" (GardenGrow; mockup G1 on the app's night sky) ── */
 .gg-pin-wrap { position: relative; height: 415vh; }
-.gg-pin { position: sticky; top: 61px; height: calc(100svh - 61px); overflow: hidden; padding-top: 10vh; }
+/* background-color = the page color, under the sky: iOS Safari fills the strip under its toolbar with the pinned
+   box's background color, and without one it filled it night blue (Adam 11/17). */
+.gg-pin { position: sticky; top: 61px; height: calc(100svh - 61px); overflow: hidden; padding-top: 10vh; background-color: #18181C; }
 .gg-pin > :not(.gg-sky) { position: relative; z-index: 1; }
 .gg-sky { position: absolute; inset: 0; z-index: 0; pointer-events: none; background: linear-gradient(#131A3A, #2A2F5A); }
 .gg-sky svg { position: absolute; inset: 0; width: 100%; height: 100%; }
-.gg-pin h2 { margin: 0 auto; max-width: 760px; padding: 0 16px; text-align: center; font-size: clamp(30px, 4.2vw, 48px); font-weight: 500; letter-spacing: -0.03em; line-height: 1.15; text-shadow: 0 2px 18px rgba(20,24,50,.35); }
+.gg-pin h2 { margin: 0 auto; max-width: 760px; padding: 0 16px; text-align: center; font-size: clamp(30px, 4.2vw, 48px); font-weight: 500; letter-spacing: -0.03em; line-height: 1.15; text-shadow: 0 2px 18px rgba(20,24,50,.35); word-break: keep-all; text-wrap: balance; }
 .gg-count { display: flex; align-items: baseline; justify-content: center; gap: 10px; margin-top: 40px; }
 .gg-num { font-weight: 900; font-size: 72px; line-height: 1; color: #7DF0A2; -webkit-text-stroke: 6px #10291D; paint-order: stroke fill; font-variant-numeric: tabular-nums; min-width: 1.2em; text-align: right; }
 .gg-unit { font-size: 20px; font-weight: 600; color: #cfe9d6; min-width: 2.6em; }

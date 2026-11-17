@@ -5,8 +5,10 @@
   },
   "home": {
     "download_alt": "Tải về trên App Store",
-    "hero_title": "Không phải gia sư AI.",
-    "hero_subtitle": "Học tiếng Hàn đời thực qua bài luyện nghe & nói mỗi ngày\ncùng những nhà sáng tạo nội dung bạn yêu thích.",
+    "hero_title": "Học tiếng Hàn <cool>đời thực</cool>",
+    "hero_subtitle": "qua bài luyện nghe & nói mỗi ngày cùng những nhà sáng tạo nội dung bạn yêu thích",
+    "roster_title": "Không phải gia sư AI",
+    "roster_subtitle": "Học cùng những nhà sáng tạo hàng đầu trên YouTube, Instagram & TikTok, chỉ có trên Candid.",
     "cta_learn": "DÙNG THỬ MIỄN PHÍ",
     "cta_teach": "DẠY TRÊN CANDID",
     "tap_to_unmute": "Chạm để bật tiếng",

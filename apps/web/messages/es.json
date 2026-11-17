@@ -5,8 +5,10 @@
   },
   "home": {
     "download_alt": "Descárgalo en el App Store",
-    "hero_title": "No es otro tutor de IA.",
-    "hero_subtitle": "Aprende el coreano de la vida real escuchando y hablando cada día\ncon tus creadores favoritos.",
+    "hero_title": "Aprende coreano <cool>de la vida real</cool>",
+    "hero_subtitle": "escuchando y hablando cada día con tus creadores favoritos",
+    "roster_title": "No es otro tutor de IA",
+    "roster_subtitle": "Estudia con los mejores creadores de YouTube, Instagram y TikTok, solo en Candid.",
     "cta_learn": "PRUEBA GRATIS",
     "cta_teach": "ENSEÑA EN CANDID",
     "tap_to_unmute": "Toca para activar el sonido",

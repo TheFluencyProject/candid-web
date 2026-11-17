@@ -5,7 +5,7 @@ import type { Tutor } from "@/lib/api";
 // just a row that keeps moving. Pure CSS loop like ScreenshotMarquee: the group is rendered twice and the
 // track slides -50%, each group carrying a trailing pr- equal to its gap so the loop has no seam.
 // No hover pause, no reduced-motion opt-out (same as the screenshot row).
-export default function TutorRoster({ tutors }: { tutors: Tutor[] }) {
+export default function TutorRoster({ title, subtitle, tutors }: { title: string; subtitle: string; tutors: Tutor[] }) {
   if (tutors.length === 0) return null;
 
   const renderGroup = (duplicate: boolean) => (
@@ -33,7 +33,12 @@ export default function TutorRoster({ tutors }: { tutors: Tutor[] }) {
 
   return (
     // Each section fills one screen under the top bar (Adam 11/17), the row centered in it.
-    <section className="flex min-h-[calc(100svh-61px)] flex-col justify-center overflow-hidden">
+    <section className="flex min-h-[calc(100svh-61px)] flex-col justify-center overflow-hidden py-16">
+      {/* "Not another AI tutor" moved here from the hero (Adam 11/17). */}
+      <div className="mx-auto mb-10 max-w-[760px] px-6 text-center [word-break:keep-all] min-[860px]:mb-14">
+        <h2 className="text-[30px] font-medium leading-[1.08] tracking-[-0.03em] [text-wrap:balance] min-[860px]:text-[clamp(36px,4vw,54px)]">{title}</h2>
+        <p className="mt-4 text-base leading-normal text-gray-300 [text-wrap:balance] min-[860px]:text-[19px]">{subtitle}</p>
+      </div>
       <div className="mx-auto w-full max-w-[1040px] [mask-image:linear-gradient(90deg,transparent,#000_15%,#000_85%,transparent)]">
         <div className="flex w-max animate-drift">
           {renderGroup(false)}

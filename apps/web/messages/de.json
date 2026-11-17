@@ -5,8 +5,10 @@
   },
   "home": {
     "download_alt": "Laden im App Store",
-    "hero_title": "Nicht noch ein KI-Tutor.",
-    "hero_subtitle": "Lerne Koreanisch aus dem echten Leben mit täglichem Hör- und Sprechtraining\nvon deinen Lieblings-Creators.",
+    "hero_title": "Lerne Koreanisch <cool>aus dem echten Leben</cool>",
+    "hero_subtitle": "mit täglichem Hör- und Sprechtraining von deinen Lieblings-Creators",
+    "roster_title": "Nicht noch ein KI-Tutor",
+    "roster_subtitle": "Lerne mit den Top-Creators von YouTube, Instagram & TikTok – exklusiv auf Candid.",
     "cta_learn": "KOSTENLOS TESTEN",
     "cta_teach": "AUF CANDID UNTERRICHTEN",
     "tap_to_unmute": "Tippen für Ton",

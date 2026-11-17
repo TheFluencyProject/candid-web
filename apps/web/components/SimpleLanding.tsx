@@ -3,6 +3,7 @@ import { getTranslations } from "next-intl/server";
 import SiteFooter from "@/components/SiteFooter";
 import ScreenshotMarquee from "@/components/ScreenshotMarquee";
 import PhoneClipHero from "@/components/PhoneClipHero";
+import { lobster } from "@/lib/lobster";
 import TutorRoster from "@/components/TutorRoster";
 import LessonLadder from "@/components/LessonLadder";
 import LessonPath, { type PathLesson } from "@/components/LessonPath";
@@ -155,12 +156,12 @@ export default async function SimpleLanding({ locale }: Props) {
             starred clips one at a time (the tutor-page PhoneClipHero). Phones: copy, then the phone under it. */}
         <div className="mx-auto grid w-full max-w-[1080px] min-[860px]:min-h-[calc(100svh-61px)] grid-cols-1 items-center justify-items-center gap-9 px-6 pt-12 pb-16 text-center min-[860px]:grid-cols-[1fr_auto] min-[860px]:justify-items-stretch min-[860px]:gap-14 min-[860px]:pt-6 min-[860px]:pb-10 min-[860px]:text-left">
           <div>
-            {/* Title \n breaks on mobile only. */}
-            <h1 className="text-4xl min-[860px]:text-[clamp(40px,5.4vw,64px)] font-normal tracking-[-0.03em] leading-[1.05] whitespace-pre-line min-[860px]:whitespace-normal">
-              {t("hero_title")}
+            {/* "Learn real-life Korean" with the script word in Lobster, like the closing line (Adam 11/17). */}
+            <h1 className="text-4xl min-[860px]:text-[clamp(40px,5.4vw,64px)] font-normal tracking-[-0.03em] leading-[1.05] [word-break:keep-all] [text-wrap:balance]">
+              {t.rich("hero_title", { cool: (chunks) => <span className={`pe-cool ${lobster.className}`}>{chunks}</span> })}
             </h1>
-            <p className="mt-5 max-w-[30em] mx-auto min-[860px]:mx-0 text-base min-[860px]:text-[19px] leading-normal text-gray-300">
-              {t("hero_subtitle").replace(/\s*\n\s*/g, " ")}
+            <p className="mt-5 max-w-[30em] mx-auto min-[860px]:mx-0 text-base min-[860px]:text-[19px] leading-normal text-gray-300 [word-break:keep-all] [text-wrap:balance]">
+              {t("hero_subtitle")}
             </p>
             <div className="mt-6 min-[860px]:mt-[30px]">
               {/* App Store download. App Clip funnel is disabled for now — this points at the
@@ -182,7 +183,7 @@ export default async function SimpleLanding({ locale }: Props) {
 
           {clips.length > 0 ? (
             <div className="w-[min(300px,78vw)] min-[860px]:w-[340px]">
-              <PhoneClipHero clips={clips} alt={t("hero_subtitle").replace(/\s*\n\s*/g, " ")} />
+              <PhoneClipHero clips={clips} alt={`${t.raw("hero_title").replace(/<\/?cool>/g, "")} ${t("hero_subtitle")}`} />
             </div>
           ) : (
             <div className="w-full min-[860px]:w-[420px] overflow-hidden">
@@ -192,9 +193,7 @@ export default async function SimpleLanding({ locale }: Props) {
         </div>
       </section>
 
-      {/* "Not another AI tutor." stays the hero's line; the people row has no heading until Adam picks
-          one (plan Q2). */}
-      <TutorRoster tutors={korean_tutors} />
+      <TutorRoster title={t("roster_title")} subtitle={t("roster_subtitle")} tutors={korean_tutors} />
       <LessonLadder locale={locale} tutors={korean_tutors} />
       {path_lessons.length > 0 && <LessonPath title={t("path_title")} subtitle={t("path_subtitle")} lessons={path_lessons} />}
       <GardenGrow title={t("garden_title")} units={Array.from({ length: 30 }, (_, i) => t("garden_unit", { count: i + 1 }))} />

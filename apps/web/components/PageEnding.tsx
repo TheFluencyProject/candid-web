@@ -1,8 +1,5 @@
-import { Lobster_Two } from "next/font/google";
 import { getTranslations } from "next-intl/server";
-
-// The script word in the closing line, in the wordmark's own typeface (Adam 11/11).
-const lobster = Lobster_Two({ weight: "700", style: "italic", subsets: ["latin"], display: "swap" });
+import { lobster } from "@/lib/lobster";
 
 // The page's closing line (mockup E1, approved 11/11) with one real-photo sticker per tutor floating in a fixed
 // circle round it (Adam 11/17: never Tina's drawings, Didi always 054). Outlines are pre-recolored in the files.

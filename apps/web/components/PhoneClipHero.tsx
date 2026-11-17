@@ -577,7 +577,7 @@ export default function PhoneClipHero({ clips, alt }: Props) {
   const seqs = clips.length > 1 && !posterOnly ? [seq - 1, seq, seq + 1].filter((s) => s >= 0) : [seq];
 
   return (
-    <div className="relative w-full aspect-[1000/2034] select-none" role="img" aria-label={alt}>
+    <div className="relative w-full aspect-[1000/2034] select-none text-left" role="img" aria-label={alt}>
       {/* Live screen, under the frame's transparent cut-out. Its own black bg fills any sliver. */}
       <div
         className="absolute isolate overflow-hidden bg-black [container-type:inline-size]"
