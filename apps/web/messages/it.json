@@ -14,7 +14,8 @@
     "tap_to_unmute": "Tocca per attivare l’audio",
     "tap_to_mute": "Tocca per disattivare l’audio",
     "reviews_title": "Cosa dicono i nostri studenti",
-    "lessons_title": "Lezioni di coreano per ogni livello",
+    "lessons_title": "Contenuti di coreano di alta qualità per ogni livello",
+    "lessons_subtitle": "Candid seleziona i contenuti migliori per chi studia coreano e li abbina al tuo livello",
     "levels": {
       "beginner": "Principiante",
       "upper_beginner": "Principiante avanzato",
@@ -25,7 +26,7 @@
     },
     "path_title": "Il tuo percorso verso la conversazione fluida",
     "path_subtitle": "Fai progressi ogni giorno in ascolto, parlato e vocabolario",
-    "garden_title": "Guarda il tuo coreano crescere",
+    "garden_title": "Guarda il tuo coreano crescere, un po’ ogni giorno",
     "garden_unit": "{count, plural, one {giorno} other {giorni}}",
     "ending_line": "Impara il coreano <cool>della vita reale</cool><br></br>con <wm></wm>",
     "reviews": {

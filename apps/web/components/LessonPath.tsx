@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef } from "react";
+import DownloadCta from "@/components/DownloadCta";
 
 // "Your path to conversational fluency" (mockup P1, Adam 11/11–11/17): the app's own lesson path (LessonHubPath:
 // coins with a 3D lip on the wave, a sticker beside each indent, gray until earned) for three real lessons. The
@@ -80,7 +81,9 @@ function layout(lessons: PathLesson[]) {
   return { heads, coins, stickers, nodes, H: y };
 }
 
-export default function LessonPath({ title, subtitle, lessons }: { title: string; subtitle: string; lessons: PathLesson[] }) {
+type Props = { title: string; subtitle: string; ctaLabel: string; tracking: string; lessons: PathLesson[] };
+
+export default function LessonPath({ title, subtitle, ctaLabel, tracking, lessons }: Props) {
   const gridRef = useRef<HTMLDivElement | null>(null);
   const copyRef = useRef<HTMLDivElement | null>(null);
   const pvRef = useRef<HTMLDivElement | null>(null);
@@ -139,6 +142,7 @@ export default function LessonPath({ title, subtitle, lessons }: { title: string
           <div ref={copyRef} className="lp-copy">
             <h2>{title}</h2>
             <p className="lp-sub">{subtitle}</p>
+            <DownloadCta label={ctaLabel} tracking={tracking} className="mt-6" />
           </div>
         </div>
         <div ref={pvRef} className="lp-pv">

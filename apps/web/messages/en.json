@@ -14,7 +14,8 @@
     "tap_to_unmute": "Tap to unmute",
     "tap_to_mute": "Tap to mute",
     "reviews_title": "Hear from our students",
-    "lessons_title": "Korean lessons for every level",
+    "lessons_title": "High-quality Korean content for every level",
+    "lessons_subtitle": "Candid curates the best content for Korean learners & matches it to you based on your level",
     "levels": {
       "beginner": "Beginner",
       "upper_beginner": "Upper Beginner",
@@ -25,7 +26,7 @@
     },
     "path_title": "Your path to conversational fluency",
     "path_subtitle": "Make daily progress on listening, speaking & vocab",
-    "garden_title": "Watch your Korean grow",
+    "garden_title": "Watch your Korean grow, a little each day",
     "garden_unit": "{count, plural, one {day} other {days}}",
     "ending_line": "Learn <cool>real-life</cool> Korean<br></br>with <wm></wm>",
     "reviews": {

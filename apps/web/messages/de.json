@@ -14,7 +14,8 @@
     "tap_to_unmute": "Tippen für Ton",
     "tap_to_mute": "Tippen zum Stummschalten",
     "reviews_title": "Das sagen unsere Lernenden",
-    "lessons_title": "Koreanischlektionen für jedes Niveau",
+    "lessons_title": "Hochwertige Koreanisch-Inhalte für jedes Niveau",
+    "lessons_subtitle": "Candid wählt die besten Inhalte für Koreanischlernende aus und passt sie an dein Niveau an",
     "levels": {
       "beginner": "Anfänger",
       "upper_beginner": "Fortgeschrittener Anfänger",
@@ -25,7 +26,7 @@
     },
     "path_title": "Dein Weg zu fließenden Gesprächen",
     "path_subtitle": "Mach jeden Tag Fortschritte beim Hören, Sprechen & Wortschatz",
-    "garden_title": "Sieh zu, wie dein Koreanisch wächst",
+    "garden_title": "Sieh zu, wie dein Koreanisch wächst – jeden Tag ein bisschen",
     "garden_unit": "{count, plural, one {Tag} other {Tage}}",
     "ending_line": "Lerne Koreanisch <cool>aus dem echten Leben</cool><br></br>mit <wm></wm>",
     "reviews": {

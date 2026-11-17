@@ -14,7 +14,8 @@
     "tap_to_unmute": "소리 켜기",
     "tap_to_mute": "소리 끄기",
     "reviews_title": "학습자들의 생생한 후기",
-    "lessons_title": "모든 레벨을 위한 레슨",
+    "lessons_title": "모든 레벨을 위한 고퀄리티 콘텐츠",
+    "lessons_subtitle": "Candid가 학습자를 위한 최고의 콘텐츠를 골라 내 레벨에 맞춰 추천해요",
     "levels": {
       "beginner": "초급",
       "upper_beginner": "초중급",
@@ -25,7 +26,7 @@
     },
     "path_title": "회화 실력으로 가는 길",
     "path_subtitle": "듣기, 말하기, 단어를 매일 조금씩",
-    "garden_title": "언어 실력이 자라는 걸 지켜보세요",
+    "garden_title": "매일 조금씩, 언어 실력이 자라는 걸 지켜보세요",
     "garden_unit": "일",
     "ending_line": "<cool>리얼</cool> 라이프 언어를<br></br><wm></wm>에서 배워요",
     "reviews": {

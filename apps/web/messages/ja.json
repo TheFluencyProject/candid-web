@@ -14,7 +14,8 @@
     "tap_to_unmute": "タップでミュート解除",
     "tap_to_mute": "タップでミュート",
     "reviews_title": "学習者の声",
-    "lessons_title": "どのレベルにも合う韓国語レッスン",
+    "lessons_title": "どのレベルにも、質の高い韓国語コンテンツ",
+    "lessons_subtitle": "Candidは韓国語学習者のために最高のコンテンツを厳選し、あなたのレベルに合わせて届けます",
     "levels": {
       "beginner": "初級",
       "upper_beginner": "初級の上",
@@ -25,7 +26,7 @@
     },
     "path_title": "会話力への道のり",
     "path_subtitle": "リスニング、スピーキング、単語を毎日少しずつ",
-    "garden_title": "韓国語が育っていくのを見よう",
+    "garden_title": "韓国語が育っていくのを見よう、毎日少しずつ",
     "garden_unit": "日",
     "ending_line": "<cool>リアル</cool>な韓国語を<br></br><wm></wm>で学ぼう",
     "reviews": {

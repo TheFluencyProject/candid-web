@@ -195,7 +195,7 @@ export default async function SimpleLanding({ locale }: Props) {
 
       <TutorRoster title={t("roster_title")} subtitle={t("roster_subtitle")} tutors={korean_tutors} />
       <LessonLadder locale={locale} tutors={korean_tutors} />
-      {path_lessons.length > 0 && <LessonPath title={t("path_title")} subtitle={t("path_subtitle")} lessons={path_lessons} />}
+      {path_lessons.length > 0 && <LessonPath title={t("path_title")} subtitle={t("path_subtitle")} ctaLabel={t("cta_learn")} tracking={tracking} lessons={path_lessons} />}
       <GardenGrow title={t("garden_title")} units={Array.from({ length: 30 }, (_, i) => t("garden_unit", { count: i + 1 }))} />
 
       <ReviewCards />

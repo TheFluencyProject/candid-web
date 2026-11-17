@@ -14,7 +14,8 @@
     "tap_to_unmute": "Appuie pour activer le son",
     "tap_to_mute": "Appuie pour couper le son",
     "reviews_title": "Ce qu'en disent nos apprenants",
-    "lessons_title": "Des leçons de coréen pour tous les niveaux",
+    "lessons_title": "Du contenu coréen de qualité pour tous les niveaux",
+    "lessons_subtitle": "Candid sélectionne le meilleur contenu pour les apprenants de coréen et l’adapte à ton niveau",
     "levels": {
       "beginner": "Débutant",
       "upper_beginner": "Débutant avancé",
@@ -25,7 +26,7 @@
     },
     "path_title": "Ton chemin vers l’aisance à l’oral",
     "path_subtitle": "Progresse chaque jour en compréhension, expression orale et vocabulaire",
-    "garden_title": "Regarde ton coréen grandir",
+    "garden_title": "Regarde ton coréen grandir, un peu chaque jour",
     "garden_unit": "{count, plural, one {jour} other {jours}}",
     "ending_line": "Apprends le coréen <cool>de la vraie vie</cool><br></br>avec <wm></wm>",
     "reviews": {
