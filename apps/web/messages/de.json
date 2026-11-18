@@ -167,5 +167,17 @@
     "button": "Auf die Warteliste",
     "success": "Du stehst auf der Liste! Wir schreiben dir, sobald Candid für Android verfügbar ist.",
     "error": "Etwas ist schiefgelaufen"
+  },
+  "lesson_path": {
+    "part": "Teil {count}",
+    "watch": "Ansehen",
+    "shadowing": "Shadowing",
+    "expressions": "{count} Ausdrücke",
+    "vocab_practice": "Vokabelübung",
+    "words": "{count} Wörter",
+    "listening_quiz": "Hörquiz",
+    "no_captions": "Keine Untertitel · Normales Tempo",
+    "dialogue": "Dialog",
+    "unit_review": "Wiederholung der Einheit"
   }
 }

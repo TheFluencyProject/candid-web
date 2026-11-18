@@ -167,5 +167,17 @@
     "button": "Đăng ký chờ",
     "success": "Bạn đã có tên trong danh sách! Chúng tôi sẽ báo qua email khi Candid ra mắt trên Android.",
     "error": "Đã xảy ra lỗi"
+  },
+  "lesson_path": {
+    "part": "Phần {count}",
+    "watch": "Xem",
+    "shadowing": "Nói đuổi",
+    "expressions": "{count} câu",
+    "vocab_practice": "Luyện từ vựng",
+    "words": "{count} từ",
+    "listening_quiz": "Kiểm tra nghe",
+    "no_captions": "Không phụ đề · Tốc độ thật",
+    "dialogue": "Hội thoại",
+    "unit_review": "Ôn tập chương"
   }
 }

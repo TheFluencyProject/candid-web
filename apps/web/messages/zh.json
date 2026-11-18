@@ -167,5 +167,17 @@
     "button": "加入候补名单",
     "success": "你已加入名单！Candid Android 版上线后，我们会发邮件通知你。",
     "error": "出错了"
+  },
+  "lesson_path": {
+    "part": "第 {count} 部分",
+    "watch": "观看",
+    "shadowing": "跟读",
+    "expressions": "{count} 个句子",
+    "vocab_practice": "词汇练习",
+    "words": "{count} 个单词",
+    "listening_quiz": "听力测验",
+    "no_captions": "无字幕 · 正常语速",
+    "dialogue": "对话",
+    "unit_review": "单元复习"
   }
 }

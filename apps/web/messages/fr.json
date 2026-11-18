@@ -167,5 +167,17 @@
     "button": "Rejoindre la liste",
     "success": "Tu es sur la liste ! On t’écrit dès que Candid est disponible sur Android.",
     "error": "Une erreur s’est produite"
+  },
+  "lesson_path": {
+    "part": "Partie {count}",
+    "watch": "Regarder",
+    "shadowing": "Shadowing",
+    "expressions": "{count} phrases",
+    "vocab_practice": "Entraînement au vocabulaire",
+    "words": "{count} mots",
+    "listening_quiz": "Quiz d'écoute",
+    "no_captions": "Sans sous-titres · Vitesse naturelle",
+    "dialogue": "Dialogue",
+    "unit_review": "Révision de l'unité"
   }
 }

@@ -167,5 +167,17 @@
     "button": "ลงชื่อรอ",
     "success": "คุณอยู่ในรายชื่อแล้ว! เราจะส่งอีเมลแจ้งทันทีที่ Candid มีบน Android",
     "error": "มีบางอย่างผิดพลาด"
+  },
+  "lesson_path": {
+    "part": "ตอนที่ {count}",
+    "watch": "ดู",
+    "shadowing": "การพูดตาม",
+    "expressions": "{count} ประโยค",
+    "vocab_practice": "การฝึกคำศัพท์",
+    "words": "{count} คำ",
+    "listening_quiz": "ทดสอบการฟัง",
+    "no_captions": "ไม่มีคำบรรยาย · ความเร็วจริง",
+    "dialogue": "บทสนทนา",
+    "unit_review": "ทบทวนยูนิต"
   }
 }

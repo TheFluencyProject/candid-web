@@ -169,5 +169,17 @@
     "button": "Join waitlist",
     "success": "You're on the list! We'll email you when Candid is on Android.",
     "error": "Something went wrong"
+  },
+  "lesson_path": {
+    "part": "Part {count}",
+    "watch": "Watch",
+    "shadowing": "Shadowing",
+    "expressions": "{count} expressions",
+    "vocab_practice": "Vocab Practice",
+    "words": "{count} words",
+    "listening_quiz": "Listening Quiz",
+    "no_captions": "No captions · Natural speed",
+    "dialogue": "Dialogue",
+    "unit_review": "Unit Review"
   }
 }

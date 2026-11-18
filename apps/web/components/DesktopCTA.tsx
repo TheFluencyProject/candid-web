@@ -33,13 +33,15 @@ type Props = {
   variant?: DesktopCtaVariant;
   // candid_did, known at SSR — so the inline QR renders server-side with the real sid.
   distinctId: string;
+  // Fill (and .cta-3d lip) color; mint unless the page has its own (the lesson page's path arm: the lesson's accent).
+  color?: string;
 };
 
 // Desktop hero CTA A/B (desktop-cta-qr): control = the pill whose click the DownloadQRInterceptor
 // turns into a QR modal; morph = the pill grows in place into the QR; inline = a white QR on the
 // page from first paint, with a ☝️ and the label in mint under it. Below lg (1024px, the interceptor's gate) every arm is the plain /download anchor —
 // switched in CSS rather than after a matchMedia effect, so neither side flashes the other's CTA.
-export default function DesktopCTA({ href, label, scanLabel, inlineLabel, tutorSlug, lessonId = null, surface, variant, distinctId }: Props) {
+export default function DesktopCTA({ href, label, scanLabel, inlineLabel, tutorSlug, lessonId = null, surface, variant, distinctId, color = MINT }: Props) {
   const arm: DesktopCtaVariant = variant ?? "control";
   const qrUrl = buildQrUrl({ tutor_slug: tutorSlug, surface, sid: distinctId, lesson_id: lessonId, variant: arm });
 
@@ -51,7 +53,7 @@ export default function DesktopCTA({ href, label, scanLabel, inlineLabel, tutorS
       href={href}
       data-cta-variant={ctaVariant}
       className={`${className} px-12 py-3.5 rounded-full text-base font-bold cta-3d`}
-      style={{ backgroundColor: MINT, color: "#000000" }}
+      style={{ backgroundColor: color, ["--cta" as string]: color, color: "#000000" }}
     >
       {label}
     </a>
@@ -67,18 +69,19 @@ export default function DesktopCTA({ href, label, scanLabel, inlineLabel, tutorS
         <div className="hidden lg:inline-flex flex-col items-center align-top lg:ml-8">
           <QRCodeSVG value={qrUrl} size={INLINE_QR_PX} fgColor="#FFFFFF" bgColor="transparent" />
           <span aria-hidden className="mt-4 text-xl leading-none">☝️</span>
-          <span className="mt-2 text-base font-bold whitespace-nowrap" style={{ color: MINT }}>
+          <span className="mt-2 text-base font-bold whitespace-nowrap" style={{ color }}>
             {inlineLabel}
           </span>
         </div>
       ) : (
-        <MorphButton label={label} scanLabel={scanLabel} qrUrl={qrUrl} tutorSlug={tutorSlug} lessonId={lessonId} surface={surface} />
+        <MorphButton label={label} scanLabel={scanLabel} qrUrl={qrUrl} tutorSlug={tutorSlug} lessonId={lessonId} surface={surface} color={color} />
       )}
     </>
   );
 }
 
-function MorphButton({ label, scanLabel, qrUrl, tutorSlug, lessonId, surface }: {
+function MorphButton({ label, scanLabel, qrUrl, tutorSlug, lessonId, surface, color }: {
+  color: string;
   label: string;
   scanLabel: string;
   qrUrl: string;
@@ -119,7 +122,7 @@ function MorphButton({ label, scanLabel, qrUrl, tutorSlug, lessonId, surface }: 
   };
 
   const square = phase === "square";
-  const style: React.CSSProperties = { backgroundColor: MINT, color: "#000000" };
+  const style: React.CSSProperties = { backgroundColor: color, color: "#000000" };
   if (phase !== "pill") {
     Object.assign(style, {
       width: square ? SQUARE_PX : from!.w,

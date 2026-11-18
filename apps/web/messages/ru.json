@@ -167,5 +167,17 @@
     "button": "Записаться",
     "success": "Вы в списке! Мы напишем вам, когда Candid появится на Android.",
     "error": "Что-то пошло не так"
+  },
+  "lesson_path": {
+    "part": "Часть {count}",
+    "watch": "Смотреть",
+    "shadowing": "Шэдоуинг",
+    "expressions": "Предложений: {count}",
+    "vocab_practice": "Практика лексики",
+    "words": "Слов: {count}",
+    "listening_quiz": "Тест на слух",
+    "no_captions": "Без субтитров · Обычный темп",
+    "dialogue": "Диалог",
+    "unit_review": "Повторение раздела"
   }
 }

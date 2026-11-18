@@ -9,7 +9,9 @@ import Image from "next/image";
 // Its button takes the color of whichever of the page's Try buttons ([data-primary-cta]) is on screen, the upper
 // one if two are, so it only switches once that one has gone under the bar; mint when none is (Adam 11/17). The sticker-circle button cycles colors
 // (.cta-cycle): the bar's button runs the same animation, locked to its clock, so they match every frame.
-export default function ScrollNav({ ctaLabel, tracking }: { ctaLabel: string; tracking: string }) {
+// No ctaLabel = wordmark only (the lesson page's path arm, whose own buttons are always on screen); the pill's effects
+// below all return early without it.
+export default function ScrollNav({ ctaLabel, tracking = "" }: { ctaLabel?: string; tracking?: string }) {
   const pillRef = useRef<HTMLAnchorElement>(null);
   const bgRef = useRef<HTMLDivElement>(null);
   const wrapRef = useRef<HTMLSpanElement>(null);
@@ -95,15 +97,17 @@ export default function ScrollNav({ ctaLabel, tracking }: { ctaLabel: string; tr
           <Image src="/wordmark-white.svg" alt="Candid" width={80} height={21} priority />
         </a>
         {/* Plain <a> to /download, same as the hero CTA (middleware redirect, unprefixed only). */}
-        <span ref={wrapRef} className="nav-pill flex">
-          <a
-            ref={pillRef}
-            href="/download"
-            className={`rounded-full bg-[#89FFB4] px-5 py-2 text-sm font-semibold ${tracking} text-[#18181C] hover:opacity-90 cta-3d`}
-          >
-            {ctaLabel}
-          </a>
-        </span>
+        {ctaLabel && (
+          <span ref={wrapRef} className="nav-pill flex">
+            <a
+              ref={pillRef}
+              href="/download"
+              className={`rounded-full bg-[#89FFB4] px-5 py-2 text-sm font-semibold ${tracking} text-[#18181C] hover:opacity-90 cta-3d`}
+            >
+              {ctaLabel}
+            </a>
+          </span>
+        )}
       </div>
     </div>
   );

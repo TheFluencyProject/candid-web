@@ -20,7 +20,8 @@ export type PathLesson = {
   sticker: { id: string; w: number; h: number };
 };
 
-type Kind = "watch" | "speak" | "vocab" | "listen" | "trophy";
+// dialogue = the Dialogue coin at the end of the lesson page's path (LessonPagePath); home never draws one.
+export type Kind = "watch" | "speak" | "vocab" | "listen" | "trophy" | "dialogue";
 // Adam 11/17: vary the speaking / vocab / listening order per lesson. Watch stays first (a lesson opens on its
 // video), no lesson's order repeats, and no lesson's 2nd coin matches the one before it. 4 coins (Q6).
 const ORDERS: Kind[][] = [
@@ -36,10 +37,12 @@ const LIGHT_AT = 0.6;
 const W = 440, ZIG = 86, COIN = 70, GAP = 28, BOX = 170, HEAD_H = 72, MAX_SCALE = 1.2;
 
 // The app's section icons (LessonSectionType.rowIcon): Phosphor play / microphone / headphones (fill), and
-// SF Symbols dumbbell.fill (Vocab) + trophy.fill (the final coin) as masks so they take the color.
-function Icon({ kind }: { kind: Kind }) {
+// SF Symbols dumbbell.fill (Vocab) + trophy.fill (the final coin), and the app's own talk asset (Dialogue), as masks
+// so they take the color.
+export function Icon({ kind }: { kind: Kind }) {
   if (kind === "vocab") return <i className="lp-db" />;
   if (kind === "trophy") return <i className="lp-tr" />;
+  if (kind === "dialogue") return <i className="lp-tk" />;
   const d = {
     watch: "M240,128a15.74,15.74,0,0,1-7.6,13.51L88.32,229.65a16,16,0,0,1-16.2.3A15.86,15.86,0,0,1,64,216.13V39.87a15.86,15.86,0,0,1,8.12-13.82,16,16,0,0,1,16.2.3L232.4,114.49A15.74,15.74,0,0,1,240,128Z",
     speak: "M80,128V64a48,48,0,0,1,96,0v64a48,48,0,0,1-96,0Zm128,0a8,8,0,0,0-16,0,64,64,0,0,1-128,0,8,8,0,0,0-16,0,80.11,80.11,0,0,0,72,79.6V240a8,8,0,0,0,16,0V207.6A80.11,80.11,0,0,0,208,128Z",

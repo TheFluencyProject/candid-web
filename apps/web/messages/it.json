@@ -167,5 +167,17 @@
     "button": "Iscriviti alla lista",
     "success": "Sei nella lista! Ti scriveremo quando Candid sarà su Android.",
     "error": "Qualcosa è andato storto"
+  },
+  "lesson_path": {
+    "part": "Parte {count}",
+    "watch": "Guarda",
+    "shadowing": "Shadowing",
+    "expressions": "{count} espressioni",
+    "vocab_practice": "Pratica di vocaboli",
+    "words": "{count} parole",
+    "listening_quiz": "Quiz di ascolto",
+    "no_captions": "Nessun sottotitolo · Velocità naturale",
+    "dialogue": "Dialogo",
+    "unit_review": "Ripasso dell'unità"
   }
 }

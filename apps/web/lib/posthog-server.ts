@@ -5,10 +5,12 @@ import { cache } from "react";
 import {
   CTA_FLAG_KEY,
   DESKTOP_CTA_FLAG_KEY,
+  LESSON_HERO_FLAG_KEY,
   LESSON_SECTIONS_FLAG_KEY,
   POSTHOG_HOST,
   POSTHOG_KEY,
   type DesktopCtaVariant,
+  type LessonHeroVariant,
   type LessonSectionsVariant,
   type MobileCtaVariant,
 } from "./posthog-config";
@@ -59,27 +61,25 @@ export const getDesktopCtaVariant = cache(
   },
 );
 
-// ?cta=control|morph|inline forces an arm on local + Vercel previews so each one can be rendered
-// on demand. Never in production: a shared link must not override the visitor's assigned arm.
-export function previewDesktopCtaOverride(param: string | string[] | undefined): DesktopCtaVariant | null {
+// ?cta= / ?sections= / ?hero= force an arm on local + Vercel previews so each one can be rendered on demand.
+// Never in production: a shared link must not override the visitor's assigned arm.
+export function previewArm<T extends string>(param: string | string[] | undefined, arms: readonly T[]): T | null {
   if (process.env.VERCEL_ENV === "production") return null;
-  return param === "control" || param === "morph" || param === "inline" ? param : null;
+  return arms.find((arm) => arm === param) ?? null;
 }
 
-// Same read-only getAllFlags as above: the exposure is the client's (FlagExposure on the lesson page).
-export const getLessonSectionsVariant = cache(
-  async (distinctId: string): Promise<LessonSectionsVariant> => {
+// Both lesson-page tests in one read-only getAllFlags (same reason as above: the exposures are the client's
+// FlagExposure on the lesson page). Cached, so the layout's bootstrap and the page share one call.
+export const getLessonPageFlags = cache(
+  async (distinctId: string): Promise<{ sections: LessonSectionsVariant; hero: LessonHeroVariant }> => {
     try {
-      const flags = await getClient().getAllFlags(distinctId, { flagKeys: [LESSON_SECTIONS_FLAG_KEY] });
-      return flags[LESSON_SECTIONS_FLAG_KEY] === "sections" ? "sections" : "control";
+      const flags = await getClient().getAllFlags(distinctId, { flagKeys: [LESSON_SECTIONS_FLAG_KEY, LESSON_HERO_FLAG_KEY] });
+      return {
+        sections: flags[LESSON_SECTIONS_FLAG_KEY] === "sections" ? "sections" : "control",
+        hero: flags[LESSON_HERO_FLAG_KEY] === "path" ? "path" : "control",
+      };
     } catch {
-      return "control";
+      return { sections: "control", hero: "control" };
     }
   },
 );
-
-// ?sections=control|sections, local + previews only — same rule as ?cta= above.
-export function previewLessonSectionsOverride(param: string | string[] | undefined): LessonSectionsVariant | null {
-  if (process.env.VERCEL_ENV === "production") return null;
-  return param === "control" || param === "sections" ? param : null;
-}
