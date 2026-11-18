@@ -45,7 +45,10 @@ export default function DownloadQRInterceptor({ label }: { label: string }) {
     const isDownload = href.startsWith("/download");
     if (!isDownload) return;
 
-    const { surface, lesson_id } = describePage(window.location.pathname);
+    const { surface, lesson_id: path_lesson_id } = describePage(window.location.pathname);
+    // Prefer the CTA's ?l= (always the full id): the path can be the 8-char share prefix, which
+    // the click report rejects.
+    const lesson_id = new URLSearchParams(href.split("?")[1] ?? "").get("l") || path_lesson_id;
     // The lesson page's CTA carries ?l=<lesson_id>; split it off or it lands in the slug.
     const tutor_slug = href.slice("/download/".length).split("?")[0];
     const android = isAndroid();
