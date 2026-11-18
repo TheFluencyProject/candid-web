@@ -9,14 +9,29 @@ export const MAC_DOWNLOAD_URL =
   "https://tfp-app-downloads.s3.us-west-1.amazonaws.com/mac/Candid.dmg";
 // Candid's Apple-provided ("basic") App Clip link — surfaces the clip card on iOS.
 export const APP_CLIP_URL = "https://appclip.apple.com/id?p=co.thefluencyproject.bloom-ios.Clip";
-export const WAITLIST_URL =
-  "https://thefluencyproject.notion.site/359bc1de5e3480bdbecddd96d7f73a3e?pvs=105";
-
-// Flip to true to send non-iOS users to the waitlist instead of the App Store.
-export const WAITLIST_ENABLED = false;
 
 export function isIOSUserAgent(ua: string): boolean {
   return /iPhone|iPad|iPod/i.test(ua);
+}
+
+export function isAndroidUserAgent(ua: string): boolean {
+  return /Android/.test(ua);
+}
+
+// Candid is iOS-only, so an Android store hop (a scanned desktop QR, /download/<slug>, /app, a shared
+// video link…) lands on one of our pages with the waitlist form open instead of a dead App Store page.
+// DownloadQRInterceptor opens the form from ?waitlist=<tutor slug | 1> — the same form an Android
+// "Study" tap opens, so every Android signup lands in one list. `from` names the link, for PostHog.
+// Lesson → that lesson's page; tutor → their page; anything else → home.
+export function androidWaitlistPath({ from, tutor_slug, lesson_id }: {
+  from: string;
+  tutor_slug?: string | null;
+  lesson_id?: string | null;
+}): string {
+  const path = lesson_id
+    ? `/lesson/${encodeURIComponent(lesson_id)}`
+    : tutor_slug ? `/tutor/${encodeURIComponent(tutor_slug)}` : "/";
+  return `${path}?${new URLSearchParams({ waitlist: tutor_slug || "1", from })}`;
 }
 
 // TikTok specifically: the one in-app browser with no known escape to the system browser, so
@@ -52,12 +67,4 @@ const TUTOR_PPID: Record<string, string> = {
 export function appStoreUrlForTutor(handle: string | null | undefined): string {
   const ppid = handle ? TUTOR_PPID[handle.toLowerCase()] : undefined;
   return ppid ? `${APP_STORE_URL}?ppid=${ppid}` : APP_STORE_URL;
-}
-
-export function getRedirectUrl(
-  ua: string,
-  appStoreUrl = APP_STORE_URL,
-): string {
-  if (!WAITLIST_ENABLED || isIOSUserAgent(ua)) return appStoreUrl;
-  return WAITLIST_URL;
 }

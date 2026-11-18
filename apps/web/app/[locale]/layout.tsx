@@ -116,7 +116,7 @@ export default async function LocaleLayout({ children, params }: Props) {
             {children}
             <InAppBrowserBlocker />
             <DownloadQRInterceptor
-              label={(messages.tutor as { download_for_ios: string }).download_for_ios}
+              label={(messages.tutor as { download_candid: string }).download_candid}
             />
           </PostHogProvider>
         </NextIntlClientProvider>

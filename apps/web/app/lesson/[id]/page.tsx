@@ -40,19 +40,19 @@ const SHARE_DESCRIPTIONS: Record<Locale, string> = {
 // so there's no translation context here — keep the little UI copy in a local map.
 // scanLabel/inlineLabel are the desktop-cta-qr morph/inline arms' copy; that test is en only, so other locales fall back to en.
 const COPY: Record<Locale, { cta: (name: string) => string; qrTitle: string; scanLabel?: string; inlineLabel?: string; privacy: string; terms: string }> = {
-  en: { cta: (name) => `Study with ${name}`, qrTitle: "Download Candid for iOS", scanLabel: "SCAN TO GET STARTED", inlineLabel: "Scan to study for free", privacy: "Privacy", terms: "Terms" },
-  ko: { cta: (name) => `${name}와 공부하기`, qrTitle: "iOS용 Candid 다운로드", privacy: "개인정보", terms: "이용약관" },
-  ja: { cta: (name) => `${name}と勉強する`, qrTitle: "iOS版Candidをダウンロード", privacy: "プライバシー", terms: "利用規約" },
-  zh: { cta: (name) => `和${name}一起学习`, qrTitle: "下载 iOS 版 Candid", privacy: "隐私", terms: "条款" },
-  "zh-Hant": { cta: (name) => `和${name}一起學習`, qrTitle: "下載 iOS 版 Candid", privacy: "隱私權", terms: "條款" },
-  es: { cta: (name) => `Estudia con ${name}`, qrTitle: "Descarga Candid para iOS", privacy: "Privacidad", terms: "Términos" },
-  ru: { cta: (name) => `Учиться с ${name}`, qrTitle: "Скачать Candid для iOS", privacy: "Конфиденциальность", terms: "Условия" },
-  fr: { cta: (name) => `Étudie avec ${name}`, qrTitle: "Télécharge Candid pour iOS", privacy: "Confidentialité", terms: "Conditions" },
-  vi: { cta: (name) => `Học cùng ${name}`, qrTitle: "Tải Candid cho iOS", privacy: "Quyền riêng tư", terms: "Điều khoản" },
-  th: { cta: (name) => `เรียนกับ ${name}`, qrTitle: "ดาวน์โหลด Candid สำหรับ iOS", privacy: "ความเป็นส่วนตัว", terms: "ข้อกำหนด" },
-  id: { cta: (name) => `Belajar bareng ${name}`, qrTitle: "Unduh Candid untuk iOS", privacy: "Privasi", terms: "Ketentuan" },
-  de: { cta: (name) => `Lerne mit ${name}`, qrTitle: "Candid für iOS laden", privacy: "Datenschutz", terms: "Bedingungen" },
-  it: { cta: (name) => `Studia con ${name}`, qrTitle: "Scarica Candid per iOS", privacy: "Privacy", terms: "Termini" },
+  en: { cta: (name) => `Study with ${name}`, qrTitle: "Download Candid", scanLabel: "SCAN TO GET STARTED", inlineLabel: "Scan to study for free", privacy: "Privacy", terms: "Terms" },
+  ko: { cta: (name) => `${name}와 공부하기`, qrTitle: "Candid 다운로드", privacy: "개인정보", terms: "이용약관" },
+  ja: { cta: (name) => `${name}と勉強する`, qrTitle: "Candidをダウンロード", privacy: "プライバシー", terms: "利用規約" },
+  zh: { cta: (name) => `和${name}一起学习`, qrTitle: "下载 Candid", privacy: "隐私", terms: "条款" },
+  "zh-Hant": { cta: (name) => `和${name}一起學習`, qrTitle: "下載 Candid", privacy: "隱私權", terms: "條款" },
+  es: { cta: (name) => `Estudia con ${name}`, qrTitle: "Descarga Candid", privacy: "Privacidad", terms: "Términos" },
+  ru: { cta: (name) => `Учиться с ${name}`, qrTitle: "Скачать Candid", privacy: "Конфиденциальность", terms: "Условия" },
+  fr: { cta: (name) => `Étudie avec ${name}`, qrTitle: "Télécharge Candid", privacy: "Confidentialité", terms: "Conditions" },
+  vi: { cta: (name) => `Học cùng ${name}`, qrTitle: "Tải Candid", privacy: "Quyền riêng tư", terms: "Điều khoản" },
+  th: { cta: (name) => `เรียนกับ ${name}`, qrTitle: "ดาวน์โหลด Candid", privacy: "ความเป็นส่วนตัว", terms: "ข้อกำหนด" },
+  id: { cta: (name) => `Belajar bareng ${name}`, qrTitle: "Unduh Candid", privacy: "Privasi", terms: "Ketentuan" },
+  de: { cta: (name) => `Lerne mit ${name}`, qrTitle: "Candid laden", privacy: "Datenschutz", terms: "Bedingungen" },
+  it: { cta: (name) => `Studia con ${name}`, qrTitle: "Scarica Candid", privacy: "Privacy", terms: "Termini" },
 };
 
 // Band labels match the app's Answers.xcstrings wording, in every site locale.
