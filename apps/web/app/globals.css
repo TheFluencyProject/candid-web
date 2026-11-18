@@ -377,7 +377,7 @@ html {
 .sd-en { margin: 3.4cqw 0 0; font-size: 5cqw; line-height: 1.3; color: rgba(255,255,255,.82); }
 @media (max-width: 859px) {
   .sd-sec { grid-template-columns: 1fr; gap: 40px; padding: 48px 16px 64px; text-align: center; justify-items: center; }
-  .sd-copy h2 { font-size: 30px; margin-inline: auto; }
+  .sd-copy h2 { font-size: 30px; margin-inline: auto; max-width: none; } /* no 9.5em cap on phones: one line wherever it fits (Adam 11/18) */
   .sd-sub { font-size: 16px; margin: 10px auto 0; }
   .sd-phone-wrap { width: min(290px, 74vw); order: 0; }
 }
