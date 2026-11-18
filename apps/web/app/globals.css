@@ -481,7 +481,9 @@ html {
 .lpp { padding: 40px 0 64px; overflow-x: clip; }
 .lpp-path { width: 440px; margin: 0 auto; }
 @media (min-width: 1024px) {
-  .lpp { padding: 12vh 0 22vh; }
+  /* "PART 1" on the thumbnail's top line (--lpp-top, lib/lesson-path-align: the left column is centred, so it moves with
+     the window and the title), less its header's 10px pad at 1.15×. */
+  .lpp { padding: calc(var(--lpp-top, 12vh) - 12px) 0 22vh; }
   .lpp-path { zoom: 1.15; }
 }
 .lpp-part + .lpp-part { margin-top: 56px; }

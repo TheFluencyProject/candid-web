@@ -8,7 +8,8 @@ const RESERVED_PX = 300;
 
 // The lesson share page's thumbnail in the tutor's focus crop; both hero arms use it. lg sizing is the caller's:
 // today's hero has the text beside the frame (only the header comes off the height), the path arm has it below.
-export default function LessonThumb({ lesson, lgMaxPx, lgReservedPx }: { lesson: LessonMeta; lgMaxPx: number; lgReservedPx: number }) {
+// animate = BlurImage's fade-and-unblur; the path arm shows it still (Adam 11/18: nothing else there animates in).
+export default function LessonThumb({ lesson, lgMaxPx, lgReservedPx, animate = true }: { lesson: LessonMeta; lgMaxPx: number; lgReservedPx: number; animate?: boolean }) {
   // orientation is nullable; default to vertical framing (matches shorts-style content).
   const isVertical = lesson.orientation !== "horizontal";
   // Crop height/width. Vertical gets a little more height than width; horizontal is square.
@@ -26,6 +27,14 @@ export default function LessonThumb({ lesson, lgMaxPx, lgReservedPx }: { lesson:
     isVertical && typeof lesson.thumbnail_focus_y === "number"
       ? Math.min(Math.max(lesson.thumbnail_focus_y, 0), 1)
       : null;
+
+  const img = (src: string, className: string) =>
+    animate ? (
+      <BlurImage src={src} alt={lesson.localized_title} className={className} />
+    ) : (
+      // eslint-disable-next-line @next/next/no-img-element
+      <img src={src} alt={lesson.localized_title} className={className} />
+    );
 
   if (!lesson.thumbnail_url) {
     return (
@@ -61,21 +70,13 @@ export default function LessonThumb({ lesson, lgMaxPx, lgReservedPx }: { lesson:
         // against this wrapper's own height, which is the image's rendered height.
         // The offset lives on the wrapper because BlurImage owns the img's own transform.
         <div className="absolute inset-x-0 top-0 mt-[50%]" style={{ transform: `translateY(${-focusY * 100}%)` }}>
-          <BlurImage
-            src={lesson.thumbnail_url}
-            alt={lesson.localized_title}
-            // `auto 9/16` = use the real ratio once decoded, else assume 9:16 (same cold-load
-            // guess as iOS's cachedAspect) — without it the wrapper is the 150px default
-            // height until decode and the crop visibly jumps.
-            className="block w-full h-auto aspect-[auto_9/16]"
-          />
+          {/* `auto 9/16` = use the real ratio once decoded, else assume 9:16 (same cold-load
+              guess as iOS's cachedAspect) — without it the wrapper is the 150px default
+              height until decode and the crop visibly jumps. */}
+          {img(lesson.thumbnail_url, "block w-full h-auto aspect-[auto_9/16]")}
         </div>
       ) : (
-        <BlurImage
-          src={lesson.thumbnail_url}
-          alt={lesson.localized_title}
-          className="block w-full h-full object-cover"
-        />
+        img(lesson.thumbnail_url, "block w-full h-full object-cover")
       )}
     </div>
   );

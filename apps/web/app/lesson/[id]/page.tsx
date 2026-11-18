@@ -13,6 +13,7 @@ import LessonPagePath, { type LessonPathCopy } from "@/components/LessonPagePath
 import LessonThumb from "@/components/LessonThumb";
 import ScrollNav from "@/components/ScrollNav";
 import { fetchLessonMeta, fetchLessonPath, fetchTutor, type LessonMeta } from "@/lib/api";
+import { alignLessonPath } from "@/lib/lesson-path-align";
 import { pickLocale } from "@/lib/i18n-helpers";
 import { getDesktopCtaVariant, getDistinctId, getLessonPageFlags, previewArm } from "@/lib/posthog-server";
 import { DESKTOP_CTA_ARMS, LESSON_HERO_ARMS, LESSON_HERO_FLAG_KEY, LESSON_SECTIONS_ARMS, LESSON_SECTIONS_FLAG_KEY } from "@/lib/posthog-config";
@@ -71,7 +72,9 @@ const BAND_LABELS: Record<Locale, Record<string, string>> = {
   it: { beginner: "Principiante", upper_beginner: "Principiante avanzato", lower_intermediate: "Intermedio basso", intermediate: "Intermedio" },
 };
 
-// The path arm's hero Study button; LessonPagePath's phone bar shows once it scrolls away.
+// The path arm's left column (LessonPagePath lines the path up with its top) and its Study button (the phone card
+// shows once it scrolls away).
+const HERO_ID = "lesson-hero";
 const HERO_CTA_ID = "lesson-hero-cta";
 
 function buildTitle(lesson: LessonMeta | null): string {
@@ -208,9 +211,10 @@ export default async function LessonPage({
           <ScrollNav />
           <div className="pt-[61px] px-4 lg:px-10 lg:grid lg:grid-cols-[minmax(360px,440px)_minmax(480px,600px)] lg:justify-center lg:gap-[72px]">
             <aside>
-              <div className="flex flex-col items-center text-center pt-3 pb-2 lg:sticky lg:top-[61px] lg:min-h-[calc(100svh-61px)] lg:justify-center lg:pt-4 lg:pb-12">
+              {/* lg+: vertically centred under the bar; LessonPagePath starts its first part on this column's top line. */}
+              <div id={HERO_ID} className="flex flex-col items-center text-center pt-3 pb-2 lg:sticky lg:top-[61px] lg:min-h-[calc(100svh-61px)] lg:justify-center lg:pt-4 lg:pb-12">
                 {/* lg+: the title, tutor row and button sit under the frame, so they come off its height too. */}
-                <LessonThumb lesson={lesson} lgMaxPx={360} lgReservedPx={360} />
+                <LessonThumb lesson={lesson} lgMaxPx={360} lgReservedPx={360} animate={false} />
                 <h1 className="mt-5 lg:mt-6 text-2xl md:text-3xl font-semibold max-w-xl lg:max-w-md leading-snug">
                   {lesson.localized_title}
                 </h1>
@@ -226,6 +230,7 @@ export default async function LessonPage({
               copy={pathCopy}
               ctaLabel={ctaLabel}
               ctaHref={downloadHref}
+              heroId={HERO_ID}
               heroCtaId={HERO_CTA_ID}
               lesson={{
                 title: lesson.localized_title,
@@ -237,6 +242,8 @@ export default async function LessonPage({
                   : "50% 50%",
               }}
             />
+            {/* Runs as the HTML parses (after the CSS, before first paint): starts the path on the left column's top line. */}
+            <script dangerouslySetInnerHTML={{ __html: `(${alignLessonPath.toString()})(${JSON.stringify(HERO_ID)})` }} />
           </div>
         </>
       ) : (

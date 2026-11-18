@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Icon, type Kind } from "@/components/LessonPath";
 import type { LessonPathData, LessonPathNodeKind } from "@/lib/api";
+import { alignLessonPath } from "@/lib/lesson-path-align";
 
 // The lesson share page's path arm (lesson-page-hero = path; plan lesson-page-path-2026-11-18): the lesson's whole
 // in-app path, one block per mini lesson ("PART n" over its title), its coins in the app's order on the app's wave,
@@ -31,7 +32,9 @@ type Props = {
   copy: LessonPathCopy;
   ctaLabel: string;
   ctaHref: string;
-  // The hero's Study button; the phone card shows once it has scrolled under the top bar.
+  // The hero's left column (desktop: the path's first part starts on its top line) and its Study button (phones: the
+  // card shows once it has scrolled under the top bar).
+  heroId: string;
   heroCtaId: string;
   // The phone card's row (Adam 11/18, phone 6): thumbnail, lesson title, tutor.
   lesson: { title: string; tutor: string; thumbUrl: string | null; thumbPos: string };
@@ -153,7 +156,7 @@ function bubbleCopy(row: Row, part: Part, copy: LessonPathCopy): { head: string;
 // The app's icons (LessonHubPath.icon): its quiz coin wears the headphones (.listen).
 const iconKind = (kind: RowKind): Kind => (kind === "quiz" ? "listen" : kind);
 
-export default function LessonPagePath({ path, accent, copy, ctaLabel, ctaHref, heroCtaId, lesson }: Props) {
+export default function LessonPagePath({ path, accent, copy, ctaLabel, ctaHref, heroId, heroCtaId, lesson }: Props) {
   const rootRef = useRef<HTMLDivElement>(null);
   const pathRef = useRef<HTMLDivElement>(null);
   const timer = useRef<number | undefined>(undefined);
@@ -174,6 +177,17 @@ export default function LessonPagePath({ path, accent, copy, ctaLabel, ctaHref, 
     size();
     return () => ro.disconnect();
   }, []);
+
+  // Desktop: keep the first part on the left column's top line as the window or the title's lines change (the page's
+  // inline script placed it before first paint).
+  useEffect(() => {
+    const hero = document.getElementById(heroId);
+    if (!hero) return;
+    const ro = new ResizeObserver(() => alignLessonPath(heroId));
+    ro.observe(hero);
+    for (const child of hero.children) ro.observe(child);
+    return () => ro.disconnect();
+  }, [heroId]);
 
   // An outside tap or a scroll closes the bubble; a tap's few px of jitter don't (the app drops it on a drag).
   useEffect(() => {
@@ -214,7 +228,8 @@ export default function LessonPagePath({ path, accent, copy, ctaLabel, ctaHref, 
   };
 
   return (
-    <div ref={rootRef} className="lpp" style={{ ["--a" as string]: accent }}>
+    // suppressHydrationWarning: the page's pre-paint script has already set --lpp-top on this style (lib/lesson-path-align).
+    <div ref={rootRef} className="lpp" style={{ ["--a" as string]: accent }} suppressHydrationWarning>
       <svg width="0" height="0" className="absolute" aria-hidden>
         <filter id="lpp-locked" colorInterpolationFilters="sRGB">
           <feColorMatrix type="matrix" values={LOCKED} />
