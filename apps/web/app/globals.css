@@ -527,3 +527,25 @@ html {
 .lpp-bar > a { height: 50px; font-size: 17px; }
 .lpp-bar.lpp-hide { transform: translateY(calc(100% + 20px)); opacity: 0; pointer-events: none; }
 @media (min-width: 1024px) { .lpp-bar { display: none; } }
+
+/* desktop-qr-card "card" arm (QRCard): the desktop QR floats bottom-right and stays. The coin bubble's dark
+   glass; white code straight on it; the title in --qrc (the page's Study colour); a faint --qrc line slowly circling the
+   edge (6 s a lap). Behind it the page dims 25% — no pointer events, so it still scrolls and clicks. Desktop only. */
+.qrc-root { position: fixed; inset: 0; z-index: 60; pointer-events: none; }
+.qrc-dim { position: absolute; inset: 0; background: #000; opacity: 0; transition: opacity .45s ease; }
+.qrc-on .qrc-dim { opacity: .25; }
+.qrc { position: absolute; right: 24px; bottom: 28px; width: 252px; padding: 16px 16px 20px; display: flex; flex-direction: column; align-items: center; gap: 16px; text-align: center; border-radius: 26px; background: rgba(46,46,52,.94); -webkit-backdrop-filter: blur(20px); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,.08); box-shadow: 0 18px 40px rgba(0,0,0,.5); opacity: 0; transform: translateY(28px) scale(.96); transition: transform .4s cubic-bezier(.2,.9,.3,1.25), opacity .22s ease; }
+.qrc-on .qrc { opacity: 1; transform: none; pointer-events: auto; }
+.qrc-code { width: 200px; height: 200px; padding: 6px; }
+.qrc-code svg { display: block; width: 100%; height: 100%; }
+.qrc-title { font-size: 18px; font-weight: 700; line-height: 1.25; letter-spacing: -.01em; text-wrap: balance; color: var(--qrc); }
+@property --qrc-ang { syntax: "<angle>"; inherits: false; initial-value: 0deg; }
+.qrc::before { content: ""; position: absolute; inset: -1px; border-radius: inherit; padding: 1.5px; background: conic-gradient(from var(--qrc-ang), transparent 0 64%, color-mix(in srgb, var(--qrc) 12%, transparent) 82%, color-mix(in srgb, var(--qrc) 45%, transparent) 95%, transparent 100%); -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask-composite: exclude; animation: qrc-line 6s linear infinite; pointer-events: none; }
+@keyframes qrc-line { to { --qrc-ang: 360deg; } }
+/* One moving thing at a time: once the card is up, the path's first coin stops pulsing. */
+html[data-qr-card] .lpp-cur::before { animation: none; opacity: 0; }
+@media (prefers-reduced-motion: reduce) {
+  .qrc { transition: opacity .2s ease; transform: none; }
+  .qrc::before { animation: none; background: color-mix(in srgb, var(--qrc) 14%, transparent); }
+}
+@media (max-width: 1023px) { .qrc-root { display: none; } }

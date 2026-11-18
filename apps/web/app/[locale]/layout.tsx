@@ -7,8 +7,8 @@ import { notFound } from "next/navigation";
 import { PostHogProvider } from "@/components/PostHogProvider";
 import InAppBrowserBlocker from "@/components/InAppBrowserBlocker";
 import DownloadQRInterceptor from "@/components/DownloadQRInterceptor";
-import { CTA_FLAG_KEY, DESKTOP_CTA_FLAG_KEY } from "@/lib/posthog-config";
-import { getDesktopCtaVariant, getDistinctId, getMobileCtaVariant } from "@/lib/posthog-server";
+import { CTA_FLAG_KEY, QR_CARD_FLAG_KEY } from "@/lib/posthog-config";
+import { getDistinctId, getMobileCtaVariant, getQrCardVariant } from "@/lib/posthog-server";
 
 const OG_LOCALES: Record<Locale, string> = {
   en: "en_US", ko: "ko_KR", ja: "ja_JP", zh: "zh_CN", "zh-Hant": "zh_TW", es: "es_ES",
@@ -74,13 +74,12 @@ export default async function LocaleLayout({ children, params }: Props) {
   // Reading cookies opts this layout into dynamic rendering — required so the
   // server-decided variant matches the client SDK's bootstrap on first paint.
   const distinctId = await getDistinctId();
-  const bootstrapFlags: Record<string, string | boolean> =
-    locale === "en"
-      ? {
-          [CTA_FLAG_KEY]: await getMobileCtaVariant(distinctId),
-          [DESKTOP_CTA_FLAG_KEY]: await getDesktopCtaVariant(distinctId),
-        }
-      : {};
+  // desktop-qr-card (every locale): which QR a desktop Study / Download tap shows. desktop-cta-qr is gone (11/18).
+  const qrArm = await getQrCardVariant(distinctId);
+  const bootstrapFlags: Record<string, string | boolean> = {
+    ...(locale === "en" ? { [CTA_FLAG_KEY]: await getMobileCtaVariant(distinctId) } : {}),
+    [QR_CARD_FLAG_KEY]: qrArm,
+  };
 
   // Get messages for client components
   const messages = await getMessages();
@@ -116,7 +115,8 @@ export default async function LocaleLayout({ children, params }: Props) {
             {children}
             <InAppBrowserBlocker />
             <DownloadQRInterceptor
-              label={(messages.tutor as { download_candid: string }).download_candid}
+              label={(messages.tutor as { download_to_get_started: string }).download_to_get_started}
+              qrArm={qrArm}
             />
           </PostHogProvider>
         </NextIntlClientProvider>

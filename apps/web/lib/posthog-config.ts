@@ -41,3 +41,9 @@ export type LessonSectionsVariant = (typeof LESSON_SECTIONS_ARMS)[number];
 export const LESSON_HERO_FLAG_KEY = "lesson-page-hero";
 export const LESSON_HERO_ARMS = ["control", "path"] as const;
 export type LessonHeroVariant = (typeof LESSON_HERO_ARMS)[number];
+
+// Desktop QR after a Study / Download tap, site-wide (landing, tutor pages, the lesson page's path hero): today's
+// centred blur popup vs a card floating in the bottom-right corner that stays. Plan lesson-page-qr-card-2026-11-18.
+export const QR_CARD_FLAG_KEY = "desktop-qr-card";
+export const QR_CARD_ARMS = ["control", "card"] as const;
+export type QrCardVariant = (typeof QR_CARD_ARMS)[number];

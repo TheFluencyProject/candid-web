@@ -206,6 +206,12 @@ export default function LessonPagePath({ path, accent, copy, ctaLabel, ctaHref, 
   }, [open]);
 
   useEffect(() => () => clearTimeout(timer.current), []);
+  // desktop-qr-card's card arm: a Study press brings up the corner QR card, which takes over from the open bubble.
+  useEffect(() => {
+    const close = () => setOpen(null);
+    window.addEventListener("candid:qr-card", close);
+    return () => window.removeEventListener("candid:qr-card", close);
+  }, []);
 
   // Phones: the Study card slides up once the hero's button has gone under the top bar (61px), and back down above it.
   useEffect(() => {

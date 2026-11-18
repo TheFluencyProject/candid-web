@@ -11,7 +11,7 @@ export default function LessonLayout({
         <meta name="color-scheme" content="dark" />
       </head>
       <body>
-        <AnonAnalytics desktopCta lessonPage>{children}</AnonAnalytics>
+        <AnonAnalytics lessonPage>{children}</AnonAnalytics>
       </body>
     </html>
   );
