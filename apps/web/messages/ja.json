@@ -167,5 +167,17 @@
     "button": "ウェイトリストに登録",
     "success": "登録しました！CandidのAndroid版がリリースされたら、メールでお知らせします。",
     "error": "問題が発生しました"
+  },
+  "lesson_path": {
+    "part": "パート{count}",
+    "watch": "見る",
+    "shadowing": "シャドーイング",
+    "expressions": "{count}文",
+    "vocab_practice": "語彙練習",
+    "words": "{count}語",
+    "listening_quiz": "リスニングクイズ",
+    "no_captions": "字幕なし · 通常スピード",
+    "dialogue": "会話",
+    "unit_review": "ユニット復習"
   }
 }

@@ -167,5 +167,17 @@
     "button": "加入候補名單",
     "success": "你已加入名單！Candid Android 版上線後，我們會寄 Email 通知你。",
     "error": "出錯了"
+  },
+  "lesson_path": {
+    "part": "第 {count} 部分",
+    "watch": "觀看",
+    "shadowing": "跟讀",
+    "expressions": "{count} 個句子",
+    "vocab_practice": "詞彙練習",
+    "words": "{count} 個單字",
+    "listening_quiz": "聽力測驗",
+    "no_captions": "無字幕 · 正常語速",
+    "dialogue": "對話",
+    "unit_review": "單元複習"
   }
 }

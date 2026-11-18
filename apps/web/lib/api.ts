@@ -1,6 +1,8 @@
 import type { Locale } from "@/i18n/routing";
 
-export const API_BASE_URL = "https://api.joincandid.co";
+// NEXT_PUBLIC_ (a client component reads this too) so a local run can point at the dev API
+// (https://dev.api.joincandid.co). Unset everywhere deployed = prod.
+export const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? "https://api.joincandid.co";
 
 export interface TutorLanguageProficiency {
   language: string;
@@ -89,6 +91,7 @@ export interface LessonMeta {
   tutor_slug: string;
   teaching_language: string;
   difficulty_band: string | null;
+  accent_color?: string | null;
 }
 
 // Returns null only for genuine 404 ("no such lesson"). Transient failures
@@ -105,6 +108,37 @@ export async function fetchLessonMeta(id: string, locale: string): Promise<Lesso
     throw new Error(`fetchLessonMeta(${id}, ${locale}): HTTP ${res.status}`);
   }
   return res.json();
+}
+
+// The lesson's whole in-app path (GET /public/lessons/:id/path): every mini lesson of the visible split
+// group, its coins in the app's order, its sticker, and the Dialogue / Unit Review tail.
+export type LessonPathNodeKind = "watch" | "speak" | "vocab" | "quiz";
+export interface LessonPathData {
+  hub_nodes_per_indent: number;
+  units: {
+    // Only in the asked locale (emoji appended); null = no title in that language → "PART n" alone.
+    title: string | null;
+    watch_seconds: number;
+    sticker: { url: string; width: number; height: number } | null;
+    nodes: { kind: LessonPathNodeKind; goal?: number }[];
+  }[];
+  tail: { dialogue: boolean; review: boolean };
+}
+
+// The path is an extra: any failure (404 until the route reaches prod, timeout, 5xx) → null, and the page
+// shows today's hero instead. 1 h cache: stickers are made after a lesson's first opens.
+export async function fetchLessonPath(id: string, locale: string): Promise<LessonPathData | null> {
+  try {
+    const res = await fetch(`${API_BASE_URL}/public/lessons/${id}/path?locale=${locale}`, {
+      next: { revalidate: 3600 },
+      signal: AbortSignal.timeout(8000),
+    });
+    if (!res.ok) return null;
+    const data: LessonPathData = await res.json();
+    return data.units?.length ? data : null;
+  } catch {
+    return null;
+  }
 }
 
 // ── Marketing clips (joincandid.co hero) ─────────────────────────────

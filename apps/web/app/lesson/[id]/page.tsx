@@ -3,17 +3,19 @@ import Image from "next/image";
 import Link from "next/link";
 import { headers } from "next/headers";
 import { notFound } from "next/navigation";
-import { getTranslations, setRequestLocale } from "next-intl/server";
+import { getMessages, getTranslations, setRequestLocale } from "next-intl/server";
 
-import BlurImage from "@/components/BlurImage";
 import DownloadQRInterceptor from "@/components/DownloadQRInterceptor";
 import DesktopCTA from "@/components/DesktopCTA";
 import FlagExposure from "@/components/FlagExposure";
 import LandingSections from "@/components/LandingSections";
-import { fetchLessonMeta, fetchTutor, type LessonMeta } from "@/lib/api";
+import LessonPagePath, { type LessonPathCopy } from "@/components/LessonPagePath";
+import LessonThumb from "@/components/LessonThumb";
+import ScrollNav from "@/components/ScrollNav";
+import { fetchLessonMeta, fetchLessonPath, fetchTutor, type LessonMeta } from "@/lib/api";
 import { pickLocale } from "@/lib/i18n-helpers";
-import { getDesktopCtaVariant, getDistinctId, getLessonSectionsVariant, previewDesktopCtaOverride, previewLessonSectionsOverride } from "@/lib/posthog-server";
-import { LESSON_SECTIONS_FLAG_KEY } from "@/lib/posthog-config";
+import { getDesktopCtaVariant, getDistinctId, getLessonPageFlags, previewArm } from "@/lib/posthog-server";
+import { DESKTOP_CTA_ARMS, LESSON_HERO_ARMS, LESSON_HERO_FLAG_KEY, LESSON_SECTIONS_ARMS, LESSON_SECTIONS_FLAG_KEY } from "@/lib/posthog-config";
 import type { Locale } from "@/i18n/routing";
 // import { localizeLanguageName } from "@/lib/i18n-helpers";
 
@@ -68,6 +70,9 @@ const BAND_LABELS: Record<Locale, Record<string, string>> = {
   de: { beginner: "Anfänger", upper_beginner: "Fortgeschrittener Anfänger", lower_intermediate: "Untere Mittelstufe", intermediate: "Mittelstufe" },
   it: { beginner: "Principiante", upper_beginner: "Principiante avanzato", lower_intermediate: "Intermedio basso", intermediate: "Intermedio" },
 };
+
+// The path arm's hero Study button; LessonPagePath's phone bar shows once it scrolls away.
+const HERO_CTA_ID = "lesson-hero-cta";
 
 function buildTitle(lesson: LessonMeta | null): string {
   const title = lesson?.localized_title;
@@ -124,46 +129,34 @@ export default async function LessonPage({
   const lesson = await fetchLessonMeta(id, locale);
   if (!lesson) notFound();
 
-  // Tutor branding is best-effort: a hiccup fetching the tutor must not crash the
-  // lesson page, so fall back to no-branding (null) rather than letting fetchTutor throw.
-  const tutor = lesson.tutor_slug
-    ? await fetchTutor(lesson.tutor_slug, locale).catch(() => null)
-    : null;
+  const [tutor, path] = await Promise.all([
+    // Tutor branding is best-effort: a hiccup fetching the tutor must not crash the
+    // lesson page, so fall back to no-branding (null) rather than letting fetchTutor throw.
+    lesson.tutor_slug ? fetchTutor(lesson.tutor_slug, locale).catch(() => null) : null,
+    // Fetched in both hero arms (never throws; null = no path), so the hero test only counts lessons that have one.
+    fetchLessonPath(lesson.lesson_id, locale),
+  ]);
 
   const copy = COPY[locale];
   // desktop-cta-qr arm: the same cached evaluation AnonAnalytics bootstraps (en only).
   const distinctId = await getDistinctId();
   const query = await searchParams;
   const desktopCtaVariant =
-    previewDesktopCtaOverride(query.cta) ??
+    previewArm(query.cta, DESKTOP_CTA_ARMS) ??
     (locale === "en" ? await getDesktopCtaVariant(distinctId) : undefined);
-  // lesson-page-sections arm (every locale): the same cached evaluation AnonAnalytics bootstraps.
-  const sectionsVariant = previewLessonSectionsOverride(query.sections) ?? (await getLessonSectionsVariant(distinctId));
+  // lesson-page-sections + lesson-page-hero arms (every locale): the same cached evaluation AnonAnalytics bootstraps.
+  const lessonFlags = await getLessonPageFlags(distinctId);
+  const sectionsVariant = previewArm(query.sections, LESSON_SECTIONS_ARMS) ?? lessonFlags.sections;
+  const heroVariant = previewArm(query.hero, LESSON_HERO_ARMS) ?? lessonFlags.hero;
+  // Path arm only when there's a path (fetch failed / route not live yet / no units → today's hero, and no
+  // hero exposure below, so the test only counts visitors who saw their arm).
+  const pathArm = heroVariant === "path" ? path : null;
+  // The lesson's accent drives the path and its Study buttons (black text, like home's lit coins); the site's mint without one.
+  const accent = lesson.accent_color || "#89FFB4";
+  const pathCopy = pathArm ? ((await getMessages()).lesson_path as LessonPathCopy) : null;
   const downloadHref = `/download/${lesson.tutor_slug}?l=${lesson.lesson_id}`;
+  const ctaLabel = copy.cta(lesson.tutor_name || "Candid");
   const tHome = sectionsVariant === "sections" ? await getTranslations("home") : null;
-  // orientation is nullable; default to vertical framing (matches shorts-style content).
-  const isVertical = lesson.orientation !== "horizontal";
-  // Crop height/width. Vertical gets a little more height than width; horizontal is square.
-  // Both sit well under the 1.472 the dashboard FramePicker clamps the saved focus against
-  // (HERO_CARD_ASPECT), so the crop can never pull blank space in above or below the square.
-  const frameRatio = isVertical ? 1.2 : 1;
-  // Height everything else in the viewport block takes — header, gaps, a two-line title, tutor
-  // row, CTA. Measured off the rendered page at the longest title we ship, not guessed. The frame
-  // gets what's left, so on a short screen it shrinks instead of pushing the CTA below the fold.
-  const RESERVED_PX = 300;
-  // lg+: title/tutor/CTA sit beside the frame, so only the header and padding come off the height.
-  const RESERVED_LG_PX = 160;
-  const frameStyle = {
-    aspectRatio: `1 / ${frameRatio}`,
-    "--frame-w": `min(300px, calc((100svh - ${RESERVED_PX}px) / ${frameRatio}))`,
-    "--frame-w-lg": `min(440px, calc((100svh - ${RESERVED_LG_PX}px) / ${frameRatio}))`,
-  } as React.CSSProperties;
-  const frameWidth = "w-[var(--frame-w)] lg:w-[var(--frame-w-lg)]";
-  // Focus only ever describes a vertical source; clamp like FocusFilledWebImage does on iOS.
-  const focusY =
-    isVertical && typeof lesson.thumbnail_focus_y === "number"
-      ? Math.min(Math.max(lesson.thumbnail_focus_y, 0), 1)
-      : null;
   // Tutor row ("Grace · Lower Intermediate"), every width.
   const bandLabel = lesson.difficulty_band ? BAND_LABELS[locale][lesson.difficulty_band] ?? null : null;
   const tutorPhoto = tutor?.large_profile_picture_url ?? tutor?.profile_picture_url ?? null;
@@ -173,120 +166,105 @@ export default async function LessonPage({
   // const bandLabel = lesson.difficulty_band ? BAND_LABELS[locale][lesson.difficulty_band] : null;
   // const levelSubtitle = bandLabel ? `${bandLabel} ${languageLabel}` : languageLabel;
 
+  const tutorRow = (className: string) => (
+    <div className={`${className} inline-flex items-center gap-3`}>
+      {tutorPhoto && (
+        // Plain <img> direct from S3 — bypasses the /_next/image transcode hop.
+        // eslint-disable-next-line @next/next/no-img-element
+        <img src={tutorPhoto} alt={lesson.tutor_name} className="w-7 h-7 rounded-full object-cover" />
+      )}
+      <span className="text-base font-medium lg:font-normal">
+        {lesson.tutor_name}
+        {bandLabel && ` · ${bandLabel}`}
+      </span>
+    </div>
+  );
+
+  // /download/{slug} = this tutor's App Store link. On desktop the interceptor below
+  // swallows the click and pops a QR of the equivalent /qr/{slug} link (same
+  // destination, but scannable without tripping the App Clip card); mobile navigates
+  // normally. Either way the click is tracked as study_cta_clicked.
+  const studyCta = (
+    <DesktopCTA
+      href={downloadHref}
+      label={ctaLabel}
+      scanLabel={copy.scanLabel ?? COPY.en.scanLabel!}
+      inlineLabel={copy.inlineLabel ?? COPY.en.inlineLabel!}
+      tutorSlug={lesson.tutor_slug}
+      lessonId={lesson.lesson_id}
+      surface="lesson"
+      variant={desktopCtaVariant}
+      distinctId={distinctId}
+      color={pathArm ? accent : undefined}
+    />
+  );
+
   return (
     <main data-tutor-slug={lesson.tutor_slug} className="flex flex-col" style={{ backgroundColor: "#18181C", color: "#FFFFFF" }}>
-      {/* One viewport tall, so the CTA is always reachable without scrolling and the footer
-          still starts below the fold. svh, not vh — vh on mobile Safari is the URL-bar-hidden
-          viewport, which is what pushed the CTA off screen. */}
-      <div className="min-h-[100svh] flex flex-col">
-        <header className="px-5 md:px-10 pt-5">
-          <Link href="/" className="inline-block">
-            <Image
-              src="/wordmark-white.svg"
-              alt="Candid"
-              width={72}
-              height={36}
-              priority
-              className="hover:opacity-80 transition-opacity"
-            />
-          </Link>
-        </header>
-
-        <section className="flex-1 flex flex-col lg:flex-row items-center justify-center lg:gap-14 px-5 py-4 text-center">
-          {lesson.thumbnail_url ? (
-            <div
-              className={`relative shrink-0 max-w-full overflow-hidden rounded-[1.75rem] shadow-2xl ${frameWidth}`}
-              style={
-                focusY != null
-                  ? {
-                      ...frameStyle,
-                      // Fallback layer for the one case the crop below can't cover: a barely-portrait
-                      // source (ratio under the frame's) leaves a strip once the fill binds on width.
-                      // iOS re-binds on height there; here the same image, centre-cropped, fills it.
-                      backgroundImage: `url(${lesson.thumbnail_url})`,
-                      backgroundSize: "cover",
-                      backgroundPosition: "center",
-                    }
-                  : frameStyle
-              }
-            >
-              {focusY != null ? (
-                // The tutor framed a full-width SQUARE centred at focusY. iOS pins that square's top
-                // to the frame top on taller-than-square cards (FocusFilledWebImage.focusYOffset), so
-                // the image top sits at frameW/2 − focusY·imgH. Percentage margins resolve against the
-                // containing block's WIDTH, so mt-[50%] is exactly frameW/2; translateY% resolves
-                // against this wrapper's own height, which is the image's rendered height.
-                // The offset lives on the wrapper because BlurImage owns the img's own transform.
-                <div className="absolute inset-x-0 top-0 mt-[50%]" style={{ transform: `translateY(${-focusY * 100}%)` }}>
-                  <BlurImage
-                    src={lesson.thumbnail_url}
-                    alt={lesson.localized_title}
-                    // `auto 9/16` = use the real ratio once decoded, else assume 9:16 (same cold-load
-                    // guess as iOS's cachedAspect) — without it the wrapper is the 150px default
-                    // height until decode and the crop visibly jumps.
-                    className="block w-full h-auto aspect-[auto_9/16]"
-                  />
+      {pathArm && pathCopy ? (
+        // lesson-page-hero = path: the pinned top bar; desktop = thumbnail, title, tutor row and button pinned in a
+        // centered left column beside the lesson's whole path; phones = the same first screen, the path below it.
+        <>
+          <ScrollNav />
+          <div className="pt-[61px] px-4 lg:px-10 lg:grid lg:grid-cols-[minmax(360px,440px)_minmax(480px,600px)] lg:justify-center lg:gap-[72px]">
+            <aside>
+              <div className="flex flex-col items-center text-center pt-3 pb-2 lg:sticky lg:top-[61px] lg:min-h-[calc(100svh-61px)] lg:justify-center lg:pt-4 lg:pb-12">
+                {/* lg+: the title, tutor row and button sit under the frame, so they come off its height too. */}
+                <LessonThumb lesson={lesson} lgMaxPx={360} lgReservedPx={360} />
+                <h1 className="mt-5 lg:mt-6 text-2xl md:text-3xl font-semibold max-w-xl lg:max-w-md leading-snug">
+                  {lesson.localized_title}
+                </h1>
+                {tutorRow("mt-3")}
+                <div id={HERO_CTA_ID} className="mt-5 lg:mt-7">
+                  {studyCta}
                 </div>
-              ) : (
-                <BlurImage
-                  src={lesson.thumbnail_url}
-                  alt={lesson.localized_title}
-                  className="block w-full h-full object-cover"
-                />
-              )}
+              </div>
+            </aside>
+            <LessonPagePath path={pathArm} accent={accent} copy={pathCopy} ctaLabel={ctaLabel} ctaHref={downloadHref} heroCtaId={HERO_CTA_ID} />
+          </div>
+        </>
+      ) : (
+        // One viewport tall, so the CTA is always reachable without scrolling and the footer
+        // still starts below the fold. svh, not vh — vh on mobile Safari is the URL-bar-hidden
+        // viewport, which is what pushed the CTA off screen.
+        <div className="min-h-[100svh] flex flex-col">
+          <header className="px-5 md:px-10 pt-5">
+            <Link href="/" className="inline-block">
+              <Image
+                src="/wordmark-white.svg"
+                alt="Candid"
+                width={72}
+                height={36}
+                priority
+                className="hover:opacity-80 transition-opacity"
+              />
+            </Link>
+          </header>
+
+          <section className="flex-1 flex flex-col lg:flex-row items-center justify-center lg:gap-14 px-5 py-4 text-center">
+            {/* lg+: title/tutor/CTA sit beside the frame, so only the header and padding come off the height. */}
+            <LessonThumb lesson={lesson} lgMaxPx={440} lgReservedPx={160} />
+
+            {/* lg+: beside the frame, left-aligned. */}
+            <div className="flex flex-col items-center lg:items-start lg:text-left">
+            <h1 className="mt-5 lg:mt-3 text-2xl md:text-3xl font-semibold max-w-xl lg:max-w-md leading-snug">
+              {lesson.localized_title}
+            </h1>
+            {/* Hidden for now. Title → tutor row falls back to mt-6, the same layout this had
+                whenever the old category subtitle was null. */}
+            {/* <p className="mt-2 text-base md:text-lg font-light" style={{ color: "rgba(255,255,255,0.6)" }}>
+              {levelSubtitle}
+            </p> */}
+
+            {/* lg+: above the title. */}
+            {tutorRow("mt-4 lg:mt-0 lg:order-first")}
+
+            <div className="mt-5 lg:mt-10">{studyCta}</div>
             </div>
-          ) : (
-            <div
-              className={`shrink-0 max-w-full rounded-[1.75rem] ${frameWidth}`}
-              style={{ ...frameStyle, background: "linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%)" }}
-            />
-          )}
-
-          {/* lg+: beside the frame, left-aligned. */}
-          <div className="flex flex-col items-center lg:items-start lg:text-left">
-          <h1 className="mt-5 lg:mt-3 text-2xl md:text-3xl font-semibold max-w-xl lg:max-w-md leading-snug">
-            {lesson.localized_title}
-          </h1>
-          {/* Hidden for now. Title → tutor row falls back to mt-6, the same layout this had
-              whenever the old category subtitle was null. */}
-          {/* <p className="mt-2 text-base md:text-lg font-light" style={{ color: "rgba(255,255,255,0.6)" }}>
-            {levelSubtitle}
-          </p> */}
-
-          {/* lg+: above the title. */}
-          <div className="mt-4 lg:mt-0 lg:order-first inline-flex items-center gap-3">
-            {tutorPhoto && (
-              // Plain <img> direct from S3 — bypasses the /_next/image transcode hop.
-              // eslint-disable-next-line @next/next/no-img-element
-              <img src={tutorPhoto} alt={lesson.tutor_name} className="w-7 h-7 rounded-full object-cover" />
-            )}
-            <span className="text-base font-medium lg:font-normal">
-              {lesson.tutor_name}
-              {bandLabel && ` · ${bandLabel}`}
-            </span>
-          </div>
-
-          {/* /download/{slug} = this tutor's App Store link. On desktop the interceptor below
-              swallows the click and pops a QR of the equivalent /qr/{slug} link (same
-              destination, but scannable without tripping the App Clip card); mobile navigates
-              normally. Either way the click is tracked as study_cta_clicked. */}
-          <div className="mt-5 lg:mt-10">
-            <DesktopCTA
-              href={downloadHref}
-              label={copy.cta(lesson.tutor_name || "Candid")}
-              scanLabel={copy.scanLabel ?? COPY.en.scanLabel!}
-              inlineLabel={copy.inlineLabel ?? COPY.en.inlineLabel!}
-              tutorSlug={lesson.tutor_slug}
-              lessonId={lesson.lesson_id}
-              surface="lesson"
-              variant={desktopCtaVariant}
-              distinctId={distinctId}
-            />
-          </div>
-          </div>
-          <DownloadQRInterceptor label={copy.qrTitle} />
-        </section>
-      </div>
+          </section>
+        </div>
+      )}
+      <DownloadQRInterceptor label={copy.qrTitle} />
 
       {/* lesson-page-sections test arm: the home page's sections under the first screen, so the heading
           only shows once the visitor scrolls. Their buttons keep this lesson's download link. */}
@@ -312,9 +290,11 @@ export default async function LessonPage({
         </>
       )}
       <FlagExposure flag={LESSON_SECTIONS_FLAG_KEY} variant={sectionsVariant} />
+      <FlagExposure flag={LESSON_HERO_FLAG_KEY} variant={path ? heroVariant : undefined} />
 
+      {/* Path arm, phones: room for the floating Study bar under the last line. */}
       <footer
-        className="px-5 py-6 flex items-center justify-between flex-wrap gap-4 text-sm"
+        className={`px-5 pt-6 flex items-center justify-between flex-wrap gap-4 text-sm ${pathArm ? "pb-[120px] lg:pb-6" : "pb-6"}`}
         style={{ color: "rgba(255,255,255,0.5)" }}
       >
         <p>&copy; {new Date().getFullYear()} The Fluency Project Inc.</p>

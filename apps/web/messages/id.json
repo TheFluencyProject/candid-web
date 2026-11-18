@@ -167,5 +167,17 @@
     "button": "Gabung daftar tunggu",
     "success": "Kamu sudah masuk daftar! Kami akan kabari lewat email begitu Candid tersedia di Android.",
     "error": "Terjadi kesalahan"
+  },
+  "lesson_path": {
+    "part": "Bagian {count}",
+    "watch": "Menonton",
+    "shadowing": "Shadowing",
+    "expressions": "{count} kalimat",
+    "vocab_practice": "Latihan Kosakata",
+    "words": "{count} kata",
+    "listening_quiz": "Kuis Mendengarkan",
+    "no_captions": "Tanpa teks · Kecepatan asli",
+    "dialogue": "Dialog",
+    "unit_review": "Ulasan Unit"
   }
 }

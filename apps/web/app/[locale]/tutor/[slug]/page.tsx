@@ -19,7 +19,8 @@ import { localizeLanguageName, localizeMapCountry, capitalize, withKoreanParticl
 import { type Tutor, type TutorLanguageProficiency, type MarketingClip, fetchTutor, fetchMarketingClips } from "@/lib/api";
 import { isJoinForFreeContext, isCandidtutorsHost } from "@/lib/canonical-hosts";
 import { isLocale, routing, type Locale } from "@/i18n/routing";
-import { getDesktopCtaVariant, getDistinctId, previewDesktopCtaOverride } from "@/lib/posthog-server";
+import { getDesktopCtaVariant, getDistinctId, previewArm } from "@/lib/posthog-server";
+import { DESKTOP_CTA_ARMS } from "@/lib/posthog-config";
 
 function formatLanguages(languages: TutorLanguageProficiency[]): string {
   return languages
@@ -153,7 +154,7 @@ export default async function TutorPage({ params, searchParams }: Props) {
   // desktop-cta-qr arm for the joincandid hero (en only; same cached call the layout bootstraps).
   const distinctId = await getDistinctId();
   const desktopCtaVariant =
-    previewDesktopCtaOverride(sp.cta) ??
+    previewArm(sp.cta, DESKTOP_CTA_ARMS) ??
     (!uses_join_sheet && locale === "en" ? await getDesktopCtaVariant(distinctId) : undefined);
 
   const firstName = tutor.name.split(" ")[0];

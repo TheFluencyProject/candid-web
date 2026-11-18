@@ -238,6 +238,7 @@ html {
 .lp-pn svg { width: 33px; height: 33px; fill: currentColor; }
 .lp-db { display: block; width: 34px; height: 21px; background: currentColor; -webkit-mask: url(/landing/dumbbell-fill.png) center / contain no-repeat; mask: url(/landing/dumbbell-fill.png) center / contain no-repeat; }
 .lp-tr { display: block; width: 32px; height: 33px; background: currentColor; -webkit-mask: url(/landing/trophy-fill.png) center / contain no-repeat; mask: url(/landing/trophy-fill.png) center / contain no-repeat; }
+.lp-tk { display: block; width: 34px; height: 34px; background: currentColor; -webkit-mask: url(/landing/talk.svg) center / contain no-repeat; mask: url(/landing/talk.svg) center / contain no-repeat; }
 .lp-pn.lp-done .lp-face { background: var(--a); box-shadow: 0 6px 0 color-mix(in srgb, var(--a) 58%, #000); color: #141414; }
 .lp-pst { position: absolute; transform: translate(-50%, -50%) rotate(var(--r)); }
 .lp-pst img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; }
@@ -473,3 +474,48 @@ html {
   .ci-right { padding-right: 64px; }
   .ci-phone { width: min(280px, 66vw); }
 }
+
+/* ── Lesson share page: the lesson's whole path (LessonPagePath; plan lesson-page-path-2026-11-18) ── */
+/* Coins are home's .lp-pn / .lp-face / .lp-done; laid out in flow, one block per mini lesson. Phones scale the
+   440-wide path to the column (LessonPagePath sets zoom); desktop shows it a touch bigger (mockup A). */
+.lpp { padding: 40px 0 64px; overflow-x: clip; }
+.lpp-path { width: 440px; margin: 0 auto; }
+@media (min-width: 1024px) {
+  .lpp { padding: 12vh 0 22vh; }
+  .lpp-path { zoom: 1.15; }
+}
+.lpp-part + .lpp-part { margin-top: 56px; }
+.lpp-ph { text-align: center; padding: 10px 24px 36px; }
+.lpp-ph b { display: block; font-size: 13px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--a); }
+.lpp-ph span { display: block; margin-top: 6px; font-size: 21px; font-weight: 600; line-height: 1.25; text-wrap: balance; }
+/* "PART n" alone (no title in the visitor's language): a touch bigger so it still reads as the header. */
+.lpp-ph.lpp-bare b { font-size: 15px; }
+.lpp-row { position: relative; height: 70px; margin-bottom: 28px; }
+.lpp-row.lpp-open { z-index: 6; }
+/* Every coin is a 3D button: a press sinks the face onto its lip. */
+.lpp-coin { top: 0; padding: 0; cursor: pointer; -webkit-tap-highlight-color: transparent; touch-action: manipulation; user-select: none; }
+.lpp-coin .lp-face { transition: transform .09s ease, box-shadow .09s ease, background .2s, color .2s; }
+.lpp-coin.lpp-down .lp-face { transform: translateY(6px); box-shadow: 0 0 0 transparent; }
+.lpp-coin:focus-visible { outline: 2px solid var(--a); outline-offset: 10px; border-radius: 50%; }
+/* The app's HubCurrentNodeRing on coin 1: a filled accent copy of the coin's outline (disc + 6px lip) swelling 1 → 1.45×
+   while fading .45 → 0, ease-out 1.8s, on repeat. Reduce Motion: a still, faint 1.15× halo. */
+.lpp-cur::before { content: ""; position: absolute; left: 0; top: 0; width: 70px; height: 76px; border-radius: 35px; background: var(--a); animation: lpp-halo 1.8s ease-out infinite; pointer-events: none; }
+@keyframes lpp-halo { from { transform: scale(1); opacity: .45; } to { transform: scale(1.45); opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .lpp-cur::before { animation: none; transform: scale(1.15); opacity: .2; } }
+/* Stickers never color in: #lpp-locked (LessonPagePath) maps them onto the page → coin-gray ramp. */
+.lpp-stk { position: absolute; transform: translate(-50%, -50%) rotate(var(--r)); pointer-events: none; }
+.lpp-stk img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; filter: url(#lpp-locked); }
+/* The app's node bubble (ChapterRowBubble): glass card under the coin, arrow up at it, text left-aligned. */
+.lpp-bub { position: absolute; top: 88px; width: 300px; padding: 18px; border-radius: 22px; background: rgba(46,46,52,.94); -webkit-backdrop-filter: blur(20px); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,.08); box-shadow: 0 18px 40px rgba(0,0,0,.5); text-align: left; animation: lpp-pop .18s ease-out; }
+.lpp-bub::before { content: ""; position: absolute; top: -9px; left: var(--ax); width: 18px; height: 18px; background: rgba(46,46,52,.94); border-left: 1px solid rgba(255,255,255,.08); border-top: 1px solid rgba(255,255,255,.08); transform: translateX(-50%) rotate(45deg); border-top-left-radius: 4px; }
+.lpp-bub b { display: block; font-size: 18px; font-weight: 700; line-height: 1.25; text-wrap: pretty; }
+.lpp-bub span { display: block; margin-top: 6px; font-size: 14px; color: rgba(255,255,255,.6); }
+.lpp-pl { display: inline-block; width: 9px; height: 10px; margin-right: 7px; background: currentColor; clip-path: polygon(0 0, 100% 50%, 0 100%); }
+.lpp-bub a, .lpp-bar a { display: flex; align-items: center; justify-content: center; width: 100%; border-radius: 999px; font-weight: 700; color: #000; white-space: nowrap; }
+.lpp-bub a { height: 50px; margin-top: 16px; font-size: 17px; }
+@keyframes lpp-pop { from { opacity: 0; transform: translateY(-6px) scale(.97); } to { opacity: 1; transform: none; } }
+/* Phones: the Study bar slides up once the hero's button has scrolled away (phone 1). */
+.lpp-bar { position: fixed; z-index: 20; left: 0; right: 0; bottom: 0; display: flex; justify-content: center; padding: 28px 16px calc(18px + env(safe-area-inset-bottom)); background: linear-gradient(rgba(24,24,28,0), rgba(24,24,28,.92) 40%, #18181C); transition: transform .3s ease, opacity .3s ease; }
+.lpp-bar a { max-width: 420px; height: 52px; font-size: 17px; }
+.lpp-bar.lpp-hide { transform: translateY(110%); opacity: 0; pointer-events: none; }
+@media (min-width: 1024px) { .lpp-bar { display: none; } }

@@ -28,10 +28,16 @@ export type MobileCtaVariant = "control" | "download_app";
 
 // Desktop hero CTA on tutor + lesson pages: plan desktop-cta-qr-ab-test-2026-11-01.
 export const DESKTOP_CTA_FLAG_KEY = "desktop-cta-qr";
-
-export type DesktopCtaVariant = "control" | "morph" | "inline";
+export const DESKTOP_CTA_ARMS = ["control", "morph", "inline"] as const;
+export type DesktopCtaVariant = (typeof DESKTOP_CTA_ARMS)[number];
 
 // Lesson share page: the home page's sections under the first screen. Plan lesson-page-landing-sections-2026-11-17.
 export const LESSON_SECTIONS_FLAG_KEY = "lesson-page-sections";
+export const LESSON_SECTIONS_ARMS = ["control", "sections"] as const;
+export type LessonSectionsVariant = (typeof LESSON_SECTIONS_ARMS)[number];
 
-export type LessonSectionsVariant = "control" | "sections";
+// Lesson share page hero: today's thumbnail hero vs the lesson's path beside it. Stacked on lesson-page-sections.
+// Plan lesson-page-path-2026-11-18.
+export const LESSON_HERO_FLAG_KEY = "lesson-page-hero";
+export const LESSON_HERO_ARMS = ["control", "path"] as const;
+export type LessonHeroVariant = (typeof LESSON_HERO_ARMS)[number];

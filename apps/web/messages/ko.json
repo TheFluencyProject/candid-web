@@ -165,5 +165,17 @@
     "button": "대기자 명단 등록",
     "success": "등록되었어요! Candid가 안드로이드에 출시되면 이메일로 알려드릴게요.",
     "error": "문제가 발생했어요"
+  },
+  "lesson_path": {
+    "part": "부분 {count}",
+    "watch": "보기",
+    "shadowing": "쉐도잉",
+    "expressions": "표현 {count}개",
+    "vocab_practice": "어휘 연습",
+    "words": "단어 {count}개",
+    "listening_quiz": "듣기 퀴즈",
+    "no_captions": "자막 없음 · 원래 속도",
+    "dialogue": "대화",
+    "unit_review": "유닛 복습"
   }
 }
