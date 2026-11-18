@@ -511,11 +511,17 @@ html {
 .lpp-bub b { display: block; font-size: 18px; font-weight: 700; line-height: 1.25; text-wrap: pretty; }
 .lpp-bub span { display: block; margin-top: 6px; font-size: 14px; color: rgba(255,255,255,.6); }
 .lpp-pl { display: inline-block; width: 9px; height: 10px; margin-right: 7px; background: currentColor; clip-path: polygon(0 0, 100% 50%, 0 100%); }
-.lpp-bub a, .lpp-bar a { display: flex; align-items: center; justify-content: center; width: 100%; border-radius: 999px; font-weight: 700; color: #000; white-space: nowrap; }
+.lpp-bub a, .lpp-bar > a { display: flex; align-items: center; justify-content: center; width: 100%; border-radius: 999px; font-weight: 700; color: #000; white-space: nowrap; }
 .lpp-bub a { height: 50px; margin-top: 16px; font-size: 17px; }
 @keyframes lpp-pop { from { opacity: 0; transform: translateY(-6px) scale(.97); } to { opacity: 1; transform: none; } }
-/* Phones: the Study bar slides up once the hero's button has scrolled away (phone 1). */
-.lpp-bar { position: fixed; z-index: 20; left: 0; right: 0; bottom: 0; display: flex; justify-content: center; padding: 28px 16px calc(18px + env(safe-area-inset-bottom)); background: linear-gradient(rgba(24,24,28,0), rgba(24,24,28,.92) 40%, #18181C); transition: transform .3s ease, opacity .3s ease; }
-.lpp-bar a { max-width: 420px; height: 52px; font-size: 17px; }
-.lpp-bar.lpp-hide { transform: translateY(110%); opacity: 0; pointer-events: none; }
+/* Phones (phone 6, Adam 11/18): a glass card slides up once the hero's button has scrolled away — the lesson's row
+   (thumbnail, title, tutor) over the Study button. */
+.lpp-bar { position: fixed; z-index: 20; left: 0; right: 0; bottom: calc(10px + env(safe-area-inset-bottom)); width: calc(100% - 20px); max-width: 520px; margin: 0 auto; display: flex; flex-direction: column; gap: 12px; padding: 12px; border-radius: 26px; background: rgba(40,40,46,.82); -webkit-backdrop-filter: blur(20px); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,.06); box-shadow: 0 10px 30px rgba(0,0,0,.45); transition: transform .3s ease, opacity .3s ease; }
+.lpp-bar-row { display: flex; align-items: center; gap: 12px; min-width: 0; padding: 0 2px; }
+.lpp-bar-row img { flex: none; width: 44px; height: 44px; border-radius: 10px; object-fit: cover; }
+.lpp-bar-row div { min-width: 0; }
+.lpp-bar-row b { display: block; font-size: 15px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.lpp-bar-row span { display: block; margin-top: 2px; font-size: 13px; color: #A7A7A9; }
+.lpp-bar > a { height: 50px; font-size: 17px; }
+.lpp-bar.lpp-hide { transform: translateY(calc(100% + 20px)); opacity: 0; pointer-events: none; }
 @media (min-width: 1024px) { .lpp-bar { display: none; } }

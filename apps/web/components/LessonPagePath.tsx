@@ -9,7 +9,7 @@ import type { LessonPathData, LessonPathNodeKind } from "@/lib/api";
 // its sticker beside them, Dialogue + Unit Review at the end. Unlike home's path nothing colors in on scroll: only
 // coin 1 is lit (with the app's pulse), every other coin and every sticker stays locked gray, so the visitor has to
 // press Study to fill it in (Adam 11/18). Every coin presses like the app's and opens the app's bubble on release.
-// Phones also get the floating Study bar once the hero's button has scrolled away.
+// Phones also get the floating Study card (the lesson's row over the button) once the hero's button has scrolled away.
 
 // Raw message templates (messages/*.json lesson_path, copied from the app's Localizable.xcstrings); {count} filled here.
 export type LessonPathCopy = {
@@ -31,8 +31,10 @@ type Props = {
   copy: LessonPathCopy;
   ctaLabel: string;
   ctaHref: string;
-  // The hero's Study button; the phone bar shows once it has scrolled under the top bar.
+  // The hero's Study button; the phone card shows once it has scrolled under the top bar.
   heroCtaId: string;
+  // The phone card's row (Adam 11/18, phone 6): thumbnail, lesson title, tutor.
+  lesson: { title: string; tutor: string; thumbUrl: string | null; thumbPos: string };
 };
 
 type RowKind = LessonPathNodeKind | "dialogue" | "trophy";
@@ -151,7 +153,7 @@ function bubbleCopy(row: Row, part: Part, copy: LessonPathCopy): { head: string;
 // The app's icons (LessonHubPath.icon): its quiz coin wears the headphones (.listen).
 const iconKind = (kind: RowKind): Kind => (kind === "quiz" ? "listen" : kind);
 
-export default function LessonPagePath({ path, accent, copy, ctaLabel, ctaHref, heroCtaId }: Props) {
+export default function LessonPagePath({ path, accent, copy, ctaLabel, ctaHref, heroCtaId, lesson }: Props) {
   const rootRef = useRef<HTMLDivElement>(null);
   const pathRef = useRef<HTMLDivElement>(null);
   const timer = useRef<number | undefined>(undefined);
@@ -191,7 +193,7 @@ export default function LessonPagePath({ path, accent, copy, ctaLabel, ctaHref, 
 
   useEffect(() => () => clearTimeout(timer.current), []);
 
-  // Phones: the Study bar slides up once the hero's button has gone under the top bar (61px), and back down above it.
+  // Phones: the Study card slides up once the hero's button has gone under the top bar (61px), and back down above it.
   useEffect(() => {
     const hero = document.getElementById(heroCtaId);
     if (!hero) return;
@@ -277,6 +279,16 @@ export default function LessonPagePath({ path, accent, copy, ctaLabel, ctaHref, 
         ))}
       </div>
       <div className={`lpp-bar${barOn ? "" : " lpp-hide"}`} aria-hidden={!barOn}>
+        <div className="lpp-bar-row">
+          {lesson.thumbUrl && (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={lesson.thumbUrl} alt="" style={{ objectPosition: lesson.thumbPos }} />
+          )}
+          <div>
+            <b>{lesson.title}</b>
+            <span>{lesson.tutor}</span>
+          </div>
+        </div>
         <a href={ctaHref} className="cta-3d" style={{ ["--cta" as string]: accent }} tabIndex={barOn ? undefined : -1}>
           {ctaLabel}
         </a>

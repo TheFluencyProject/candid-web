@@ -220,7 +220,23 @@ export default async function LessonPage({
                 </div>
               </div>
             </aside>
-            <LessonPagePath path={pathArm} accent={accent} copy={pathCopy} ctaLabel={ctaLabel} ctaHref={downloadHref} heroCtaId={HERO_CTA_ID} />
+            <LessonPagePath
+              path={pathArm}
+              accent={accent}
+              copy={pathCopy}
+              ctaLabel={ctaLabel}
+              ctaHref={downloadHref}
+              heroCtaId={HERO_CTA_ID}
+              lesson={{
+                title: lesson.localized_title,
+                tutor: lesson.tutor_name,
+                thumbUrl: lesson.thumbnail_url || null,
+                // The tutor's framing (vertical sources only), like the hero's crop.
+                thumbPos: lesson.orientation !== "horizontal" && typeof lesson.thumbnail_focus_y === "number"
+                  ? `50% ${Math.round(Math.min(Math.max(lesson.thumbnail_focus_y, 0), 1) * 100)}%`
+                  : "50% 50%",
+              }}
+            />
           </div>
         </>
       ) : (
@@ -292,9 +308,9 @@ export default async function LessonPage({
       <FlagExposure flag={LESSON_SECTIONS_FLAG_KEY} variant={sectionsVariant} />
       <FlagExposure flag={LESSON_HERO_FLAG_KEY} variant={path ? heroVariant : undefined} />
 
-      {/* Path arm, phones: room for the floating Study bar under the last line. */}
+      {/* Path arm, phones: room for the floating Study card under the last line. */}
       <footer
-        className={`px-5 pt-6 flex items-center justify-between flex-wrap gap-4 text-sm ${pathArm ? "pb-[120px] lg:pb-6" : "pb-6"}`}
+        className={`px-5 pt-6 flex items-center justify-between flex-wrap gap-4 text-sm ${pathArm ? "pb-[170px] lg:pb-6" : "pb-6"}`}
         style={{ color: "rgba(255,255,255,0.5)" }}
       >
         <p>&copy; {new Date().getFullYear()} The Fluency Project Inc.</p>
