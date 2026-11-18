@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import posthog from "posthog-js";
 import { QRCodeSVG } from "qrcode.react";
 import ResponsiveOverlay from "@/components/ResponsiveOverlay";
@@ -8,7 +8,8 @@ import AndroidWaitlistOverlay, { type AndroidWaitlistTarget } from "@/components
 import type { AndroidWaitlistSurface } from "@/lib/api";
 import { isAndroid } from "@/lib/in-app-browser";
 import { buildQrUrl } from "@/lib/qr-url";
-import type { DesktopCtaVariant } from "@/lib/posthog-config";
+import { QR_CARD_FLAG_KEY, QR_CARD_ARMS, type DesktopCtaVariant, type QrCardVariant } from "@/lib/posthog-config";
+import QRCard from "@/components/QRCard";
 
 // Which page the click happened on, for the funnel. Custom-domain tutor pages rewrite server-side
 // so their pathname is "/" — they render join-sheet buttons, not /download anchors, so they never
@@ -33,9 +34,26 @@ function describePage(pathname: string): { surface: AndroidWaitlistSurface; less
 //
 // `label` is passed in rather than read from next-intl: /lesson/[id] lives outside the [locale] group
 // (no translation context there) and mounts this with its own local copy map.
-export default function DownloadQRInterceptor({ label }: { label: string }) {
-  const [target, setTarget] = useState<{ url: string } | null>(null);
+//
+// `qrArm` = this visitor's desktop-qr-card arm (unset = not in the test: the lesson page's old hero): "card" shows
+// QRCard in `cardColor` instead of the popup. Either arm records the test's exposure the first time its QR shows, so
+// only desktop visitors who got a QR from a Study / Download tap count, and its scans carry the arm (`u`, →
+// qr_scanned.qr_ui). On local + previews, ?qr=card|control forces the arm (the [locale] layout can't read the query).
+export default function DownloadQRInterceptor({ label, qrArm: assignedArm, cardColor = "#89FFB4" }: {
+  label: string;
+  qrArm?: QrCardVariant;
+  cardColor?: string;
+}) {
+  const [qrArm, setQrArm] = useState(assignedArm);
+  useEffect(() => {
+    if (!assignedArm || process.env.NEXT_PUBLIC_VERCEL_ENV === "production") return;
+    const forced = QR_CARD_ARMS.find((arm) => arm === new URLSearchParams(window.location.search).get("qr"));
+    if (forced) setQrArm(forced);
+  }, [assignedArm]);
+  // `shows` counts this page's QR shows: the card hops on each one after the first.
+  const [target, setTarget] = useState<{ url: string; shows: number } | null>(null);
   const [waitlist, setWaitlist] = useState<AndroidWaitlistTarget | null>(null);
+  const exposed = useRef(false);
 
   const handleClick = useCallback((e: MouseEvent) => {
     // Leave new-tab / modified / non-primary clicks alone.
@@ -78,8 +96,16 @@ export default function DownloadQRInterceptor({ label }: { label: string }) {
     const sid = posthog.get_distinct_id();
     // DesktopCTA's control arm marks its anchor so the modal's scans carry the arm too.
     const variant = (anchor?.dataset.ctaVariant as DesktopCtaVariant | undefined) ?? null;
-    setTarget({ url: buildQrUrl({ tutor_slug, surface, sid, lesson_id, variant }) });
-  }, []);
+    const ui = qrArm === "card" ? "card" : qrArm ? "modal" : null;
+    const url = buildQrUrl({ tutor_slug, surface, sid, lesson_id, variant, ui });
+    setTarget((t) => ({ url, shows: (t?.shows ?? 0) + 1 }));
+    if (qrArm && !exposed.current) {
+      exposed.current = true;
+      posthog.capture("$feature_flag_called", { $feature_flag: QR_CARD_FLAG_KEY, $feature_flag_response: qrArm });
+    }
+    // The card takes over from the path's coin bubble (LessonPagePath closes it), the bubble's own Study included.
+    if (qrArm === "card") window.dispatchEvent(new Event("candid:qr-card"));
+  }, [qrArm]);
 
   useEffect(() => {
     document.addEventListener("click", handleClick, { capture: true });
@@ -108,29 +134,33 @@ export default function DownloadQRInterceptor({ label }: { label: string }) {
   return (
     <>
       <AndroidWaitlistOverlay target={waitlist} onClose={() => setWaitlist(null)} />
-      <ResponsiveOverlay
-        open={target !== null}
-        onClose={() => setTarget(null)}
-        blurBackdrop
-        panelBackground="#FFFFFF"
-        desktopMaxWidthClass="max-w-[340px]"
-      >
-        {target && (
-          <div className="px-8 py-8 flex flex-col items-center text-center gap-4">
-            <h2 className="text-xl font-semibold" style={{ color: "#18181C" }}>
-              {label}
-            </h2>
-            <div className="rounded-2xl bg-white p-4">
-              <QRCodeSVG value={target.url} size={196} />
+      {qrArm === "card" ? (
+        <QRCard url={target?.url ?? null} shows={target?.shows ?? 0} title={label} color={cardColor} />
+      ) : (
+        <ResponsiveOverlay
+          open={target !== null}
+          onClose={() => setTarget(null)}
+          blurBackdrop
+          panelBackground="#FFFFFF"
+          desktopMaxWidthClass="max-w-[340px]"
+        >
+          {target && (
+            <div className="px-8 py-8 flex flex-col items-center text-center gap-4">
+              <h2 className="text-xl font-semibold" style={{ color: "#18181C" }}>
+                {label}
+              </h2>
+              <div className="rounded-2xl bg-white p-4">
+                <QRCodeSVG value={target.url} size={196} />
+              </div>
+              {/* Where the scan goes, in words. Plain text: the QR's own /qr link is the tracked one,
+                  and both end in the same place (App Store on iPhone, our waitlist on Android). */}
+              <p className="-mt-3 text-sm font-medium" style={{ color: "#6B6B70" }}>
+                joincandid.co/app
+              </p>
             </div>
-            {/* Where the scan goes, in words. Plain text: the QR's own /qr link is the tracked one,
-                and both end in the same place (App Store on iPhone, our waitlist on Android). */}
-            <p className="-mt-3 text-sm font-medium" style={{ color: "#6B6B70" }}>
-              joincandid.co/app
-            </p>
-          </div>
-        )}
-      </ResponsiveOverlay>
+          )}
+        </ResponsiveOverlay>
+      )}
     </>
   );
 }

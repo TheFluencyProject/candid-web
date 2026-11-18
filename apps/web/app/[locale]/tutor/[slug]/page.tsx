@@ -19,8 +19,7 @@ import { localizeLanguageName, localizeMapCountry, capitalize, withKoreanParticl
 import { type Tutor, type TutorLanguageProficiency, type MarketingClip, fetchTutor, fetchMarketingClips } from "@/lib/api";
 import { isJoinForFreeContext, isCandidtutorsHost } from "@/lib/canonical-hosts";
 import { isLocale, routing, type Locale } from "@/i18n/routing";
-import { getDesktopCtaVariant, getDistinctId, previewArm } from "@/lib/posthog-server";
-import { DESKTOP_CTA_ARMS } from "@/lib/posthog-config";
+import { getDistinctId } from "@/lib/posthog-server";
 
 function formatLanguages(languages: TutorLanguageProficiency[]): string {
   return languages
@@ -151,11 +150,9 @@ export default async function TutorPage({ params, searchParams }: Props) {
   // bypassed middleware and left those installs unattributable.
   const cta_href = `/download/${slug}`;
 
-  // desktop-cta-qr arm for the joincandid hero (en only; same cached call the layout bootstraps).
+  // The hero CTA is always the pill now (desktop-cta-qr ended 11/18: the only QR test is desktop-qr-card, in the layout).
+  // distinctId still seeds DesktopCTA's QR url.
   const distinctId = await getDistinctId();
-  const desktopCtaVariant =
-    previewArm(sp.cta, DESKTOP_CTA_ARMS) ??
-    (!uses_join_sheet && locale === "en" ? await getDesktopCtaVariant(distinctId) : undefined);
 
   const firstName = tutor.name.split(" ")[0];
   const localizedFirstName =
@@ -343,7 +340,6 @@ export default async function TutorPage({ params, searchParams }: Props) {
                   inlineLabel={t("scan_to_study_free")}
                   tutorSlug={slug}
                   surface="tutor"
-                  variant={desktopCtaVariant}
                   distinctId={distinctId}
                 />
               </div>

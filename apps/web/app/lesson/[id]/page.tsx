@@ -15,8 +15,8 @@ import ScrollNav from "@/components/ScrollNav";
 import { fetchLessonMeta, fetchLessonPath, fetchTutor, type LessonMeta } from "@/lib/api";
 import { alignLessonPath } from "@/lib/lesson-path-align";
 import { pickLocale } from "@/lib/i18n-helpers";
-import { getDesktopCtaVariant, getDistinctId, getLessonPageFlags, previewArm } from "@/lib/posthog-server";
-import { DESKTOP_CTA_ARMS, LESSON_HERO_ARMS, LESSON_HERO_FLAG_KEY, LESSON_SECTIONS_ARMS, LESSON_SECTIONS_FLAG_KEY } from "@/lib/posthog-config";
+import { getDistinctId, getLessonPageFlags, previewArm } from "@/lib/posthog-server";
+import { LESSON_HERO_ARMS, LESSON_HERO_FLAG_KEY, QR_CARD_ARMS, LESSON_SECTIONS_ARMS, LESSON_SECTIONS_FLAG_KEY } from "@/lib/posthog-config";
 import type { Locale } from "@/i18n/routing";
 // import { localizeLanguageName } from "@/lib/i18n-helpers";
 
@@ -40,19 +40,19 @@ const SHARE_DESCRIPTIONS: Record<Locale, string> = {
 // so there's no translation context here — keep the little UI copy in a local map.
 // scanLabel/inlineLabel are the desktop-cta-qr morph/inline arms' copy; that test is en only, so other locales fall back to en.
 const COPY: Record<Locale, { cta: (name: string) => string; qrTitle: string; scanLabel?: string; inlineLabel?: string; privacy: string; terms: string }> = {
-  en: { cta: (name) => `Study with ${name}`, qrTitle: "Download Candid", scanLabel: "SCAN TO GET STARTED", inlineLabel: "Scan to study for free", privacy: "Privacy", terms: "Terms" },
-  ko: { cta: (name) => `${name}와 공부하기`, qrTitle: "Candid 다운로드", privacy: "개인정보", terms: "이용약관" },
-  ja: { cta: (name) => `${name}と勉強する`, qrTitle: "Candidをダウンロード", privacy: "プライバシー", terms: "利用規約" },
-  zh: { cta: (name) => `和${name}一起学习`, qrTitle: "下载 Candid", privacy: "隐私", terms: "条款" },
-  "zh-Hant": { cta: (name) => `和${name}一起學習`, qrTitle: "下載 Candid", privacy: "隱私權", terms: "條款" },
-  es: { cta: (name) => `Estudia con ${name}`, qrTitle: "Descarga Candid", privacy: "Privacidad", terms: "Términos" },
-  ru: { cta: (name) => `Учиться с ${name}`, qrTitle: "Скачать Candid", privacy: "Конфиденциальность", terms: "Условия" },
-  fr: { cta: (name) => `Étudie avec ${name}`, qrTitle: "Télécharge Candid", privacy: "Confidentialité", terms: "Conditions" },
-  vi: { cta: (name) => `Học cùng ${name}`, qrTitle: "Tải Candid", privacy: "Quyền riêng tư", terms: "Điều khoản" },
-  th: { cta: (name) => `เรียนกับ ${name}`, qrTitle: "ดาวน์โหลด Candid", privacy: "ความเป็นส่วนตัว", terms: "ข้อกำหนด" },
-  id: { cta: (name) => `Belajar bareng ${name}`, qrTitle: "Unduh Candid", privacy: "Privasi", terms: "Ketentuan" },
-  de: { cta: (name) => `Lerne mit ${name}`, qrTitle: "Candid laden", privacy: "Datenschutz", terms: "Bedingungen" },
-  it: { cta: (name) => `Studia con ${name}`, qrTitle: "Scarica Candid", privacy: "Privacy", terms: "Termini" },
+  en: { cta: (name) => `Study with ${name}`, qrTitle: "Download Candid to get started", scanLabel: "SCAN TO GET STARTED", inlineLabel: "Scan to study for free", privacy: "Privacy", terms: "Terms" },
+  ko: { cta: (name) => `${name}와 공부하기`, qrTitle: "Candid 다운로드하고 시작하기", privacy: "개인정보", terms: "이용약관" },
+  ja: { cta: (name) => `${name}と勉強する`, qrTitle: "Candidをダウンロードしてはじめよう", privacy: "プライバシー", terms: "利用規約" },
+  zh: { cta: (name) => `和${name}一起学习`, qrTitle: "下载 Candid，马上开始", privacy: "隐私", terms: "条款" },
+  "zh-Hant": { cta: (name) => `和${name}一起學習`, qrTitle: "下載 Candid，馬上開始", privacy: "隱私權", terms: "條款" },
+  es: { cta: (name) => `Estudia con ${name}`, qrTitle: "Descarga Candid para empezar", privacy: "Privacidad", terms: "Términos" },
+  ru: { cta: (name) => `Учиться с ${name}`, qrTitle: "Скачай Candid, чтобы начать", privacy: "Конфиденциальность", terms: "Условия" },
+  fr: { cta: (name) => `Étudie avec ${name}`, qrTitle: "Télécharge Candid pour commencer", privacy: "Confidentialité", terms: "Conditions" },
+  vi: { cta: (name) => `Học cùng ${name}`, qrTitle: "Tải Candid để bắt đầu", privacy: "Quyền riêng tư", terms: "Điều khoản" },
+  th: { cta: (name) => `เรียนกับ ${name}`, qrTitle: "ดาวน์โหลด Candid เพื่อเริ่มต้น", privacy: "ความเป็นส่วนตัว", terms: "ข้อกำหนด" },
+  id: { cta: (name) => `Belajar bareng ${name}`, qrTitle: "Unduh Candid untuk mulai", privacy: "Privasi", terms: "Ketentuan" },
+  de: { cta: (name) => `Lerne mit ${name}`, qrTitle: "Lade Candid, um loszulegen", privacy: "Datenschutz", terms: "Bedingungen" },
+  it: { cta: (name) => `Studia con ${name}`, qrTitle: "Scarica Candid per iniziare", privacy: "Privacy", terms: "Termini" },
 };
 
 // Band labels match the app's Answers.xcstrings wording, in every site locale.
@@ -141,12 +141,9 @@ export default async function LessonPage({
   ]);
 
   const copy = COPY[locale];
-  // desktop-cta-qr arm: the same cached evaluation AnonAnalytics bootstraps (en only).
+  // No desktop-cta-qr here any more (Adam 11/18: only the QR test below): the Study button is always the pill.
   const distinctId = await getDistinctId();
   const query = await searchParams;
-  const desktopCtaVariant =
-    previewArm(query.cta, DESKTOP_CTA_ARMS) ??
-    (locale === "en" ? await getDesktopCtaVariant(distinctId) : undefined);
   // lesson-page-sections + lesson-page-hero arms (every locale): the same cached evaluation AnonAnalytics bootstraps.
   const lessonFlags = await getLessonPageFlags(distinctId);
   const sectionsVariant = previewArm(query.sections, LESSON_SECTIONS_ARMS) ?? lessonFlags.sections;
@@ -154,6 +151,9 @@ export default async function LessonPage({
   // Path arm only when there's a path (fetch failed / route not live yet / no units → today's hero, and no
   // hero exposure below, so the test only counts visitors who saw their arm).
   const pathArm = heroVariant === "path" ? path : null;
+  // desktop-qr-card, path arm only (Adam 11/18): the desktop QR after a Study press — today's centred popup or the corner
+  // card. Its exposure is the interceptor's, when a QR first shows. Today's hero keeps the popup, outside the test.
+  const qrVariant = pathArm ? previewArm(query.qr, QR_CARD_ARMS) ?? lessonFlags.qr : undefined;
   // The lesson's accent drives the path and its Study buttons (black text, like home's lit coins); the site's mint without one.
   const accent = lesson.accent_color || "#89FFB4";
   const pathCopy = pathArm ? ((await getMessages()).lesson_path as LessonPathCopy) : null;
@@ -196,7 +196,6 @@ export default async function LessonPage({
       tutorSlug={lesson.tutor_slug}
       lessonId={lesson.lesson_id}
       surface="lesson"
-      variant={desktopCtaVariant}
       distinctId={distinctId}
       color={pathArm ? accent : undefined}
     />
@@ -287,7 +286,8 @@ export default async function LessonPage({
           </section>
         </div>
       )}
-      <DownloadQRInterceptor label={copy.qrTitle} />
+      {/* The card's title + line take the path's Study colour: the lesson's accent. */}
+      <DownloadQRInterceptor label={copy.qrTitle} qrArm={qrVariant} cardColor={accent} />
 
       {/* lesson-page-sections test arm: the home page's sections under the first screen, so the heading
           only shows once the visitor scrolls. Their buttons keep this lesson's download link. */}

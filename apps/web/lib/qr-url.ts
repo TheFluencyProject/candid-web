@@ -7,12 +7,14 @@ const BASE_URL = "https://joincandid.co";
 // Clip Experience, so scanning it pops the clip card before the redirect can run. /qr is
 // unregistered (goes straight to the tutor's App Store page) and lets middleware record the scan.
 // The App Clip funnel used `${BASE_URL}${href}` here; restore that if it's ever re-enabled.
-export function buildQrUrl({ tutor_slug, surface, sid, lesson_id, variant }: {
+export function buildQrUrl({ tutor_slug, surface, sid, lesson_id, variant, ui }: {
   tutor_slug: string;
   surface: AndroidWaitlistSurface;
   sid?: string | null;
   lesson_id?: string | null;
   variant?: DesktopCtaVariant | null;
+  // desktop-qr-card arm that showed the QR: the centred popup or the corner card.
+  ui?: "modal" | "card" | null;
 }): string {
   const params = new URLSearchParams({ s: surface });
   // Omit rather than bake "undefined" into the QR (the client SDK's id is unset before init).
@@ -20,6 +22,8 @@ export function buildQrUrl({ tutor_slug, surface, sid, lesson_id, variant }: {
   if (lesson_id) params.set("l", lesson_id);
   // Middleware copies this onto qr_scanned as cta_variant.
   if (variant) params.set("v", variant);
+  // Middleware copies this onto qr_scanned as qr_ui.
+  if (ui) params.set("u", ui);
   // No trailing slash on the bare form — Next 308s "/qr/" to "/qr" before middleware runs.
   const path = tutor_slug ? `/qr/${tutor_slug}` : "/qr";
   return `${BASE_URL}${path}?${params}`;
