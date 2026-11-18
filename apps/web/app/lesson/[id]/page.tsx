@@ -164,7 +164,7 @@ export default async function LessonPage({
     isVertical && typeof lesson.thumbnail_focus_y === "number"
       ? Math.min(Math.max(lesson.thumbnail_focus_y, 0), 1)
       : null;
-  // Desktop tutor row only ("Grace · Lower Intermediate").
+  // Tutor row ("Grace · Lower Intermediate"), every width.
   const bandLabel = lesson.difficulty_band ? BAND_LABELS[locale][lesson.difficulty_band] ?? null : null;
   const tutorPhoto = tutor?.large_profile_picture_url ?? tutor?.profile_picture_url ?? null;
 
@@ -258,13 +258,11 @@ export default async function LessonPage({
             {tutorPhoto && (
               // Plain <img> direct from S3 — bypasses the /_next/image transcode hop.
               // eslint-disable-next-line @next/next/no-img-element
-              <img src={tutorPhoto} alt={lesson.tutor_name} className="w-9 h-9 lg:w-7 lg:h-7 rounded-full object-cover" />
+              <img src={tutorPhoto} alt={lesson.tutor_name} className="w-7 h-7 rounded-full object-cover" />
             )}
             <span className="text-base font-medium lg:font-normal">
               {lesson.tutor_name}
-              {bandLabel && (
-                <span className="hidden lg:inline"> · {bandLabel}</span>
-              )}
+              {bandLabel && ` · ${bandLabel}`}
             </span>
           </div>
 
