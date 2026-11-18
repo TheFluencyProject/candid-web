@@ -294,11 +294,21 @@ export default async function LessonPage({
           only shows once the visitor scrolls. Their buttons keep this lesson's download link. */}
       {tHome && (
         <>
-          {/* Option 6 (Adam 11/17): the page turns a lighter gray from a hairline down, with the caps label under the line. */}
-          <div id="how-it-works" className="mt-16 border-t border-[#4B4B50]" style={{ backgroundColor: "#202026" }}>
-            <h2 className={`px-6 pt-10 pb-2 text-center text-[13px] font-bold uppercase ${locale === "ko" ? "" : "tracking-[0.14em]"}`}>
-              {tHome("how_it_works")}
-            </h2>
+          {/* Options 6 + 9 combined (Adam 11/17): the caps label in an outlined pill sitting on a gray hairline; below the
+              line the page starts a lighter gray and fades back to the page color over the first section (about a screen). */}
+          <div
+            id="how-it-works"
+            className="mt-16 border-t border-[#4B4B50]"
+            style={{ background: "linear-gradient(#202026, #18181C 100svh) no-repeat, #18181C" }}
+          >
+            <div className="-mt-[17px] flex justify-center px-6 pb-10">
+              <h2
+                className={`rounded-full border border-[#4B4B50] px-4 py-2 text-[12px] leading-4 font-bold uppercase whitespace-nowrap ${locale === "ko" ? "" : "tracking-[0.14em]"}`}
+                style={{ backgroundColor: "#202026" }}
+              >
+                {tHome("how_it_works")}
+              </h2>
+            </div>
             <LandingSections locale={locale} ctaHref={downloadHref} />
           </div>
         </>
