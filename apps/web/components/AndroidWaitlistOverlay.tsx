@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import posthog from "posthog-js";
 import ResponsiveOverlay from "@/components/ResponsiveOverlay";
 import { routing, type Locale } from "@/i18n/routing";
 import { submit_android_waitlist, type AndroidWaitlistSurface } from "@/lib/api";
@@ -32,7 +33,8 @@ function useWaitlistCopy(): Copy | null {
   return copy;
 }
 
-export type AndroidWaitlistTarget = { tutor_slug: string; surface: AndroidWaitlistSurface };
+// `from` is set when a store-link redirect opened the form (DownloadQRInterceptor), unset for a tap.
+export type AndroidWaitlistTarget = { tutor_slug: string; surface: AndroidWaitlistSurface; from?: string };
 
 export default function AndroidWaitlistOverlay({
   target,
@@ -81,6 +83,12 @@ export default function AndroidWaitlistOverlay({
         locale: navigator.language || null,
       });
       setState("done");
+      posthog.capture("android_waitlist_joined", {
+        via: target.from ? "redirect" : "tap",
+        from: target.from ?? null,
+        surface: target.surface,
+        tutor_slug: target.tutor_slug,
+      });
     } catch (err) {
       console.error("submit_android_waitlist failed", err);
       setState("error");

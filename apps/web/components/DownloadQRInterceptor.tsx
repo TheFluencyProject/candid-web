@@ -83,6 +83,25 @@ export default function DownloadQRInterceptor({ label }: { label: string }) {
     return () => document.removeEventListener("click", handleClick, { capture: true });
   }, [handleClick]);
 
+  // Android store hops (middleware's storeRedirect: a scanned QR, /download/<slug>, /app…) land here
+  // with ?waitlist=<tutor slug | 1>&from=<link>. Open the same form an Android tap opens, and drop the
+  // params so a refresh or a share doesn't reopen it. Runs before PostHogProvider's init (child effects
+  // run first), so the replaceState fires no extra pageview and the capture waits one task.
+  useEffect(() => {
+    const url = new URL(window.location.href);
+    const slug = url.searchParams.get("waitlist");
+    if (slug === null || !isAndroid()) return;
+    const from = url.searchParams.get("from") ?? "unknown";
+    url.searchParams.delete("waitlist");
+    url.searchParams.delete("from");
+    window.history.replaceState(window.history.state, "", url);
+
+    const { surface, lesson_id } = describePage(window.location.pathname);
+    const tutor_slug = slug === "1" ? "" : slug;
+    setTimeout(() => posthog.capture("android_waitlist_opened", { from, surface, tutor_slug, lesson_id }), 0);
+    setWaitlist({ tutor_slug, surface, from });
+  }, []);
+
   return (
     <>
       <AndroidWaitlistOverlay target={waitlist} onClose={() => setWaitlist(null)} />
@@ -101,6 +120,11 @@ export default function DownloadQRInterceptor({ label }: { label: string }) {
             <div className="rounded-2xl bg-white p-4">
               <QRCodeSVG value={target.url} size={196} />
             </div>
+            {/* Where the scan goes, in words. Plain text: the QR's own /qr link is the tracked one,
+                and both end in the same place (App Store on iPhone, our waitlist on Android). */}
+            <p className="-mt-3 text-sm font-medium" style={{ color: "#6B6B70" }}>
+              joincandid.co/app
+            </p>
           </div>
         )}
       </ResponsiveOverlay>

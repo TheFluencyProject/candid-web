@@ -1,7 +1,7 @@
 import createMiddleware from "next-intl/middleware";
 import { NextResponse, type NextFetchEvent, type NextRequest } from "next/server";
 import { routing, type Locale } from "./i18n/routing";
-import { APP_STORE_URL, MAC_DOWNLOAD_URL, appStoreUrlForTutor, getRedirectUrl } from "./lib/platform";
+import { APP_STORE_URL, MAC_DOWNLOAD_URL, androidWaitlistPath, appStoreUrlForTutor, isAndroidUserAgent } from "./lib/platform";
 import { captureServerEvent } from "./lib/posthog-capture";
 import { reportInstallClick } from "./lib/install-click";
 import { resolve_tutor_by_host, resolve_tutor_by_username, resolve_lesson_by_handle_and_code } from "./lib/resolve-domain";
@@ -73,6 +73,21 @@ function resolveAppStoreRedirect(
     return { dest: appStoreUrlForTutor(slug), status: 307 /* , appClip: true */ };
   }
   return null;
+}
+
+// One store hop. Android can't install from the App Store, so it lands on our page with the waitlist
+// form open (lib/platform androidWaitlistPath). Always 307 for Android: the same URL sends everyone
+// else to the store (some at 308), and a cached hop would pin the wrong destination.
+function storeRedirect(
+  request: NextRequest,
+  appStoreUrl: string,
+  status: number,
+  android: Parameters<typeof androidWaitlistPath>[0],
+): NextResponse {
+  if (isAndroidUserAgent(request.headers.get("user-agent") ?? "")) {
+    return NextResponse.redirect(new URL(androidWaitlistPath(android), request.url), { status: 307 });
+  }
+  return NextResponse.redirect(appStoreUrl, { status });
 }
 
 // iPhone iOS major from the UA ("iPhone OS 18_5" → 18), or 0 when not an iPhone.
@@ -158,7 +173,7 @@ export default async function middleware(request: NextRequest, event: NextFetchE
   // locale-agnostic, and matching the raw path 404'd every /ko|/en-prefixed store link.
   const locale_stripped = pathname.replace(LOCALE_PREFIX, "") || "/";
 
-  // ── Scanned QR → App Store (tracked) ──
+  // ── Scanned QR → App Store, or our waitlist on Android (tracked) ──
   // Deliberately NOT /download/*: that prefix is a registered App Clip Experience, so scanning it
   // pops the clip card before any redirect can run. /qr is unregistered, so it goes straight to
   // the store. `sid` is the distinct_id of the desktop session that rendered the QR, so the scan
@@ -186,37 +201,44 @@ export default async function middleware(request: NextRequest, event: NextFetchE
         handle: slug, source: "qr", lessonId: params.get("l"), sid: params.get("sid"),
       }));
     }
-    const ua = request.headers.get("user-agent") ?? "";
-    return NextResponse.redirect(getRedirectUrl(ua, appStoreUrlForTutor(slug)), { status: 307 });
+    return storeRedirect(request, appStoreUrlForTutor(slug), 307, {
+      from: "qr", tutor_slug: slug, lesson_id: params.get("l"),
+    });
   }
 
   // ── App Store / waitlist redirects (UA-aware) ──
   const redirect = resolveAppStoreRedirect(locale_stripped);
   if (redirect) {
-    const ua = request.headers.get("user-agent") ?? "";
     // App Clip funnel — DISABLED for now. When enabled, a /download or /download/<slug> visit on a
     // clip-capable iPhone (iOS 18+, the clip's min target) renders the landing page so Safari
     // surfaces the App Clip card from its apple-itunes-app meta tag — tapping the card opens the
     // clip. Everything else (older iOS, Android, desktop, and the ppid product-page vanity links)
     // falls through to the App Store redirect below. iOS may also auto-present the clip from a
     // registered Experience or QR/camera before this ever runs. Uncomment to re-enable.
-    // if (redirect.appClip && iphoneIOSMajor(ua) >= 18) {
+    // if (redirect.appClip && iphoneIOSMajor(request.headers.get("user-agent") ?? "") >= 18) {
     //   return NextResponse.next();
     // }
     // Bare /download and /download/mac carry no tutor; the vanity words carry one only when
     // EXACT_REDIRECTS names it. The lesson page's CTA appends ?l= so a lesson-share install
     // keeps its lesson through the store hop.
-    if (locale_stripped.startsWith("/download/") && locale_stripped !== "/download/mac") {
-      event.waitUntil(reportInstallClick(request, {
-        handle: locale_stripped.slice("/download/".length),
-        source: "download",
-        lessonId: request.nextUrl.searchParams.get("l"),
-      }));
-    } else if (redirect.handle) {
+    // The Mac DMG isn't a store hop: everyone gets the file.
+    if (locale_stripped === "/download/mac") {
+      return NextResponse.redirect(redirect.dest, { status: redirect.status });
+    }
+    if (locale_stripped.startsWith("/download/")) {
+      const slug = locale_stripped.slice("/download/".length);
+      const lesson_id = request.nextUrl.searchParams.get("l");
+      event.waitUntil(reportInstallClick(request, { handle: slug, source: "download", lessonId: lesson_id }));
+      return storeRedirect(request, redirect.dest, redirect.status, { from: "download", tutor_slug: slug, lesson_id });
+    }
+    if (redirect.handle) {
       event.waitUntil(reportInstallClick(request, { handle: redirect.handle, source: "vanity" }));
     }
-    const dest = getRedirectUrl(ua, redirect.dest);
-    return NextResponse.redirect(dest, { status: redirect.status });
+    // Bare /download and the vanity words (/app, /join, /news…). A word that names its tutor
+    // (EXACT_REDIRECTS handle, a slug) lands Android on that tutor's page; the rest on home.
+    return storeRedirect(request, redirect.dest, redirect.status, {
+      from: locale_stripped.slice(1), tutor_slug: redirect.handle,
+    });
   }
 
   // ── Username vanity redirect: joincandid.co/{username} → /tutor/{slug} ──
@@ -229,12 +251,9 @@ export default async function middleware(request: NextRequest, event: NextFetchE
   // tutor has a Custom Product Page. Must precede the lesson-share branch below — a 6-char handle
   // (e.g. "hayden") would otherwise match its share-code regex. 307: handles/ppids can change.
   if (segments.length === 2 && segments[0] === "redirects") {
-    const ua = request.headers.get("user-agent") ?? "";
     event.waitUntil(reportInstallClick(request, { handle: segments[1], source: "redirects" }));
-    return NextResponse.redirect(
-      getRedirectUrl(ua, appStoreUrlForTutor(segments[1])),
-      { status: 307 },
-    );
+    // The handle may be a username rather than a slug, so Android lands on home, not a tutor page.
+    return storeRedirect(request, appStoreUrlForTutor(segments[1]), 307, { from: "redirects" });
   }
 
   if (segments.length === 1 && !RESERVED_USERNAME_PATHS.has(segments[0])) {

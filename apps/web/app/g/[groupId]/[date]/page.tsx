@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { APP_STORE_URL, WAITLIST_URL, WAITLIST_ENABLED } from "@/lib/platform";
+import { APP_STORE_URL, androidWaitlistPath } from "@/lib/platform";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://joincandid.co"),
@@ -20,10 +20,10 @@ export const metadata: Metadata = {
 };
 
 export default function GroupDatePage() {
+  // Android can't install from the App Store: our waitlist form instead (lib/platform androidWaitlistPath).
   const redirectScript = `
     var ua = navigator.userAgent;
-    var isIOS = /iPhone|iPad|iPod/i.test(ua);
-    var dest = (${!WAITLIST_ENABLED} || isIOS) ? ${JSON.stringify(APP_STORE_URL)} : ${JSON.stringify(WAITLIST_URL)};
+    var dest = /Android/.test(ua) ? ${JSON.stringify(androidWaitlistPath({ from: "group" }))} : ${JSON.stringify(APP_STORE_URL)};
     window.location.replace(dest);
   `;
 
