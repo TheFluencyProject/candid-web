@@ -47,10 +47,9 @@ export function PostHogProvider({ children, distinctId, bootstrapFlags }: Props)
         featureFlags: bootstrapFlags,
       },
     });
-    // The landing pageview is ours to send: the SDK's own init-time capture does not fire when it
-    // boots from an effect (post-hydration), and history_change only covers navigations AFTER this
-    // one. Confirmed against PostHog debug logs — without this line a bounce produces zero events.
-    posthog.capture("$pageview");
+    // No manual landing $pageview: the SDK sends its own one tick after init (once the tab is
+    // visible), even when booted from this effect. A manual capture here doubled the landing on 89%
+    // of sessions (posthog-js 1.376.4, Nov 2026).
   }, [distinctId, bootstrapFlags]);
 
   return <>{children}</>;
