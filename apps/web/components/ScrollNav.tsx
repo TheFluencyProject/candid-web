@@ -6,11 +6,15 @@ import Image from "next/image";
 // Fixed top bar (wordmark + Try for free), visible from the first frame (Adam 11/17: it used to slide in only
 // once the hero's own CTA had scrolled off), so a download button is always one tap away. Phones hide its button until the
 // hero's has scrolled under the bar (Adam 11/18, below).
-// Its button takes the color of whichever of the page's Try buttons ([data-primary-cta]) is on screen, the upper
-// one if two are, so it only switches once that one has gone under the bar; mint when none is (Adam 11/17). The sticker-circle button cycles colors
+// Its button takes the color of the Try button ([data-primary-cta]) of the section at the top of the page: it only
+// switches once the next section has scrolled up to the bar, not when that section's button first peeks in at the
+// bottom (Adam 11/19; was "whichever button is on screen", 11/17). The sticker-circle button cycles colors
 // (.cta-cycle): the bar's button runs the same animation, locked to its clock, so they match every frame.
 // No ctaLabel = wordmark only (the lesson page's path arm, whose own buttons are always on screen); the pill's effects
 // below all return early without it.
+// How far below the bar a section's top may still be when the bar takes its color: "basically at the top".
+const TOP_SLACK = 0.15;
+
 export default function ScrollNav({ ctaLabel, tracking = "" }: { ctaLabel?: string; tracking?: string }) {
   const pillRef = useRef<HTMLAnchorElement>(null);
   const bgRef = useRef<HTMLDivElement>(null);
@@ -46,15 +50,16 @@ export default function ScrollNav({ ctaLabel, tracking = "" }: { ctaLabel?: stri
   useEffect(() => {
     const pill = pillRef.current;
     if (!pill) return;
-    const visible = new Set<HTMLElement>();
+    const ctas = [...document.querySelectorAll<HTMLElement>("[data-primary-cta]")];
     const cycle = (el: Element) => el.getAnimations().find((a) => (a as CSSAnimation).animationName === "cta-cycle");
-    const apply = () => {
+    let shown: HTMLElement | null | undefined;
+    const apply = (force = false) => {
+      // The last section (document order) whose top is at the bar, give or take TOP_SLACK of the screen.
+      const line = 61 + innerHeight * TOP_SLACK;
       let best: HTMLElement | null = null;
-      let best_top = Infinity;
-      for (const el of visible) {
-        const top = el.getBoundingClientRect().top;
-        if (top < best_top) { best_top = top; best = el; }
-      }
+      for (const el of ctas) if ((el.closest("section") ?? el).getBoundingClientRect().top <= line) best = el;
+      if (best === shown && !force) return;
+      shown = best;
       const cycling = !!best?.classList.contains("cta-cycle");
       if (cycling) {
         pill.style.removeProperty("--cta");
@@ -67,23 +72,16 @@ export default function ScrollNav({ ctaLabel, tracking = "" }: { ctaLabel?: stri
         else pill.style.removeProperty("--cta");
       }
     };
-    // "On screen" = below this bar (61px) and above the bottom edge.
-    const io = new IntersectionObserver(
-      (entries) => {
-        for (const e of entries) {
-          if (e.isIntersecting) visible.add(e.target as HTMLElement);
-          else visible.delete(e.target as HTMLElement);
-        }
-        apply();
-      },
-      { rootMargin: "-61px 0px 0px 0px" },
-    );
-    document.querySelectorAll<HTMLElement>("[data-primary-cta]").forEach((el) => io.observe(el));
-    // The path's button changes color in place.
-    addEventListener("cta-tint", apply);
+    const onScroll = () => apply();
+    const onTint = () => apply(true); // the path's button changes color in place
+    apply();
+    addEventListener("scroll", onScroll, { passive: true });
+    addEventListener("resize", onScroll);
+    addEventListener("cta-tint", onTint);
     return () => {
-      io.disconnect();
-      removeEventListener("cta-tint", apply);
+      removeEventListener("scroll", onScroll);
+      removeEventListener("resize", onScroll);
+      removeEventListener("cta-tint", onTint);
     };
   }, []);
 
