@@ -2,7 +2,7 @@ import { getTranslations } from "next-intl/server";
 import TutorRoster from "@/components/TutorRoster";
 import LessonLadder from "@/components/LessonLadder";
 import LessonPath, { type PathLesson } from "@/components/LessonPath";
-import GardenGrow from "@/components/GardenGrow";
+// import GardenGrow from "@/components/GardenGrow"; // garden section hidden for now (below)
 import PageEnding from "@/components/PageEnding";
 import ShadowDeck from "@/components/ShadowDeck";
 import InputPhone, { type InputPhoneClip } from "@/components/InputPhone";
@@ -168,7 +168,9 @@ export default async function LandingSections({ locale, clips, ctaHref }: Props)
       <ShadowDeck ctaLabel={t("cta_learn")} ctaHref={ctaHref} tracking={tracking} tag={t("shadow_tag")} title={t("shadow_title")} subtitle={t("shadow_subtitle")} clips={shadow_clips} />
       <ReviewCards />
       <TutorRoster title={t("roster_title")} subtitle={t("roster_subtitle")} tutors={korean_tutors} />
-      <GardenGrow title={t("garden_title")} units={Array.from({ length: 30 }, (_, i) => t("garden_unit", { count: i + 1 }))} />
+      {/* Garden section hidden for now (Adam 11/19): it's confusing, and 2 of 2 viewers so far stopped halfway
+          through it and scrolled back up. To restore, uncomment this and its import (GardenGrow.tsx + its CSS are kept).
+      <GardenGrow title={t("garden_title")} units={Array.from({ length: 30 }, (_, i) => t("garden_unit", { count: i + 1 }))} /> */}
       <PageEnding tracking={tracking} ctaHref={ctaHref} />
     </>
   );
