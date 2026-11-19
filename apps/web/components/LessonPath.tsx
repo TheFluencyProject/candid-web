@@ -29,8 +29,8 @@ const ORDERS: Kind[][] = [
   ["watch", "listen", "speak", "vocab"],
   ["watch", "vocab", "listen", "speak"],
 ];
-// The app's wave at 4 circles per indent (LessonHubPath.wave).
-const WAVE = [0, 40, 56, 40, 0, -40, -56, -40];
+// The app's wave at 4 circles per indent (LessonHubPath.wave): even steps (Adam 11/19).
+const WAVE = [0, 28, 56, 28, 0, -28, -56, -28];
 // Desktop geometry (the mockup's P1): wider swing at the indents (Adam 11/11), scaled to fit, at most 1.2×.
 // A coin lights when its centre passes this far down the screen: a bit below the middle (Adam 11/17: "a tad" sooner).
 const LIGHT_AT = 0.6;

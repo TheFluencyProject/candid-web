@@ -53,21 +53,13 @@ const BUBBLE_W = 300;
 // Desktop = lg, the page's (and DownloadQRInterceptor's) breakpoint.
 const DESKTOP_MIN_PX = 1024;
 
-// Locked stickers: each pixel's luminance L → page + L × (coin − page), per channel, so the white cutout outline lands
-// exactly on the coins' gray #393436 and black on the page's #18181C. A color matrix, not a CSS mask: it needs no
-// CORS on the CloudFront PNGs.
-const LOCKED = (() => {
-  const page = [0x18, 0x18, 0x1c], coin = [0x39, 0x34, 0x36], lum = [0.2126, 0.7152, 0.0722];
-  const rows = page.map((p, i) => {
-    const k = (coin[i] - p) / 255;
-    return [...lum.map((w) => (w * k).toFixed(4)), 0, (p / 255).toFixed(4)].join(" ");
-  });
-  return [...rows, "0 0 0 1 0"].join(" ");
-})();
-
 // The app's wave (LessonHubPath.wave): a full swing on one row every n rows, sides alternating, the rows between on
-// the curve. g runs on across every part, as in the app.
-const waveX = (g: number, n: number) => ZIG * Math.cos((Math.PI * (g - Math.floor(n / 2))) / n);
+// a straight line, so every row steps the same 2 × ZIG / n (Adam 11/19: a cosine's step across the centre was twice
+// the others'). g runs on across every part, as in the app.
+const waveX = (g: number, n: number) => {
+  const p = (((g - Math.floor(n / 2)) % (2 * n)) + 2 * n) % (2 * n); // rows past the right indent
+  return ZIG * (1 - (2 * Math.min(p, 2 * n - p)) / n);
+};
 
 const fill = (template: string, n: number) => template.replace("{count}", String(n));
 
@@ -236,11 +228,6 @@ export default function LessonPagePath({ path, accent, copy, ctaLabel, ctaHref, 
   return (
     // suppressHydrationWarning: the page's pre-paint script has already set --lpp-top on this style (lib/lesson-path-align).
     <div ref={rootRef} className="lpp" style={{ ["--a" as string]: accent }} suppressHydrationWarning>
-      <svg width="0" height="0" className="absolute" aria-hidden>
-        <filter id="lpp-locked" colorInterpolationFilters="sRGB">
-          <feColorMatrix type="matrix" values={LOCKED} />
-        </filter>
-      </svg>
       <div ref={pathRef} className="lpp-path">
         {parts.map((p, pi) => (
           <div key={pi} className="lpp-part">
