@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useTranslations } from "next-intl";
 import type Hls from "hls.js";
 import type { MarketingClip } from "@/lib/api";
 import { isRestrictedInAppBrowser } from "@/lib/platform";
@@ -156,6 +157,7 @@ async function run_line(card: Card, use_video: boolean, alive: () => boolean) {
 type Props = { tag: string; title: string; subtitle: string; clips: MarketingClip[]; ctaLabel: string; ctaHref?: string; tracking: string };
 
 export default function ShadowDeck({ tag, title, subtitle, clips, ctaLabel, ctaHref, tracking }: Props) {
+  const t = useTranslations("home");
   const sectionRef = useRef<HTMLElement>(null);
   const cardEls = useRef<(HTMLDivElement | null)[]>([]);
   const recRef = useRef<HTMLDivElement>(null);
@@ -330,14 +332,14 @@ export default function ShadowDeck({ tag, title, subtitle, clips, ctaLabel, ctaH
                   <video muted playsInline preload="none" />
                   <div className="sd-scrim" />
                   <div className="sd-pill" style={{ backgroundColor: ACCENT }}>
-                    <span className="sd-pill-txt">Speak now</span>
+                    <span className="sd-pill-txt">{t("speak_now")}</span>
                     {/* the app's LessonModeTopPill .success: bold black checkmark, same pill height */}
                     <svg className="sd-pill-chk" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
                       <path d="M4.5 12.5l5 5L19.5 7" />
                     </svg>
                   </div>
                   <div className="sd-cap">
-                    <p className="sd-ko">
+                    <p className="sd-ko" lang="ko">
                       {words.map((w, k) => (
                         <span key={k}>
                           {k > 0 && " "}
