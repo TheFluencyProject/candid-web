@@ -1,6 +1,7 @@
 "use client";
 
 import { Fragment, memo, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useTranslations } from "next-intl";
 import type { MarketingClip } from "@/lib/api";
 import { cover_position_x } from "@/lib/clip-crop";
 
@@ -67,6 +68,7 @@ type Props = {
 };
 
 function MarketingClipCard({ clip, dataKey, isActive, shouldLoad, onSegmentEnd, onReady, karaoke = true, muted = true, frozen = false, posterOnly = false }: Props) {
+  const t = useTranslations("home");
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const [activeWordIdx, setActiveWordIdx] = useState(-1);
   const [ready, setReady] = useState(false); // first frame buffered → fade video over poster
@@ -394,7 +396,7 @@ function MarketingClipCard({ clip, dataKey, isActive, shouldLoad, onSegmentEnd, 
         <div className={`pointer-events-none mb-2 md:mb-3 flex justify-center transition-opacity duration-300 ease-out ${isActive && ready ? "opacity-100" : "opacity-0"}`}>
           {/* size tracks the card: smaller on the 340px mobile card, larger on the 460px desktop one */}
           <span className="inline-block rounded-md px-2 py-1 md:px-2.5 text-xs md:text-base font-semibold leading-tight text-black shadow" style={{ backgroundColor: KARAOKE_ACCENT }}>
-            Speak now
+            {t("speak_now")}
           </span>
         </div>
       )}

@@ -94,10 +94,13 @@ html {
   word-break: keep-all;
 }
 /* Japanese and Chinese have no spaces, so keep-all leaves them no break point at all and
-   the heading runs off the screen. Their normal line breaking already respects words. */
-:lang(ja) .hero-heading,
-:lang(zh) .hero-heading {
-  word-break: normal;
+   headings run off the screen. Their normal line breaking already respects words.
+   keep-all is set in many places (hero, section copy, Tailwind [word-break:keep-all]),
+   so turn it off for every ja/zh element at once (Adam 11/20: /ja hero ran off both sides).
+   Korean text inside a ja/zh page carries lang="ko", so it keeps keep-all. */
+:lang(ja),
+:lang(zh) {
+  word-break: normal !important;
 }
 
 /* The cursive em renders shadow much heavier than the sans-serif line1

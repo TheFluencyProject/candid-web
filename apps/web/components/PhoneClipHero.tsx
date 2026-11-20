@@ -1,6 +1,7 @@
 "use client";
 
 import { Fragment, useEffect, useRef, useState } from "react";
+import { useTranslations } from "next-intl";
 import type { MarketingClip } from "@/lib/api";
 import { isRestrictedInAppBrowser } from "@/lib/platform";
 import { cover_position_x, crop_slice_x } from "@/lib/clip-crop";
@@ -272,6 +273,7 @@ type LayerProps = {
 // One clip's whole screen — video, scrims, title row, Speak now + caption — so a clip change
 // crossfades everything together.
 function ClipLayer({ clip, role, handsOff, posterOnly, onScreen, onEnd }: LayerProps) {
+  const t = useTranslations("home");
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const posterRef = useRef<HTMLImageElement | null>(null);
   const topEdgeRef = useRef<HTMLCanvasElement | null>(null);
@@ -518,7 +520,7 @@ function ClipLayer({ clip, role, handsOff, posterOnly, onScreen, onEnd }: LayerP
       <div className="absolute inset-x-0 top-[120cqw] z-[2] px-[6.2cqw]">
         <div className="mb-[3.6cqw] flex justify-center">
           <span className="rounded-[2.8cqw] px-[4.6cqw] py-[2.6cqw] text-[4.8cqw] font-semibold leading-none text-black" style={{ backgroundColor: ACCENT }}>
-            Speak now
+            {t("speak_now")}
           </span>
         </div>
         <p className="text-[11.5cqw] font-bold leading-[1.13] tracking-[-0.01em]">
