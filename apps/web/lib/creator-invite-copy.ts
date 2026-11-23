@@ -19,29 +19,29 @@ export const CREATOR_INVITE_COPY = {
     ko: "{name}님께,",
   },
   invited: {
-    en: "You’re invited to be a Candid creator.",
-    ko: "Candid 크리에이터로 초대합니다.",
+    en: "You’re invited to be a creator on Candid.",
+    ko: "Candid의 크리에이터로 초대합니다.",
   },
   intro: {
-    en: "Candid helps you make money through your {language} content by turning it into a daily {language} learning app for your followers.",
-    ko: "Candid는 크리에이터님의 {language} 콘텐츠를 팔로워들이 매일 공부하는 {language} 학습 앱으로 바꿔, 수익을 낼 수 있도록 도와드려요.",
+    en: "Candid helps you make money through your {language} content by making it part of a daily {language} learning app for your followers.",
+    ko: "Candid는 크리에이터님의 {language} 콘텐츠를 팔로워들이 매일 공부하는 {language} 학습 앱에 담아, 수익을 낼 수 있도록 도와드려요.",
   },
 
-  what_candid_is: { en: "⭐️ What Candid is", ko: "⭐️ Candid란?" },
+  what_candid_is: { en: "⭐️ How Candid works", ko: "⭐️ Candid란?" },
 
   for_you: { en: "For you", ko: "크리에이터님께" },
   for_you_items: [
     {
-      en: "💰 Candid helps you earn money by turning your {language} content into a language learning app which your followers can study with & pay for.",
-      ko: "💰 Candid는 크리에이터님의 {language} 콘텐츠를 팔로워들이 공부하고 결제하는 언어 학습 앱으로 바꿔, 수익을 낼 수 있도록 도와드려요.",
+      en: "💰 **Candid helps you earn money** by making your {language} content part of a language learning app which your followers can study with & pay for.",
+      ko: "💰 **Candid로 수익을 낼 수 있어요.** 크리에이터님의 {language} 콘텐츠를 팔로워들이 공부하고 결제하는 언어 학습 앱에 담아 드려요.",
     },
     {
-      en: "✅ Candid doesn’t require any additional time from you—you simply share with us the {language} content you already upload to social media.",
-      ko: "✅ Candid는 추가 시간이 전혀 들지 않아요. 이미 소셜 미디어에 올리고 계신 {language} 콘텐츠를 저희와 공유해 주시기만 하면 돼요.",
+      en: "✅ **Candid doesn’t require any additional time from you**—you simply share with us the {language} content you already upload to social media.",
+      ko: "✅ **Candid는 추가 시간이 전혀 들지 않아요.** 이미 소셜 미디어에 올리고 계신 {language} 콘텐츠를 저희와 공유해 주시기만 하면 돼요.",
     },
     {
-      en: "⏱️ Candid helps you save time through the video editing tools we’ve built. They have saved our creators as much as 1 hour of editing per video. You’ll get free access to these.",
-      ko: "⏱️ 저희가 만든 영상 편집 도구로 시간을 아낄 수 있어요. 영상 하나당 편집 시간을 최대 1시간까지 줄인 크리에이터도 있어요. 이 도구들은 무료로 이용하실 수 있어요.",
+      en: "⏱️ **Candid saves you time** through the video editing tools we’ve built. They have saved our creators as much as 1 hour of editing per video. You’ll get free access to these.",
+      ko: "⏱️ **Candid로 시간을 아낄 수 있어요.** 저희가 만든 영상 편집 도구 덕분이에요. 영상 하나당 편집 시간을 최대 1시간까지 줄인 크리에이터도 있어요. 이 도구들은 무료로 이용하실 수 있어요.",
     },
   ],
 
