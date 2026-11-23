@@ -15,12 +15,16 @@ export const CREATOR_INVITE_COPY = {
     ko: "Candid 크리에이터로 초대합니다",
   },
   headline: {
-    en: "{name}, you’re invited to be a Candid creator",
-    ko: "{name}님, Candid 크리에이터로 초대합니다",
+    en: "Dear {name},",
+    ko: "{name}님께,",
+  },
+  invited: {
+    en: "You’re invited to be a Candid creator.",
+    ko: "Candid 크리에이터로 초대합니다.",
   },
   intro: {
-    en: "Candid helps you make money through the {language} content you already create by turning it into a daily {language} learning app for your followers.",
-    ko: "Candid는 이미 만들고 계신 {language} 콘텐츠를 팔로워들이 매일 공부하는 {language} 학습 앱으로 바꿔, 크리에이터님이 수익을 낼 수 있도록 도와드려요.",
+    en: "Candid helps you make money through your {language} content by turning it into a daily {language} learning app for your followers.",
+    ko: "Candid는 크리에이터님의 {language} 콘텐츠를 팔로워들이 매일 공부하는 {language} 학습 앱으로 바꿔, 수익을 낼 수 있도록 도와드려요.",
   },
 
   what_candid_is: { en: "⭐️ What Candid is", ko: "⭐️ Candid란?" },
