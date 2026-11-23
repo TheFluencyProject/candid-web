@@ -112,7 +112,7 @@ const LOCALE_PREFIX = new RegExp(`^/(${routing.locales.join("|")})(?=/|$)`);
 // above; api/_next/videos/lesson/g are excluded by the matcher.
 const RESERVED_USERNAME_PATHS = new Set([
   "classic", "company-info", "privacy", "terms", "tutor", "youtube-videos",
-  "download", "g", "lesson", "qr", "teach", "videos", ...routing.locales,
+  "download", "g", "invite", "lesson", "qr", "teach", "videos", ...routing.locales,
 ]);
 
 // Routes that render their own <html> and are excluded from the intl matcher below, but still

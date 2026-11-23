@@ -72,6 +72,27 @@ export async function fetchTutor(
   return res.json();
 }
 
+// ── Creator invite page (joincandid.co/invite/{username}) ───────────
+
+export interface CreatorInvite {
+  name: string;
+  teaching_language: string;
+}
+
+// null = no invite (unknown username, or the creator already signed their agreement).
+// revalidate 60 matches the API's s-maxage, so signing turns the page off within ~1 minute.
+export async function fetchCreatorInvite(username: string): Promise<CreatorInvite | null> {
+  const res = await fetch(
+    `${API_BASE_URL}/public/creator-invites/${encodeURIComponent(username)}`,
+    { next: { revalidate: 60 }, signal: AbortSignal.timeout(8000) }
+  );
+  if (res.status === 404) return null;
+  if (!res.ok) {
+    throw new Error(`fetchCreatorInvite(${username}): HTTP ${res.status}`);
+  }
+  return res.json();
+}
+
 // ── Public lessons (share page + home lessons ladder) ───────────────
 
 export interface LessonMeta {
