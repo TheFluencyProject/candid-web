@@ -14,6 +14,10 @@ export const CREATOR_INVITE_COPY = {
     en: "You’re invited to be a Candid creator",
     ko: "Candid 크리에이터로 초대합니다",
   },
+  og_title: {
+    en: "{name}, you’re invited",
+    ko: "{name}님, 초대합니다",
+  },
   headline: {
     en: "Dear {name},",
     ko: "{name}님께,",
