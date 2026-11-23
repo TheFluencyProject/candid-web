@@ -23,8 +23,8 @@ export const CREATOR_INVITE_COPY = {
     ko: "{name}님께,",
   },
   invited: {
-    en: "You’re invited to be a creator on Candid.",
-    ko: "Candid의 크리에이터로 초대합니다.",
+    en: "You’re invited to be an early creator on Candid.",
+    ko: "Candid의 초기 크리에이터로 초대합니다.",
   },
   intro: {
     en: "Candid helps you make money through your {language} content by making it part of a daily {language} learning app for your followers.",
