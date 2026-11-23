@@ -27,7 +27,7 @@ export const CREATOR_INVITE_COPY = {
     ko: "Candid는 크리에이터님의 {language} 콘텐츠를 팔로워들이 매일 공부하는 {language} 학습 앱에 담아, 수익을 낼 수 있도록 도와드려요.",
   },
 
-  what_candid_is: { en: "⭐️ What Candid is", ko: "⭐️ Candid란?" },
+  what_candid_is: { en: "⭐️ How Candid works", ko: "⭐️ Candid란?" },
 
   for_you: { en: "For you", ko: "크리에이터님께" },
   for_you_items: [
