@@ -101,8 +101,8 @@ export const CREATOR_INVITE_COPY = {
     ko: "그 외에는 최소 업로드 횟수 같은 추가 조건이 전혀 없어요. Candid는 크리에이터님을 위한 도구라서, 많이 활용하실수록 더 많은 혜택을 누리실 수 있어요.",
   },
   our_team: {
-    en: "Our team will spend all our time improving the app & website, iterating on pricing, building new features, etc to create a great language learning experience for students & help us all earn more money.",
-    ko: "저희 팀은 앱과 웹사이트 개선, 가격 조정, 새로운 기능 개발 등에 모든 시간을 쏟아, 학생들에게 훌륭한 언어 학습 경험을 만들고 모두가 더 많은 수익을 낼 수 있도록 할 거예요.",
+    en: "We handle the rest. Our team will keep improving the app with new features, smoother onboarding, bug fixes, and more, so students have a great experience. You get the benefit of all of it, and can simply focus on creating great content.",
+    ko: "나머지는 저희가 맡을게요. 저희 팀은 새로운 기능, 더 매끄러운 온보딩, 버그 수정 등으로 학생들이 즐겁게 공부할 수 있도록 앱을 계속 발전시킬 거예요. 크리에이터님은 그 혜택을 모두 누리시면서, 좋은 콘텐츠를 만드는 데만 집중하시면 돼요.",
   },
 
   how_you_make_money: { en: "💰 How you make money", ko: "💰 수익을 얻는 방법" },
