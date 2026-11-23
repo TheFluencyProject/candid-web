@@ -56,20 +56,20 @@ export const CREATOR_INVITE_COPY = {
   },
   for_students_items: [
     {
-      en: "🌌 Brings together {language} content not just from you, but from many creators",
-      ko: "🌌 크리에이터님뿐만 아니라 여러 크리에이터의 {language} 콘텐츠를 한곳에 모아요",
+      en: "🌌 Brings together {language} content not just from you, but also from a variety of other creators",
+      ko: "🌌 크리에이터님뿐만 아니라 다양한 다른 크리에이터의 {language} 콘텐츠도 한곳에 모아요",
     },
     {
       en: "💪 Splits videos into structured, shorter lessons for a daily 10 minute habit",
       ko: "💪 영상을 짧고 체계적인 레슨으로 나눠, 매일 10분 공부하는 습관을 만들어 줘요",
     },
     {
-      en: "📝 Includes many great language learning features, such as: shadowing practice, vocab review, looking up & saving words, listening in the background",
+      en: "📝 Includes many helpful language learning features, such as: shadowing practice, vocab review, looking up & saving words, listening in the background",
       ko: "📝 섀도잉 연습, 단어 복습, 단어 찾기와 저장, 백그라운드 듣기 같은 유용한 언어 학습 기능이 많아요",
     },
     {
-      en: "😄 Brings together a variety of fun gamified features, like streaks, widgets, & stickers",
-      ko: "😄 스트릭, 위젯, 스티커 같은 재미있는 게임 요소가 다양하게 있어요",
+      en: "😄 Makes learning more fun with gamified features like streaks, widgets, & stickers",
+      ko: "😄 스트릭, 위젯, 스티커 같은 게임 요소로 공부를 더 재미있게 만들어 줘요",
     },
   ],
   feedback_intro: {
@@ -81,7 +81,7 @@ export const CREATOR_INVITE_COPY = {
     ko: "앱은 여기에서 체험해 보실 수 있어요: {app_link}",
   },
 
-  what_youll_do: { en: "📋 What you’ll do", ko: "📋 크리에이터님이 하실 일" },
+  what_youll_do: { en: "📋 How you’d contribute", ko: "📋 크리에이터님의 참여 방법" },
   what_youll_do_intro: {
     en: "We’ve intentionally made Candid as simple & flexible as possible for you.",
     ko: "Candid는 크리에이터님이 최대한 간단하고 유연하게 쓰실 수 있도록 의도적으로 설계했어요.",
