@@ -40,7 +40,7 @@ export function siteLocaleForTag(tag: string): Locale | null {
 }
 
 const LANG_NAMES: Partial<Record<Locale, Record<string, string>>> = {
-  ko: { english: "영어", korean: "한국어" },
+  ko: { english: "영어", korean: "한국어", chinese: "중국어" },
   ja: { english: "英語", korean: "韓国語" },
   zh: { english: "英语", korean: "韩语" },
   "zh-Hant": { english: "英語", korean: "韓語" },
