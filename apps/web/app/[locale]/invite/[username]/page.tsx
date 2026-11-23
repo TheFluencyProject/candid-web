@@ -22,12 +22,29 @@ type Props = {
 // Personal pitch page for one creator, live only until they sign their agreement (the API 404s
 // after that). English + Korean copy; every other locale falls back to English.
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { locale } = await params;
-  return {
+  const { locale, username } = await params;
+  const base: Metadata = {
     title: `Candid | ${pick(COPY.meta_title, locale)}`,
     // Personal pages must not show up in search.
     robots: { index: false, follow: false },
   };
+  const invite = await fetchCreatorInvite(username);
+  if (!invite) return base;
+
+  // Link preview (iMessage, Instagram DMs, …): "Kelly, you’re invited" over the Candid logo on navy.
+  const title = pick(COPY.og_title, locale).replace("{name}", capitalize_first(invite.name));
+  const description = pick(COPY.invited, locale);
+  const image = { url: "https://joincandid.co/creator-invite/og.png", width: 1200, height: 630, alt: "Candid" };
+  return {
+    ...base,
+    openGraph: { type: "website", siteName: "Candid", title, description, images: [image] },
+    twitter: { card: "summary_large_image", title, description, images: [image.url] },
+  };
+}
+
+// Some names are stored lowercase ("kelly"); the page always shows "Kelly".
+function capitalize_first(name: string): string {
+  return name.charAt(0).toUpperCase() + name.slice(1);
 }
 
 function pick(copy: InviteCopy, locale: string): string {
@@ -65,8 +82,7 @@ export default async function CreatorInvitePage({ params }: Props) {
   const invite = await fetchCreatorInvite(username);
   if (!invite) notFound();
 
-  // Some names are stored lowercase ("kelly"); the page always shows "Kelly".
-  const name = invite.name.charAt(0).toUpperCase() + invite.name.slice(1);
+  const name = capitalize_first(invite.name);
   const vars = { name, language: localizeLanguageName(invite.teaching_language, locale) };
   const t = (copy: InviteCopy) => render(pick(copy, locale), vars);
   const partners = CREATOR_INVITE_PARTNERS[invite.teaching_language];
