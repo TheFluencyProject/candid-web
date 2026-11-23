@@ -56,15 +56,15 @@ export const CREATOR_INVITE_COPY = {
   },
   for_students_items: [
     {
-      en: "🌌 Brings together {language} content not just from you, but from many creators",
-      ko: "🌌 크리에이터님뿐만 아니라 여러 크리에이터의 {language} 콘텐츠를 한곳에 모아요",
+      en: "🌌 Brings together {language} content not just from you, but also from a variety of other creators",
+      ko: "🌌 크리에이터님뿐만 아니라 다양한 다른 크리에이터의 {language} 콘텐츠도 한곳에 모아요",
     },
     {
       en: "💪 Splits videos into structured, shorter lessons for a daily 10 minute habit",
       ko: "💪 영상을 짧고 체계적인 레슨으로 나눠, 매일 10분 공부하는 습관을 만들어 줘요",
     },
     {
-      en: "📝 Includes many great language learning features, such as: shadowing practice, vocab review, looking up & saving words, listening in the background",
+      en: "📝 Includes many helpful language learning features, such as: shadowing practice, vocab review, looking up & saving words, listening in the background",
       ko: "📝 섀도잉 연습, 단어 복습, 단어 찾기와 저장, 백그라운드 듣기 같은 유용한 언어 학습 기능이 많아요",
     },
     {
