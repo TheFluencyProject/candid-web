@@ -83,8 +83,8 @@ export const CREATOR_INVITE_COPY = {
 
   what_youll_do: { en: "📋 What you’ll do", ko: "📋 크리에이터님이 하실 일" },
   what_youll_do_intro: {
-    en: "We’ve intentionally made Candid as simple & flexible as possible for you.",
-    ko: "Candid는 크리에이터님이 최대한 간단하고 유연하게 쓰실 수 있도록 의도적으로 설계했어요.",
+    en: "We’ve made Candid as simple & flexible as possible for you.",
+    ko: "Candid는 크리에이터님이 최대한 간단하고 유연하게 쓰실 수 있도록 만들었어요.",
   },
   what_youll_do_items: [
     {

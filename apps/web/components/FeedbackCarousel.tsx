@@ -8,10 +8,11 @@ type Slide = { src: string; width: number; height: number; alt: string };
 const CARD_HEIGHT = 288;
 const EDGE = "max(24px, calc((100vw - 720px) / 2 + 24px))";
 
-// A row of screenshots you swipe through, like an App Store screenshot row: the next card always
-// peeks in from the right. The row breaks out of the text column to span the whole screen, with
-// its first card lined up with the text. Touch and trackpad use native scroll + snap; a mouse can drag the row,
-// and clicking a card that's partly off-screen scrolls it into view.
+// A row of screenshots you swipe through, like an App Store screenshot row. Cards are at most 72% of
+// the screen on phones, so a good chunk of the next one always peeks in from the right. The row
+// breaks out of the text column to span the whole screen, with its first card lined up with the text.
+// Touch and trackpad use native scroll + snap; a mouse can drag the row, and clicking a card that's
+// partly off-screen scrolls it into view.
 export default function FeedbackCarousel({ slides }: { slides: Slide[] }) {
   // The track is `relative`, so each card's offsetLeft is measured from the track's edge.
   const trackRef = useRef<HTMLDivElement>(null);
@@ -81,8 +82,8 @@ export default function FeedbackCarousel({ slides }: { slides: Slide[] }) {
         <div
           key={s.src}
           onClick={(e) => snap_to(e.currentTarget)}
-          className="shrink-0 snap-start overflow-hidden rounded-xl bg-black/30"
-          style={{ aspectRatio: `${s.width} / ${s.height}`, width: `min(85vw, ${Math.round((s.width / s.height) * CARD_HEIGHT)}px)` }}
+          className="shrink-0 snap-start overflow-hidden rounded-xl bg-black/30 ring-1 ring-inset ring-white/15"
+          style={{ aspectRatio: `${s.width} / ${s.height}`, width: `min(72vw, ${Math.round((s.width / s.height) * CARD_HEIGHT)}px)` }}
         >
           <Image
             src={s.src}
@@ -90,7 +91,7 @@ export default function FeedbackCarousel({ slides }: { slides: Slide[] }) {
             width={s.width}
             height={s.height}
             draggable={false}
-            sizes="(min-width: 768px) 700px, 85vw"
+            sizes="(min-width: 768px) 700px, 72vw"
             className="h-full w-full object-cover"
           />
         </div>
