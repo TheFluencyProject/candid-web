@@ -68,8 +68,8 @@ export const CREATOR_INVITE_COPY = {
       ko: "📝 섀도잉 연습, 단어 복습, 단어 찾기와 저장, 백그라운드 듣기 같은 유용한 언어 학습 기능이 많아요",
     },
     {
-      en: "😄 Brings together a variety of fun gamified features, like streaks, widgets, & stickers",
-      ko: "😄 스트릭, 위젯, 스티커 같은 재미있는 게임 요소가 다양하게 있어요",
+      en: "😄 Makes learning more fun with gamified features like streaks, widgets, & stickers",
+      ko: "😄 스트릭, 위젯, 스티커 같은 게임 요소로 공부를 더 재미있게 만들어 줘요",
     },
   ],
   feedback_intro: {
