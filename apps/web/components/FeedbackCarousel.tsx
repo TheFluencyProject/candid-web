@@ -1,64 +1,96 @@
 "use client";
 
 import Image from "next/image";
-import { useRef, useState } from "react";
+import { useRef } from "react";
 
 type Slide = { src: string; width: number; height: number; alt: string };
 
-// One screenshot per view. Native horizontal scroll + CSS scroll-snap, so touch swipe needs no
-// library; dots show and jump to the current card, arrows (lg+ only, where the page padding fits them) step one card.
-export default function FeedbackCarousel({ slides }: { slides: Slide[] }) {
-  const trackRef = useRef<HTMLDivElement>(null);
-  const [index, setIndex] = useState(0);
+const CARD_HEIGHT = 288;
 
-  const go_to = (i: number) => {
+// A row of screenshots you swipe through, like an App Store screenshot row: the next card always
+// peeks in from the right. Touch and trackpad use native scroll + snap; a mouse can drag the row,
+// and clicking a card that's partly off-screen scrolls it into view.
+export default function FeedbackCarousel({ slides }: { slides: Slide[] }) {
+  // The track is `relative`, so each card's offsetLeft is measured from the track's edge.
+  const trackRef = useRef<HTMLDivElement>(null);
+  const drag = useRef<{ x: number; left: number; moved: boolean } | null>(null);
+
+  const snap_to = (card: HTMLElement) => {
     const track = trackRef.current;
     if (!track) return;
-    const clamped = Math.max(0, Math.min(slides.length - 1, i));
-    track.scrollTo({ left: clamped * track.clientWidth, behavior: "smooth" });
+    const pad = parseFloat(getComputedStyle(track).paddingLeft) || 0;
+    track.scrollTo({ left: card.offsetLeft - pad, behavior: "smooth" });
   };
 
-  const on_scroll = () => {
+  const nearest_card = () => {
     const track = trackRef.current;
-    if (!track || track.clientWidth === 0) return;
-    setIndex(Math.round(track.scrollLeft / track.clientWidth));
+    if (!track) return null;
+    const pad = parseFloat(getComputedStyle(track).paddingLeft) || 0;
+    const cards = Array.from(track.children) as HTMLElement[];
+    return cards.reduce((best, c) =>
+      Math.abs(c.offsetLeft - pad - track.scrollLeft) < Math.abs(best.offsetLeft - pad - track.scrollLeft) ? c : best,
+    );
   };
 
-  const arrow = "hidden lg:flex absolute top-1/2 -translate-y-1/2 h-10 w-10 items-center justify-center rounded-full bg-white/10 text-white text-xl hover:bg-white/20 transition-colors disabled:opacity-0";
+  const on_pointer_down = (e: React.PointerEvent) => {
+    if (e.pointerType !== "mouse" || !trackRef.current) return;
+    drag.current = { x: e.clientX, left: trackRef.current.scrollLeft, moved: false };
+  };
+
+  const on_pointer_move = (e: React.PointerEvent) => {
+    const track = trackRef.current;
+    const d = drag.current;
+    if (!d || !track) return;
+    const dx = e.clientX - d.x;
+    if (!d.moved && Math.abs(dx) < 5) return;
+    if (!d.moved) {
+      d.moved = true;
+      track.style.scrollSnapType = "none";
+      track.setPointerCapture(e.pointerId);
+    }
+    track.scrollLeft = d.left - dx;
+  };
+
+  const end_drag = () => {
+    const track = trackRef.current;
+    const d = drag.current;
+    drag.current = null;
+    if (!d?.moved || !track) return;
+    const card = nearest_card();
+    if (card) snap_to(card);
+    // Turn snap back on once the smooth scroll has settled.
+    setTimeout(() => { track.style.scrollSnapType = ""; }, 400);
+    // Swallow the click that follows a drag.
+    track.addEventListener("click", (ev) => ev.stopPropagation(), { capture: true, once: true });
+  };
 
   return (
-    <div className="my-6">
-      <div className="relative">
+    <div
+      ref={trackRef}
+      onPointerDown={on_pointer_down}
+      onPointerMove={on_pointer_move}
+      onPointerUp={end_drag}
+      onPointerCancel={end_drag}
+      className="relative -mx-6 my-2 flex items-start gap-3 overflow-x-auto snap-x snap-mandatory scroll-px-6 px-6 pb-1 cursor-grab active:cursor-grabbing select-none [scrollbar-width:none] [&::-webkit-scrollbar]:hidden md:mx-0 md:scroll-px-0 md:px-0"
+    >
+      {slides.map((s) => (
         <div
-          ref={trackRef}
-          onScroll={on_scroll}
-          className="flex overflow-x-auto snap-x snap-mandatory rounded-2xl [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+          key={s.src}
+          onClick={(e) => snap_to(e.currentTarget)}
+          className="shrink-0 snap-start overflow-hidden rounded-xl bg-black/30"
+          style={{ aspectRatio: `${s.width} / ${s.height}`, width: `min(85%, ${Math.round((s.width / s.height) * CARD_HEIGHT)}px)` }}
         >
-          {slides.map((s) => (
-            <div key={s.src} className="w-full shrink-0 snap-center flex items-center justify-center bg-black/30">
-              <Image src={s.src} alt={s.alt} width={s.width} height={s.height} sizes="(min-width: 768px) 672px, 100vw" className="w-full h-auto" />
-            </div>
-          ))}
-        </div>
-        <button type="button" aria-label="Previous" onClick={() => go_to(index - 1)} disabled={index === 0} className={`${arrow} -left-14`}>
-          ‹
-        </button>
-        <button type="button" aria-label="Next" onClick={() => go_to(index + 1)} disabled={index === slides.length - 1} className={`${arrow} -right-14`}>
-          ›
-        </button>
-      </div>
-      <div className="mt-4 flex justify-center gap-2">
-        {slides.map((s, i) => (
-          <button
-            key={s.src}
-            type="button"
-            aria-label={`Show feedback ${i + 1}`}
-            aria-current={i === index}
-            onClick={() => go_to(i)}
-            className={`h-2 rounded-full transition-all ${i === index ? "w-6 bg-white" : "w-2 bg-white/30 hover:bg-white/50"}`}
+          <Image
+            src={s.src}
+            alt={s.alt}
+            width={s.width}
+            height={s.height}
+            draggable={false}
+            sizes="(min-width: 768px) 600px, 85vw"
+            className="h-full w-full object-cover"
           />
-        ))}
-      </div>
+        </div>
+      ))}
     </div>
   );
 }

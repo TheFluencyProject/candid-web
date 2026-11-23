@@ -4,7 +4,6 @@ import Image from "next/image";
 import { notFound } from "next/navigation";
 import { setRequestLocale } from "next-intl/server";
 import { Link } from "@/i18n/routing";
-import SiteFooter from "@/components/SiteFooter";
 import FeedbackCarousel from "@/components/FeedbackCarousel";
 import { fetchCreatorInvite } from "@/lib/api";
 import { localizeLanguageName } from "@/lib/i18n-helpers";
@@ -35,7 +34,11 @@ function pick(copy: InviteCopy, locale: string): string {
   return copy[locale as keyof InviteCopy] ?? copy.en;
 }
 
-const link_class = "text-white underline underline-offset-2 hover:opacity-80";
+// Notion-style link: same color as the text, faint underline.
+const link_class = "underline decoration-[rgba(240,239,237,0.35)] underline-offset-[3px] hover:decoration-[rgba(240,239,237,0.8)]";
+
+// Notion's own font stack.
+const NOTION_FONT = 'ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol"';
 
 // Fills {name}/{language} and turns {app_link}/{grace}/{didi} into links.
 function render(text: string, vars: { name: string; language: string }): ReactNode[] {
@@ -58,78 +61,79 @@ export default async function CreatorInvitePage({ params }: Props) {
   const invite = await fetchCreatorInvite(username);
   if (!invite) notFound();
 
-  const vars = { name: invite.name, language: localizeLanguageName(invite.teaching_language, locale) };
+  // Some names are stored lowercase ("kelly"); the page always shows "Kelly".
+  const name = invite.name.charAt(0).toUpperCase() + invite.name.slice(1);
+  const vars = { name, language: localizeLanguageName(invite.teaching_language, locale) };
   const t = (copy: InviteCopy) => render(pick(copy, locale), vars);
   const partners = CREATOR_INVITE_PARTNERS[invite.teaching_language];
 
-  const h2 = "text-2xl md:text-3xl font-light text-white mt-12 mb-5";
-  const h3 = "text-lg font-semibold text-white mt-6 mb-3";
-  const p = "text-gray-300 text-lg leading-relaxed mb-4";
-  const li = "text-gray-300 text-lg leading-relaxed pl-1";
+  // Sizes and spacing measured from a published Notion page (dark mode): title 40/700,
+  // heading 30/600, sub-heading 24/600, body 16 on a 24 line with 16 between paragraphs.
+  const h2 = "text-[30px] font-semibold leading-[1.3] mt-8 mb-1";
+  const h3 = "text-2xl font-semibold leading-[1.3] mt-6 mb-1";
+  const p = "text-base leading-6 py-2";
+  const list = "pl-6 py-1";
+  const li = "text-base leading-6 py-1 pl-1";
 
   return (
-    <div className="min-h-screen flex flex-col" style={{ backgroundColor: "#18181C" }}>
-      <main className="min-h-screen flex-1 px-8 py-10 md:px-12 lg:px-16">
-        <header className="mb-10">
-          <Link href="/" className="inline-block mb-8">
-            <Image
-              src="/wordmark-white.svg"
-              alt="Candid"
-              width={60}
-              height={30}
-              className="hover:opacity-80 transition-opacity"
-            />
-          </Link>
+    <div className="min-h-screen" style={{ backgroundColor: "#191919", color: "rgb(240, 239, 237)", fontFamily: NOTION_FONT }}>
+      <header className="px-6 pt-5 md:px-8">
+        <Link href="/" className="inline-block">
+          <Image
+            src="/wordmark-white.svg"
+            alt="Candid"
+            width={60}
+            height={30}
+            className="hover:opacity-80 transition-opacity"
+          />
+        </Link>
+      </header>
 
-          <h1 className="text-4xl md:text-5xl font-light text-white mb-6 [word-break:keep-all]">
-            {t(COPY.headline)}
-          </h1>
-        </header>
+      {/* Bottom padding lets the last lines scroll up to the middle of the screen. */}
+      <main className="mx-auto max-w-[720px] px-6 pt-16 pb-[45vh] md:pt-24 [word-break:keep-all]">
+        <h1 className="text-[32px] md:text-[40px] font-bold leading-[1.2] mb-4">{t(COPY.headline)}</h1>
 
-        <div className="max-w-2xl [word-break:keep-all]">
-          <p className={p}>{t(COPY.intro)}</p>
+        <p className={p}>{t(COPY.invited)}</p>
+        <p className={p}>{t(COPY.intro)}</p>
 
-          <h2 className={h2}>{t(COPY.what_candid_is)}</h2>
+        <h2 className={h2}>{t(COPY.what_candid_is)}</h2>
 
-          <h3 className={h3}>{t(COPY.for_you)}</h3>
-          <ol className="list-decimal pl-6 space-y-3 mb-4">
-            {COPY.for_you_items.map((item, i) => <li key={i} className={li}>{t(item)}</li>)}
-          </ol>
+        <h3 className={h3}>{t(COPY.for_you)}</h3>
+        <ol className={`list-decimal ${list}`}>
+          {COPY.for_you_items.map((item, i) => <li key={i} className={li}>{t(item)}</li>)}
+        </ol>
 
-          <h3 className={h3}>{t(COPY.for_students)}</h3>
-          <p className={p}>{t(COPY.for_students_intro)}</p>
-          <ol className="list-decimal pl-6 space-y-3 mb-6">
-            {COPY.for_students_items.map((item, i) => <li key={i} className={li}>{t(item)}</li>)}
-          </ol>
-          <p className={p}>{t(COPY.feedback_intro)}</p>
-          <FeedbackCarousel slides={CREATOR_INVITE_FEEDBACK} />
-          <p className={p}>{t(COPY.try_app)}</p>
+        <h3 className={h3}>{t(COPY.for_students)}</h3>
+        <p className={p}>{t(COPY.for_students_intro)}</p>
+        <ol className={`list-decimal ${list}`}>
+          {COPY.for_students_items.map((item, i) => <li key={i} className={li}>{t(item)}</li>)}
+        </ol>
+        <p className={p}>{t(COPY.feedback_intro)}</p>
+        <FeedbackCarousel slides={CREATOR_INVITE_FEEDBACK} />
+        <p className={p}>{t(COPY.try_app)}</p>
 
-          <h2 className={h2}>{t(COPY.what_youll_do)}</h2>
-          <p className={p}>{t(COPY.what_youll_do_intro)}</p>
-          <ol className="list-decimal pl-6 space-y-3 mb-6">
-            {COPY.what_youll_do_items.map((item, i) => <li key={i} className={li}>{t(item)}</li>)}
-          </ol>
-          <p className={p}>{t(COPY.no_requirements)}</p>
-          <p className={p}>{t(COPY.our_team)}</p>
+        <h2 className={h2}>{t(COPY.what_youll_do)}</h2>
+        <p className={p}>{t(COPY.what_youll_do_intro)}</p>
+        <ol className={`list-decimal ${list}`}>
+          {COPY.what_youll_do_items.map((item, i) => <li key={i} className={li}>{t(item)}</li>)}
+        </ol>
+        <p className={p}>{t(COPY.no_requirements)}</p>
+        <p className={p}>{t(COPY.our_team)}</p>
 
-          <h2 className={h2}>{t(COPY.how_you_make_money)}</h2>
-          <p className={p}>{t(COPY.revenue_share)}</p>
-          <p className={p}>{t(COPY.invited_students)}</p>
-          <p className={p}>{t(COPY.other_students)}</p>
+        <h2 className={h2}>{t(COPY.how_you_make_money)}</h2>
+        <p className={p}>{t(COPY.revenue_share)}</p>
+        <p className={p}>{t(COPY.invited_students)}</p>
+        <p className={p}>{t(COPY.other_students)}</p>
 
-          <h2 className={h2}>{t(COPY.faq)}</h2>
-          <ul className="list-disc pl-6 space-y-3 mb-4">
-            {COPY.faq_items.map((item, i) => <li key={i} className={li}>{t(item)}</li>)}
-          </ul>
+        <h2 className={h2}>{t(COPY.faq)}</h2>
+        <ul className={`list-disc ${list}`}>
+          {COPY.faq_items.map((item, i) => <li key={i} className={li}>{t(item)}</li>)}
+        </ul>
 
-          <h2 className={h2}>{t(COPY.youre_invited)}</h2>
-          {partners && <p className={p}>{t(partners)}</p>}
-          <p className={p}>{t(COPY.slowly_partner)}</p>
-        </div>
+        <h2 className={h2}>{t(COPY.youre_invited)}</h2>
+        {partners && <p className={p}>{t(partners)}</p>}
+        <p className={p}>{t(COPY.slowly_partner)}</p>
       </main>
-
-      <SiteFooter />
     </div>
   );
 }
