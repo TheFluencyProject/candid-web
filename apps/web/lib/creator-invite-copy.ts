@@ -23,8 +23,8 @@ export const CREATOR_INVITE_COPY = {
     ko: "{name}님께,",
   },
   invited: {
-    en: "You’re invited to be a creator on Candid.",
-    ko: "Candid의 크리에이터로 초대합니다.",
+    en: "You’re invited to be an early creator on Candid.",
+    ko: "Candid의 초기 크리에이터로 초대합니다.",
   },
   intro: {
     en: "Candid helps you make money through your {language} content by making it part of a daily {language} learning app for your followers.",
@@ -83,8 +83,8 @@ export const CREATOR_INVITE_COPY = {
 
   what_youll_do: { en: "📋 How you’d contribute", ko: "📋 크리에이터님의 참여 방법" },
   what_youll_do_intro: {
-    en: "We’ve intentionally made Candid as simple & flexible as possible for you.",
-    ko: "Candid는 크리에이터님이 최대한 간단하고 유연하게 쓰실 수 있도록 의도적으로 설계했어요.",
+    en: "We’ve made Candid as simple & flexible as possible for you.",
+    ko: "Candid는 크리에이터님이 최대한 간단하고 유연하게 쓰실 수 있도록 만들었어요.",
   },
   what_youll_do_items: [
     {
