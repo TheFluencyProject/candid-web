@@ -6,9 +6,11 @@ import { useRef } from "react";
 type Slide = { src: string; width: number; height: number; alt: string };
 
 const CARD_HEIGHT = 288;
+const EDGE = "max(24px, calc((100vw - 720px) / 2 + 24px))";
 
 // A row of screenshots you swipe through, like an App Store screenshot row: the next card always
-// peeks in from the right. Touch and trackpad use native scroll + snap; a mouse can drag the row,
+// peeks in from the right. The row breaks out of the text column to span the whole screen, with
+// its first card lined up with the text. Touch and trackpad use native scroll + snap; a mouse can drag the row,
 // and clicking a card that's partly off-screen scrolls it into view.
 export default function FeedbackCarousel({ slides }: { slides: Slide[] }) {
   // The track is `relative`, so each card's offsetLeft is measured from the track's edge.
@@ -71,14 +73,16 @@ export default function FeedbackCarousel({ slides }: { slides: Slide[] }) {
       onPointerMove={on_pointer_move}
       onPointerUp={end_drag}
       onPointerCancel={end_drag}
-      className="relative -mx-6 my-2 flex items-start gap-3 overflow-x-auto snap-x snap-mandatory scroll-px-6 px-6 pb-1 cursor-grab active:cursor-grabbing select-none [scrollbar-width:none] [&::-webkit-scrollbar]:hidden md:mx-0 md:scroll-px-0 md:px-0"
+      className="relative my-2 flex w-screen items-start gap-3 overflow-x-auto snap-x snap-mandatory pb-1 cursor-grab active:cursor-grabbing select-none [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+      // Full-bleed: centered on the screen; padding = where the 720px column's text starts.
+      style={{ marginLeft: "calc(50% - 50vw)", paddingInline: EDGE, scrollPaddingInline: EDGE }}
     >
       {slides.map((s) => (
         <div
           key={s.src}
           onClick={(e) => snap_to(e.currentTarget)}
           className="shrink-0 snap-start overflow-hidden rounded-xl bg-black/30"
-          style={{ aspectRatio: `${s.width} / ${s.height}`, width: `min(85%, ${Math.round((s.width / s.height) * CARD_HEIGHT)}px)` }}
+          style={{ aspectRatio: `${s.width} / ${s.height}`, width: `min(85vw, ${Math.round((s.width / s.height) * CARD_HEIGHT)}px)` }}
         >
           <Image
             src={s.src}
@@ -86,7 +90,7 @@ export default function FeedbackCarousel({ slides }: { slides: Slide[] }) {
             width={s.width}
             height={s.height}
             draggable={false}
-            sizes="(min-width: 768px) 600px, 85vw"
+            sizes="(min-width: 768px) 700px, 85vw"
             className="h-full w-full object-cover"
           />
         </div>

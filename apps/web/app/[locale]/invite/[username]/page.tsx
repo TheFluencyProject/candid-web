@@ -40,17 +40,21 @@ const link_class = "underline decoration-[rgba(240,239,237,0.35)] underline-offs
 // Notion's own font stack.
 const NOTION_FONT = 'ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol"';
 
-// Fills {name}/{language} and turns {app_link}/{grace}/{didi} into links.
+// Fills {name}/{language}, turns {app_link}/{grace}/{didi} into links and **text** into bold.
 function render(text: string, vars: { name: string; language: string }): ReactNode[] {
-  return text.split(/(\{\w+\})/).map((part, i) => {
-    const key = part.match(/^\{(\w+)\}$/)?.[1];
-    if (key === "name") return vars.name;
-    if (key === "language") return vars.language;
-    if (key && key in CREATOR_INVITE_LINKS) {
-      const l = CREATOR_INVITE_LINKS[key as keyof typeof CREATOR_INVITE_LINKS];
-      return <a key={i} href={l.href} target="_blank" rel="noopener noreferrer" className={link_class}>{l.label}</a>;
-    }
-    return part;
+  return text.split(/(\*\*[^*]+\*\*)/).map((chunk, c) => {
+    const bold = chunk.match(/^\*\*([^*]+)\*\*$/)?.[1];
+    if (bold !== undefined) return <strong key={c} className="font-semibold">{render(bold, vars)}</strong>;
+    return chunk.split(/(\{\w+\})/).map((part, i) => {
+      const key = part.match(/^\{(\w+)\}$/)?.[1];
+      if (key === "name") return vars.name;
+      if (key === "language") return vars.language;
+      if (key && key in CREATOR_INVITE_LINKS) {
+        const l = CREATOR_INVITE_LINKS[key as keyof typeof CREATOR_INVITE_LINKS];
+        return <a key={`${c}-${i}`} href={l.href} target="_blank" rel="noopener noreferrer" className={link_class}>{l.label}</a>;
+      }
+      return part;
+    });
   });
 }
 
@@ -67,16 +71,16 @@ export default async function CreatorInvitePage({ params }: Props) {
   const t = (copy: InviteCopy) => render(pick(copy, locale), vars);
   const partners = CREATOR_INVITE_PARTNERS[invite.teaching_language];
 
-  // Sizes and spacing measured from a published Notion page (dark mode): title 40/700,
-  // heading 30/600, sub-heading 24/600, body 16 on a 24 line with 16 between paragraphs.
-  const h2 = "text-[30px] font-semibold leading-[1.3] mt-8 mb-1";
+  // Sizes and spacing measured from a published Notion page (dark mode; background is the site's own #18181C): title 40/700,
+  // heading 30/600 (with extra room above, per Adam), sub-heading 24/600, body 16 on a 24 line with 16 between paragraphs.
+  const h2 = "text-[30px] font-semibold leading-[1.3] mt-14 mb-1";
   const h3 = "text-2xl font-semibold leading-[1.3] mt-6 mb-1";
   const p = "text-base leading-6 py-2";
   const list = "pl-6 py-1";
   const li = "text-base leading-6 py-1 pl-1";
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: "#191919", color: "rgb(240, 239, 237)", fontFamily: NOTION_FONT }}>
+    <div className="min-h-screen overflow-x-clip" style={{ backgroundColor: "#18181C", color: "rgb(240, 239, 237)", fontFamily: NOTION_FONT }}>
       <header className="px-6 pt-5 md:px-8">
         <Link href="/" className="inline-block">
           <Image
