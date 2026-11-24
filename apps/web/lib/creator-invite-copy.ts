@@ -164,8 +164,8 @@ export const CREATOR_INVITE_LINKS: Record<"app_link" | "grace" | "didi", { label
 
 // Same 4 screenshots in every language. Alt text quotes the highlighted line.
 export const CREATOR_INVITE_FEEDBACK = [
-  { src: "/creator-invite/feedback-1.webp", width: 1030, height: 518, alt: "Claire S: “I really like how it combines all aspects of the learning (speaking, reading, listening).”" },
   { src: "/creator-invite/feedback-2.webp", width: 1052, height: 650, alt: "Мадина О: “I just wanted to say that your app has become my favorite way to learn Korean.”" },
-  { src: "/creator-invite/feedback-3.webp", width: 1036, height: 430, alt: "moi m: “It’s been really good so far and really stands out compared to other language apps I’ve been using.”" },
   { src: "/creator-invite/feedback-4.webp", width: 1206, height: 809, alt: "Luke: “Recent features really make it feel like the best Korean learning app, feels better than Duolingo and memrise.”" },
+  { src: "/creator-invite/feedback-3.webp", width: 1036, height: 430, alt: "moi m: “It’s been really good so far and really stands out compared to other language apps I’ve been using.”" },
+  { src: "/creator-invite/feedback-1.webp", width: 1030, height: 518, alt: "Claire S: “I really like how it combines all aspects of the learning (speaking, reading, listening).”" },
 ];
