@@ -119,6 +119,11 @@ export const CREATOR_INVITE_COPY = {
     ko: "직접 초대하지 않은 학생에게서도 수익이 생겨요. 그 학생들의 구독료 중 더 작은 비율이, 학생이 누구의 콘텐츠로 공부했는지에 따라 Candid 크리에이터들에게 나눠 지급돼요.",
   },
 
+  early_creators: {
+    en: "As one of our early creators, you’ll earn a higher revenue share than creators who join later.",
+    ko: "초기 크리에이터 중 한 분으로서, 나중에 합류하는 크리에이터보다 더 높은 수익 배분을 받으시게 돼요.",
+  },
+
   faq: { en: "🤔 FAQ", ko: "🤔 자주 묻는 질문" },
   faq_items: [
     {
@@ -135,6 +140,10 @@ export const CREATOR_INVITE_COPY = {
   slowly_partner: {
     en: "We’re now looking to slowly partner with more creators, and we’d like to personally extend an invite to you.",
     ko: "이제 조금씩 더 많은 크리에이터와 함께하려고 해요. 그래서 크리에이터님을 직접 초대하고 싶어요.",
+  },
+  trial: {
+    en: "We’ll start with a trial period for a few months to make sure it’s a fit for both of us.",
+    ko: "처음 몇 달은 시범 기간으로 시작해서, 서로에게 잘 맞는지 확인해 보려고 해요.",
   },
 } satisfies Record<string, InviteCopy | InviteCopy[]>;
 
