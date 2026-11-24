@@ -77,7 +77,7 @@ export const CREATOR_INVITE_COPY = {
     ko: "앱은 여기에서 체험해 보실 수 있어요: {app_link}",
   },
 
-  what_youll_do: { en: "📋 How you’d contribute", ko: "📋 크리에이터님의 참여 방법" },
+  what_youll_do: { en: "📋 How you contribute", ko: "📋 크리에이터님의 참여 방법" },
   what_youll_do_intro: {
     en: "We’ve made Candid as simple & flexible as possible for you.",
     ko: "Candid는 크리에이터님이 최대한 간단하고 유연하게 쓰실 수 있도록 만들었어요.",
@@ -161,11 +161,11 @@ export const CREATOR_INVITE_ENGLISH = {
     { en: "We’re excited that Candid now fully supports English creators & learners as well. We’ve partnered with one of the top English creators, Jay Fujiwara ({jay}, 6M), and we’re now looking to slowly partner with more." },
     { en: "We’d like to personally extend an invite to you." },
   ],
-  try_app_title: { en: "📱 Trying out the app" },
+  try_app_title: { en: "📱 Try the app" },
   try_app: [
-    { en: "We’ve created a demo for you to see what your content would look like in the app. After you sign up and you’re asked which creator invited you, please search your name and select your profile. This is only a demo for you and won’t be visible to any other students in the app." },
     { en: "You can download & try the app out here: {app_link}" },
-    { en: "Note: we originally built Candid for Korean, so the Korean side of the app is more built out. Feel free to change your language to Korean within settings to see this side of the app as well." },
+    { en: "We’ve created a demo for you to see what your content would look like in the app. After you sign up and you’re asked which creator invited you, please search your name and select your profile. This is only a demo for you and won’t be visible to any other students in the app." },
+    { en: "Note: we originally built Candid for Korean, so the Korean side of the app is more built out. Feel free to switch to learning Korean later on within settings to see this side of the app as well." },
   ],
 } satisfies Record<string, InviteCopy | InviteCopy[]>;
 
