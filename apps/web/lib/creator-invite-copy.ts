@@ -152,10 +152,33 @@ export const CREATOR_INVITE_PARTNERS: Partial<Record<string, InviteCopy>> = {
   },
 };
 
-export const CREATOR_INVITE_LINKS: Record<"app_link" | "grace" | "didi", { label: string; href: string }> = {
+// English creators only (teaching_language = english), Adam's text (2026-11-24). English only: a
+// Korean-locale viewer sees these in English. `launch` replaces the closing "You're Invited"
+// paragraphs; `try_app` replaces the one-line `try_app` under the feedback screenshots.
+export const CREATOR_INVITE_ENGLISH = {
+  launch: [
+    { en: "We originally built Candid to support Korean creators & learners. We’ve partnered with the top Korean language creators, such as Grace Sooda ({grace}, 300k), Taehyun Woo ({taehyun}, 100k), and Didi ({didi_instagram}, 200k)." },
+    { en: "We’re excited that Candid now fully supports English creators & learners as well. We’ve partnered with one of the top English creators, Jay Fujiwara ({jay}, 6M), and we’re now looking to slowly partner with more." },
+    { en: "We’d like to personally extend an invite to you." },
+  ],
+  try_app_title: { en: "📱 Trying out the app" },
+  try_app: [
+    { en: "We’ve created a demo for you to see what your content would look like in the app. After you sign up and you’re asked which creator invited you, please search your name and select your profile. This is only a demo for you and won’t be visible to any other students in the app." },
+    { en: "You can download & try the app out here: {app_link}" },
+    { en: "Note: we originally built Candid for Korean, so the Korean side of the app is more built out. Feel free to change your language to Korean within settings to see this side of the app as well." },
+  ],
+} satisfies Record<string, InviteCopy | InviteCopy[]>;
+
+export const CREATOR_INVITE_LINKS: Record<
+  "app_link" | "grace" | "didi" | "didi_instagram" | "taehyun" | "jay",
+  { label: string; href: string }
+> = {
   app_link: { label: "joincandid.co/app", href: "https://joincandid.co/app" },
   grace: { label: "@gracesooda", href: "https://instagram.com/gracesooda" },
   didi: { label: "@didikoreanpodcast", href: "https://youtube.com/@didikoreanpodcast" },
+  didi_instagram: { label: "@didikoreanpodcast", href: "https://instagram.com/didikoreanpodcast" },
+  taehyun: { label: "@blue._.a", href: "https://instagram.com/blue._.a" },
+  jay: { label: "@jayfujiwara", href: "https://instagram.com/jayfujiwara" },
 };
 
 // Same 4 screenshots in every language. Alt text quotes the highlighted line.
