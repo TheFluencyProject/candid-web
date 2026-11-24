@@ -52,8 +52,8 @@ export const CREATOR_INVITE_COPY = {
   },
   for_students_items: [
     {
-      en: "🌌 Brings together {language} content not just from you, but also from a variety of other creators",
-      ko: "🌌 크리에이터님뿐만 아니라 다양한 다른 크리에이터의 {language} 콘텐츠도 한곳에 모아요",
+      en: "🌌 Brings together {language} content (vlogs, podcasts, etc) not just from you, but also from a variety of other creators",
+      ko: "🌌 크리에이터님뿐만 아니라 다양한 다른 크리에이터의 {language} 콘텐츠(브이로그, 팟캐스트 등)도 한곳에 모아요",
     },
     {
       en: "💪 Splits videos into structured, shorter lessons for a daily 10 minute habit",
