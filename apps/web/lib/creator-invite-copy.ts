@@ -26,18 +26,14 @@ export const CREATOR_INVITE_COPY = {
     en: "You’re invited to be an early creator on Candid.",
     ko: "Candid의 초기 크리에이터로 초대합니다.",
   },
-  intro: {
-    en: "Candid helps you make money through your {language} content by making it part of a daily {language} learning app for your followers.",
-    ko: "Candid는 크리에이터님의 {language} 콘텐츠를 팔로워들이 매일 공부하는 {language} 학습 앱에 담아, 수익을 낼 수 있도록 도와드려요.",
-  },
 
   what_candid_is: { en: "⭐️ How Candid works", ko: "⭐️ Candid란?" },
 
   for_you: { en: "For you", ko: "크리에이터님께" },
   for_you_items: [
     {
-      en: "💰 **Candid helps you earn money** by making your {language} content part of a language learning app which your followers can study with & pay for.",
-      ko: "💰 **Candid로 수익을 낼 수 있어요.** 크리에이터님의 {language} 콘텐츠를 팔로워들이 공부하고 결제하는 언어 학습 앱에 담아 드려요.",
+      en: "💰 **Candid helps you earn money** by making your {language} content part of a daily language learning app for your followers.",
+      ko: "💰 **Candid로 수익을 낼 수 있어요.** 크리에이터님의 {language} 콘텐츠를 팔로워들이 매일 공부하는 언어 학습 앱에 담아 드려요.",
     },
     {
       en: "✅ **Candid doesn’t require any additional time from you**—you simply share with us the {language} content you already upload to social media.",
@@ -51,8 +47,8 @@ export const CREATOR_INVITE_COPY = {
 
   for_students: { en: "For students", ko: "학생들에게" },
   for_students_intro: {
-    en: "Candid is the best way for your students to study with your content. Candid is valuable because it:",
-    ko: "Candid는 학생들이 크리에이터님의 콘텐츠로 공부하는 가장 좋은 방법이에요. Candid는 이런 점이 좋아요:",
+    en: "Candid is the best way for your followers to study with your content. Candid is valuable because it:",
+    ko: "Candid는 팔로워들이 크리에이터님의 콘텐츠로 공부하는 가장 좋은 방법이에요. Candid는 이런 점이 좋아요:",
   },
   for_students_items: [
     {
@@ -64,8 +60,8 @@ export const CREATOR_INVITE_COPY = {
       ko: "💪 영상을 짧고 체계적인 레슨으로 나눠, 매일 10분 공부하는 습관을 만들어 줘요",
     },
     {
-      en: "📝 Includes many helpful language learning features, such as: shadowing practice, vocab review, looking up & saving words, listening in the background",
-      ko: "📝 섀도잉 연습, 단어 복습, 단어 찾기와 저장, 백그라운드 듣기 같은 유용한 언어 학습 기능이 많아요",
+      en: "📝 Includes a variety of helpful language learning features, such as: shadowing practice, vocab review, looking up & saving words, listening in the background",
+      ko: "📝 섀도잉 연습, 단어 복습, 단어 찾기와 저장, 백그라운드 듣기 같은 다양한 언어 학습 기능이 있어요",
     },
     {
       en: "😄 Makes learning more fun with gamified features like streaks, widgets, & stickers",

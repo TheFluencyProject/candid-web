@@ -114,7 +114,6 @@ export default async function CreatorInvitePage({ params }: Props) {
         <h1 className="text-[32px] md:text-[40px] font-bold leading-[1.2] mb-4">{t(COPY.headline)}</h1>
 
         <p className={p}>{t(COPY.invited)}</p>
-        <p className={p}>{t(COPY.intro)}</p>
 
         <h2 className={h2}>{t(COPY.what_candid_is)}</h2>
 
