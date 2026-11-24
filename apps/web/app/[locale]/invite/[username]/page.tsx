@@ -9,6 +9,7 @@ import { fetchCreatorInvite } from "@/lib/api";
 import { localizeLanguageName } from "@/lib/i18n-helpers";
 import {
   CREATOR_INVITE_COPY as COPY,
+  CREATOR_INVITE_ENGLISH as ENGLISH,
   CREATOR_INVITE_FEEDBACK,
   CREATOR_INVITE_LINKS,
   CREATOR_INVITE_PARTNERS,
@@ -57,7 +58,7 @@ const link_class = "underline decoration-[rgba(240,239,237,0.35)] underline-offs
 // Notion's own font stack.
 const NOTION_FONT = 'ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol"';
 
-// Fills {name}/{language}, turns {app_link}/{grace}/{didi} into links and **text** into bold.
+// Fills {name}/{language}, turns {app_link}/{grace}/{didi}/… into links and **text** into bold.
 function render(text: string, vars: { name: string; language: string }): ReactNode[] {
   return text.split(/(\*\*[^*]+\*\*)/).map((chunk, c) => {
     const bold = chunk.match(/^\*\*([^*]+)\*\*$/)?.[1];
@@ -86,6 +87,7 @@ export default async function CreatorInvitePage({ params }: Props) {
   const vars = { name, language: localizeLanguageName(invite.teaching_language, locale) };
   const t = (copy: InviteCopy) => render(pick(copy, locale), vars);
   const partners = CREATOR_INVITE_PARTNERS[invite.teaching_language];
+  const english = invite.teaching_language === "english";
 
   // Sizes and spacing measured from a published Notion page (dark mode; background is the site's own #18181C): title 40/700,
   // heading 30/600 (with extra room above, per Adam), sub-heading 24/600, body 16 on a 24 line with 16 between paragraphs.
@@ -129,7 +131,14 @@ export default async function CreatorInvitePage({ params }: Props) {
         </ol>
         <p className={p}>{t(COPY.feedback_intro)}</p>
         <FeedbackCarousel slides={CREATOR_INVITE_FEEDBACK} />
-        <p className={p}>{t(COPY.try_app)}</p>
+        {english ? (
+          <div className="mt-4 rounded-xl px-5 py-4" style={{ backgroundColor: "rgba(255, 255, 255, 0.06)" }}>
+            <p className="text-base leading-6 font-semibold pb-1">{t(ENGLISH.try_app_title)}</p>
+            {ENGLISH.try_app.map((item, i) => <p key={i} className={p}>{t(item)}</p>)}
+          </div>
+        ) : (
+          <p className={p}>{t(COPY.try_app)}</p>
+        )}
 
         <h2 className={h2}>{t(COPY.what_youll_do)}</h2>
         <p className={p}>{t(COPY.what_youll_do_intro)}</p>
@@ -151,8 +160,14 @@ export default async function CreatorInvitePage({ params }: Props) {
         </ul>
 
         <h2 className={h2}>{t(COPY.youre_invited)}</h2>
-        {partners && <p className={p}>{t(partners)}</p>}
-        <p className={p}>{t(COPY.slowly_partner)}</p>
+        {english ? (
+          ENGLISH.launch.map((item, i) => <p key={i} className={p}>{t(item)}</p>)
+        ) : (
+          <>
+            {partners && <p className={p}>{t(partners)}</p>}
+            <p className={p}>{t(COPY.slowly_partner)}</p>
+          </>
+        )}
       </main>
     </div>
   );
