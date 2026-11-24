@@ -92,7 +92,7 @@ export default function FeedbackCarousel({ slides }: { slides: Slide[] }) {
             height={s.height}
             draggable={false}
             // Only 4 small screenshots: fetch them all with the page, so the next card is ready before
-            // it's swiped in (Safari lazy-loads off-screen cards in a scroller only once they're almost visible).
+            // it's swiped in (lazy-loaded, Firefox fetched an off-screen card only as it scrolled into view).
             loading="eager"
             sizes="(min-width: 768px) 700px, 72vw"
             className="h-full w-full object-cover"
