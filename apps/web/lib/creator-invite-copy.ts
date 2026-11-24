@@ -163,7 +163,7 @@ export const CREATOR_INVITE_ENGLISH = {
   ],
   try_app_title: { en: "📱 Try the app" },
   try_app: [
-    { en: "We’ve created a demo for you to see what your content would look like in the app." },
+    { en: "We’ve created a demo for you to see what your content would look like in Candid." },
     { en: "First, download the app {app_here}. When you’re asked which creator invited you, search your own name and select your profile. Note this is only a demo for you and won’t be visible to any other students in the app." },
     { en: "Note: we originally built Candid for Korean, so the Korean side of the app is more built out. Feel free to switch to learning Korean later on within settings to see this side of the app as well." },
   ],
