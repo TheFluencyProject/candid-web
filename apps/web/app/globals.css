@@ -507,9 +507,11 @@ html {
 .lpp-cur::before { content: ""; position: absolute; left: 0; top: 0; width: 70px; height: 76px; border-radius: 35px; background: var(--a); animation: lpp-halo 1.8s ease-out infinite; pointer-events: none; }
 @keyframes lpp-halo { from { transform: scale(1); opacity: .45; } to { transform: scale(1.45); opacity: 0; } }
 @media (prefers-reduced-motion: reduce) { .lpp-cur::before { animation: none; transform: scale(1.15); opacity: .2; } }
-/* Stickers never color in: #lpp-locked (LessonPagePath) maps them onto the page → coin-gray ramp. */
+/* Stickers never color in: luminance L → the page's #18181C (L 0) to the coins' #393436 (L 1), each channel within
+   4/255 (contrast(c) after brightness(b) = c·b·L + (1 − c) / 2). Filter functions, not an SVG url(#…): PostHog's
+   recorder rewrites url(#…) to the stylesheet's address, so replays drew the stickers in color (Adam 11/19). */
 .lpp-stk { position: absolute; transform: translate(-50%, -50%) rotate(var(--r)); pointer-events: none; }
-.lpp-stk img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; filter: url(#lpp-locked); }
+.lpp-stk img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; filter: grayscale(1) brightness(0.1419) contrast(0.8013); }
 /* The app's node bubble (ChapterRowBubble): glass card under the coin, arrow up at it, text left-aligned. */
 .lpp-bub { position: absolute; top: 88px; width: 300px; padding: 18px; border-radius: 22px; background: rgba(46,46,52,.94); -webkit-backdrop-filter: blur(20px); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,.08); box-shadow: 0 18px 40px rgba(0,0,0,.5); text-align: left; animation: lpp-pop .18s ease-out; }
 .lpp-bub::before { content: ""; position: absolute; top: -9px; left: var(--ax); width: 18px; height: 18px; background: rgba(46,46,52,.94); border-left: 1px solid rgba(255,255,255,.08); border-top: 1px solid rgba(255,255,255,.08); transform: translateX(-50%) rotate(45deg); border-top-left-radius: 4px; }
