@@ -158,8 +158,7 @@ export const CREATOR_INVITE_PARTNERS: Partial<Record<string, InviteCopy>> = {
 export const CREATOR_INVITE_ENGLISH = {
   launch: [
     { en: "We originally built Candid to support Korean creators & learners. We’ve partnered with the top Korean language creators, such as Grace Sooda ({grace}, 300k), Taehyun Woo ({taehyun}, 100k), and Didi ({didi_instagram}, 200k)." },
-    { en: "We’re excited that Candid now fully supports English creators & learners as well. We’ve partnered with one of the top English creators, Jay Fujiwara ({jay}, 6M), and we’re now looking to slowly partner with more." },
-    { en: "We’d like to personally extend an invite to you." },
+    { en: "We’re excited that Candid now fully supports English creators & learners as well. We’re now looking to partner with our first creators, and we’d like to personally extend an invite to you." },
   ],
   try_app_title: { en: "📱 Try the app" },
   try_app: [
@@ -170,7 +169,7 @@ export const CREATOR_INVITE_ENGLISH = {
 } satisfies Record<string, InviteCopy | InviteCopy[]>;
 
 export const CREATOR_INVITE_LINKS: Record<
-  "app_link" | "app_here" | "grace" | "didi" | "didi_instagram" | "taehyun" | "jay",
+  "app_link" | "app_here" | "grace" | "didi" | "didi_instagram" | "taehyun",
   { label: string; href: string }
 > = {
   app_link: { label: "joincandid.co/app", href: "https://joincandid.co/app" },
@@ -179,7 +178,6 @@ export const CREATOR_INVITE_LINKS: Record<
   didi: { label: "@didikoreanpodcast", href: "https://youtube.com/@didikoreanpodcast" },
   didi_instagram: { label: "@didikoreanpodcast", href: "https://instagram.com/didikoreanpodcast" },
   taehyun: { label: "@blue._.a", href: "https://instagram.com/blue._.a" },
-  jay: { label: "@jayfujiwara", href: "https://instagram.com/jayfujiwara" },
 };
 
 // Same 4 screenshots in every language. Alt text quotes the highlighted line.
