@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 type Slide = { src: string; width: number; height: number; alt: string };
 
@@ -17,6 +17,9 @@ export default function FeedbackCarousel({ slides }: { slides: Slide[] }) {
   // The track is `relative`, so each card's offsetLeft is measured from the track's edge.
   const trackRef = useRef<HTMLDivElement>(null);
   const drag = useRef<{ x: number; left: number; moved: boolean } | null>(null);
+  // Instagram-style dots under the row: which card is in front, and whether there's anything to swipe.
+  const [active, setActive] = useState(0);
+  const [scrollable, setScrollable] = useState(false);
 
   const snap_to = (card: HTMLElement) => {
     const track = trackRef.current;
@@ -34,6 +37,24 @@ export default function FeedbackCarousel({ slides }: { slides: Slide[] }) {
       Math.abs(c.offsetLeft - pad - track.scrollLeft) < Math.abs(best.offsetLeft - pad - track.scrollLeft) ? c : best,
     );
   };
+
+  // At the far right the last card can't reach the snap line, so the end of the scroll counts as the last card.
+  const update_active = () => {
+    const track = trackRef.current;
+    const card = nearest_card();
+    if (!track || !card) return;
+    const at_end = track.scrollLeft >= track.scrollWidth - track.clientWidth - 2;
+    setActive(at_end ? track.children.length - 1 : Array.from(track.children).indexOf(card));
+  };
+
+  useEffect(() => {
+    const track = trackRef.current;
+    if (!track) return;
+    const measure = () => setScrollable(track.scrollWidth > track.clientWidth + 1);
+    measure();
+    window.addEventListener("resize", measure);
+    return () => window.removeEventListener("resize", measure);
+  }, []);
 
   const on_pointer_down = (e: React.PointerEvent) => {
     if (e.pointerType !== "mouse" || !trackRef.current) return;
@@ -68,13 +89,15 @@ export default function FeedbackCarousel({ slides }: { slides: Slide[] }) {
   };
 
   return (
+    <>
     <div
       ref={trackRef}
+      onScroll={update_active}
       onPointerDown={on_pointer_down}
       onPointerMove={on_pointer_move}
       onPointerUp={end_drag}
       onPointerCancel={end_drag}
-      className="relative my-2 flex w-screen items-start gap-3 overflow-x-auto snap-x snap-mandatory pb-1 cursor-grab active:cursor-grabbing select-none [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+      className="relative mt-1 flex w-screen items-start gap-3 overflow-x-auto snap-x snap-mandatory pt-2 pb-5 cursor-grab active:cursor-grabbing select-none [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
       // Full-bleed: centered on the screen; padding = where the 720px column's text starts.
       style={{ marginLeft: "calc(50% - 50vw)", paddingInline: EDGE, scrollPaddingInline: EDGE }}
     >
@@ -82,7 +105,7 @@ export default function FeedbackCarousel({ slides }: { slides: Slide[] }) {
         <div
           key={s.src}
           onClick={(e) => snap_to(e.currentTarget)}
-          className="shrink-0 snap-start overflow-hidden rounded-xl bg-black/30 ring-1 ring-inset ring-white/15"
+          className="shrink-0 snap-start overflow-hidden rounded-xl bg-black/30 ring-1 ring-inset ring-white/15 shadow-[0_4px_14px_rgba(0,0,0,0.55)]"
           style={{ aspectRatio: `${s.width} / ${s.height}`, width: `min(72vw, ${Math.round((s.width / s.height) * CARD_HEIGHT)}px)` }}
         >
           <Image
@@ -100,5 +123,22 @@ export default function FeedbackCarousel({ slides }: { slides: Slide[] }) {
         </div>
       ))}
     </div>
+    {scrollable && (
+      <div className="-mt-2 mb-2 flex justify-center gap-1.5" aria-hidden>
+        {slides.map((s, i) => (
+          <button
+            key={s.src}
+            type="button"
+            tabIndex={-1}
+            onClick={() => {
+              const card = trackRef.current?.children[i];
+              if (card) snap_to(card as HTMLElement);
+            }}
+            className={`h-1.5 w-1.5 rounded-full transition-colors ${i === active ? "bg-white" : "bg-white/30"}`}
+          />
+        ))}
+      </div>
+    )}
+    </>
   );
 }
