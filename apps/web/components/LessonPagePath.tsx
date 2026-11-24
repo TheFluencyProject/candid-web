@@ -49,8 +49,8 @@ type Part = { title: string | null; seconds: number; rows: Row[]; xs: number[]; 
 const W = 440, ZIG = 86, COIN = 70, BOX = 153;
 const PITCH = 98; // row 70 + gap 28
 const GAP = 24; // clear space kept between a sticker and any coin, both ways
-// The bubble spans the path's column, a small inset each side, like Duolingo's (Adam 11/24).
-const BUBBLE_INSET = 12;
+// The bubble spans the path's column, inset each side like Duolingo's (Adam 11/24, option C).
+const BUBBLE_INSET = 38; // ≈32px on a phone, where the 440 path is scaled to the column
 // Desktop = lg, the page's (and DownloadQRInterceptor's) breakpoint.
 const DESKTOP_MIN_PX = 1024;
 
