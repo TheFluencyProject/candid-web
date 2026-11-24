@@ -154,7 +154,6 @@ export default async function CreatorInvitePage({ params }: Props) {
         <h2 className={h2}>{t(COPY.youre_invited)}</h2>
         {partners && <p className={p}>{t(partners)}</p>}
         <p className={p}>{t(COPY.slowly_partner)}</p>
-        <p className={p}>{t(COPY.trial)}</p>
       </main>
     </div>
   );

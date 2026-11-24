@@ -127,12 +127,16 @@ export const CREATOR_INVITE_COPY = {
   faq: { en: "🤔 FAQ", ko: "🤔 자주 묻는 질문" },
   faq_items: [
     {
-      en: "📄 You continue to own all the content you create; you simply allow Candid to use it in the app. At any point in time, for whatever reason, you may end our working relationship & remove your content from the app.",
-      ko: "📄 크리에이터님이 만든 모든 콘텐츠의 소유권은 계속 크리에이터님께 있어요. Candid가 앱에서 사용하도록 허락만 해 주시는 거예요. 언제든, 어떤 이유로든 협업을 끝내고 앱에서 콘텐츠를 내리실 수 있어요.",
+      en: "📄 You continue to own all the content you create; you simply allow Candid to use it in the app.",
+      ko: "📄 크리에이터님이 만든 모든 콘텐츠의 소유권은 계속 크리에이터님께 있어요. Candid가 앱에서 사용하도록 허락만 해 주시는 거예요.",
     },
     {
       en: "✅ Candid does not compete with any of your existing offers. You may continue to sell any other language learning products & services to your students on top of Candid.",
       ko: "✅ Candid는 크리에이터님의 기존 상품과 경쟁하지 않아요. Candid와 별개로 다른 언어 학습 상품이나 서비스도 계속 학생들에게 판매하실 수 있어요.",
+    },
+    {
+      en: "🤝 We’ll start with a trial period for a few months to make sure it’s a good fit for both of us. At any point in time, for whatever reason, you may choose to end our working relationship & remove your content from the app.",
+      ko: "🤝 처음 몇 달은 시범 기간으로 시작해서, 서로에게 잘 맞는지 확인해 보려고 해요. 언제든, 어떤 이유로든 협업을 끝내고 앱에서 콘텐츠를 내리실 수 있어요.",
     },
   ],
 
@@ -140,10 +144,6 @@ export const CREATOR_INVITE_COPY = {
   slowly_partner: {
     en: "We’re now looking to slowly partner with more creators, and we’d like to personally extend an invite to you.",
     ko: "이제 조금씩 더 많은 크리에이터와 함께하려고 해요. 그래서 크리에이터님을 직접 초대하고 싶어요.",
-  },
-  trial: {
-    en: "We’ll start with a trial period for a few months to make sure it’s a fit for both of us.",
-    ko: "처음 몇 달은 시범 기간으로 시작해서, 서로에게 잘 맞는지 확인해 보려고 해요.",
   },
 } satisfies Record<string, InviteCopy | InviteCopy[]>;
 
