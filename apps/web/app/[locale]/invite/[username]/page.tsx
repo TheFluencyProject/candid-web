@@ -144,6 +144,7 @@ export default async function CreatorInvitePage({ params }: Props) {
         <p className={p}>{t(COPY.revenue_share)}</p>
         <p className={p}>{t(COPY.invited_students)}</p>
         <p className={p}>{t(COPY.other_students)}</p>
+        <p className={p}>{t(COPY.early_creators)}</p>
 
         <h2 className={h2}>{t(COPY.faq)}</h2>
         <ul className={`list-disc ${list}`}>
@@ -153,6 +154,7 @@ export default async function CreatorInvitePage({ params }: Props) {
         <h2 className={h2}>{t(COPY.youre_invited)}</h2>
         {partners && <p className={p}>{t(partners)}</p>}
         <p className={p}>{t(COPY.slowly_partner)}</p>
+        <p className={p}>{t(COPY.trial)}</p>
       </main>
     </div>
   );
