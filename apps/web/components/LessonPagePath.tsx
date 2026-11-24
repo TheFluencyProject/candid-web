@@ -49,7 +49,8 @@ type Part = { title: string | null; seconds: number; rows: Row[]; xs: number[]; 
 const W = 440, ZIG = 86, COIN = 70, BOX = 153;
 const PITCH = 98; // row 70 + gap 28
 const GAP = 24; // clear space kept between a sticker and any coin, both ways
-const BUBBLE_W = 300;
+// The bubble spans the path's column, a small inset each side, like Duolingo's (Adam 11/24).
+const BUBBLE_INSET = 12;
 // Desktop = lg, the page's (and DownloadQRInterceptor's) breakpoint.
 const DESKTOP_MIN_PX = 1024;
 
@@ -137,9 +138,9 @@ function bubbleCopy(row: Row, part: Part, copy: LessonPathCopy): { head: string;
   switch (row.kind) {
     case "watch": {
       const s = Math.round(part.seconds);
-      // No title in the visitor's language: the app's own fallback header, "Watch".
+      // Always "Watch": the part's title already sits over its coins (Adam 11/24).
       return {
-        head: part.title ?? copy.watch,
+        head: copy.watch,
         sub: s > 0 ? <><i className="lpp-pl" />{`${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`}</> : null,
       };
     }
@@ -252,7 +253,6 @@ export default function LessonPagePath({ path, accent, copy, ctaLabel, ctaHref, 
               const cx = W / 2 + p.xs[k];
               const isOpen = open === r.g;
               const { head, sub } = bubbleCopy(r, p, copy);
-              const left = Math.max(0, Math.min(W - BUBBLE_W, cx - BUBBLE_W / 2));
               return (
                 <div key={r.g} className={`lpp-row${isOpen ? " lpp-open" : ""}`}>
                   {p.sticker?.row === k && (
@@ -284,7 +284,7 @@ export default function LessonPagePath({ path, accent, copy, ctaLabel, ctaHref, 
                     </span>
                   </button>
                   {isOpen && (
-                    <div className="lpp-bub" style={{ left, ["--ax" as string]: `${cx - left}px` }}>
+                    <div className="lpp-bub" style={{ left: BUBBLE_INSET, right: BUBBLE_INSET, ["--ax" as string]: `${cx - BUBBLE_INSET}px` }}>
                       <b>{head}</b>
                       {sub && <span>{sub}</span>}
                       {/* A /download link like every Study button: DownloadQRInterceptor tracks it and pops the QR on desktop. */}
