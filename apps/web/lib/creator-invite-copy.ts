@@ -163,17 +163,18 @@ export const CREATOR_INVITE_ENGLISH = {
   ],
   try_app_title: { en: "📱 Try the app" },
   try_app: [
-    { en: "You can download & try the app out here: {app_link}" },
-    { en: "We’ve created a demo for you to see what your content would look like in the app. After you sign up and you’re asked which creator invited you, please search your name and select your profile. This is only a demo for you and won’t be visible to any other students in the app." },
+    { en: "We’ve created a demo for you to see what your content would look like in the app." },
+    { en: "First, download the app {app_here}. When you’re asked which creator invited you, search your own name and select your profile. Note this is only a demo for you and won’t be visible to any other students in the app." },
     { en: "Note: we originally built Candid for Korean, so the Korean side of the app is more built out. Feel free to switch to learning Korean later on within settings to see this side of the app as well." },
   ],
 } satisfies Record<string, InviteCopy | InviteCopy[]>;
 
 export const CREATOR_INVITE_LINKS: Record<
-  "app_link" | "grace" | "didi" | "didi_instagram" | "taehyun" | "jay",
+  "app_link" | "app_here" | "grace" | "didi" | "didi_instagram" | "taehyun" | "jay",
   { label: string; href: string }
 > = {
   app_link: { label: "joincandid.co/app", href: "https://joincandid.co/app" },
+  app_here: { label: "here", href: "https://joincandid.co/app" },
   grace: { label: "@gracesooda", href: "https://instagram.com/gracesooda" },
   didi: { label: "@didikoreanpodcast", href: "https://youtube.com/@didikoreanpodcast" },
   didi_instagram: { label: "@didikoreanpodcast", href: "https://instagram.com/didikoreanpodcast" },
