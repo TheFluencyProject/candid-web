@@ -1,13 +1,13 @@
-import type { Tutor } from "@/lib/api";
+import type { TutorCard } from "@/lib/api";
 import DriftRow from "@/components/DriftRow";
 
-const handle_of = (t: Tutor) => t.instagram_handle || t.youtube_handle || t.tiktok_handle;
+const handle_of = (t: TutorCard) => t.instagram_handle || t.youtube_handle || t.tiktok_handle;
 
 // The people row under the hero (mockup C2, Adam 11/11–11/17): the Korean creators' faces drifting by,
 // 7:8 cards with the name over a bottom gradient. Never all tutors at once as a list or grid, no count:
 // just a row that keeps moving, and can be dragged or scrolled sideways (DriftRow). The group is rendered twice,
 // each carrying a trailing pr- equal to its gap so the loop has no seam. No hover pause, no reduced-motion opt-out.
-export default function TutorRoster({ title, subtitle, tutors }: { title: string; subtitle: string; tutors: Tutor[] }) {
+export default function TutorRoster({ title, subtitle, tutors }: { title: string; subtitle: string; tutors: TutorCard[] }) {
   if (tutors.length === 0) return null;
 
   const renderGroup = (duplicate: boolean) => (

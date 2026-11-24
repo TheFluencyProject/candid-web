@@ -72,6 +72,25 @@ export async function fetchTutor(
   return res.json();
 }
 
+// What the home people row and lessons ladder draw of a tutor.
+export type TutorCard = Pick<
+  Tutor,
+  "slug" | "name" | "profile_picture_url" | "large_profile_picture_url" | "instagram_handle" | "youtube_handle" | "tiktok_handle"
+>;
+
+/**
+ * Every public tutor of one language with a photo, newest first (GET /public/tutors, Adam 11/24).
+ * Throws on any non-OK response, so the caller can fall back (see LandingSections).
+ */
+export async function fetchTutors(teaching_language: string, locale: string): Promise<TutorCard[]> {
+  const res = await fetch(
+    `${API_BASE_URL}/public/tutors?teaching_language=${teaching_language}&locale=${locale}`,
+    { next: { revalidate: 300 }, signal: AbortSignal.timeout(8000) }
+  );
+  if (!res.ok) throw new Error(`fetchTutors(${teaching_language}, ${locale}): HTTP ${res.status}`);
+  return (await res.json()).tutors;
+}
+
 // ── Creator invite page (joincandid.co/invite/{username}) ───────────
 
 export interface CreatorInvite {

@@ -1,5 +1,5 @@
 import { getTranslations } from "next-intl/server";
-import { type LessonMeta, type Tutor, fetchLessonMeta } from "@/lib/api";
+import { type LessonMeta, type TutorCard, fetchLessonMeta } from "@/lib/api";
 import { cover_position_x } from "@/lib/clip-crop";
 import DownloadCta from "@/components/DownloadCta";
 
@@ -45,7 +45,7 @@ function thumb_position(l: LessonMeta): string {
 
 type Card = { lesson: LessonMeta; level: Level };
 
-function LessonCard({ lesson, level, tutor, label }: Card & { tutor: Tutor | undefined; label: string }) {
+function LessonCard({ lesson, level, tutor, label }: Card & { tutor: TutorCard | undefined; label: string }) {
   const avatar = tutor?.profile_picture_url;
   return (
     <div
@@ -74,7 +74,7 @@ function LessonCard({ lesson, level, tutor, label }: Card & { tutor: Tutor | und
   );
 }
 
-export default async function LessonLadder({ locale, tutors, ctaHref }: { locale: string; tutors: Tutor[]; ctaHref?: string }) {
+export default async function LessonLadder({ locale, tutors, ctaHref }: { locale: string; tutors: TutorCard[]; ctaHref?: string }) {
   const t = await getTranslations("home");
   // A failed fetch drops that card (a hiccup here shouldn't take the home page down with it).
   const cards = (
