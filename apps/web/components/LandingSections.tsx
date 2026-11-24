@@ -8,7 +8,7 @@ import ShadowDeck from "@/components/ShadowDeck";
 import InputPhone, { type InputPhoneClip } from "@/components/InputPhone";
 import { INPUT_CLIPS, DECK_SEED, text_in } from "@/lib/input-clips";
 import ReviewCards from "@/components/ReviewCards";
-import { type Tutor, type MarketingClip, type LessonMeta, fetchTutor, fetchMarketingClips, fetchLessonMeta } from "@/lib/api";
+import { type Tutor, type TutorCard, type MarketingClip, type LessonMeta, fetchTutor, fetchTutors, fetchMarketingClips, fetchLessonMeta } from "@/lib/api";
 import { cover_position_x } from "@/lib/clip-crop";
 
 // The home page's "about the app" sections, under its hero. Also rendered under the lesson share
@@ -23,19 +23,41 @@ function square_thumb_position(l: LessonMeta): string {
   return `50% ${Math.min(1, Math.max(0, (fy - visible / 2) / (1 - visible))) * 100}%`;
 }
 
-// The Korean creators in the people row under the hero (and the lessons ladder's avatars), in the
-// mockup's order. korean-jinnny is the real slug (three n's).
-const KOREAN_TUTOR_SLUGS = [
+// The people row under the hero (and the lessons ladder's avatars) shows every public Korean tutor
+// (Adam 11/24). These come first, in this order (Adam 11/24); everyone else follows, newest first.
+// korean-jinnny is the real slug (three n's).
+const PINNED_TUTOR_SLUGS = [
   "korean-mia",
-  "korean-hansoo",
-  "korean-grace",
-  "korean-sol",
+  "korean-didi",
   "korean-hayden",
+  "korean-grace",
   "korean-jinnny",
+  "korean-hansoo",
+  "korean-sol",
   "korean-ellie",
   "korean-tina",
-  "korean-didi",
 ];
+
+// Pinned first (in pinned order), the rest keep the API's newest-first order.
+function pinned_first(list: TutorCard[]): TutorCard[] {
+  const rank = (slug: string) => {
+    const i = PINNED_TUTOR_SLUGS.indexOf(slug);
+    return i === -1 ? PINNED_TUTOR_SLUGS.length : i;
+  };
+  return [...list].sort((a, b) => rank(a.slug) - rank(b.slug));
+}
+
+// The list endpoint, or — if it fails (e.g. not deployed yet) — the pinned tutors one by one as before.
+// Per-slug: a 404 drops out; a transient throw → Next serves the last cached render (see fetchTutor).
+async function load_korean_tutors(locale: string): Promise<TutorCard[]> {
+  try {
+    return pinned_first(await fetchTutors("korean", locale));
+  } catch {
+    return (await Promise.all(PINNED_TUTOR_SLUGS.map((slug) => fetchTutor(slug, locale)))).filter(
+      (t): t is Tutor => t !== null
+    );
+  }
+}
 
 // The path section's three real lessons (Didi, Hayden, Grace: Adam's picks 11/17), each in its own lesson accent
 // with one of its own stickers beside its indent coin (public/landing/path-<id>-{locked,accent}.webp, w × h).
@@ -107,11 +129,7 @@ export default async function LandingSections({ locale, clips, ctaHref }: Props)
   const tracking = locale === "ko" ? "" : "tracking-wide";
   const all_clips = clips ?? (await loadLandingClips(locale));
 
-  // Promise.all + filter(null): a 404 drops out; a transient throw → Next serves
-  // the last cached render (see fetchTutor) instead of a blank row.
-  const korean_tutors = (
-    await Promise.all(KOREAN_TUTOR_SLUGS.map((slug) => fetchTutor(slug, locale)))
-  ).filter((t): t is Tutor => t !== null);
+  const korean_tutors = await load_korean_tutors(locale);
 
   // Localized lesson titles; a failed fetch drops that lesson from the path, none left hides the section.
   const by_slug = new Map(korean_tutors.map((tu) => [tu.slug, tu]));
